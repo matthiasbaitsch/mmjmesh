@@ -1,0 +1,7 @@
+author: "Matthias Baitsch"
+project:
+  output-dir: _output
+format:
+  html: 
+    code-fold: true
+jupyter: julia-1.9
