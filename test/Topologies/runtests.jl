@@ -1,4 +1,4 @@
-module TopologyTests
+module TopologiesTests
 
 using Test
 
