@@ -1,7 +1,15 @@
 module MMJMesh
 
-include("Topologies/Topologies.jl")
+include("mmjbase/mmjbase.jl")
 
-include("Exports.jl")
+include("topologies/topologies.jl")
+
+include("geometries/geometries.jl")
+
+include("meshes/meshes.jl")
+
+include("utilities/utilities.jl")
+
+include("exports.jl")
 
 end

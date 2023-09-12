@@ -1,7 +1,9 @@
-module GridapRunTests
+module MMJMeshRunTests
 
 using Test
 
-@testset "Topologies" begin include("Topologies/runtests.jl") end
+@testset "Topologies" include("topologies/runtests.jl")
 
-end # module
+@testset "Geometries" include("geometries/runtests.jl")
+
+end
