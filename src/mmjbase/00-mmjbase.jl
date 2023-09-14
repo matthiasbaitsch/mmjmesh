@@ -1,12 +1,15 @@
 module MMJBase
 
+# Exports
+## functions.jl
 export atol
+## macros.jl
 export @abstractmethod
 export @notimplemented
 export @unreachable
 
-atol(Float64) = 1e-10
-
+# Parts
+include("functions.jl")
 include("macros.jl")
 
 end

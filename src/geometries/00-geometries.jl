@@ -1,19 +1,19 @@
 module Geometries
 
-
+# Exports
+## geometry.jl
 export Geometry
+## point.jl
+export Point
 export coordinates
 
-export Point
-
+# Modules needed by this module
 using StaticArrays
 using MMJMesh.MMJBase
 
-
-include("details.jl")
-
+# Parts
+include("detail.jl")
 include("point.jl")
-
 include("geometry.jl")
 
 end

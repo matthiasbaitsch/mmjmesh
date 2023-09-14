@@ -1,0 +1,36 @@
+---
+title: "Demo for mesh entities"
+---
+
+```{julia}
+using Pkg
+Pkg.activate(".")
+using MMJMesh.Meshes
+```
+
+# Basic usage
+
+```{julia}
+
+abstract type D3 end
+abstract type D2 <: D3 end
+abstract type D1 <: D2 end
+abstract type D0 <: D1 end
+
+struct ME{D <: D3}
+    m::Int
+    idx::Int
+end
+
+foo(m::ME{D0}) = println("bar 0")
+foo(m::ME{D}) where D1<:D<:D3 = println("bar 1,2,3")
+
+m0 = ME{D0}(10, 1)
+m1 = ME{D1}(10, 1)
+m2 = ME{D3}(10, 1)
+
+foo(m0)
+foo(m1)
+foo(m2)
+
+```

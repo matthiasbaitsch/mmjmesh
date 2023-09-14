@@ -1,0 +1,24 @@
+---
+title: "Demo for topology"
+---
+
+```{julia}
+using Pkg
+Pkg.activate(".")
+using MMJMesh.Topologies
+```
+
+
+# Example from documentation.
+
+```{julia}
+    m = Topology(2, 6)
+    addlinks!(m, 2, 0, [[1, 2, 5, 4], [2, 3, 6, 5]])
+
+    for d0 ∈ 0:2, d1 ∈ 0:2
+        links(m, d0, d1)
+    end
+
+    show(m, all=true)
+```
+

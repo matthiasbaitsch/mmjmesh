@@ -6,19 +6,36 @@ title: "Development sandbox"
 using Pkg
 Pkg.activate(".")
 using Revise
-using MMJMesh
-```
 
+using MMJMesh.Meshes
+using MMJMesh.Utilities
+using MMJMesh.Topologies
 
-```{julia}
-using Test
+m = makemeshonrectangle(9.0, 4.2, 11, 7)
 
-t = Topology(2, 6)
-addlinks!(t, 2, 0, [[1, 2, 5, 4], [5, 2, 3], [6, 5, 3]])
+nnodes(m::Mesh) = nentities(m.topology, 0)
+node(m::Mesh, idx::Int) = Node(m, idx)
+edge(m::Mesh, idx::Int) = Edge(m, idx)
+face(m::Mesh, idx::Int) = Face(m, idx)
+solid(m::Mesh, idx::Int) = Solid(m, idx)
 
-cl = links(t, 2, 2)
-@test length(cl) == 3
-@test cl[1] == [2]
-@test cl[2] == [1, 3]
-@test cl[3] == [2]
+f1 = edge(m, 2)
+
+dimension(f1)
+
+# links(f1, 1)
+# nnodes(m)
+
+pc = PlotMeshConfiguration()
+pc.nodes.visible = true
+pc.hidedecorations = true
+plotMesh(m, pc)
+
+# n = Node(m, 1)
+
+# nodes(n)
+
+# dimension(n)
+# nodeindexes(n)
+
 ```

@@ -9,8 +9,8 @@ end
 
 Point{D}(coords...) where D = Point{D}(coords)
 
-Point(a1::Real, a2::Real) = Point{2}(a1, a2)
-Point(a1::Real, a2::Real, a3::Real) = Point{3}(a1, a2, a3)
+Point(a1::Number, a2::Number) = Point{2}(a1, a2)
+Point(a1::Number, a2::Number, a3::Number) = Point{3}(a1, a2, a3)
 
 pdim(A::Point) = 0
 gdim(::Point{D}) where D = D
@@ -22,7 +22,7 @@ coordinates(A::Point) = A.coordinates
 Base.:(-)(A::Point, B::Point) = A.coordinates - B.coordinates
 Base.:(==)(A::Point, B::Point) = A.coordinates == B.coordinates
 Base.in(A::Point, B::Point) = A == B
-Base.isapprox(A::Point{D}, B::Point{D}; atol=atol(Float64), kwargs...) where D = isapprox(A.coords, B.coords; atol, kwargs...)
+Base.isapprox(A::Point{D}, B::Point{D}; atol=atol(Float64), kwargs...) where D = isapprox(A.coordinates, B.coordinates; atol, kwargs...)
 
 function Base.show(io::IO, point::Point)
     print(io, "Point$(Tuple(point.coordinates))")

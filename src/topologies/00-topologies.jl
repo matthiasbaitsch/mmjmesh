@@ -1,7 +1,11 @@
 module Topologies
 
-
-# Topology
+# Exports
+## ConnectivityList
+export ConnectivityList
+export inverse
+export maxlinksize
+## Topology
 export Topology
 export addlinks!
 export entity
@@ -9,18 +13,12 @@ export isanonymous
 export links
 export nentities
 
-# ConnectivityList
-export ConnectivityList
-export inverse
-export maxlinksize
-
+# Modules needed by this module
 using Printf
 
-
+# Parts
 include("connectivitylist.jl")
-
 include("topology.jl")
-
 include("entitytopologies.jl")
 
 end

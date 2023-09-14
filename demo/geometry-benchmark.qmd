@@ -1,0 +1,60 @@
+---
+title: "Development sandbox"
+---
+
+```{julia}
+using Pkg
+Pkg.activate(".")
+using Revise
+using MMJMesh
+using BenchmarkTools
+
+n = 10_000_000
+```
+
+# Version with vector of points (as in Meshes.jl)
+
+```{julia}
+struct Geometry2{D}
+    points::Vector{Point{D}}
+end
+point2(g::Geometry2, idx::Int) = g.points[idx]
+addpoint2!(g::Geometry2, p::Point) = push!(g.points, p)
+
+g = Geometry2{3}(Point{3}[])
+
+@time for _ in 1:n
+    addpoint2!(g, Point(rand(), rand(), rand()))
+end
+
+@benchmark begin
+    for _ in 1:100_000
+        a = point2(g, rand(1:n))
+    end
+end
+```
+
+# Our version
+
+```{julia}
+
+g = Geometry(3)
+@time for i in 1:n
+    push!(g, [rand(); rand(); rand()])
+end
+println("Number of points: ", length(g, 0))
+
+g = Geometry(3)
+@time for i in 1:n/2
+   push!(g, [rand() rand(); rand() rand(); rand() rand()])
+end
+println("Number of points: ", length(g, 0))
+
+@benchmark begin
+    for _ in 1:100_000
+        a = g[0, rand(1:n)]
+    end
+end
+```
+
+Constructing the point is not expensive

@@ -1,0 +1,34 @@
+---
+title: "Demo for connectivity list"
+---
+
+```{julia}
+using Pkg
+Pkg.activate(".")
+using MMJMesh.Topologies
+```
+
+# Basic usage
+
+Construct and add element
+
+```{julia}
+    cl = ConnectivityList([[4, 1, 9], [1, 4], [9, 8]])
+
+    println("Step 1\n", cl)
+    push!(cl, [9, 1, 11])
+    println("Step 2\n", cl)
+```
+
+Transpose
+
+```{julia}
+print(cl')
+```
+
+Inverse
+
+```{julia}
+display(inverse(cl))
+```
+
