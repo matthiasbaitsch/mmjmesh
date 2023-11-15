@@ -1,20 +1,27 @@
 ---
 title: "Development sandbox"
+execut:
+    echo: false
 ---
 
 ```{julia}
 using Pkg
 Pkg.activate(".")
-using Revise
-using MMJMesh
-using BenchmarkTools
 
+using Revise
+using BenchmarkTools
+using MMJMesh.Geometries
+
+# Number of points
 n = 10_000_000
 ```
 
-# Version with vector of points (as in Meshes.jl)
+# What is a fast way to store points
+
+## Version with vector of points (as in Meshes.jl)
 
 ```{julia}
+# Mimic the way Meshes.jl stores points
 struct Geometry2{D}
     points::Vector{Point{D}}
 end
@@ -23,38 +30,35 @@ addpoint2!(g::Geometry2, p::Point) = push!(g.points, p)
 
 g = Geometry2{3}(Point{3}[])
 
+println("\nMeshes.jl version")
+
+println("Adding $n points")
 @time for _ in 1:n
     addpoint2!(g, Point(rand(), rand(), rand()))
 end
 
-@benchmark begin
-    for _ in 1:100_000
-        a = point2(g, rand(1:n))
-    end
+println("Retrieving $n points")
+@time for _ in 1:n
+    a = point2(g, rand(1:n))
 end
 ```
 
-# Our version
+## Our version
 
 ```{julia}
+g = Geometry(3);
 
-g = Geometry(3)
+println("\nOur version")
+
+println("Adding $n points")
 @time for i in 1:n
     push!(g, [rand(); rand(); rand()])
 end
-println("Number of points: ", length(g, 0))
 
-g = Geometry(3)
-@time for i in 1:n/2
-   push!(g, [rand() rand(); rand() rand(); rand() rand()])
-end
-println("Number of points: ", length(g, 0))
-
-@benchmark begin
-    for _ in 1:100_000
-        a = g[0, rand(1:n)]
-    end
+println("Retrieving $n points")
+@time for _ in 1:n
+    a = g[0, rand(1:n)]
 end
 ```
 
-Constructing the point is not expensive
+Constructing the point is not that expensive

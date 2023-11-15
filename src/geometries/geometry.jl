@@ -31,7 +31,7 @@ Geometry(coordinates::Matrix) =
 
 Get number of geometric objects of dimension `d`.
 """
-function Base.length(g::Geometry{D}, d::Int) where D
+function Base.length(g::Geometry{D}, d::Int) where {D}
     @assert 0 <= d <= D
     if d == 0
         return g.points.n
@@ -45,7 +45,7 @@ end
 
 Get geometric object of dimension `d` at index `idx`.
 """
-function Base.getindex(g::Geometry{D}, d::Int, idx::Int) where D
+function Base.getindex(g::Geometry{D}, d::Int, idx::Int) where {D}
     @assert 0 <= d <= D
     if d == 0
         return Point{D}(g.points.coordinates[:, idx])
@@ -72,13 +72,13 @@ end
 coordinates(g::Geometry) = g.points.coordinates[:, 1:g.points.n]
 coordinates(g::Geometry, idx) = g.points.coordinates[:, idx]
 
-function Base.setindex!(g::Geometry{D}, p::AbstractVecOrMat{<:Number}, d::Int, idx::Int) where D
+function Base.setindex!(g::Geometry{D}, p::AbstractVecOrMat{<:Number}, d::Int, idx::Int) where {D}
     @assert d == 0
     @assert 1 <= idx <= g.points.n
     g.points.coordinates[:, idx] = p
 end
 
-Base.setindex!(g::Geometry{D}, p::Point{D}, d::Int, idx::Int) where D = setindex!(g, p.coordinates, d, idx)
+Base.setindex!(g::Geometry{D}, p::Point{D}, d::Int, idx::Int) where {D} = setindex!(g, p.coordinates, d, idx)
 
 function Base.push!(g::Geometry{D}, p::Vector{T}) where {D,T<:Number}
     @assert length(p) == D
@@ -107,7 +107,7 @@ end
 # IO
 # -------------------------------------------------------------------------------------------------
 
-function Base.show(io::IO, g::Geometry{D}) where D
+function Base.show(io::IO, g::Geometry{D}) where {D}
     println(io, "Geometry{$D}")
     println(io, "$(length(g, 0)) Points")
     println(io, g.points.coordinates[:, 1:g.points.n])

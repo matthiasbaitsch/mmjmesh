@@ -1,3 +1,9 @@
+"""
+    makemeshonrectangle(w::Number, h::Number, nx::Int, ny::Int)
+
+Generate a quad mesh on the domain ``[0, w] x [0, h]`` with `nx` nodes in the 
+``x`` direction and `ny` nodes in the ``y`` direction.
+"""
 function makemeshonrectangle(w::Number, h::Number, nx::Int, ny::Int)
 
     # Coordinates
