@@ -18,7 +18,7 @@ a connectivity list is called `linkslist`, one element in the list is called `li
 When constructing a topology, entities are added by specifying their IDs and 
 connectivities to vertexes. Each entity of dimension d > 1 defines additional
 entities of dimensions d-1, ..., 1 (such as a face comes with edges). If not 
-specified explicitly, these entities are added as needed but no not have IDs. 
+specified explicitly, these entities are added as needed but do not have IDs. 
 Thus, they are called anonymous. 
 
 Remarks:
