@@ -1,0 +1,55 @@
+---
+title: "Development sandbox"
+---
+
+```{julia}
+using Pkg
+Pkg.activate(".")
+
+using Revise
+import CairoMakie
+
+using MMJMesh.Meshes
+using MMJMesh.Utilities
+using MMJMesh.Topologies
+using MMJMesh.Plots
+
+a = 500
+a = 80
+m = makemeshonrectangle(9.0, 4.5, 2a, a)
+# m = makemeshonrectangle(9.0, 4.2, 2, 2)
+
+# nnodes(m::Mesh) = nentities(m.topology, 0)
+# node(m::Mesh, idx::Int) = Node(m, idx)
+# edge(m::Mesh, idx::Int) = Edge(m, idx)
+# face(m::Mesh, idx::Int) = Face(m, idx)
+# solid(m::Mesh, idx::Int) = Solid(m, idx)
+
+# f1 = edge(m, 2)
+
+# dimension(f1)
+
+# links(f1, 1)
+# nnodes(m)
+
+pc = PlotMeshConfiguration()
+
+pc.colorbar = true
+pc.hidedecorations = true
+
+# pc.nodes.visible = true
+pc.nodes.size = 1
+# pc.nodes.color = :magenta
+# pc.edges.visible = true
+# pc.edges.linewidth = 4
+pc.edges.outlineonly = true
+# pc.edges.color = :orange
+pc.faces.visible = true
+pc.faces.color = 4 * (rand(nentities(m.topology, 0)) .- 0.25)
+
+println("Number of nodes: ", nentities(m.topology, 0))
+
+@time plot(m, pc)
+
+
+```
