@@ -36,16 +36,15 @@ end
 
 maxlinksize(cl::ConnectivityList) = maximum([length(links) for links in cl])
 
-
 # -------------------------------------------------------------------------------------------------
 # Adapt methods from Base
 # -------------------------------------------------------------------------------------------------
 
 Base.:(==)(cl1::ConnectivityList, cl2::ConnectivityList) = cl1.offsets == cl2.offsets && cl1.entries == cl2.entries
-Base.length(cl::ConnectivityList) = length(cl.offsets) - 1
 Base.length(cl::ConnectivityList, i::Int) = cl.offsets[i+1] - cl.offsets[i]
+Base.length(cl::ConnectivityList) = length(cl.offsets) - 1
 Base.iterate(cl::ConnectivityList, state=1) = state > length(cl) ? nothing : (cl[state], state + 1)
-Base.size(cl::ConnectivityList) = (length(cl), )
+Base.size(cl::ConnectivityList) = (length(cl),)
 
 function Base.push!(connectivityList::ConnectivityList, links::Vector{Int})
     push!(connectivityList.offsets, connectivityList.offsets[end] + length(links))
