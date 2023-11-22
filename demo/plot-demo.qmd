@@ -1,0 +1,37 @@
+---
+title: "Plot Demo"
+format: 
+    pdf: default
+---
+
+```{julia}
+using Pkg
+Pkg.activate(".")
+
+using Revise
+import CairoMakie
+
+using MMJMesh
+using MMJMesh.Meshes
+using MMJMesh.Topologies
+using MMJMesh.Plots
+using MMJMesh.Utilities
+```
+
+# Plot a 2D mesh
+
+```{julia}
+a = 200
+
+println("Number of nodes is Nn = ", (a + 1) * (2a + 1))
+println()
+
+m = makemeshonrectangle(9.0, 4.5, 2a, a)
+pc = PlotMeshConfiguration()
+pc.faces.color = 4.1 * (rand(nentities(m.topology, 0)) .- 0.25)
+
+print("Links...")
+@time l12 = links(m.topology, 1, 2)
+print(" Plot...")
+@time plot(m, pc)
+```
