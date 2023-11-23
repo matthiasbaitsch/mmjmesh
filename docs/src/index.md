@@ -1,14 +1,12 @@
 # MMJMesh.jl
 
-```@contents
-```
+## Overview
 
 Documentation for MMJMesh.jl
 
 ```@autodocs
 Modules = [
     MMJMesh, 
-    MMJMesh.Topologies, 
     MMJMesh.Geometries,
     MMJMesh.Meshes,
     MMJMesh.Plots,
@@ -16,3 +14,4 @@ Modules = [
 ]
 Order   = [:type, :function]
 ```
+

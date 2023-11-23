@@ -4,7 +4,7 @@ module Topologies
 ## ConnectivityList
 export ConnectivityList
 export inverse
-export maxlinksize
+export maxlinkssize
 ## Topology
 export Topology
 export addlinks!

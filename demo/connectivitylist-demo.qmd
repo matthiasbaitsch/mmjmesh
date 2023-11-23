@@ -15,9 +15,18 @@ Construct and add element
 ```{julia}
     cl = ConnectivityList([[4, 1, 9], [1, 4], [9, 8]])
 
-    println("Step 1\n", cl)
-    push!(cl, [9, 1, 11])
-    println("Step 2\n", cl)
+    println("Initial list\n", cl)
+    push!(cl, [9, 1, 11, 9, 22, 1, 999])
+    println("Added one more connectivity\n", cl)
+    println("Number of entities\n length(cl) = ", length(cl))
+    println("Maximum links size\n maxlinkssize(cl) = ", maxlinkssize(cl))
+    println("Number of links of entity 2\n length(cl, 4) = ", length(cl, 4))
+    println("Links of entity 2\n cl[2] = ", cl[2])
+    println("Link 2 of entity 2\n cl[2, 2] = ", cl[2, 2])
+    println("Processing all links")
+    for (i, l) ∈ enumerate(cl)
+        println("Entity $i: $l")
+    end
 ```
 
 Transpose

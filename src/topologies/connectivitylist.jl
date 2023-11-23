@@ -1,18 +1,30 @@
+# -------------------------------------------------------------------------------------------------
+# Struct and constructors
+# -------------------------------------------------------------------------------------------------
+
 """
     ConnectivityList
 
-A `ConnectivityList` stores connections between mesh entities. Each entry in a connectivity is an array
+A `ConnectivityList` stores connections between mesh entities. Each entry in a `ConnectivityList` is an array
 of links to other entities.
-
-TODO: Complete implementation of `AbstractVector` interface.
 """
 struct ConnectivityList <: AbstractVector{Vector{Int}}
     offsets::Vector{Int}
     entries::Vector{Int}
 end
 
+"""
+    ConnectivityList()
+
+Construct empty `ConnectivityList`.
+"""
 ConnectivityList() = ConnectivityList([1], Int[])
 
+"""
+    ConnectivityList(linkslist::Vector{Vector{Int}})
+
+Construct `ConnectivityList` from a list of links.
+"""
 function ConnectivityList(linkslist::Vector{Vector{Int}})
     cl = ConnectivityList()
     for links in linkslist
@@ -26,6 +38,12 @@ end
 # Methods
 # -------------------------------------------------------------------------------------------------
 
+"""
+    inverse(cl::ConnectivityList)
+
+The inverse of a connectivity list maps links to an index. Note that the inverse does not
+take into account the order of the links.
+"""
 function inverse(cl::ConnectivityList)
     m = Dict{Set{Int},Int}()
     for (i, c) in enumerate(cl)
@@ -34,31 +52,65 @@ function inverse(cl::ConnectivityList)
     return m
 end
 
-maxlinksize(cl::ConnectivityList) = maximum([length(links) for links in cl])
+"""
+    maxlinkssize(cl::ConnectivityList)
+
+Get the maximum link size of a connectivity list.
+"""
+maxlinkssize(cl::ConnectivityList) = maximum([length(links) for links in cl])
+
 
 # -------------------------------------------------------------------------------------------------
-# Adapt methods from Base
+# Methods from Base
 # -------------------------------------------------------------------------------------------------
 
-Base.:(==)(cl1::ConnectivityList, cl2::ConnectivityList) = cl1.offsets == cl2.offsets && cl1.entries == cl2.entries
-Base.length(cl::ConnectivityList, i::Int) = cl.offsets[i+1] - cl.offsets[i]
-Base.length(cl::ConnectivityList) = length(cl.offsets) - 1
-Base.iterate(cl::ConnectivityList, state=1) = state > length(cl) ? nothing : (cl[state], state + 1)
-Base.size(cl::ConnectivityList) = (length(cl),)
+"""
+    push!(cl::ConnectivityList, links::Vector{Int})
 
-function Base.push!(connectivityList::ConnectivityList, links::Vector{Int})
-    push!(connectivityList.offsets, connectivityList.offsets[end] + length(links))
-    push!(connectivityList.entries, links...)
+Add entity by adding links to the end of the list.
+"""
+function Base.push!(cl::ConnectivityList, links::Vector{Int})
+    push!(cl.offsets, cl.offsets[end] + length(links))
+    push!(cl.entries, links...)
     return nothing
 end
 
+"""
+    length(cl)
+
+Returns the number of entities.
+"""
+Base.length(cl::ConnectivityList) = length(cl.offsets) - 1
+
+"""
+    length(cl, i)
+
+Returns the number of links from entity `i`.
+"""
+Base.length(cl::ConnectivityList, i::Int) = cl.offsets[i+1] - cl.offsets[i]
+
+"""
+    cl[i]
+
+Returns the links from entity `i`.
+"""
 Base.getindex(cl::ConnectivityList, i::Int) = cl.entries[(cl.offsets[i]):(cl.offsets[i+1]-1)]
 
+"""
+    cl[i, j]
+
+Returns the `j`-th link from entity `i`.
+"""
 function Base.getindex(cl::ConnectivityList, i::Int, j::Int)
     @assert 1 <= i <= length(cl) && 1 <= j <= length(cl, i)
     return cl.entries[cl.offsets[i]+j-1]
 end
 
+"""
+    cl'
+
+Returns the transpose of connectivity list `cl`.
+"""
 function Base.adjoint(cl::ConnectivityList)
     n = maximum(cl.entries)
     linkslist = [Vector{Int}() for _ in 1:n]
@@ -70,6 +122,10 @@ function Base.adjoint(cl::ConnectivityList)
     return ConnectivityList(linkslist)
 end
 
+Base.:(==)(cl1::ConnectivityList, cl2::ConnectivityList) = cl1.offsets == cl2.offsets && cl1.entries == cl2.entries
+Base.size(cl::ConnectivityList) = (length(cl),)
+Base.iterate(cl::ConnectivityList, state=1) = state > length(cl) ? nothing : (cl[state], state + 1)
+
 
 # -------------------------------------------------------------------------------------------------
 # IO
@@ -77,7 +133,7 @@ end
 
 # function Base.show(io::IO, cl::ConnectivityList)
 #     n = length(cl)
-#     mnl = maxlinksize(cl)
+#     mnl = maxlinkssize(cl)
 #     for (i, links) in enumerate(cl)
 #         s1 = @sprintf "%7i:" i
 #         s2 = join([@sprintf "%8i" l for l in links])

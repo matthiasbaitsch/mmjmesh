@@ -10,7 +10,7 @@ using MMJMesh.Topologies
     push!(cl, [3, 4, 5])
     @test length(cl) == 6
     @test length(cl, 2) == 4
-    @test maxlinksize(cl) == 4
+    @test maxlinkssize(cl) == 4
     @test cl[3] == [1, 9, 3, 2]
     @test cl[5] == [1, 2]
     @test cl[6] == [3, 4, 5]
