@@ -29,6 +29,7 @@ addlinks!(t, 2, 0, [[1, 2, 5, 4], [5, 2, 3], [6, 5, 3]])
     @test nentities(t, 1, false) == 0
     @test nentities(t, 1) == 8
     @test nentities(t, 2) == 3
+    @test nentities(t, 3) == 0
     @test links(t, 2, 0) == ConnectivityList([[1, 2, 5, 4], [5, 2, 3], [6, 5, 3]])
     @test links(t, 2, 0)[1] == [1, 2, 5, 4]
 end

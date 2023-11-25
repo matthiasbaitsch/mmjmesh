@@ -75,11 +75,15 @@ isanonymous(t::Topology, d::Int) = !haskey(t.entities, d)
 
 entity(t::Topology, dim::Int, idx::Int) = t.entities[dim][idx]
 
-function nentities(t::Topology, d::Int, anonymous::Bool=true)
-    if haskey(t.entities, d)
-        return length(t.entities[d])
-    elseif anonymous
-        return length(links(t, d, 0))
+function nentities(t::Topology{D}, d::Int, anonymous::Bool=true) where {D}
+    if d <= D
+        if haskey(t.entities, d)
+            return length(t.entities[d])
+        elseif anonymous
+            return length(links(t, d, 0))
+        else
+            return 0
+        end
     else
         return 0
     end
