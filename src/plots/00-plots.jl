@@ -8,6 +8,7 @@ export PlotMeshConfiguration, plot
 # Modules needed by this module
 import Makie
 using MMJMesh.Meshes
+using MMJMesh.MMJBase
 using MMJMesh.Topologies
 using MMJMesh.Geometries
 

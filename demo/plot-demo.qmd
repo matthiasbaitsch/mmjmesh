@@ -2,15 +2,15 @@
 title: "Plot Demo"
 format: 
     pdf: default
+jupyter: julia-1.9    
 ---
 
 ```{julia}
 using Pkg
-Pkg.activate(".")
+Pkg.activate("..")
 
 using Revise
 import CairoMakie
-
 using MMJMesh
 using MMJMesh.Meshes
 using MMJMesh.Topologies
@@ -20,18 +20,74 @@ using MMJMesh.Utilities
 
 # Plot a 2D mesh
 
+## Quad mesh
+
 ```{julia}
-a = 200
+a = 80
+m = makemeshonrectangle(9.0, 4.5, 2a, a)
 
 println("Number of nodes is Nn = ", (a + 1) * (2a + 1))
-println()
+print("Links...")
+@time l12 = links(m.topology, 1, 2);
+```
 
-m = makemeshonrectangle(9.0, 4.5, 2a, a)
+Plot with default color
+
+```{julia}
+pc = PlotMeshConfiguration()
+pc.edges.outlineonly = false
+pc.edges.color = :hotpink
+plot(m, pc)
+```
+
+Plot colors for nodes
+
+```{julia}
 pc = PlotMeshConfiguration()
 pc.faces.color = 4.1 * (rand(nentities(m.topology, 0)) .- 0.25)
+plot(m, pc)
+```
 
+Plot colors for elements
+
+```{julia}
+pc = PlotMeshConfiguration()
+pc.faces.color = 4.1 * (rand(nentities(m.topology, 2)) .- 0.25)
+plot(m, pc)
+```
+
+## Triangle mesh
+
+```{julia}
+a = 20
+m = makemeshonrectangle(9.0, 4.5, 2a, a, TRIANGLE)
+
+println("Number of nodes is Nn = ", (a + 1) * (2a + 1))
 print("Links...")
-@time l12 = links(m.topology, 1, 2)
-print(" Plot...")
-@time plot(m, pc)
+@time l12 = links(m.topology, 1, 2);
+```
+
+Plot with default color
+
+```{julia}
+pc = PlotMeshConfiguration()
+pc.edges.outlineonly = false
+pc.edges.color = :hotpink
+plot(m, pc)
+```
+
+Plot colors for nodes
+
+```{julia}
+pc = PlotMeshConfiguration()
+pc.faces.color = 4.1 * (rand(nentities(m.topology, 0)) .- 0.25)
+plot(m, pc)
+```
+
+Plot colors for elements
+
+```{julia}
+pc = PlotMeshConfiguration()
+pc.faces.color = 4.1 * (rand(nentities(m.topology, 2)) .- 0.25)
+plot(m, pc)
 ```

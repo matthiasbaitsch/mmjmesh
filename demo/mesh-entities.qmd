@@ -29,6 +29,8 @@ struct MeshEntity{DE}
     index::Int
 end
 
+# XXX
+nentities(mesh::Mesh, dim::Int) = nentities(mesh.topology, dim)
 entity(mesh::Mesh, dim::Int, index::Int) = MeshEntity{dim}(mesh, index)
 # node(m::Mesh{DT, DG}, index::Int) where {DT, DG} = entity(m, 0, index)
 # edge(m::Mesh{DT, DG}, index::Int) where {DT, DG} = entity(m, 1, index)
@@ -41,6 +43,7 @@ coordinates(e::MeshEntity{DE}) where {DE} = e.mesh.geometry.points.coordinates[:
 node = entity(m, 0, 11)
 edge = entity(m, 1, 12)
 
+println("nNodes: ", nentities(m, 0))
 println("Node coordinates: ", coordinates(node))
 println("Eode coordinates: ", coordinates(edge))
 

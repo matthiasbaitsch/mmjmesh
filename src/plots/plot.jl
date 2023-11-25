@@ -1,3 +1,8 @@
+"""
+    PointConfiguration
+
+How to plot points.
+"""
 mutable struct PointConfiguration
     visible::Bool
     size::Real
@@ -8,6 +13,11 @@ mutable struct PointConfiguration
     end
 end
 
+"""
+    EdgeConfiguration
+
+How to plot edges.
+"""
 mutable struct EdgeConfiguration
     visible::Bool
     outlineonly::Bool
@@ -19,6 +29,11 @@ mutable struct EdgeConfiguration
     end
 end
 
+"""
+    FaceConfiguration
+
+How to plot faces.
+"""
 mutable struct FaceConfiguration
     visible::Bool
     color
@@ -29,6 +44,11 @@ mutable struct FaceConfiguration
     end
 end
 
+"""
+    PlotMeshConfiguration
+
+How to plot the mesh.
+"""
 mutable struct PlotMeshConfiguration
 
     # Parts
@@ -53,6 +73,11 @@ mutable struct PlotMeshConfiguration
     end
 end
 
+"""
+    plot(m::Mesh[, pc::PlotMeshConfiguration=PlotMeshConfiguration()])
+
+Plot mesh `m` with configuration `pc`.
+"""
 function plot(m::Mesh, pc::PlotMeshConfiguration=PlotMeshConfiguration())
 
     # Figure
@@ -81,6 +106,7 @@ function plot(m::Mesh, pc::PlotMeshConfiguration=PlotMeshConfiguration())
     # Appearance
     if pc.hidedecorations
         Makie.hidedecorations!(ax)
+        Makie.hidespines!(ax)
         Makie.tightlimits!(ax)
     end
 
@@ -90,27 +116,66 @@ end
 
 function plotfaces(f::Makie.Figure, m::Mesh, cfg::FaceConfiguration, colorbar::Bool)
 
+    # Test if we have data
+    haveData = cfg.color isa Vector
+
+    # Helpers
+    coords = coordinates(m.geometry)
+    nnodes = nentities(m.topology, 0)
+    nfaces = nentities(m.topology, 2)
+
     # Collect triangles
-    t = Vector{Vector{Int}}()
-    for l in links(m.topology, 2, 0)
-        if length(l) == 3
-            push!(t, l)
-        elseif length(l) == 4
-            push!(t, [l[1], l[2], l[3]])
-            push!(t, [l[1], l[3], l[4]])
+    
+    # No color or nodal color
+    if !haveData || length(cfg.color) == nnodes
+        t = Vector{Vector{Int}}()
+        for l in links(m.topology, 2, 0)
+            if length(l) == 3
+                push!(t, l)
+            elseif length(l) == 4
+                push!(t, [l[1], l[2], l[3]])
+                push!(t, [l[1], l[3], l[4]])
+            end
         end
+        x = coords
+        t = mapreduce(permutedims, vcat, t)
+        c = cfg.color
+    # Element color
+    elseif length(cfg.color) == nfaces
+        cnt = 1;
+        t = Vector{Vector{Int}}()
+        c = Vector{Float64}()
+        xc = Vector{Float64}()
+        yc = Vector{Float64}()
+        for (i, l) ∈ enumerate(links(m.topology, 2, 0))
+            if length(l) == 3
+                append!(c, cfg.color[i] * ones(3))
+                append!(xc, coords[1, l[[1, 2, 3]]])
+                append!(yc, coords[2, l[[1, 2, 3]]])
+                push!(t, cnt:cnt+2)
+                cnt += 3
+            elseif length(l) == 4
+                append!(c, cfg.color[i] * ones(6))
+                append!(xc, coords[1, l[[1, 2, 3, 1, 3, 4]]])
+                append!(yc, coords[2, l[[1, 2, 3, 1, 3, 4]]])
+                push!(t, cnt:cnt+2)
+                push!(t, cnt+3:cnt+5)
+                cnt += 6
+            else
+                @notimplemented
+            end
+        end
+        x = [xc yc]'
+        t = mapreduce(permutedims, vcat, t)
+    else
+        @notimplemented
     end
 
     # Plot
-    hm = Makie.mesh!(
-        coordinates(m.geometry),
-        mapreduce(permutedims, vcat, t),
-        color=cfg.color,
-        colormap=cfg.colormap
-    )
+    hm = Makie.mesh!(x, t, color=c, colormap=cfg.colormap)
 
     # Colorbar
-    if colorbar
+    if haveData && colorbar
         Makie.Colorbar(f[1, 2], hm)
     end
 end

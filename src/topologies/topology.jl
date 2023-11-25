@@ -1,7 +1,8 @@
 """
     Topology(entities, links)
 
-A `Topology` stores connections between entities of a mesh.
+A `Topology` stores connections between entities of a mesh. The approach
+is based on the mesh implementation in the FEniCSx project.
 
 Mesh entities have a parametric dimension ``d``. We use the terminology
 
@@ -55,6 +56,12 @@ struct Topology{D}
     links::Dict{Tuple{Int,Int},ConnectivityList}
 end
 
+
+"""
+    Topology(d, nn)
+
+Construct topology of parametric dimension `d` with `nn` nodes.
+"""
 function Topology(d::Int, nn::Int)
     return Topology{d}(Dict(0 => collect(1:nn)), Dict{Tuple{Int,Int},ConnectivityList}())
 end

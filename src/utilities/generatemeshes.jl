@@ -1,10 +1,21 @@
+
 """
-    makemeshonrectangle(w::Number, h::Number, nx::Int, ny::Int)
+    Meshtype
+
+Types of meshes on structured grids.
+"""
+@enum Meshtype begin
+    QUADRANGLE
+    TRIANGLE
+end
+
+"""
+    makemeshonrectangle(w::Number, h::Number, nx::Int, ny::Int, meshtype::Meshtype)
 
 Generate a quad mesh on the domain ``[0, w] \\times [0, h]`` with `nx` elements in the 
 ``x`` direction and `ny` elements in the ``y`` direction.
 """
-function makemeshonrectangle(w::Number, h::Number, nx::Int, ny::Int)
+function makemeshonrectangle(w::Number, h::Number, nx::Int, ny::Int, mt::Meshtype=QUADRANGLE)
 
     # Coordinates
     nn = (nx + 1) * (ny + 1)
@@ -19,7 +30,12 @@ function makemeshonrectangle(w::Number, h::Number, nx::Int, ny::Int)
     cl = ConnectivityList()
     idx(i, j) = (j - 1) * (nx + 1) + i
     for j in 1:ny, i in 1:nx
-        push!(cl, [idx(i, j), idx(i + 1, j), idx(i + 1, j + 1), idx(i, j + 1)])
+        if mt == QUADRANGLE
+            push!(cl, [idx(i, j), idx(i + 1, j), idx(i + 1, j + 1), idx(i, j + 1)])
+        elseif mt == TRIANGLE
+            push!(cl, [idx(i, j), idx(i + 1, j), idx(i + 1, j + 1)])
+            push!(cl, [idx(i, j), idx(i + 1, j + 1), idx(i, j + 1)])
+        end
     end
     addlinks!(m.topology, 2, 0, cl)
 
