@@ -1,0 +1,15 @@
+
+
+```{julia}
+using Pkg
+Pkg.activate(".")
+using Revise
+using MMJMesh.Meshes
+using MMJMesh.Geometries
+```
+
+
+```{julia}
+m = Mesh(2, 3, 100)
+
+```

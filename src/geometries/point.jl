@@ -3,7 +3,7 @@
 
     A point in `D`-dimensional space. Based on `point.jl` from Meshes.jl.
 """
-struct Point{D}
+struct Point{D} <: GeometricObject{0, D}
     coordinates::SVector{D,Float64}
 end
 
@@ -21,7 +21,7 @@ coordinates(A::Point) = A.coordinates
 Base.:(-)(A::Point, B::Point) = A.coordinates - B.coordinates
 Base.:(==)(A::Point, B::Point) = A.coordinates == B.coordinates
 Base.in(A::Point, B::Point) = A == B
-Base.isapprox(A::Point{D}, B::Point{D}; atol=atol(Float64), kwargs...) where {D} = isapprox(A.coordinates, B.coordinates; atol, kwargs...)
+Base.isapprox(A::Point, B::Point; atol=atol(Float64), kwargs...) = isapprox(A.coordinates, B.coordinates; atol, kwargs...)
 
 function Base.show(io::IO, point::Point)
     print(io, "Point$(Tuple(point.coordinates))")

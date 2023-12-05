@@ -4,4 +4,4 @@ project:
 format:
   html: 
     code-fold: true
-jupyter: julia-1.9
+

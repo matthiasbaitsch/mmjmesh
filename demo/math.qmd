@@ -1,0 +1,10 @@
+
+
+```{julia}
+using Pkg
+Pkg.activate(".")
+
+```
+
+
+

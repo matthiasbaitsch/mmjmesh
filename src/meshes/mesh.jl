@@ -1,8 +1,6 @@
 using MMJMesh.Topologies: Topology
 using MMJMesh.Geometries: Geometry
 
-import Base.show
-
 struct Mesh{DT,DG}
     topology::Topology{DT}
     geometry::Geometry{DG}
@@ -10,12 +8,15 @@ end
 
 Mesh(dt::Int, dg::Int, nn::Int=0) = Mesh{dt,dg}(Topology(dt, nn), Geometry(dg, nn))
 
-Mesh(coordinates::Matrix{T}, dt::Int=size(coordinates, 1)) where T<:Number =
+Mesh(coordinates::Matrix{T}, dt::Int=size(coordinates, 1)) where {T<:Number} =
     Mesh{dt,size(coordinates, 1)}(
         Topology(dt, size(coordinates, 2)),
         Geometry(coordinates))
 
-function show(io::IO, m::Mesh{DT,DG}) where {DT,DG}
+pdim(m::Mesh) = Topologies.dimension(m.topology)
+gdim(m::Mesh) = Geometries.dimension(m.geometry)
+
+function Base.show(io::IO, m::Mesh{DT,DG}) where {DT,DG}
     n = 100
     s1 = repeat("=", n)
     s2 = repeat("-", n)

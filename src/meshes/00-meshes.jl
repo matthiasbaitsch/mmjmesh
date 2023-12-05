@@ -1,8 +1,11 @@
 module Meshes
 
 # Exports
+
 ## mesh.jl
 export Mesh
+export pdim, gdim
+
 ## meshentities.jl
 export Node, Edge, Face, Solid
 export dimension, nodes, nodeindexes

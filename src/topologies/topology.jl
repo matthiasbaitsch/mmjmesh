@@ -66,7 +66,7 @@ function Topology(d::Int, nn::Int)
     return Topology{d}(Dict(0 => collect(1:nn)), Dict{Tuple{Int,Int},ConnectivityList}())
 end
 
-dimension(::Topology{D}) where {D} = D
+dimension(t::Topology{D}) where {D} = D
 isanonymous(t::Topology, d::Int) = !haskey(t.entities, d)
 
 # -------------------------------------------------------------------------------------------------

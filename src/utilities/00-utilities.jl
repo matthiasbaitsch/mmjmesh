@@ -4,6 +4,7 @@ module Utilities
 
 ## generatemeshes.jl
 export Meshtype, QUADRANGLE, TRIANGLE
+export makemeshoninterval
 export makemeshonrectangle
 
 # Modules needed by this module

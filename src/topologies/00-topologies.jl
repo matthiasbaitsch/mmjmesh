@@ -8,6 +8,7 @@ export maxlinkssize
 ## Topology
 export Topology
 export addlinks!
+export dimension
 export entity
 export isanonymous
 export links

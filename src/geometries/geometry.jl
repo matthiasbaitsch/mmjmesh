@@ -12,7 +12,7 @@ struct Geometry{D}
     points::PointList
 end
 
-Geometry(d::Int, nn::Int=0) = Geometry{d}(PointList(nn, zeros(d, 20)))
+Geometry(d::Int, nn::Int=0) = Geometry{d}(PointList(nn, zeros(d, nn)))
 
 Geometry(coordinates::Matrix) =
     Geometry{size(coordinates, 1)}(
@@ -25,6 +25,8 @@ Geometry(coordinates::Matrix) =
 # -------------------------------------------------------------------------------------------------
 # General methods
 # -------------------------------------------------------------------------------------------------
+
+dimension(::Geometry{D}) where {D} = D
 
 """
     length(g, d)
