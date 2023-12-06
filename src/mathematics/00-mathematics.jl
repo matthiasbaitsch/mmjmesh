@@ -1,4 +1,4 @@
-module Math
+module Mathematics
 
 # Modules needed by this module
 
