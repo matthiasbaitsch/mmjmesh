@@ -1,12 +1,13 @@
-abstract type MeshEntity{D} end
+abstract type MeshEntity{DT, DG} end
 
-dimension(me::MeshEntity{D}) where {D} = D
+pdim(::MeshEntity{DT, DG}) where {DT, DG} = DT
+gdim(::MeshEntity{DT, DG}) where {DT, DG} = DG
 
 """
     nodes(me::MeshEntity)
 
 Return the nodes of a mesh entity.
 """
-nodes(me::MeshEntity) = @abstractmethod
+nodes( ::MeshEntity) = @abstractmethod
 
-links(me::MeshEntity, d::Int) = links(me.mesh.topology, dimension(me), d)[me.idx]
+links(me::MeshEntity{DT, DG}, d::Int) where {DT, DG} = links(me.mesh.topology, DT, d)[me.idx]

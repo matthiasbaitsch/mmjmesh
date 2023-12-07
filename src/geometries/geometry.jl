@@ -29,9 +29,9 @@ Geometry(coordinates::Matrix) =
 dimension(::Geometry{D}) where {D} = D
 
 """
-    length(g, d)
+    length(g::Geometry, d::int)
 
-Get number of geometric objects of dimension `d`.
+Number of geometric objects of dimension `d` in `g`.
 """
 function Base.length(g::Geometry{D}, d::Int) where {D}
     @assert 0 <= d <= D
@@ -43,9 +43,9 @@ function Base.length(g::Geometry{D}, d::Int) where {D}
 end
 
 """
-    g[d, idx]
+    g::Geometry[d, idx]
 
-Get geometric object of dimension `d` at index `idx`.
+Geometric object of dimension `d` at index `idx` in `g`.
 """
 function Base.getindex(g::Geometry{D}, d::Int, idx::Int) where {D}
     @assert 0 <= d <= D
@@ -59,7 +59,7 @@ end
 """
     squeeze!(g)
 
-Remove unused memory from `g`.
+Release unused memory from `g`.
 """
 function squeeze!(g::Geometry)
     g.coordinates = g.points.coordinates[:, 1:g.points.n]

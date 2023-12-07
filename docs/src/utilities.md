@@ -1,8 +1,8 @@
-# Topologies
+# Utilities
 
 ```@autodocs
 Modules = [
-    MMJMesh.Topologies
+    MMJMesh.Utilities
 ]
 Order   = [:type, :function]
 ```

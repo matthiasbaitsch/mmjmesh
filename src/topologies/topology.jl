@@ -66,7 +66,7 @@ function Topology(d::Int, nn::Int)
     return Topology{d}(Dict(0 => collect(1:nn)), Dict{Tuple{Int,Int},ConnectivityList}())
 end
 
-dimension(t::Topology{D}) where {D} = D
+dimension(::Topology{D}) where {D} = D
 isanonymous(t::Topology, d::Int) = !haskey(t.entities, d)
 
 # -------------------------------------------------------------------------------------------------
@@ -94,6 +94,12 @@ end
 # Links
 # -------------------------------------------------------------------------------------------------
 
+"""
+    addlinks!(t::Topology, d0::Int, d1::Int, ids::Vector{Int}, cl::ConnectivityList)
+
+Add links from entities of dimension `d0` to entities of dimension `d1` by specifying the
+entities `ids` and the `ConnectivityList` `cl`.
+"""
 function addlinks!(t::Topology{D}, d0::Int, d1::Int, ids::Vector{Int}, cl::ConnectivityList) where {D}
     @assert d0 <= D && d0 > d1 "Only downward links with d0 < $D are allowed."
     t.entities[d0] = ids
@@ -101,9 +107,21 @@ function addlinks!(t::Topology{D}, d0::Int, d1::Int, ids::Vector{Int}, cl::Conne
     return nothing
 end
 
+"""
+    addlinks!(t::Topology, d0::Int, d1::Int, cl)
+
+Add links from entities of dimension `d0` to entities of dimension `d1` by specifying the connectivity list.
+Entity IDs are generated automatically. The parameter `cl` can be a `ConnectivityList` or a vector of integer vectors.
+"""
 addlinks!(t::Topology, d0::Int, d1::Int, cl::ConnectivityList) = addlinks!(t, d0, d1, collect(1:length(cl)), cl)
 addlinks!(t::Topology, d0::Int, d1::Int, cl::Vector{Vector{Int}}) = addlinks!(t, d0, d1, ConnectivityList(cl))
 
+"""
+    links(t::Topology, d0::Int, d1::Int)
+
+Links from entities of dimension `d0` to entities of dimension `d1` in the form of
+a `ConnectivityList`.
+"""
 function links(t::Topology{D}, d0::Int, d1::Int) where {D}
     @assert d0 <= D && d1 <= D
     key = (d0, d1)

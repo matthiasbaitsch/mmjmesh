@@ -1,7 +1,16 @@
-author: "Matthias Baitsch"
 project:
-  output-dir: _output
-format:
-  html: 
-    code-fold: true
+  type: book
 
+
+book:
+  title: "Using MMJMesh"
+  author: "Matthias Baitsch"
+  chapters: 
+    - index.qmd
+    - plot.qmd
+
+format:
+  html:
+    code-fold: true
+  pdf:
+    documentclass: scrreport

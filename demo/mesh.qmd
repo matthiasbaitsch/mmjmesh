@@ -1,0 +1,77 @@
+---
+title: "Plot Demo"
+format: 
+    pdf: default
+---
+
+```{julia}
+using Pkg
+Pkg.activate(".")
+
+import CairoMakie
+using Test
+
+using MMJMesh
+using MMJMesh.Meshes
+using MMJMesh.Topologies
+using MMJMesh.Plots
+using MMJMesh.Utilities
+```
+
+
+```{julia}
+a = 3
+m = makemeshonrectangle(9.0, 4.5, 2a, a)
+
+nentities(m::Mesh, dim::Int) = Topologies.nentities(m.topology, dim, true)
+
+@test nentities(m, 0) == (a + 1) * (2a + 1)
+@test nentities(m, 1) == (a + 1) * 2a + a * (2a + 1)
+@test nentities(m, 2) == 2a^2
+
+struct MeshEntity{DT,DG,NN}
+    mesh::Mesh
+    index::Int
+
+    MeshEntity(mesh::Mesh{DT,DG}, pdim::Int, index::Int) where {DT,DG} = new{pdim,DG,length(links(m.topology, pdim, 0), index)}(mesh, index)
+end
+
+name(e::MeshEntity) = name(typeof(e))
+name(::Type{MeshEntity{0,DG,NN}}) where {DG,NN} = "Node"
+name(::Type{MeshEntity{1,DG,NN}}) where {DG,NN} = "Edge"
+name(::Type{MeshEntity{2,DG,NN}}) where {DG,NN} = "Face"
+name(::Type{MeshEntity{3,DG,NN}}) where {DG,NN} = "Solid"
+
+Base.show(io::IO, e::MeshEntity) = print(io, "$(name(e))[$(e.index)]")
+
+entity(m::Mesh, pdim::Int, index::Int) = MeshEntity(m, pdim, index)
+
+print(m)
+
+n2 = entity(m, 0, 2)
+e12 = entity(m, 1, 12)
+f14 = entity(m, 2, 14)
+
+println(" n2: ", n2)
+println("e12: ", e12)
+println("f21: ", f14)
+
+
+# entity(mesh::Mesh, dim::Int, index::Int) = MeshEntity{dim}(mesh, index)
+# # node(m::Mesh{DT, DG}, index::Int) where {DT, DG} = entity(m, 0, index)
+# # edge(m::Mesh{DT, DG}, index::Int) where {DT, DG} = entity(m, 1, index)
+# # face(m::Mesh{DT, DG}, index::Int) where {DT, DG} = entity(m, 2, index)
+# # solid(m::Mesh{DT, DG}, index::Int) where {DT, DG} = entity(m, 3, index)
+
+# coordinates(e::MeshEntity{0}) = e.mesh.geometry.points.coordinates[:, e.index]
+# coordinates(e::MeshEntity{DE}) where {DE} = e.mesh.geometry.points.coordinates[:, links(m.topology, DE, 0)[e.index]]
+
+# node = entity(m, 0, 11)
+# edge = entity(m, 1, 12)
+
+# println("nNodes: ", nentities(m, 0))
+# println("Node coordinates: ", coordinates(node))
+# println("Eode coordinates: ", coordinates(edge))
+
+
+```
