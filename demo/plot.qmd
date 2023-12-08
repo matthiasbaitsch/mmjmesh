@@ -1,22 +1,13 @@
-```{julia}
-using MMJMesh
-using MMJMesh.Meshes
-using MMJMesh.Topologies
-using MMJMesh.Plots
-using MMJMesh.Utilities
-
-import CairoMakie as MK
-
-MK.set_theme!(MK.theme_minimal())
-```
-
 # Plotting
+
+```{julia}
+#| echo: false
+include("setup.jl")
+```
 
 ## Plot a 1D mesh
 
 ### On a straight line
-
-Hallo
 
 ```{julia}
 m = makemeshoninterval(0, 4, 20)

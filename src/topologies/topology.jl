@@ -73,8 +73,6 @@ isanonymous(t::Topology, d::Int) = !haskey(t.entities, d)
 # Entities
 # -------------------------------------------------------------------------------------------------
 
-entity(t::Topology, dim::Int, idx::Int) = t.entities[dim][idx]
-
 function nentities(t::Topology{D}, d::Int, anonymous::Bool=true) where {D}
     if d <= D
         if haskey(t.entities, d)
@@ -89,6 +87,7 @@ function nentities(t::Topology{D}, d::Int, anonymous::Bool=true) where {D}
     end
 end
 
+MMJMesh.entity(t::Topology, dim::Int, idx::Int) = t.entities[dim][idx]
 
 # -------------------------------------------------------------------------------------------------
 # Links

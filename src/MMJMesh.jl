@@ -1,5 +1,22 @@
 module MMJMesh
 
+# Toplevel functions to be exported
+"""
+    entity(o, pdim::Int, idx::Int)
+
+TODO
+"""
+function entity end
+
+"""
+    coordinates(o [, index::int])
+
+TODO
+"""
+function coordinates end
+
+export entity, coordinates
+
 # Basic stuff
 include("mmjbase/00-mmjbase.jl")
 

@@ -1,16 +1,14 @@
 module Utilities
 
-# Exports
-
-## generatemeshes.jl
-export Meshtype, QUADRANGLE, TRIANGLE
-export makemeshoninterval
-export makemeshonrectangle
-
 # Modules needed by this module
 using MMJMesh.Meshes
 using MMJMesh.Topologies
 using MMJMesh.Geometries
+
+# Exports
+## generatemeshes.jl
+export Meshtype, QUADRANGLE, TRIANGLE
+export makemeshoninterval, makemeshonrectangle
 
 # Parts
 include("generatemeshes.jl")

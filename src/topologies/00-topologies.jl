@@ -1,21 +1,16 @@
 module Topologies
 
+# Modules needed by this module
+using Printf
+using MMJMesh
+
 # Exports
 ## ConnectivityList
 export ConnectivityList
-export inverse
-export maxlinkssize
+export inverse, maxlinkssize
 ## Topology
 export Topology
-export addlinks!
-export dimension
-export entity
-export isanonymous
-export links
-export nentities
-
-# Modules needed by this module
-using Printf
+export addlinks!, nentities, dimension, isanonymous, links
 
 # Parts
 include("connectivitylist.jl")

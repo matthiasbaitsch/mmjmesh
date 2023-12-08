@@ -71,8 +71,8 @@ end
 # Points
 # -------------------------------------------------------------------------------------------------
 
-coordinates(g::Geometry) = g.points.coordinates[:, 1:g.points.n]
-coordinates(g::Geometry, idx) = g.points.coordinates[:, idx]
+MMJMesh.coordinates(g::Geometry) = g.points.coordinates[:, 1:g.points.n]
+MMJMesh.coordinates(g::Geometry, idx) = g.points.coordinates[:, idx]
 
 function Base.setindex!(g::Geometry{D}, p::AbstractVecOrMat{<:Number}, d::Int, idx::Int) where {D}
     @assert d == 0

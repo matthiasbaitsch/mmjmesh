@@ -1,6 +1,8 @@
 module TopologyTests
 
 using Test
+
+using MMJMesh
 using MMJMesh.Topologies
 
 """

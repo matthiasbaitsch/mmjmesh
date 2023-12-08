@@ -1,6 +1,7 @@
 module GeometryTests
 
 using Test
+using MMJMesh
 using MMJMesh.Geometries
 
 @testset "Empty constructor" begin

@@ -2,6 +2,7 @@ module Geometries
 
 # Modules needed by this module
 using StaticArrays
+using MMJMesh
 using MMJMesh.MMJBase
 
 # Functions extended by this module
@@ -21,6 +22,5 @@ export GeometricObject
 export Geometry
 ## point.jl
 export Point
-export coordinates
 
 end

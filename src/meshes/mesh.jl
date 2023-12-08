@@ -13,8 +13,12 @@ Mesh(coordinates::Matrix{T}, dt::Int=size(coordinates, 1)) where {T<:Number} =
         Topology(dt, size(coordinates, 2)),
         Geometry(coordinates))
 
+nentities(m::Mesh, dim::Int) = Topologies.nentities(m.topology, dim, true)
+indexes(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
 pdim(m::Mesh) = Topologies.dimension(m.topology)
 gdim(m::Mesh) = Geometries.dimension(m.geometry)
+MMJMesh.coordinates(m::Mesh) = m.geometry.points.coordinates[:, nodeIdxs(m)]
+MMJMesh.coordinates(m::Mesh, index::Int) = m.geometry.points.coordinates[:, index]
 
 function Base.show(io::IO, m::Mesh{DT,DG}) where {DT,DG}
     n = 100
