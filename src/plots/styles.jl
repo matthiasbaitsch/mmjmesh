@@ -127,6 +127,7 @@ function PlotStyle(m::Mesh, values=nothing)
         if !isnothing(values)
             ps.faces.color = values
         end
+        ps.edges.outlineonly = nfaces(m) > 100
         
     # Edges and faces is all we got at the moment
     else

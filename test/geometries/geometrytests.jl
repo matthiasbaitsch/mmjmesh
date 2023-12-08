@@ -3,6 +3,7 @@ module GeometryTests
 using Test
 using MMJMesh
 using MMJMesh.Geometries
+using MMJMesh.Geometries: coordinates
 
 @testset "Empty constructor" begin
     g = Geometry(3)

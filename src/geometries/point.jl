@@ -16,7 +16,7 @@ gdim(::Point{D}) where {D} = D
 center(A::Point) = A
 measure(::Point) = 0.0
 boundingbox(::Point) = nothing
-MMJMesh.coordinates(A::Point) = A.coordinates
+coordinates(A::Point) = A.coordinates
 
 Base.:(-)(A::Point, B::Point) = A.coordinates - B.coordinates
 Base.:(==)(A::Point, B::Point) = A.coordinates == B.coordinates

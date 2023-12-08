@@ -17,10 +17,13 @@ struct MeshEntity{DT,DG,NN}
 end
 
 # Get entity
-MMJMesh.entity(m::Mesh, pdim::Int, index::Int) = MeshEntity(m, pdim, index)
+entity(m::Mesh, pdim::Int, index::Int) = MeshEntity(m, pdim, index)
 
 # Indexes
 indexes(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index]
+
+# Length of an edge
+Base.length(e::MeshEntity{1, DG, 2}) where {DG} = norm(diff(coordinates(e), dims=2))
 
 # Show
 name(e::MeshEntity) = name(typeof(e))
@@ -56,6 +59,6 @@ entities(m::Mesh, pdim::Int) = MeshEntityList(m, pdim, 1:nentities(m, pdim))
 entities(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = MeshEntityList(me.mesh, pdim, indexes(me, pdim))
 
 # Coordinates
-MMJMesh.coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, nodeIdxs(me)]
-MMJMesh.coordinates(me::MeshEntity{0, DG, NN}) where {DG,NN} = me.mesh.geometry.points.coordinates[:, me.index]
-MMJMesh.coordinates(me::MeshEntity, index::Int) = me.mesh.geometry.points.coordinates[:, index]
+coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, nodeIdxs(me)]
+coordinates(me::MeshEntity{0, DG, NN}) where {DG,NN} = me.mesh.geometry.points.coordinates[:, me.index]
+coordinates(me::MeshEntity, index::Int) = me.mesh.geometry.points.coordinates[:, index]

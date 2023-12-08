@@ -87,7 +87,7 @@ function nentities(t::Topology{D}, d::Int, anonymous::Bool=true) where {D}
     end
 end
 
-MMJMesh.entity(t::Topology, dim::Int, idx::Int) = t.entities[dim][idx]
+entity(t::Topology, dim::Int, idx::Int) = t.entities[dim][idx]
 
 # -------------------------------------------------------------------------------------------------
 # Links

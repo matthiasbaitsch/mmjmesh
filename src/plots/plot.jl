@@ -27,7 +27,7 @@ function plot(m::Mesh, ps::PlotStyle=PlotStyle(m))
     # Nodes
     if ps.nodes.visible
         Makie.scatter!(
-            coordinates(m.geometry),
+            coordinates(m),
             color=ps.nodes.color,
             markersize=ps.nodes.size
         )
@@ -36,7 +36,7 @@ function plot(m::Mesh, ps::PlotStyle=PlotStyle(m))
     # Appearance
     if ps.hidedecorations
         Makie.hidedecorations!(ax)
-        Makie.hidespines!(ax)
+        Makie.hidespines!(ax)        
     end
 
     # Return
@@ -157,14 +157,14 @@ function plotfaces(f::Makie.Figure, m::Mesh, ps::FaceStyle, colorbar::Bool)
     haveData = ps.color isa Vector
 
     # Helpers
-    coords = coordinates(m.geometry)
-    nnodes = nentities(m.topology, 0)
-    nfaces = nentities(m.topology, 2)
+    coords = coordinates(m)
+    Nn = nnodes(m)
+    Nf = nfaces(m)
 
     # Collect triangles
 
     # No color or nodal color
-    if !haveData || length(ps.color) == nnodes
+    if !haveData || length(ps.color) == Nn
         tf = Vector{Vector{Int}}()
         for l in links(m.topology, 2, 0)
             if length(l) == 3
@@ -178,7 +178,7 @@ function plotfaces(f::Makie.Figure, m::Mesh, ps::FaceStyle, colorbar::Bool)
         tf = mapreduce(permutedims, vcat, tf)
         c = ps.color
         # Element color
-    elseif length(ps.color) == nfaces
+    elseif length(ps.color) == Nf
         cnt = 1
         tf = Vector{Vector{Int}}()
         c = Vector{Float64}()
@@ -223,7 +223,7 @@ function plotedges(f::Makie.Figure, m::Mesh, ps::EdgeStyle)
     checkboundary = pdim(m) > 1 && ps.outlineonly
 
     # Coordinates and links from edges to faces
-    coords = coordinates(m.geometry)
+    coords = coordinates(m)
     l12 = checkboundary ? links(m.topology, 1, 2) : ConnectivityList()
 
     # Collect coordinates - currently only 2D

@@ -2,7 +2,7 @@ module MeshesTests
 
 using Test
 
-@testset "Meshes" include("meshtests.jl")
+@testset "Meshes" include("meshestests.jl")
 
 end
 

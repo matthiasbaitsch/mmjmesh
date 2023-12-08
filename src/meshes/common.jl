@@ -1,6 +1,6 @@
 nnodes(o) = nentities(o, 0)
 nedges(o) = nentities(o, 1)
-nnfaces(o) = nentities(o, 2)
+nfaces(o) = nentities(o, 2)
 nsolids(o) = nentities(o, 3)
 nodeIdxs(o) = indexes(o, 0)
 edgeIdxs(o) = indexes(o, 1)

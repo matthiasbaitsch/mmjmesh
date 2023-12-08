@@ -8,19 +8,16 @@ include("setup.jl")
 Create mesh
 
 ```{julia}
-#| echo: false
-a = 2
-m = makemeshonrectangle(4, 2, 2a, a)
-ps = PlotStyle()
-ps.edges.outlineonly = false
-plot(m, ps)
+coords = [0.0 1.0 2.0 0.1 0.9 1.9; 0.0 0.1 0.0 0.9 1.0 0.9]
+elts = [[1, 2, 5, 4], [2, 3, 6], [2, 6, 5]]
+m = Mesh(coords, elts, 2)
+
+plot(m)
 ```
 
 Coordinates of a node
 
 ```{julia}
-using MMJMesh.Meshes
-
 coordinates(node(m, 2))
 ```
 
@@ -30,12 +27,14 @@ Coordinates of a face
 coordinates(face(m, 3))
 ```
 
-Process faces and print node indexes
+Process faces and print node and edge indexes
 
 ```{julia}
-for f ∈ faces(m)
-    println(f)
-    println("- ", nodeIdxs(f))
+for e ∈ elements(m)
+    println(e)
+    println("- ", nodeIdxs(e))
+    println("- ", edgeIdxs(e))
+    println("- ", faceIdxs(e))
 end
 ```
 

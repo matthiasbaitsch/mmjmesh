@@ -22,5 +22,7 @@ export GeometricObject
 export Geometry
 ## point.jl
 export Point
+## various
+# export coordinates
 
 end
