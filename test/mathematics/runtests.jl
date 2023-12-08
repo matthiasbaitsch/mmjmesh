@@ -1,4 +1,4 @@
-module GeometriesTests
+module MathematicsTests
 
 using Test
 using MMJMesh.Mathematics
