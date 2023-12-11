@@ -48,7 +48,7 @@ function makemeshonrectangle(w::Number, h::Number, nx::Int, ny::Int, mt::Meshtyp
     c[2, :] = repeat(range(0, stop=h, length=ny + 1), inner=(nx + 1, 1))
 
     # Mesh
-    m = Mesh(c)
+    m = Mesh(c, 2)
 
     # Connectivity
     cl = ConnectivityList()

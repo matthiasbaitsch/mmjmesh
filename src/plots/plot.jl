@@ -36,7 +36,12 @@ function plot(m::Mesh, ps::PlotStyle=PlotStyle(m))
     # Appearance
     if ps.hidedecorations
         Makie.hidedecorations!(ax)
-        Makie.hidespines!(ax)        
+        Makie.hidespines!(ax)
+    end
+    ax.xreversed = ps.xreversed
+    ax.yreversed = ps.yreversed
+    if ps.title != ""
+        ax.title = ps.title
     end
 
     # Return
@@ -56,7 +61,7 @@ function plotlineplot(f::Makie.Figure, m::Mesh, ps::LineplotStyle, colorbar::Boo
     Ne = nentities(m.topology, 1)
     values = ps.values
     edges = links(m.topology, 1, 0)
-    coords = coordinates(m.geometry)
+    coords = coordinates(m)
 
     # Get values right
     dv = size(values)
@@ -77,10 +82,10 @@ function plotlineplot(f::Makie.Figure, m::Mesh, ps::LineplotStyle, colorbar::Boo
     @assert dv[2] == Ne
 
     # sz = size(boundingbox(m.geometry))
-    minx = minimum(coordinates(m.geometry)[1, :])
-    maxx = maximum(coordinates(m.geometry)[1, :])
-    miny = minimum(coordinates(m.geometry)[2, :])
-    maxy = maximum(coordinates(m.geometry)[2, :])
+    minx = minimum(coordinates(m)[1, :])
+    maxx = maximum(coordinates(m)[1, :])
+    miny = minimum(coordinates(m)[2, :])
+    maxy = maximum(coordinates(m)[2, :])
     lx = maxx - minx
     ly = maxy - miny
     sz = sqrt(lx * ly)
@@ -89,7 +94,7 @@ function plotlineplot(f::Makie.Figure, m::Mesh, ps::LineplotStyle, colorbar::Boo
     end
 
     vmx = maximum(abs, values)
-    a = ps.scale * sz / vmx
+    a = -ps.scale * sz / vmx
 
     c = Vector{Float64}()
     xf = Vector{Float64}()

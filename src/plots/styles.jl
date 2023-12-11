@@ -74,6 +74,10 @@ mutable struct LineplotStyle
     end
 end
 
+# -------------------------------------------------------------------------------------------------
+# PlotStyle
+# -------------------------------------------------------------------------------------------------
+
 """
     PlotStyle
 
@@ -90,7 +94,9 @@ mutable struct PlotStyle
     # Appearance
     hidedecorations::Bool
     colorbar::Bool
-    # title::String
+    xreversed::Bool
+    yreversed::Bool
+    title::String
 
     function PlotStyle()
         return new(
@@ -101,11 +107,14 @@ mutable struct PlotStyle
             LineplotStyle(),
             # Appearance
             true,  # hidedecorations
-            true #,  # colorbar
-            # ""
+            true,  # colorbar
+            false, # xreversed
+            false, # yreversed
+            ""     # title
         )
     end
 end
+
 
 function PlotStyle(m::Mesh, values=nothing)
     ps = PlotStyle()

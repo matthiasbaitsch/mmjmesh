@@ -1,17 +1,12 @@
 project:
   type: book
 
-
 book:
-  title: "The MMJMesh Book"
+  title: "The MMJMesh Library"
   author: "Matthias Baitsch"
   chapters: 
     - index.qmd
-    - mesh.qmd
-    - plot.qmd
 
 format:
-  html:
-    code-fold: true
-  pdf:
-    documentclass: scrreport
+  html: default
+

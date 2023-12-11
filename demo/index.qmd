@@ -1,4 +1,97 @@
-# Preface 
+# Introduction 
 
-Hallo Hallo
+The `MMJMesh` library is intended to become a simple yet versatile basis for the implementation of finite element methods or postprocessing tools. At the moment it is in a very early stage of development.
+
+## Demo for 1D meshes
+
+First, we need to load the required modules. Note that `CairoMakie` included by `import` and not by `using` in order to avoid name collissions.
+
+```{julia}
+import CairoMakie
+using MMJMesh.Plots
+using MMJMesh.Meshes
+using MMJMesh.Utilities
+```
+
+```{julia}
+#| echo: false
+CairoMakie.set_theme!(CairoMakie.theme_minimal())
+```
+
+In the simplest case, a 1D mesh is defined by parameter bounds and the number of elements. 
+
+```{julia}
+m = makemeshoninterval(0.0, 8.0, 4)
+plot(m)
+```
+
+Elements of the mesh can be easily processed in a loop:
+
+```{julia}
+for e ∈ elements(m)
+    println(e, " with n = ", nodeIdxs(e), " and l = ", length(e))
+end
+```
+
+Various functions like `nodeIdxs` and `length` exist to access properties. If you are used to an object-oriented language like Java it might be helpful to understand that `nodeIdxs(e)` in Julia is equivalent to `e.nodeIdxs()` in an OO language.
+
+Node coordinates are retrieved using the `coordinates` method:
+
+```{julia}
+coordinates(m)
+```
+
+Properties are associated with the mesh using the `data` field of the mesh and a name for the property in the form `:name`
+
+```{julia}
+m.data[:foo] = 99
+m.data[:bar] = sqrt
+```
+
+and then are ready to be used in a later stage
+
+```{julia}
+f = m.data[:bar]
+f(4)
+```
+
+In Julia, `:name` is called a symbol. In many applications, this is equivalent to the use of strings like `"name"`, however, easier to type.
+
+It is easy to plot quantities for nodes
+
+```{julia}
+plot(m, -1 .+ 2 * rand(nnodes(m)))
+```
+
+constant on elements
+
+```{julia}
+plot(m, -1 .+ 2 * rand(nelements(m)))
+```
+
+or linear on elements
+
+```{julia}
+plot(m, -1 .+ 2 * rand(2, nelements(m)))
+```
+
+Furthermore, 1D meshes can be created with a parametric function
+
+```{julia}
+m = makemeshoninterval(0, 4pi, 60, t -> [t; sin(t)])
+plot(m)
+```
+
+where the last parameter `t -> [t; sin(t)]` (read: `t` is mapped on the vector `(t, sin(t))`) defines the parametric curve
+
+$$
+    \mathbf{u}(t) =
+    \left(
+    \begin{array}{c}
+        t
+        \\ 
+        \sin(t)
+    \end{array}
+    \right).
+$$
 

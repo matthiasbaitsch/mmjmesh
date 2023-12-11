@@ -1,0 +1,19 @@
+# Associations
+
+```{julia}
+#| echo: false
+include("setup.jl")
+```
+
+```{julia}
+m = makemeshoninterval(0, 4, 20)
+
+n4 = node(m, 4)
+e3 = edge(m, 3)
+
+# Associate something with the mesh
+m.data[:foo] = 99
+@test n4.data[:foo] == 99
+@test e3.data[:foo] == 99
+```
+

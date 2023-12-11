@@ -51,6 +51,7 @@ end
 
 # AbstractArray interface
 Base.length(el::MeshEntityList) = length(el.indexes)
+Base.size(el::MeshEntityList) = (length(el),)
 Base.getindex(el::MeshEntityList{DT}, i::Int) where {DT} = entity(el.mesh, DT, el.indexes[i])
 Base.iterate(el::MeshEntityList, state=1) = state > length(el) ? nothing : (el[state], state + 1)
 

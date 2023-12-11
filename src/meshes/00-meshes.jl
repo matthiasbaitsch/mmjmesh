@@ -3,13 +3,14 @@ module Meshes
 # Modules needed by this module
 ## Other
 using LinearAlgebra
+import Base.length
+import Base.size
 ## Own
 using MMJMesh
 using MMJMesh.MMJBase
 using MMJMesh.Topologies
 using MMJMesh.Geometries
-
-import Base.length
+using MMJMesh.Associations
 
 # Exports
 ## mesh.jl

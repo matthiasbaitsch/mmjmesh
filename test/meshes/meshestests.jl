@@ -1,5 +1,3 @@
-module MeshesTests
-
 using Test
 using MMJMesh.Meshes
 
@@ -18,4 +16,5 @@ f1 = face(m, 1)
 @test faceIdxs(f1) == [3]
 @test length(e2) == hypot(0.1, 0.9)
 
-end
+
+elements(m)

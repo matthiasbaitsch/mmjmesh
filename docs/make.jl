@@ -8,10 +8,11 @@ makedocs(
     format = Documenter.HTML(prettyurls = false),
     pages = [
         "Home" => "index.md",
-        "Geometries" => "geometries.md",
         "Meshes" => "meshes.md",
+        "Associations" => "associations.md",
         "Plots" => "plots.md",
         "Utilities" => "utilities.md",
+        "Geometries" => "geometries.md",
         "Topologies" => "topologies.md"
     ]
 )

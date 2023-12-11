@@ -12,6 +12,7 @@ Mesh of parametric dimension ``d_t`` embedded in ``d_g`` dimensional space.
 struct Mesh{DT,DG}
     topology::Topology{DT}
     geometry::Geometry{DG}
+    data::MeshData
 end
 
 Mesh(dt::Int, dg::Int, nn::Int=0) = Mesh{dt,dg}(Topology(dt, nn), Geometry(dg, nn))
@@ -19,7 +20,8 @@ Mesh(dt::Int, dg::Int, nn::Int=0) = Mesh{dt,dg}(Topology(dt, nn), Geometry(dg, n
 Mesh(coordinates::Matrix, dt::Int) =
     Mesh{dt,size(coordinates, 1)}(
         Topology(dt, size(coordinates, 2)),
-        Geometry(coordinates)
+        Geometry(coordinates),
+        MeshData()
     )
 
 function Mesh(coordinates::Matrix, elements::Vector{Vector{Int}}, dt::Int)
