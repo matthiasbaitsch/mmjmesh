@@ -8,14 +8,18 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+        run: pip install jupyter
       - name: Check out repository
         uses: actions/checkout@v4        
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
-        with:
-          tinytex: true 
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
+        run: julia --project -e 'using Pkg; Pkg.instantiate()'
       - name: Publish to GitHub Pages (and render) 
         uses: quarto-dev/quarto-actions/publish@v2
         with:
