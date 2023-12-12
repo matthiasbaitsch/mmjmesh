@@ -78,7 +78,7 @@ plot(m, -1 .+ 2 * rand(2, nelements(m)))
 Furthermore, 1D meshes can be created with a parametric function
 
 ```{julia}
-m = makemeshoninterval(0, 4pi, 60, t -> [t; sin(t)])
+m = makemeshoninterval(0, 4, 60, t -> [t; sin(π * t)])
 plot(m)
 ```
 

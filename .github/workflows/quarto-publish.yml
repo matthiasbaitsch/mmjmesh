@@ -6,7 +6,7 @@ on:
 name: Render and Publish
 
 jobs:
-  build-deploy:
+  build-test-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Python
@@ -21,8 +21,12 @@ jobs:
         uses: quarto-dev/quarto-actions/setup@v2
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
+      - name: Cache Julia dependencies
+        uses: julia-actions/cache@v1
       - name: Install Julia dependencies
         run: julia --project -e 'using Pkg; Pkg.instantiate()'
+      - name: Test
+        uses: julia-actions/julia-runtest@v1
       - name: Publish to GitHub Pages (and render) 
         uses: quarto-dev/quarto-actions/publish@v2
         with:

@@ -1,3 +1,6 @@
-# mmjmesh - Minh's and Matthias' Julia Mesh Library
+# MMJMesh - Minh's and Matthias' Julia Mesh Library
 
-Simple library for Finite Element meshes.
+Simple mesh library for the implementation of finite element methods and postprocessing tools.
+
+Documentation
+- [User guide](https://matthiasbaitsch.github.io/mmjmesh/)
