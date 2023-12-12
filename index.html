@@ -185,7 +185,7 @@ f(4)</code></pre>
 <p>or linear on elements</p>
 <pre class="{julia}"><code>plot(m, -1 .+ 2 * rand(2, nelements(m)))</code></pre>
 <p>Furthermore, 1D meshes can be created with a parametric function</p>
-<pre class="{julia}"><code>m = makemeshoninterval(0, 4pi, 60, t -&gt; [t; sin(t)])
+<pre class="{julia}"><code>m = makemeshoninterval(0, 4, 60, t -&gt; [t; sin(π * t)])
 plot(m)</code></pre>
 <p>where the last parameter <code>t -&gt; [t; sin(t)]</code> (read: <code>t</code> is mapped on the vector <code>(t, sin(t))</code>) defines the parametric curve</p>
 <p><span class="math display">\[
