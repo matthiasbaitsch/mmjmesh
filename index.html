@@ -179,7 +179,7 @@ using MMJMesh.Utilities</code></pre>
 CairoMakie.set_theme!(CairoMakie.theme_minimal())</code></pre>
 <p>In the simplest case, a 1D mesh is defined by parameter bounds and the number of elements.</p>
 <pre class="{julia}"><code>m = makemeshoninterval(0.0, 8.0, 4)
-plot(m)</code></pre>
+mplot(m)</code></pre>
 <p>Elements of the mesh can be easily processed in a loop:</p>
 <pre class="{julia}"><code>for e ∈ elements(m)
     println(e, " with n = ", nodeIdxs(e), " and l = ", length(e))
@@ -196,14 +196,14 @@ m.data[:bar] = sqrt</code></pre>
 f(4)</code></pre>
 <p>In Julia, <code>:name</code> is called a symbol. In many applications, this is equivalent to the use of strings like <code>"name"</code>, however, easier to type.</p>
 <p>It is easy to plot quantities for nodes</p>
-<pre class="{julia}"><code>plot(m, -1 .+ 2 * rand(nnodes(m)))</code></pre>
+<pre class="{julia}"><code>mplot(m, -1 .+ 2 * rand(nnodes(m)))</code></pre>
 <p>constant on elements</p>
-<pre class="{julia}"><code>plot(m, -1 .+ 2 * rand(nelements(m)))</code></pre>
+<pre class="{julia}"><code>mplot(m, -1 .+ 2 * rand(nelements(m)))</code></pre>
 <p>or linear on elements</p>
-<pre class="{julia}"><code>plot(m, -1 .+ 2 * rand(2, nelements(m)))</code></pre>
+<pre class="{julia}"><code>mplot(m, -1 .+ 2 * rand(2, nelements(m)))</code></pre>
 <p>Furthermore, 1D meshes can be created with a parametric function</p>
 <pre class="{julia}"><code>m = makemeshoninterval(0, 4, 60, t -&gt; [t; sin(π * t)])
-plot(m)</code></pre>
+mplot(m)</code></pre>
 <p>where the last parameter <code>t -&gt; [t; sin(t)]</code> (read: <code>t</code> is mapped on the vector <code>(t, sin(t))</code>) defines the parametric curve</p>
 <p><span class="math display">\[
     \mathbf{u}(t) =

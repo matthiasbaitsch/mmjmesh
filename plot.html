@@ -172,28 +172,28 @@ CairoMakie.set_theme!(CairoMakie.theme_minimal())</code></pre>
 <section id="on-a-straight-line" class="level3" data-number="3.1.1">
 <h3 data-number="3.1.1" class="anchored" data-anchor-id="on-a-straight-line"><span class="header-section-number">3.1.1</span> On a straight line</h3>
 <pre class="{julia}"><code>m = makemeshoninterval(0, 4, 20)
-plot(m)</code></pre>
+mplot(m)</code></pre>
 <p>One value per node</p>
-<pre class="{julia}"><code>plot(m, -1.1 .+ 2.2 * rand(nentities(m.topology, 0)))</code></pre>
+<pre class="{julia}"><code>mplot(m, -1.1 .+ 2.2 * rand(nentities(m.topology, 0)))</code></pre>
 <p>One value per element</p>
-<pre class="{julia}"><code>plot(m, -1.1 .+ 2.2 * rand(nedges(m)))</code></pre>
+<pre class="{julia}"><code>mplot(m, -1.1 .+ 2.2 * rand(nedges(m)))</code></pre>
 <p>Two values per element</p>
-<pre class="{julia}"><code>plot(m, -1.1 .+ 2.2 * rand(2, nedges(m)))</code></pre>
+<pre class="{julia}"><code>mplot(m, -1.1 .+ 2.2 * rand(2, nedges(m)))</code></pre>
 </section>
 <section id="vertical" class="level3" data-number="3.1.2">
 <h3 data-number="3.1.2" class="anchored" data-anchor-id="vertical"><span class="header-section-number">3.1.2</span> Vertical</h3>
 <pre class="{julia}"><code>m = makemeshoninterval(π, 3π, 20, t -&gt; [0; t])
-plot(m, -1.1 .+ 3.2 * rand(nedges(m)))</code></pre>
+mplot(m, -1.1 .+ 3.2 * rand(nedges(m)))</code></pre>
 </section>
 <section id="on-a-spiral" class="level3" data-number="3.1.3">
 <h3 data-number="3.1.3" class="anchored" data-anchor-id="on-a-spiral"><span class="header-section-number">3.1.3</span> On a spiral</h3>
 <pre class="{julia}"><code>m = makemeshoninterval(π, 3π, 20, t -&gt; t * [cos(t); sin(t)])
-plot(m, -1.1 .+ 3.2 * rand(2, nedges(m)))</code></pre>
+mplot(m, -1.1 .+ 3.2 * rand(2, nedges(m)))</code></pre>
 </section>
 <section id="customize-plot" class="level3" data-number="3.1.4">
 <h3 data-number="3.1.4" class="anchored" data-anchor-id="customize-plot"><span class="header-section-number">3.1.4</span> Customize plot</h3>
 <p>Plot customization works like this:</p>
-<pre class="{julia}"><code>f = plot(m, -1.1 .+ 3.2 * rand(2, nedges(m)))
+<pre class="{julia}"><code>f = mplot(m, -1.1 .+ 3.2 * rand(2, nedges(m)))
 ax = f.content[1]
 ax.title = "Spiral with reversed vertical axis"
 ax.yreversed = true
@@ -214,11 +214,11 @@ print("Links...")
 <pre class="{julia}"><code>ps = PlotStyle(m)
 ps.edges.outlineonly = false
 ps.edges.color = :hotpink
-plot(m, ps)</code></pre>
+mplot(m, ps)</code></pre>
 <p>Colors for nodes</p>
-<pre class="{julia}"><code>plot(m, 4.1 * (rand(nentities(m.topology, 0)) .- 0.25))</code></pre>
+<pre class="{julia}"><code>mplot(m, 4.1 * (rand(nentities(m.topology, 0)) .- 0.25))</code></pre>
 <p>Colors for elements</p>
-<pre class="{julia}"><code>plot(m, 4.1 * (rand(nentities(m.topology, 2)) .- 0.25))</code></pre>
+<pre class="{julia}"><code>mplot(m, 4.1 * (rand(nentities(m.topology, 2)) .- 0.25))</code></pre>
 </section>
 <section id="triangle-mesh" class="level3" data-number="3.2.2">
 <h3 data-number="3.2.2" class="anchored" data-anchor-id="triangle-mesh"><span class="header-section-number">3.2.2</span> Triangle mesh</h3>
@@ -231,11 +231,11 @@ print("Links (1, 2):")
 <pre class="{julia}"><code>ps = PlotStyle(m)
 ps.edges.outlineonly = false
 ps.edges.color = :hotpink
-plot(m, ps)</code></pre>
+mplot(m, ps)</code></pre>
 <p>Colors for nodes</p>
-<pre class="{julia}"><code>plot(m, 4.1 * (rand(nentities(m.topology, 0)) .- 0.25))</code></pre>
+<pre class="{julia}"><code>mplot(m, 4.1 * (rand(nentities(m.topology, 0)) .- 0.25))</code></pre>
 <p>Colors for elements</p>
-<pre class="{julia}"><code>plot(m, 4.1 * (rand(nentities(m.topology, 2)) .- 0.25))</code></pre>
+<pre class="{julia}"><code>mplot(m, 4.1 * (rand(nentities(m.topology, 2)) .- 0.25))</code></pre>
 
 
 </section>
