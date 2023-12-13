@@ -7,6 +7,7 @@ The `MMJMesh` library is intended to become a simple yet versatile basis for the
 First, we need to load the required modules. Note that `CairoMakie` included by `import` and not by `using` in order to avoid name collissions.
 
 ```{julia}
+#| warning: false
 import CairoMakie
 using MMJMesh.Plots
 using MMJMesh.Meshes
@@ -44,6 +45,7 @@ coordinates(m)
 Properties are associated with the mesh using the `data` field of the mesh and a name for the property in the form `:name`
 
 ```{julia}
+#| echo: false
 m.data[:foo] = 99
 m.data[:bar] = sqrt
 ```

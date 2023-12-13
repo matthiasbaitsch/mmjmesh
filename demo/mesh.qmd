@@ -1,7 +1,10 @@
 # The Mesh interface
 
+This chapter is incomplete and probably not worth reading.
+
 ```{julia}
 #| echo: false
+#| warning: false
 include("setup.jl")
 ```
 

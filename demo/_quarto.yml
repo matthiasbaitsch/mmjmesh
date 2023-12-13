@@ -3,10 +3,14 @@ project:
 
 book:
   title: "The MMJMesh Library"
+  subtitle: "Minh's and Matthias' Julia Mesh Library"
   author: "Matthias Baitsch"
   chapters: 
     - index.qmd
+    - mesh.qmd
+    - plot.qmd
 
 format:
-  html: default
+  html:
+    css: style.css
 
