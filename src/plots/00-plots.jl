@@ -15,7 +15,7 @@ using MMJMesh.Geometries
 ## styles.jl
 export PlotStyle
 ## plot.jl
-export plot
+export mplot
 
 # Parts
 include("styles.jl")

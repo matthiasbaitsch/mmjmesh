@@ -1,9 +1,9 @@
 """
-    plot(m::Mesh[, ps::PlotStyle=PlotStyle()])
+    mplot(m::Mesh[, ps::PlotStyle=PlotStyle()])
 
 Plot mesh `m` with style `ps`.
 """
-function plot(m::Mesh, ps::PlotStyle=PlotStyle(m))
+function mplot(m::Mesh, ps::PlotStyle=PlotStyle(m))
 
     # Figure
     f = Makie.Figure()
@@ -48,7 +48,7 @@ function plot(m::Mesh, ps::PlotStyle=PlotStyle(m))
     return f
 end
 
-plot(m::Mesh, values::AbstractArray) = plot(m, PlotStyle(m, values))
+mplot(m::Mesh, values::AbstractArray) = mplot(m, PlotStyle(m, values))
 
 # -------------------------------------------------------------------------------------------------
 # Details
