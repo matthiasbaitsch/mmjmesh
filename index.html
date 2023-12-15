@@ -214,7 +214,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshoninterval</span>(<span class="fl">0.0</span>, <span class="fl">8.0</span>, <span class="fl">4</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="17">
 <p><img src="index_files/figure-html/cell-4-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
@@ -234,7 +234,7 @@ Edge[4] with n = [4, 5] and l = 2.0</code></pre>
 <p>Node coordinates are retrieved using the <code>coordinates</code> method:</p>
 <div class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coordinates</span>(m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div class="cell-output cell-output-display" data-execution_count="19">
 <pre><code>2×5 Matrix{Float64}:
  0.0  2.0  4.0  6.0  8.0
  0.0  0.0  0.0  0.0  0.0</code></pre>
@@ -249,7 +249,7 @@ Edge[4] with n = [4, 5] and l = 2.0</code></pre>
 <div class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> m.data[<span class="op">:</span>bar]</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(<span class="fl">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
+<div class="cell-output cell-output-display" data-execution_count="21">
 <pre><code>2.0</code></pre>
 </div>
 </div>
@@ -257,21 +257,21 @@ Edge[4] with n = [4, 5] and l = 2.0</code></pre>
 <p>It is easy to plot quantities for nodes</p>
 <div class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1</span> <span class="op">.+</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fu">nnodes</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="22">
 <p><img src="index_files/figure-html/cell-9-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
 <p>constant on elements</p>
 <div class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1</span> <span class="op">.+</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fu">nelements</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="10">
+<div class="cell-output cell-output-display" data-execution_count="23">
 <p><img src="index_files/figure-html/cell-10-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
 <p>or linear on elements</p>
 <div class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1</span> <span class="op">.+</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fl">2</span>, <span class="fu">nelements</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="11">
+<div class="cell-output cell-output-display" data-execution_count="24">
 <p><img src="index_files/figure-html/cell-11-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
@@ -279,7 +279,7 @@ Edge[4] with n = [4, 5] and l = 2.0</code></pre>
 <div class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshoninterval</span>(<span class="fl">0</span>, <span class="fl">5</span>, <span class="fl">60</span>, t <span class="op">-&gt;</span> [t; <span class="fl">0.3</span> <span class="op">*</span> <span class="fu">sin</span>(<span class="cn">π</span> <span class="op">*</span> t)])</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="cell-output cell-output-display" data-execution_count="25">
 <p><img src="index_files/figure-html/cell-12-output-1.svg" class="img-fluid"></p>
 </div>
 </div>

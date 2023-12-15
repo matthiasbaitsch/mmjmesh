@@ -205,28 +205,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshoninterval</span>(<span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">20</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, nodecolor<span class="op">=:</span>green) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="23">
 <p><img src="plot_files/figure-html/cell-3-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
 <p>One value per node</p>
 <div class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1.1</span> <span class="op">.+</span> <span class="fl">2.6</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fu">nentities</span>(m.topology, <span class="fl">0</span>))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="24">
 <p><img src="plot_files/figure-html/cell-4-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
 <p>One value per element</p>
 <div class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1.1</span> <span class="op">.+</span> <span class="fl">2.2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fu">nedges</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="25">
 <p><img src="plot_files/figure-html/cell-5-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
 <p>Two values per element</p>
 <div class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1.1</span> <span class="op">.+</span> <span class="fl">2.2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fl">2</span>, <span class="fu">nedges</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div class="cell-output cell-output-display" data-execution_count="26">
 <p><img src="plot_files/figure-html/cell-6-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
@@ -236,7 +236,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshoninterval</span>(<span class="cn">π</span>, <span class="fl">3</span>π, <span class="fl">20</span>, t <span class="op">-&gt;</span> [<span class="fl">0</span>; t])</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1.1</span> <span class="op">.+</span> <span class="fl">3.2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fu">nedges</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="27">
 <p><img src="plot_files/figure-html/cell-7-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
@@ -246,7 +246,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshoninterval</span>(<span class="cn">π</span>, <span class="fl">3</span>π, <span class="fl">20</span>, t <span class="op">-&gt;</span> t <span class="op">*</span> [<span class="fu">cos</span>(t); <span class="fu">sin</span>(t)])</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1.1</span> <span class="op">.+</span> <span class="fl">3.2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fl">2</span>, <span class="fu">nedges</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
+<div class="cell-output cell-output-display" data-execution_count="28">
 <p><img src="plot_files/figure-html/cell-8-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
@@ -259,7 +259,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ax.title <span class="op">=</span> <span class="st">"Spiral with reversed vertical axis"</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ax.yreversed <span class="op">=</span> <span class="cn">true</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>f</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="29">
 <p><img src="plot_files/figure-html/cell-9-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
@@ -281,27 +281,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 Links...</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  0.169687 seconds (1.17 M allocations: 90.228 MiB, 23.54% gc time, 46.36% compilation time)</code></pre>
+<pre><code>  0.073294 seconds (1.10 M allocations: 85.724 MiB, 33.09% gc time)</code></pre>
 </div>
 </div>
 <p>Default color</p>
 <div class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, showedges<span class="op">=</span><span class="cn">true</span>, edgecolor<span class="op">=:</span>hotpink) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="11">
+<div class="cell-output cell-output-display" data-execution_count="31">
 <p><img src="plot_files/figure-html/cell-11-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
 <p>Colors for nodes</p>
 <div class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="fl">4.1</span> <span class="op">*</span> (<span class="fu">rand</span>(<span class="fu">nentities</span>(m.topology, <span class="fl">0</span>)) <span class="op">.-</span> <span class="fl">0.25</span>)) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="cell-output cell-output-display" data-execution_count="32">
 <p><img src="plot_files/figure-html/cell-12-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
 <p>Colors for elements</p>
 <div class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="fl">4.1</span> <span class="op">*</span> (<span class="fu">rand</span>(<span class="fu">nentities</span>(m.topology, <span class="fl">2</span>)) <span class="op">.-</span> <span class="fl">0.25</span>)) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="13">
+<div class="cell-output cell-output-display" data-execution_count="33">
 <p><img src="plot_files/figure-html/cell-13-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
@@ -316,27 +316,27 @@ Links...</code></pre>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> l12 <span class="op">=</span> <span class="fu">links</span>(m.topology, <span class="fl">1</span>, <span class="fl">2</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Nn = 861
-Links (1, 2):  0.004302 seconds (101.71 k allocations: 8.227 MiB)</code></pre>
+Links (1, 2):  0.004366 seconds (101.71 k allocations: 8.227 MiB)</code></pre>
 </div>
 </div>
 <p>Default color</p>
 <div class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, showedges<span class="op">=</span><span class="cn">true</span>) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="15">
+<div class="cell-output cell-output-display" data-execution_count="35">
 <p><img src="plot_files/figure-html/cell-15-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
 <p>Colors for nodes</p>
 <div class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="fl">4.1</span> <span class="op">*</span> (<span class="fu">rand</span>(<span class="fu">nentities</span>(m.topology, <span class="fl">0</span>)) <span class="op">.-</span> <span class="fl">0.25</span>)) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="16">
+<div class="cell-output cell-output-display" data-execution_count="36">
 <p><img src="plot_files/figure-html/cell-16-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
 <p>Colors for elements</p>
 <div class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="fl">4.1</span> <span class="op">*</span> (<span class="fu">rand</span>(<span class="fu">nentities</span>(m.topology, <span class="fl">2</span>)) <span class="op">.-</span> <span class="fl">0.25</span>)) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="17">
+<div class="cell-output cell-output-display" data-execution_count="37">
 <p><img src="plot_files/figure-html/cell-17-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
@@ -353,7 +353,7 @@ Links (1, 2):  0.004302 seconds (101.71 k allocations: 8.227 MiB)</code></pre>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    featureedgecolor<span class="op">=:</span>red, featureedgelinewidth<span class="op">=</span><span class="fl">6</span>,</span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    facecolormap<span class="op">=:</span>bluesreds</span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="18">
+<div class="cell-output cell-output-display" data-execution_count="38">
 <p><img src="plot_files/figure-html/cell-18-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
@@ -367,7 +367,7 @@ Links (1, 2):  0.004302 seconds (101.71 k allocations: 8.227 MiB)</code></pre>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    lineplotoutlineslinewidth<span class="op">=</span><span class="fl">2.0</span>,</span>
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    lineplotfacescolormap<span class="op">=:</span>bluesreds</span>
 <span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>) <span class="op">|&gt;</span> <span class="fu">mconf</span>(title<span class="op">=</span><span class="st">"Test Plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="19">
+<div class="cell-output cell-output-display" data-execution_count="39">
 <p><img src="plot_files/figure-html/cell-19-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
