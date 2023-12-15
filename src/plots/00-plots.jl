@@ -5,20 +5,16 @@ module Plots
 import Makie
 using LinearAlgebra
 ## Own
-using MMJMesh
 using MMJMesh.Meshes
 using MMJMesh.MMJBase
 using MMJMesh.Topologies
-using MMJMesh.Geometries
 
 # Exports
-## styles.jl
-export PlotStyle
-## plot.jl
-export mplot
+export mplot, mconf
 
 # Parts
+include("plotrecipe.jl")
 include("styles.jl")
-include("plot.jl")
+include("doplot.jl")
 
 end

@@ -1,60 +1,45 @@
+# -------------------------------------------------------------------------------------------------
+# Main plot function
+# -------------------------------------------------------------------------------------------------
+
 """
-    mplot(m::Mesh[, ps::PlotStyle=PlotStyle()])
+    xmplot(m::Mesh[, ps::PlotStyle=PlotStyle()])
 
 Plot mesh `m` with style `ps`.
 """
-function mplot(m::Mesh, ps::PlotStyle=PlotStyle(m))
+function doplot(plot::MPlot, m::Mesh, ps::PlotStyle)
 
-    # Figure
-    f = Makie.Figure()
-    ax = Makie.Axis(f[1, 1], aspect=Makie.DataAspect())
+    show(s) = !isnothing(s) && s.visible
 
-    # Line plot
-    if !isnothing(ps.lineplot) && !isnothing(ps.lineplot.values)
-        plotlineplot(f, m, ps.lineplot, ps.colorbar)
+    if show(ps.lineplot)
+        doplotlineplot(plot, m, ps.lineplot)
     end
-
-    # Faces
-    if pdim(m) >= 2 && ps.faces.visible
-        plotfaces(f, m, ps.faces, ps.colorbar)
+    if show(ps.faces)
+        doplotfaces(plot, m, ps.faces)
     end
-
-    # Edges
-    if ps.edges.visible
-        plotedges(f, m, ps.edges)
+    if show(ps.edges)
+        doplotedges(plot, m, ps.edges, false)
     end
-
-    # Nodes
-    if ps.nodes.visible
+    if show(ps.featureedges)
+        doplotedges(plot, m, ps.featureedges, true)
+    end
+    if show(ps.nodes)
         Makie.scatter!(
+            plot,
             coordinates(m),
             color=ps.nodes.color,
             markersize=ps.nodes.size
         )
     end
 
-    # Appearance
-    if ps.hidedecorations
-        Makie.hidedecorations!(ax)
-        Makie.hidespines!(ax)
-    end
-    ax.xreversed = ps.xreversed
-    ax.yreversed = ps.yreversed
-    if ps.title != ""
-        ax.title = ps.title
-    end
-
-    # Return
-    return f
+    return plot
 end
-
-mplot(m::Mesh, values::AbstractArray) = mplot(m, PlotStyle(m, values))
 
 # -------------------------------------------------------------------------------------------------
 # Details
 # -------------------------------------------------------------------------------------------------
 
-function plotlineplot(f::Makie.Figure, m::Mesh, ps::LineplotStyle, colorbar::Bool)
+function doplotlineplot(plot::MPlot, m::Mesh, ps::LineplotStyle)
 
     # TODO complete rewrite using functions
     Nn = nentities(m.topology, 0)
@@ -142,21 +127,22 @@ function plotlineplot(f::Makie.Figure, m::Mesh, ps::LineplotStyle, colorbar::Boo
         end
     end
 
+    if !isnothing(ps.faces.color)
+        c = ps.faces.color
+    end
+
     if ps.faces.visible
         x = [xf yf]'
         tf = mapreduce(permutedims, vcat, tf)
-        hm = Makie.mesh!(x, tf, color=c, colormap=ps.faces.colormap)
-        if colorbar
-            Makie.Colorbar(f[1, 2], hm)
-        end
+        Makie.mesh!(plot, x, tf, color=c, colormap=ps.faces.colormap)
     end
 
     if ps.outlines.visible
-        Makie.lines!(xe, ye, linewidth=ps.outlines.linewidth, color=ps.outlines.color)
+        Makie.lines!(plot, xe, ye, linewidth=ps.outlines.linewidth, color=ps.outlines.color)
     end
 end
 
-function plotfaces(f::Makie.Figure, m::Mesh, ps::FaceStyle, colorbar::Bool)
+function doplotfaces(plot::MPlot, m::Mesh, ps::MeshStyle)
 
     # Test if we have data
     haveData = ps.color isa Vector
@@ -166,10 +152,8 @@ function plotfaces(f::Makie.Figure, m::Mesh, ps::FaceStyle, colorbar::Bool)
     Nn = nnodes(m)
     Nf = nfaces(m)
 
-    # Collect triangles
-
-    # No color or nodal color
-    if !haveData || length(ps.color) == Nn
+    # Collect triangles    
+    if !haveData || length(ps.color) == Nn                           # No color or nodal color
         tf = Vector{Vector{Int}}()
         for l in links(m.topology, 2, 0)
             if length(l) == 3
@@ -181,9 +165,8 @@ function plotfaces(f::Makie.Figure, m::Mesh, ps::FaceStyle, colorbar::Bool)
         end
         x = coords
         tf = mapreduce(permutedims, vcat, tf)
-        c = ps.color
-        # Element color
-    elseif length(ps.color) == Nf
+        c = ps.color        
+    elseif length(ps.color) == Nf                                    # Element color
         cnt = 1
         tf = Vector{Vector{Int}}()
         c = Vector{Float64}()
@@ -214,28 +197,20 @@ function plotfaces(f::Makie.Figure, m::Mesh, ps::FaceStyle, colorbar::Bool)
     end
 
     # Plot
-    hm = Makie.mesh!(x, tf, color=c, colormap=ps.colormap)
-
-    # Colorbar
-    if haveData && colorbar
-        Makie.Colorbar(f[1, 2], hm)
-    end
+    Makie.mesh!(plot, x, tf, color=c, colormap=ps.colormap)
 end
 
-function plotedges(f::Makie.Figure, m::Mesh, ps::EdgeStyle)
-
-    # Check if we have to check for boundary
-    checkboundary = pdim(m) > 1 && ps.outlineonly
+function doplotedges(plot::MPlot, m::Mesh, ps::LineStyle, featureedgesonly::Bool)
 
     # Coordinates and links from edges to faces
     coords = coordinates(m)
-    l12 = checkboundary ? links(m.topology, 1, 2) : ConnectivityList()
+    l12 = featureedgesonly ? links(m.topology, 1, 2) : ConnectivityList()
 
     # Collect coordinates - currently only 2D
     xx = Vector{Float64}()
     yy = Vector{Float64}()
     for (i, l) in enumerate(links(m.topology, 1, 0))
-        if !checkboundary || length(l12, i) == 1
+        if !featureedgesonly || length(l12, i) == 1
             x1 = coords[:, l[1]]
             x2 = coords[:, l[2]]
             push!(xx, x1[1], x2[1], NaN)
@@ -244,5 +219,5 @@ function plotedges(f::Makie.Figure, m::Mesh, ps::EdgeStyle)
     end
 
     # Plot
-    Makie.lines!(xx, yy, linewidth=ps.linewidth, color=ps.color)
+    Makie.lines!(plot, xx, yy, linewidth=ps.linewidth, color=ps.color)
 end

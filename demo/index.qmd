@@ -23,7 +23,7 @@ In the simplest case, a 1D mesh is defined by parameter bounds and the number of
 
 ```{julia}
 m = makemeshoninterval(0.0, 8.0, 4)
-mplot(m)
+mplot(m) |> mconf()
 ```
 
 Elements of the mesh can be easily processed in a loop:
@@ -45,9 +45,8 @@ coordinates(m)
 Properties are associated with the mesh using the `data` field of the mesh and a name for the property in the form `:name`
 
 ```{julia}
-#| echo: false
 m.data[:foo] = 99
-m.data[:bar] = sqrt
+m.data[:bar] = sqrt;
 ```
 
 and then are ready to be used in a later stage
@@ -62,26 +61,26 @@ In Julia, `:name` is called a symbol. In many applications, this is equivalent t
 It is easy to plot quantities for nodes
 
 ```{julia}
-mplot(m, -1 .+ 2 * rand(nnodes(m)))
+mplot(m, -1 .+ 2 * rand(nnodes(m))) |> mconf()
 ```
 
 constant on elements
 
 ```{julia}
-mplot(m, -1 .+ 2 * rand(nelements(m)))
+mplot(m, -1 .+ 2 * rand(nelements(m))) |> mconf()
 ```
 
 or linear on elements
 
 ```{julia}
-mplot(m, -1 .+ 2 * rand(2, nelements(m)))
+mplot(m, -1 .+ 2 * rand(2, nelements(m))) |> mconf()
 ```
 
 Furthermore, 1D meshes can be created with a parametric function
 
 ```{julia}
-m = makemeshoninterval(0, 4, 60, t -> [t; sin(π * t)])
-mplot(m)
+m = makemeshoninterval(0, 5, 60, t -> [t; 0.3 * sin(π * t)])
+mplot(m) |> mconf()
 ```
 
 where the last parameter `t -> [t; sin(t)]` (read: `t` is mapped on the vector `(t, sin(t))`) defines the parametric curve

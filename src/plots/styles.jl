@@ -1,144 +1,59 @@
-"""
-    NodeStyle
-
-How to plot points.
-"""
-mutable struct NodeStyle
-    visible::Bool
-    size::Real
-    color
-
-    function NodeStyle()
-        return new(false, 7.0, :tomato)
-    end
+@kwdef mutable struct PointStyle
+    visible::Bool = false
+    size::Real = 7.0
+    color = :tomato
 end
 
-"""
-    EdgeStyle
-
-How to plot edges.
-"""
-mutable struct EdgeStyle
-    visible::Bool
-    outlineonly::Bool
-    linewidth::Real
-    color
-
-    function EdgeStyle()
-        return new(true, true, 1.0, :black)
-    end
+@kwdef mutable struct LineStyle
+    visible::Bool = true
+    linewidth::Real = 1.0
+    color = :gray30
 end
 
-"""
-    FaceStyle
-
-How to plot faces.
-"""
-mutable struct FaceStyle
-    visible::Bool
-    color
-    colormap
-
-    function FaceStyle()
-        return new(true, :lightsteelblue, :jet)
-    end
+@kwdef mutable struct MeshStyle
+    visible::Bool = true
+    color = :seashell2                         # Color or scalars
+    colormap = :jet                             # Unused unless color is scalars
 end
 
-"""
-    LineplotStyle
-
-How to plot values along edges.
-"""
-mutable struct LineplotStyle
-
-    # Data
-    values
-
-    # Scaling factor
-    scale::Float64
-
-    # Parts
-    outlines::EdgeStyle
-    faces::FaceStyle
-
-
-    function LineplotStyle()
-        return new(
-            # Data
-            nothing,        # values
-            0.1,            # scale
-            # Parts
-            EdgeStyle(),
-            FaceStyle()
-        )
-    end
+@kwdef mutable struct LineplotStyle
+    visible = false
+    values = nothing
+    scale::Float64 = 0.1
+    outlines::LineStyle = LineStyle()
+    faces::MeshStyle = MeshStyle(color=nothing)
 end
 
-# -------------------------------------------------------------------------------------------------
-# PlotStyle
-# -------------------------------------------------------------------------------------------------
-
-"""
-    PlotStyle
-
-How to plot the mesh.
-"""
-mutable struct PlotStyle
-
-    # Parts
-    nodes::Union{Nothing,NodeStyle}
-    edges::Union{Nothing,EdgeStyle}
-    faces::Union{Nothing,FaceStyle}
-    lineplot::Union{Nothing,LineplotStyle}
-
-    # Appearance
-    hidedecorations::Bool
-    colorbar::Bool
-    xreversed::Bool
-    yreversed::Bool
-    title::String
-
-    function PlotStyle()
-        return new(
-            # Parts
-            NodeStyle(),
-            EdgeStyle(),
-            FaceStyle(),
-            LineplotStyle(),
-            # Appearance
-            true,  # hidedecorations
-            true,  # colorbar
-            false, # xreversed
-            false, # yreversed
-            ""     # title
-        )
-    end
+@kwdef mutable struct PlotStyle
+    nodes::Union{Nothing,PointStyle} = PointStyle()
+    edges::Union{Nothing,LineStyle} = LineStyle()
+    featureedges::Union{Nothing,LineStyle} = LineStyle(color=:gray30)
+    faces::Union{Nothing,MeshStyle} = MeshStyle()
+    lineplot::Union{Nothing,LineplotStyle} = LineplotStyle()
 end
 
-
-function PlotStyle(m::Mesh, values=nothing)
+function PlotStyle(m::Mesh, scalars=nothing)
     ps = PlotStyle()
 
-    # Only Edges
-    if pdim(m) == 1
-        ps.faces = nothing
+    if pdim(m) == 1                              # 1D mesh
         ps.nodes.visible = true
-        ps.edges.linewidth = 2
-        if !isnothing(values)
-            ps.lineplot.values = values
+        ps.edges.linewidth = 2.0
+        ps.faces = nothing
+        ps.featureedges = nothing
+        if !isnothing(scalars)
+            ps.lineplot.visible = true
+            ps.lineplot.values = scalars
         else
             ps.lineplot = nothing
         end
-
-    # Faces
-    elseif pdim(m) == 2
+    elseif pdim(m) == 2                          # 2D mesh
         ps.lineplot = nothing
-        if !isnothing(values)
-            ps.faces.color = values
+        ps.edges.color = :gray60
+        ps.featureedges.linewidth = 1.5
+        if !isnothing(scalars)
+            ps.faces.color = scalars
         end
-        ps.edges.outlineonly = nfaces(m) > 100
-        
-    # Edges and faces is all we got at the moment
+        ps.edges.visible = nfaces(m) <= 100
     else
         @notimplemented
     end
