@@ -1,0 +1,54 @@
+# Mathematics
+
+```{julia}
+#| echo: false
+#| warning: false
+include("setup.jl")
+using IntervalSets
+```
+
+## Mappings
+
+```{julia}
+s = Sin(0 .. 3π)
+c = Cos(0 .. 3π)
+
+f = 2s
+g = s + f'
+p = 1 / 20 * Polynomial([2, -1], 1 .. 8) * Polynomial([3, -1]) * Polynomial([4.5, -1]) * Polynomial([8, -1])
+
+plot(c, s, g, p)
+```
+
+### Monomials
+
+```{julia}
+plot(monomials(0:100, 0 .. 1)...)
+```
+
+### Hermite like polynomials with middle node
+
+Define linear forms
+
+```{julia}
+struct ValueAt <: AbstractMapping{AbstractMapping,Real,Everything()}
+    x::Real
+end
+MMJMesh.Mathematics.valueat(u::ValueAt, f) = f(u.x)
+
+struct DerivativeAt <: AbstractMapping{AbstractMapping,Real,Everything()}
+    x::Real
+end
+MMJMesh.Mathematics.valueat(u::DerivativeAt, f) = f'(u.x)
+```
+
+Compute polynomials from Vandermonde matrix
+
+```{julia}
+h = 2.0
+N = [ValueAt.(0:h/2:h); DerivativeAt.([0, h])] |> vcat
+P = monomials(0:length(N)-1, 0 .. h)
+M = [n(p) for p in P, n in N]
+H = inv(M) * P
+plot(H...)
+```

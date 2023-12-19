@@ -9,6 +9,7 @@ book:
     - index.qmd
     - mesh.qmd
     - plot.qmd
+    - mathematics.qmd
 
 format:
   html:
