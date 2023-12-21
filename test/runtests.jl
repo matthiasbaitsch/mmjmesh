@@ -1,7 +1,7 @@
 module MMJMeshRunTests
 
 using Test
-using Aqua
+# using Aqua
 using MMJMesh
 
 @testset "MMJMesh" begin    
