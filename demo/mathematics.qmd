@@ -5,7 +5,10 @@
 #| warning: false
 include("setup.jl")
 using IntervalSets
+using LinearAlgebra
+import CairoMakie as cm
 ```
+
 
 ## Mappings
 
@@ -20,11 +23,38 @@ p = 1 / 20 * Polynomial([2, -1], 1 .. 8) * Polynomial([3, -1]) * Polynomial([4.5
 plot(c, s, g, p)
 ```
 
+```{julia}
+f = Polynomial([0, 1], -1 .. 1)
+F = antiderivative(f)
+plot(f, F)
+```
+
+```{julia}
+integrate(f, 0 .. 1)
+```
+
+```{julia}
+p = [0, 1, 2]
+f = plot(fromroots(p, -0.1 .. 2.1))
+CairoMakie.scatter!(p, 0 * p, color=:tomato)
+f
+```
+
+```{julia}
+p = [0, 1.5, 2]
+f = plot(lagrangepolynomials(p, 0 .. 2)...)
+CairoMakie.scatter!(p, 0 * p, color=:tomato)
+CairoMakie.scatter!(p, 1 .+ 0 * p, color=:blue)
+f
+```
+
+
 ### Monomials
 
 ```{julia}
 plot(monomials(0:100, 0 .. 1)...)
 ```
+
 
 ### Hermite like polynomials with middle node
 

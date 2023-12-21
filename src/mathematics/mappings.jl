@@ -96,6 +96,12 @@ function plot(f::AbstractFunctionRToR, fs::AbstractFunctionRToR...)
     f
 end
 
+function antiderivative end
+function integrate(f::AbstractFunctionRToR, I) 
+    F = antiderivative(f)
+    return F(rightendpoint(I)) - F(leftendpoint(I))
+end
+
 # -------------------------------------------------------------------------------------------------
 # Special functions
 # -------------------------------------------------------------------------------------------------
@@ -126,6 +132,8 @@ Polynomial(p::Polynomials.Polynomial, d=R) = Polynomial{d}(p)
 Polynomial(c::AbstractArray, d=R) = Polynomial{d}(Polynomials.Polynomial(c))
 valueat(p::Polynomial, x::Real) = p.p(x)
 derivative(p::Polynomial{D}) where {D} = Polynomial(Polynomials.derivative(p.p), D)
+antiderivative(p::Polynomial{D}) where {D} = Polynomial(Polynomials.integrate(p.p), D)
+
 # TODO: derivativeat
 Base.:+(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = Polynomial(p1.p + p2.p, D1 ∩ D2)
 Base.:*(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = Polynomial(p1.p * p2.p, D1 ∩ D2)
@@ -139,5 +147,18 @@ function monomials(p::AbstractArray{Int}, d=R)
         return c
     end
     return [Polynomial(coeffs(i), d) for i in p]
+end
+
+fromroots(r::AbstractArray{<:Real}, d=R) = Polynomial(Polynomials.fromroots(r), d)
+
+function lagrangepolynomials(c::AbstractArray{<:Real}, d=R)
+    indexes = 1:length(c)
+    normalize(f, x) = 1 / f(x) * f
+    return [
+        normalize(
+            fromroots(c[filter(j -> j != i, indexes)], d), 
+            c[i]
+        ) for i in indexes
+    ]
 end
 
