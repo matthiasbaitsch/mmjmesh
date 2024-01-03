@@ -29,5 +29,6 @@ using MMJMesh.Plots
 end
 
 @testset "Sample" include("sampleadaptive.jl")
+@testset "Reference" include("reference.jl")
 
 end

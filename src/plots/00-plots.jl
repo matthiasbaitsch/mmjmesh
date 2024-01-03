@@ -3,6 +3,8 @@ module Plots
 # Modules needed by this module
 ## Others
 import Makie
+import MakieCore
+
 using LinearAlgebra
 using IntervalSets
 ## Own
@@ -16,8 +18,6 @@ export mplot, mconf
 
 # Parts
 include("sampleadaptive.jl")
-include("plotrecipe.jl")
-include("styles.jl")
-include("doplot.jl")
+include("mplot.jl")
 
 end

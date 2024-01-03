@@ -14,14 +14,21 @@ import MMJMesh.Plots: approximationerror, sampleadaptive
 ### On a straight line
 
 ```{julia}
-m = makemeshoninterval(0, 4, 20)
-mplot(m, nodecolor=:green) |> mconf()
+m = makemeshoninterval(0, 4, 20) 
+mplot(m) |> mconf()
+```
+
+Nodes hidden if too many.
+
+```{julia}
+m = makemeshoninterval(0, 4, 60)
+mplot(m) |> mconf()
 ```
 
 One value per node
 
 ```{julia}
-mplot(m, -1.1 .+ 2.6 * rand(nentities(m.topology, 0))) |> mconf()
+mplot(m, -1.1 .+ 2.6 * rand(nnodes(m))) |> mconf()
 ```
 
 One value per element
@@ -78,19 +85,19 @@ print("Links...")
 Default color
 
 ```{julia}
-mplot(m, showedges=true, edgecolor=:hotpink) |> mconf()
+mplot(m, edgesvisible=true, edgecolor=:hotpink) |> mconf()
 ```
 
 Colors for nodes
 
 ```{julia}
-mplot(m, 4.1 * (rand(nentities(m.topology, 0)) .- 0.25)) |> mconf()
+mplot(m, 4.1 * (rand(nnodes(m)) .- 0.25)) |> mconf()
 ```
 
 Colors for elements
 
 ```{julia}
-mplot(m, 4.1 * (rand(nentities(m.topology, 2)) .- 0.25)) |> mconf()
+mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf()
 ```
 
 ### Triangle mesh
@@ -106,19 +113,34 @@ print("Links (1, 2):")
 Default color
 
 ```{julia}
-mplot(m, showedges=true) |> mconf()
+mplot(m, edgesvisible=true) |> mconf()
 ```
 
 Colors for nodes
 
 ```{julia}
-mplot(m, 4.1 * (rand(nentities(m.topology, 0)) .- 0.25)) |> mconf()
+mplot(m, 4.1 * (rand(nnodes(m)) .- 0.25)) |> mconf()
 ```
 
 Colors for elements
 
 ```{julia}
-mplot(m, 4.1 * (rand(nentities(m.topology, 2)) .- 0.25)) |> mconf()
+mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf()
+```
+
+```{julia}
+cm.set_theme!(cm.theme_minimal())
+m = makemeshoninterval(π, 3π, 20, t -> t * [cos(t); sin(t)])
+# cm.with_theme(cm.theme_dark()) do
+# cm.update_theme!(xxx=:blue)
+# cm.update_theme!(markercolor=:tomato)
+cm.update_theme!(Axis=(leftspinevisible=false,))
+
+#println(cm.theme(:markercolor)[])
+
+mplot(m, edgecolor = :green)
+#cm.scatter(coordinates(m))
+#end
 ```
 
 ## Plot options
@@ -127,8 +149,8 @@ mplot(m, 4.1 * (rand(nentities(m.topology, 2)) .- 0.25)) |> mconf()
 a = 10
 m1 = makemeshonrectangle(4, 2, 2a, a)
 mplot(m1, 3 * rand(nfaces(m1)),
-    shownodes=true, nodecolor=:hotpink, nodesize=12,
-    showedges=true,edgecolor=:lightblue, edgelinewidth=3,
+    nodesvisible=true, nodecolor=:hotpink, nodesize=12,
+    edgesvisible=true, edgecolor=:lightblue, edgelinewidth=3,
     featureedgecolor=:red, featureedgelinewidth=6,
     facecolormap=:bluesreds
 ) |> mconf()
@@ -137,7 +159,7 @@ mplot(m1, 3 * rand(nfaces(m1)),
 ```{julia}
 m2 = makemeshoninterval(0, 4, 20)
 mplot(m2, rand(nnodes(m2)),
-    showlineplotoutlines=true,
+    lineplotoutlinesvisible=true,
     edgecolor=:blue, edgelinewidth=10,
     lineplotscale=0.3,
     lineplotoutlinescolor=:hotpink,

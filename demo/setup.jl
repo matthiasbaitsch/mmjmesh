@@ -1,4 +1,4 @@
-import CairoMakie
+import CairoMakie as cm
 
 using MMJMesh
 using MMJMesh.Plots
@@ -7,4 +7,5 @@ using MMJMesh.Utilities
 using MMJMesh.Topologies
 using MMJMesh.Mathematics
 
-CairoMakie.set_theme!(CairoMakie.theme_minimal())
+cm.set_theme!(cm.theme_minimal())
+cm.update_theme!(colormap=:jet)
