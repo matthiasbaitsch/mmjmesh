@@ -4,6 +4,7 @@ module Gmsh
 using Lerche
 using Tables
 using PrettyTables
+import MMJMesh.Utilities: SeqIntSet
 
 # Parts
 include("objecttable.jl")

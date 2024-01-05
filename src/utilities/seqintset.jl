@@ -48,7 +48,7 @@ end
 
 function Base.show(io::IO, s::SeqIntSet)
     if (isempty(s))
-        println(io, "[]")
+        print(io, "[]")
     else
         tostring(p) = p.first == p.second ? string(p.first) : string(p.first) * ":" * string(p.second)
         array = tostring.(s.sequences)
@@ -57,7 +57,7 @@ function Base.show(io::IO, s::SeqIntSet)
             pstring *= ", " * a
         end
         pstring *= "]"
-        println(io, pstring)
+        print(io, pstring)
     end
 end
 

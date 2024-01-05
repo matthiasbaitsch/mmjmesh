@@ -11,8 +11,8 @@ include("associations/00-associations.jl")
 include("meshes/00-meshes.jl")
 
 # Other things
+include("utilities/00-utilities.jl")
 include("gmsh/00-gmsh.jl")
 include("plots/00-plots.jl")
-include("utilities/00-utilities.jl")
 
 end

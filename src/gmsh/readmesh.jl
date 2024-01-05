@@ -62,7 +62,7 @@ end
     nodeBlocks = [
         begin
             eDim, eTag, para, nn = next!(as, 4)
-            NodeBlock(eDim, eTag, para == 1, next!(as, nn), reshape(next!(as, 3 * nn), 3, :)')
+            NodeBlock(eDim, eTag, para == 1, SeqIntSet(Int.(next!(as, nn))), reshape(next!(as, 3 * nn), 3, :)')
         end
         for _ = 1:nBlocks
     ]
@@ -78,7 +78,7 @@ end
             entityDim, entityTag, elementType, numElementsInBlock = next!(as, 4)
             nn = elementTypesNn[elementType]
             data = reshape(next!(as, numElementsInBlock * (1 + nn)), 1 + nn, :)'
-            elementTags = (data[:, 1])
+            elementTags = SeqIntSet(Int.(data[:, 1]))
             nodeTags = data[:, 2:end]
             ElementBlock(entityDim, entityTag, elementType, elementTags, nodeTags)
         end

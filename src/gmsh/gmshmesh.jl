@@ -54,8 +54,6 @@ struct Entity
     boundingEntities::Vector{Int}
 end
 
-
-
 struct EntityCollection
     # Note that entity numbering does not
     # always start at 1, see e.g. complex-g1.msh
@@ -105,7 +103,7 @@ struct NodeBlock <: Block
     entityDim::Int
     entityTag::Int
     parametric::Bool
-    nodeTags::Vector{Int}
+    nodeTags::SeqIntSet
     coordinates::Matrix{Float64}
 end
 
@@ -136,7 +134,7 @@ struct ElementBlock <: Block
     entityDim::Int
     entityTag::Int
     elementType::Int
-    elementTags::Vector{Int}
+    elementTags::SeqIntSet
     nodeTags::Matrix{Int}
 end
 
