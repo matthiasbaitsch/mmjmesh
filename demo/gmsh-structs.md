@@ -33,10 +33,10 @@ classDiagram
     }
 
     class EntityCollection {
-      points: Point[]
-      curves: Entity[]
-      surfaces: Entity[]
-      volumes: Entity[]
+      points: Dict<&#8203;Int, Point&#8203;>
+      curves: Dict<&#8203;Int, Entity&#8203;>
+      surfaces: Dict<&#8203;Int, Entity&#8203;>
+      volumes: Dict<&#8203;Int, Entity&#8203;>
       entities: Dict
     }
 
