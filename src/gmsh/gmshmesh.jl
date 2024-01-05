@@ -8,7 +8,6 @@ struct MeshFormat
     dataSize::Int
 end
 
-Base.show(io::IO, mf::MeshFormat) = println(io, "MeshFormat[version=$(mf.version), fileType=$(mf.fileType), dataSize=$(mf.dataSize)]")
 
 struct PhysicalName
     dimension::Int
@@ -16,6 +15,7 @@ struct PhysicalName
     name::String
 end
 
+Base.show(io::IO, mf::MeshFormat) = println(io, "# MeshFormat\n\n  version: $(mf.version)\n filetype: $(mf.fileType)\n datasize: $(mf.dataSize)")
 Base.show(io::IO, pn::PhysicalName) = println(io, "PhysicalName[dimension=$(pn.dimension), tag=$(pn.tag), name=$(pn.name)]")
 
 struct PhysicalNameCollection
@@ -23,14 +23,14 @@ struct PhysicalNameCollection
     names::Vector{PhysicalName}
 end
 
+const PT_CONF = set_pt_conf(crop=:horizontal)
+
 function Base.show(io::IO, pnc::PhysicalNameCollection)
     if length(pnc.names) == 0
-        println("No physical names")
+        println("# No physical names")
     else
-        println("Physical names")
-        for pn ∈ pnc.names
-            print(io, " ", pn)
-        end
+        println("# Physical names\n")
+        pretty_table_with_conf(PT_CONF, io, ObjectTable(pnc.names))
     end
 end
 
@@ -54,7 +54,7 @@ struct Entity
     boundingEntities::Vector{Int}
 end
 
-toDict(points) = reduce((d, e) -> (d[e.tag] = e; d), points, init=Dict{Int,Any}())
+
 
 struct EntityCollection
     # Note that entity numbering does not
@@ -65,6 +65,7 @@ struct EntityCollection
     volumes::Dict{Int,Any}
     allEntities::Dict{Int,Any}
     EntityCollection(points, curves, surfaces, volumes) = begin
+        toDict(points) = reduce((d, e) -> (d[e.tag] = e; d), points, init=Dict{Int,Any}())
         pd = toDict(points)
         cd = toDict(curves)
         sd = toDict(surfaces)
@@ -76,6 +77,26 @@ struct EntityCollection
     end
 end
 Base.getindex(ec::EntityCollection, dim::Int) = ec.allEntities[dim]
+
+function Base.show(io::IO, ec::EntityCollection)
+    println(io, "# Entities")
+    if !isempty(ec.points)
+        println(io, "\n## Points\n")
+        pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.points))
+    end
+    if !isempty(ec.curves)
+        println(io, "\n## Curves\n")
+        pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.curves))
+    end
+    if !isempty(ec.surfaces)
+        println(io, "\n## Surfaces\n")
+        pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.surfaces))
+    end
+    if !isempty(ec.volumes)
+        println(io, "\n## Volumes\n")
+        pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.volumes))
+    end
+end
 
 abstract type Block end
 abstract type BlockCollection end
@@ -99,6 +120,18 @@ end
 Base.length(ebc::NodeBlockCollection) = ebc.nBlocks
 Base.getindex(ebc::NodeBlockCollection, i) = ebc.blocks[i]
 
+function Base.show(io::IO, ec::NodeBlockCollection)
+    println(io, "# Node Blocks\n")
+    println(io, "    nBlocks: ", ec.nBlocks)
+    println(io, "     nNodes: ", ec.nNodes)
+    println(io, " minNodeTag: ", ec.minNodeTag)
+    println(io, " maxNodeTag: ", ec.maxNodeTag)
+    if !isempty(ec.blocks)
+        println(io)
+        pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.blocks))
+    end
+end
+
 struct ElementBlock <: Block
     entityDim::Int
     entityTag::Int
@@ -113,6 +146,18 @@ struct ElementBlockCollection <: BlockCollection
     minElementTag::Int
     maxElementTag::Int
     blocks::Vector{ElementBlock}
+end
+
+function Base.show(io::IO, ec::ElementBlockCollection)
+    println(io, "# Element Blocks\n")
+    println(io, "       nBlocks: ", ec.nBlocks)
+    println(io, "     nElements: ", ec.nElements)
+    println(io, " minElementTag: ", ec.minElementTag)
+    println(io, " maxElementTag: ", ec.maxElementTag)
+    if !isempty(ec.blocks)
+        println(io)
+        pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.blocks))
+    end
 end
 
 Base.length(ebc::ElementBlockCollection) = ebc.nBlocks
@@ -142,11 +187,11 @@ struct GmshMesh
 end
 
 function Base.show(io::IO, m::GmshMesh)
-    print(io, m.meshFormat)
-    print(io, m.physicalNames)
-    #print(io, m.entities)
-    #print(io, m.nodeBlocks)
-    #print(io, m.elementBlocks)
+    println(io, m.meshFormat)
+    println(io, m.physicalNames)
+    println(io, m.entities)
+    println(io, m.nodeBlocks)
+    println(io, m.elementBlocks)
 end
 
 dimension(m::GmshMesh) = maximum(n -> n.entityDim, m.elementBlocks.blocks)
