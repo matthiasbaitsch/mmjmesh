@@ -7,7 +7,7 @@ book-publish:
 	cd demo && quarto publish gh-pages --no-prompt
 
 apidoc:
-	cd docs && julia make.jl
+	cd docs && julia --project make.jl
 
 .PHONY: test
 test:
