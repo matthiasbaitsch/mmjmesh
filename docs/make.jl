@@ -1,6 +1,7 @@
 push!(LOAD_PATH,"../src/")
 
 using Documenter
+using DocumenterMermaid
 using MMJMesh
 
 makedocs(
@@ -13,7 +14,8 @@ makedocs(
         "Plots" => "plots.md",
         "Utilities" => "utilities.md",
         "Geometries" => "geometries.md",
-        "Topologies" => "topologies.md"
+        "Topologies" => "topologies.md",
+        "Gmsh" => "gmsh.md"
     ]
 )
 

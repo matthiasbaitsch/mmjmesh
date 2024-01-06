@@ -1,6 +1,8 @@
-# GMSH Data Structure
+# Interface to Gmsh
 
-::: mermaid
+## Gmsh Data Structure
+
+```mermaid
 classDiagram
 
     class GmshMesh {
@@ -33,10 +35,10 @@ classDiagram
     }
 
     class EntityCollection {
-      points: Dict<&#8203;Int, Point&#8203;>
-      curves: Dict<&#8203;Int, Entity&#8203;>
-      surfaces: Dict<&#8203;Int, Entity&#8203;>
-      volumes: Dict<&#8203;Int, Entity&#8203;>
+      points: Dict<#8203;Int, Point#8203;>
+      curves: Dict<#8203;Int, Entity#8203;>
+      surfaces: Dict<#8203;Int, Entity#8203;>
+      volumes: Dict<#8203;Int, Entity#8203;>
       entities: Dict
     }
 
@@ -65,7 +67,7 @@ classDiagram
       entityDim: Int
       entityTag: Int
       parametric: Bool
-      nodeTags: Int[]
+      tags: SeqIntSet
       coordinates: Float[][]
     }
 
@@ -80,8 +82,8 @@ classDiagram
     class ElementBlock {
         entityDim: Int
         entityTag: Int
-        elementType: Int
-        elementTags: Int[]
+        type: Int
+        tags: SeqIntSet
         nodeTags: Int[][]
     }
 
@@ -96,4 +98,4 @@ classDiagram
     EntityCollection o-- "*" Point
     EntityCollection o-- "*" Entity
     Entity o-- BoundingBox
-:::
+```
