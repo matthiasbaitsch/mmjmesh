@@ -1,6 +1,4 @@
-"""
- More or less verbatim translation of msh file format to Julia structs.
-"""
+# More or less verbatim translation of Gmsh's .msh file format to Julia structs
 
 struct MeshFormat
     version::Float64
@@ -8,34 +6,16 @@ struct MeshFormat
     dataSize::Int
 end
 
-
 struct PhysicalName
     dimension::Int
     tag::Int
     name::String
 end
 
-Base.show(io::IO, mf::MeshFormat) = println(io, "# MeshFormat\n\n  version: $(mf.version)\n filetype: $(mf.fileType)\n datasize: $(mf.dataSize)")
-Base.show(io::IO, pn::PhysicalName) = println(io, "PhysicalName[dimension=$(pn.dimension), tag=$(pn.tag), name=$(pn.name)]")
-
 struct PhysicalNameCollection
     nNames::Int
     names::Vector{PhysicalName}
 end
-
-const PT_CONF = set_pt_conf(crop=:horizontal)
-
-function Base.show(io::IO, pnc::PhysicalNameCollection)
-    if length(pnc.names) == 0
-        println("# No physical names")
-    else
-        println("# Physical names\n")
-        pretty_table_with_conf(PT_CONF, io, ObjectTable(pnc.names))
-    end
-end
-
-Base.length(ebc::PhysicalNameCollection) = ebc.nNames
-Base.getindex(ebc::PhysicalNameCollection, idx) = ebc.names[idx]
 
 struct BoundingBox
     bounds::Vector{Float64}
@@ -74,6 +54,80 @@ struct EntityCollection
         )
     end
 end
+
+abstract type Block end
+abstract type BlockCollection end
+
+struct NodeBlock <: Block
+    entityDim::Int
+    entityTag::Int
+    parametric::Bool
+    tags::SeqIntSet
+    coordinates::Matrix{Float64}
+end
+
+struct NodeBlockCollection <: BlockCollection
+    nBlocks::Int
+    nNodes::Int
+    minNodeTag::Int
+    maxNodeTag::Int
+    blocks::Vector{NodeBlock}
+end
+
+struct ElementBlock <: Block
+    entityDim::Int
+    entityTag::Int
+    type::Int
+    tags::SeqIntSet
+    nodeTags::Matrix{Int}
+end
+
+struct ElementBlockCollection <: BlockCollection
+    nBlocks::Int
+    nElements::Int
+    minElementTag::Int
+    maxElementTag::Int
+    blocks::Vector{ElementBlock}
+end
+
+struct GmshMesh
+    meshFormat::MeshFormat
+    physicalNames::PhysicalNameCollection
+    entities::EntityCollection
+    nodeBlocks::NodeBlockCollection
+    elementBlocks::ElementBlockCollection
+end
+
+
+# PrettyTables configuration
+
+const PT_CONF = set_pt_conf(crop=:horizontal)
+
+
+# MeshFormat and PhysicalName methods
+
+Base.show(io::IO, mf::MeshFormat) = print(io, "# MeshFormat\n\n  version: $(mf.version)\n filetype: $(mf.fileType)\n datasize: $(mf.dataSize)")
+Base.show(io::IO, pn::PhysicalName) = print(io, "PhysicalName[dimension=$(pn.dimension), tag=$(pn.tag), name=$(pn.name)]")
+Base.show(io::IO, bb::BoundingBox) = Base.show(io, bb.bounds)
+
+
+# PhysicalNameCollection methods
+
+function Base.show(io::IO, pnc::PhysicalNameCollection)
+    if length(pnc.names) == 0
+        println("# No physical names")
+    else
+        println("# Physical names\n")
+        pretty_table_with_conf(PT_CONF, io, ObjectTable(pnc.names))
+    end
+end
+
+Base.length(ebc::PhysicalNameCollection) = ebc.nNames
+Base.getindex(ebc::PhysicalNameCollection, idx) = ebc.names[idx]
+
+
+# EntityCollection methods
+
 Base.getindex(ec::EntityCollection, dim::Int) = ec.allEntities[dim]
 
 function Base.show(io::IO, ec::EntityCollection)
@@ -96,24 +150,8 @@ function Base.show(io::IO, ec::EntityCollection)
     end
 end
 
-abstract type Block end
-abstract type BlockCollection end
 
-struct NodeBlock <: Block
-    entityDim::Int
-    entityTag::Int
-    parametric::Bool
-    nodeTags::SeqIntSet
-    coordinates::Matrix{Float64}
-end
-
-struct NodeBlockCollection <: BlockCollection
-    nBlocks::Int
-    nNodes::Int
-    minNodeTag::Int
-    maxNodeTag::Int
-    blocks::Vector{NodeBlock}
-end
+# NodeBlockCollection methods
 
 Base.length(ebc::NodeBlockCollection) = ebc.nBlocks
 Base.getindex(ebc::NodeBlockCollection, i) = ebc.blocks[i]
@@ -130,21 +168,8 @@ function Base.show(io::IO, ec::NodeBlockCollection)
     end
 end
 
-struct ElementBlock <: Block
-    entityDim::Int
-    entityTag::Int
-    elementType::Int
-    elementTags::SeqIntSet
-    nodeTags::Matrix{Int}
-end
 
-struct ElementBlockCollection <: BlockCollection
-    nBlocks::Int
-    nElements::Int
-    minElementTag::Int
-    maxElementTag::Int
-    blocks::Vector{ElementBlock}
-end
+# ElementBlockCollection methods
 
 function Base.show(io::IO, ec::ElementBlockCollection)
     println(io, "# Element Blocks\n")
@@ -176,21 +201,8 @@ function nodeTags(ebc::ElementBlockCollection, dim::Int)
     return nts
 end
 
-struct GmshMesh
-    meshFormat::MeshFormat
-    physicalNames::PhysicalNameCollection
-    entities::EntityCollection
-    nodeBlocks::NodeBlockCollection
-    elementBlocks::ElementBlockCollection
-end
 
-function Base.show(io::IO, m::GmshMesh)
-    println(io, m.meshFormat)
-    println(io, m.physicalNames)
-    println(io, m.entities)
-    println(io, m.nodeBlocks)
-    println(io, m.elementBlocks)
-end
+# GmshMesh methods
 
 dimension(m::GmshMesh) = maximum(n -> n.entityDim, m.elementBlocks.blocks)
 
@@ -217,4 +229,17 @@ function getnodes(m::GmshMesh)
     end
     return nodes'
 end
+
+function Base.show(io::IO, m::GmshMesh)
+    println(io, m.meshFormat)
+    println(io, m.physicalNames)
+    println(io, m.entities)
+    println(io, m.nodeBlocks)
+    println(io, m.elementBlocks)
+end
+
+
+
+
+
 
