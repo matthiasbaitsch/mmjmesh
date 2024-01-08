@@ -2,8 +2,8 @@
 
 struct MeshFormat
     version::Float64
-    fileType::Int
-    dataSize::Int
+    filetype::Int
+    datasize::Int
 end
 
 struct PhysicalName
@@ -13,7 +13,7 @@ struct PhysicalName
 end
 
 struct PhysicalNameCollection
-    nNames::Int
+    nnames::Int
     names::Vector{PhysicalName}
 end
 
@@ -24,14 +24,14 @@ end
 struct Point
     tag::Int
     position::Vector{Float64}
-    physicalTags::Vector{Int}
+    physicaltags::Vector{Int}
 end
 
 struct Entity
     tag::Int
-    boundingBox::BoundingBox
-    physicalTags::Vector{Int}
-    boundingEntities::Vector{Int}
+    boundingbox::BoundingBox
+    physicaltags::Vector{Int}
+    boundingentities::Vector{Int}
 end
 
 struct EntityCollection
@@ -41,7 +41,7 @@ struct EntityCollection
     curves::Dict{Int,Any}
     surfaces::Dict{Int,Any}
     volumes::Dict{Int,Any}
-    allEntities::Dict{Int,Any}
+    allentities::Dict{Int,Any}
     EntityCollection(points, curves, surfaces, volumes) = begin
         toDict(points) = reduce((d, e) -> (d[e.tag] = e; d), points, init=Dict{Int,Any}())
         pd = toDict(points)
@@ -56,10 +56,11 @@ struct EntityCollection
 end
 
 abstract type Block end
+
 abstract type BlockCollection end
 
 struct NodeBlock <: Block
-    entityDim::Int
+    entitydim::Int
     entityTag::Int
     parametric::Bool
     tags::SeqIntSet
@@ -67,35 +68,35 @@ struct NodeBlock <: Block
 end
 
 struct NodeBlockCollection <: BlockCollection
-    nBlocks::Int
-    nNodes::Int
-    minNodeTag::Int
-    maxNodeTag::Int
+    nblocks::Int
+    nnodes::Int
+    minnodetag::Int
+    maxnodetag::Int
     blocks::Vector{NodeBlock}
 end
 
 struct ElementBlock <: Block
-    entityDim::Int
+    entitydim::Int
     entityTag::Int
     type::Int
     tags::SeqIntSet
-    nodeTags::Matrix{Int}
+    nodetags::Matrix{Int}
 end
 
 struct ElementBlockCollection <: BlockCollection
-    nBlocks::Int
-    nElements::Int
-    minElementTag::Int
-    maxElementTag::Int
+    nblocks::Int
+    nelements::Int
+    minelementtag::Int
+    maxelementtag::Int
     blocks::Vector{ElementBlock}
 end
 
 struct GmshMesh
     meshFormat::MeshFormat
-    physicalNames::PhysicalNameCollection
+    physicalnames::PhysicalNameCollection
     entities::EntityCollection
     nodeBlocks::NodeBlockCollection
-    elementBlocks::ElementBlockCollection
+    elementblocks::ElementBlockCollection
 end
 
 
@@ -106,7 +107,7 @@ const PT_CONF = set_pt_conf(crop=:horizontal)
 
 # MeshFormat and PhysicalName methods
 
-Base.show(io::IO, mf::MeshFormat) = print(io, "# MeshFormat\n\n  version: $(mf.version)\n filetype: $(mf.fileType)\n datasize: $(mf.dataSize)")
+Base.show(io::IO, mf::MeshFormat) = print(io, "# MeshFormat\n\n  version: $(mf.version)\n filetype: $(mf.filetype)\n datasize: $(mf.datasize)\n")
 Base.show(io::IO, pn::PhysicalName) = print(io, "PhysicalName[dimension=$(pn.dimension), tag=$(pn.tag), name=$(pn.name)]")
 Base.show(io::IO, bb::BoundingBox) = Base.show(io, bb.bounds)
 
@@ -122,13 +123,13 @@ function Base.show(io::IO, pnc::PhysicalNameCollection)
     end
 end
 
-Base.length(ebc::PhysicalNameCollection) = ebc.nNames
+Base.length(ebc::PhysicalNameCollection) = ebc.nnames
 Base.getindex(ebc::PhysicalNameCollection, idx) = ebc.names[idx]
 
 
 # EntityCollection methods
 
-Base.getindex(ec::EntityCollection, dim::Int) = ec.allEntities[dim]
+Base.getindex(ec::EntityCollection, dim::Int) = ec.allentities[dim]
 
 function Base.show(io::IO, ec::EntityCollection)
     println(io, "# Entities")
@@ -153,15 +154,15 @@ end
 
 # NodeBlockCollection methods
 
-Base.length(ebc::NodeBlockCollection) = ebc.nBlocks
+Base.length(ebc::NodeBlockCollection) = ebc.nblocks
 Base.getindex(ebc::NodeBlockCollection, i) = ebc.blocks[i]
 
 function Base.show(io::IO, ec::NodeBlockCollection)
     println(io, "# Node Blocks\n")
-    println(io, "    nBlocks: ", ec.nBlocks)
-    println(io, "     nNodes: ", ec.nNodes)
-    println(io, " minNodeTag: ", ec.minNodeTag)
-    println(io, " maxNodeTag: ", ec.maxNodeTag)
+    println(io, "    nblocks: ", ec.nblocks)
+    println(io, "     nnodes: ", ec.nnodes)
+    println(io, " minnodetag: ", ec.minnodetag)
+    println(io, " maxnodetag: ", ec.maxnodetag)
     if !isempty(ec.blocks)
         println(io)
         pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.blocks))
@@ -173,28 +174,26 @@ end
 
 function Base.show(io::IO, ec::ElementBlockCollection)
     println(io, "# Element Blocks\n")
-    println(io, "       nBlocks: ", ec.nBlocks)
-    println(io, "     nElements: ", ec.nElements)
-    println(io, " minElementTag: ", ec.minElementTag)
-    println(io, " maxElementTag: ", ec.maxElementTag)
+    println(io, "       nblocks: ", ec.nblocks)
+    println(io, "     nelements: ", ec.nelements)
+    println(io, " minelementtag: ", ec.minelementtag)
+    println(io, " maxelementtag: ", ec.maxelementtag)
     if !isempty(ec.blocks)
         println(io)
         pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.blocks))
     end
 end
 
-Base.length(ebc::ElementBlockCollection) = ebc.nBlocks
-Base.getindex(ebc::ElementBlockCollection, i) = ebc.blocks[i]
-blocksByDimension(bc::BlockCollection, dim::Int) = filter(b -> b.entityDim == dim, bc.blocks)
+Base.length(ebc::ElementBlockCollection) = ebc.nblocks
+# XXX Base.getindex(ebc::ElementBlockCollection, i) = ebc.blocks[i]
+# XXX blocksByDimension(bc::BlockCollection, dim::Int) = filter(b -> b.entitydim == dim, bc.blocks)
 
-function nodeTags(ebc::ElementBlockCollection, dim::Int)
-    nts = []
-    for eb ∈ ebc.blocks
-        if eb.entityDim == dim
-            if length(nts) == 0
-                nts = eb.nodeTags
-            else
-                nts = vcat(nts, eb.nodeTags)
+function nodetags(ebc::ElementBlockCollection, dim::Int)
+    nts = Vector{Vector{Int}}()
+    for eb ∈ ebc.blocks        
+        if eb.entitydim == dim            
+            for i ∈ 1:size(eb.nodetags, 1)
+                push!(nts, eb.nodetags[i, :])
             end
         end
     end
@@ -204,38 +203,38 @@ end
 
 # GmshMesh methods
 
-dimension(m::GmshMesh) = maximum(n -> n.entityDim, m.elementBlocks.blocks)
+dimension(m::GmshMesh) = maximum(n -> n.entitydim, m.elementblocks.blocks)
 
-function blockName(m::GmshMesh, b::Block)
-    entity = m.entities[b.entityDim][b.entityTag]
-    physicalTags = entity.physicalTags
-    if length(physicalTags) == 0
-        return "_$(b.entityDim).$(b.entityTag)"
-    elseif length(physicalTags) == 1
-        return m.physicalNames[physicalTags[1]].name
+function blockname(m::GmshMesh, b::Block)
+    entity = m.entities[b.entitydim][b.entityTag]
+    physicaltags = entity.physicaltags
+    if length(physicaltags) == 0
+        return "_$(b.entitydim).$(b.entityTag)"
+    elseif length(physicaltags) == 1
+        return m.physicalnames[physicaltags[1]].name
     else
         error("Should not happen")
     end
 end
 
-function getnodes(m::GmshMesh)
-    Nn = m.nodeBlocks.nNodes
-    nodes = zeros(Nn, 3)
+function coordinates(m::GmshMesh)
+    Nn = m.nodeBlocks.nnodes
+    nodes = zeros(3, Nn)
     for nb ∈ m.nodeBlocks.blocks
-        nodes[nb.nodeTags, :] = nb.coordinates
+        nodes[:, nb.tags] = nb.coordinates'
     end
-    if norm(nodes[:, 3]) == 0
-        nodes = nodes[:, 1:2]
+    if norm(nodes[3, :]) == 0
+        nodes = nodes[1:2, :]
     end
-    return nodes'
+    return nodes
 end
 
 function Base.show(io::IO, m::GmshMesh)
     println(io, m.meshFormat)
-    println(io, m.physicalNames)
+    println(io, m.physicalnames)
     println(io, m.entities)
     println(io, m.nodeBlocks)
-    println(io, m.elementBlocks)
+    println(io, m.elementblocks)
 end
 
 

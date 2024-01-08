@@ -7,20 +7,20 @@ classDiagram
 
     class GmshMesh {
       meshFormat: MeshFormat
-      physicalNames: physicalNameCollection
+      physicalnames: physicalNameCollection
       entities: EntityCollection
       nodeBlocks: NodeBlockCollection
-      elementBlocks: ElementBlockCollection
+      elementblocks: ElementBlockCollection
     }
 
     class MeshFormat {
       version: Float
-      fileType: Int
-      dataSize: Int
+      filetype: Int
+      datasize: Int
     }
 
     class PhysicalNameCollection {
-      nNames: Int
+      nnames: Int
       names: PhysicalName[]
     }
 
@@ -45,26 +45,26 @@ classDiagram
     class Point {
       tag: Int
       position: Float[]
-      physicalTags: Int[]
+      physicaltags: Int[]
     }
 
     class Entity {
         tag: Int
         bb: BoundingBox
-        physicalTags: Int[]
-        boundingEntities: Int[]
+        physicaltags: Int[]
+        boundingentities: Int[]
     }
 
     class NodeBlockCollection {
-      nBlocks: Int
-      nNodes: Int
-      minNodeTag: Int
-      maxNodeTag: Int
+      nblocks: Int
+      nnodes: Int
+      minnodetag: Int
+      maxnodetag: Int
       blocks: NodeBlock[]
     }
 
     class NodeBlock {
-      entityDim: Int
+      entitydim: Int
       entityTag: Int
       parametric: Bool
       tags: SeqIntSet
@@ -72,19 +72,19 @@ classDiagram
     }
 
     class ElementBlockCollection {
-      nBlocks: Int
-      nElements: Int
-      minElementTag: Int
-      maxElementTag: Int
+      nblocks: Int
+      nelements: Int
+      minelementtag: Int
+      maxelementtag: Int
       blocks: ElementBlock[]
     }
 
     class ElementBlock {
-        entityDim: Int
+        entitydim: Int
         entityTag: Int
         type: Int
         tags: SeqIntSet
-        nodeTags: Int[][]
+        nodetags: Int[][]
     }
 
     GmshMesh o-- MeshFormat
