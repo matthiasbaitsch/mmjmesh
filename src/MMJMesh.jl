@@ -3,7 +3,7 @@ module MMJMesh
 # Basic stuff
 include("mmjbase/00-mmjbase.jl")
 
-# Mesh consisits of a topology and a geometry
+# Mesh consists a topology, a geometry and data
 include("topologies/00-topologies.jl")
 include("geometries/00-geometries.jl")
 include("mathematics/00-mathematics.jl")

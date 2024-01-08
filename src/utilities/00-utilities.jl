@@ -12,6 +12,5 @@ export makemeshoninterval, makemeshonrectangle
 
 # Parts
 include("generatemeshes.jl")
-include("seqintset.jl")
 
 end

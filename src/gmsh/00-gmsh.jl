@@ -6,7 +6,7 @@ using Tables
 using LinearAlgebra
 using PrettyTables
 import MMJMesh.Meshes: Mesh
-import MMJMesh.Utilities: SeqIntSet
+import MMJMesh.MMJBase: SeqIntSet
 import MMJMesh.Gmsh: nodetags, dimension, coordinates
 
 # Parts
