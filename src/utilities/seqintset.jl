@@ -3,7 +3,7 @@ SeqIntSet(a::AbstractVector{Int}; sorted=false)
 
 Set of integers which handles sets containing sequences like ```{-100, -99, … , 3, 9, 10, … , 1001}``` efficiently.
 """
-struct SeqIntSet
+struct SeqIntSet <: AbstractVector{Int}
     length::Int
     sequences::Vector{Pair{Int,Int}}
 end
@@ -27,6 +27,7 @@ function SeqIntSet(a::AbstractVector{Int}; sorted=false)
 end
 
 Base.length(s::SeqIntSet) = s.length
+Base.size(s::SeqIntSet) = (s.length,)
 Base.isempty(s::SeqIntSet) = s.length == 0
 
 function Base.in(target::Int, set::SeqIntSet)
