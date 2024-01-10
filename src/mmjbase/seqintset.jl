@@ -4,48 +4,52 @@ SeqIntSet(a::AbstractVector{Int}; sorted=false)
 Set of integers which handles sets containing sequences like ```{-100, -99, … , 3, 9, 10, … , 1001}``` efficiently.
 """
 struct SeqIntSet <: AbstractVector{Int}
-    length::Int
+    count::Vector{Int}
     sequences::Vector{Pair{Int,Int}}
 end
 
 function SeqIntSet(a::AbstractVector{Int}; sorted=false)
-    isempty(a) && return SeqIntSet(0, Vector{Pair{Int,Int}}())
+    isempty(a) && return SeqIntSet([0], Vector{Pair{Int,Int}}())
     asorted = sorted ? a : sort(a)
-    entries = Vector{Pair{Int,Int}}()
+    sequences = Vector{Pair{Int,Int}}()
     start = stop = popfirst!(asorted)
     for i ∈ eachindex(asorted)
-        if asorted[i] - stop == 1
+        if asorted[i] - stop <= 1
             stop = asorted[i]
         else
-            push!(entries, Pair(start, stop))
+            push!(sequences, Pair(start, stop))
             start = stop = asorted[i]
         end
     end
-    push!(entries, Pair(start, stop))
-    length = reduce((s, p) -> s + p.second - p.first + 1, entries, init=0)
-    return SeqIntSet(length, entries)
+    push!(sequences, Pair(start, stop))
+    count = [p.second - p.first + 1 for p ∈ sequences] |> cumsum
+    return SeqIntSet(count, sequences)
 end
 
-Base.length(s::SeqIntSet) = s.length
-Base.size(s::SeqIntSet) = (s.length,)
-Base.isempty(s::SeqIntSet) = s.length == 0
-
-function Base.in(target::Int, set::SeqIntSet)
+function sequenceofvalue(target::Int, set::SeqIntSet)
     low = 1
     high = length(set.sequences)
     while low <= high
         mid = low + div(high - low, 2)
         seq = set.sequences[mid]
         if seq.first <= target && target <= seq.second
-            return true
+            return mid
         elseif seq.second < target
             low = mid + 1
         else
             high = mid - 1
         end
     end
-    return false
+    return -1
 end
+
+Base.length(s::SeqIntSet) = s.count[end]
+Base.size(s::SeqIntSet) = (length(s),)
+Base.isempty(s::SeqIntSet) = length(s) == 0
+Base.in(target::Int, set::SeqIntSet) = sequenceofvalue(target, set) != -1
+
+# TODO: Implement this reasonably
+Base.getindex(s::SeqIntSet, i::Int) = collect(s)[i]
 
 function Base.show(io::IO, s::SeqIntSet)
     if (isempty(s))
