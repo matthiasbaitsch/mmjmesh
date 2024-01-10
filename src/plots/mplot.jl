@@ -38,8 +38,8 @@ MakieCore.@recipe(MPlot, mesh, scalars) do scene
         lineplotfacescolormap=MakieCore.theme(scene, :colormap),
     )
 
-    MakieCore.generic_plot_attributes!(attr)
-    MakieCore.colormap_attributes!(attr, MakieCore.theme(scene, :colormap))
+    #    MakieCore.generic_plot_attributes!(attr)
+    #    MakieCore.colormap_attributes!(attr, MakieCore.theme(scene, :colormap))
 
     return attr
 end
