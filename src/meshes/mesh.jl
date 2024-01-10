@@ -12,6 +12,7 @@ Mesh of parametric dimension ``d_t`` embedded in ``d_g`` dimensional space.
 struct Mesh{DT,DG}
     topology::Topology{DT}
     geometry::Geometry{DG}
+    groups::EntityGroupCollection
     data::MeshData
 end
 
@@ -21,12 +22,14 @@ Mesh(coordinates::Matrix, dt::Int) =
     Mesh{dt,size(coordinates, 1)}(
         Topology(dt, size(coordinates, 2)),
         Geometry(coordinates),
+        EntityGroupCollection(),
         MeshData()
     )
 
 function Mesh(coordinates::Matrix, elements::Vector{Vector{Int}}, dt::Int)
     m = Mesh(coordinates, dt)
     addlinks!(m.topology, dt, 0, elements)
+    populatepredfinedgroups!(m)
     return m
 end
 

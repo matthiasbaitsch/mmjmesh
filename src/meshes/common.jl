@@ -14,3 +14,25 @@ nodes(o) = entities(o, 0)
 edges(o) = entities(o, 1)
 faces(o) = entities(o, 2)
 solids(o) = entities(o, 3)
+
+# TODO: Use recipe for lazy creation, move to better place
+function populatepredfinedgroups!(m::Mesh)
+    # TODO 3D: Generalize
+    be = Vector{Int}()
+    bn = Vector{Int}()
+
+    # TODO: Should be like this 
+    # for e ∈ edges(m)
+    # if nfaces(e) == 1
+    # push!(be, e.index)
+
+    l12 = links(m.topology, 1, 2)
+    for (i, l) in enumerate(links(m.topology, 1, 0))
+        if length(l12, i) == 1
+            push!(be, i)
+            append!(bn, l)
+        end
+    end
+    m.groups[:boundarynodes] = EntityGroup(0, bn)
+    m.groups[:boundaryedges] = EntityGroup(1, be)
+end

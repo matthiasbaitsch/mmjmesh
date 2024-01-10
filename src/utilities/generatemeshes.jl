@@ -63,6 +63,9 @@ function makemeshonrectangle(w::Number, h::Number, nx::Int, ny::Int, mt::Meshtyp
     end
     addlinks!(m.topology, 2, 0, cl)
 
+    # TODO: ???
+    populatepredfinedgroups!(m)
+
     # Done
     return m
 end

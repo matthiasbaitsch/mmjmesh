@@ -12,6 +12,8 @@ using MMJMesh.Topologies
 using MMJMesh.Geometries
 using MMJMesh.Associations
 
+import MMJMesh.Groups: EntityGroup, EntityGroupCollection
+
 # Exports
 ## mesh.jl
 export Mesh
@@ -19,11 +21,12 @@ export pdim, gdim, nelements, element, elements
 ## meshentities.jl
 export MeshEntity
 ## common.jl
-export coordinates
+export coordinate, coordinates
 export nnodes, nedges, nfaces, nsolids
 export node, edge, face, solid
 export nodes, edges, faces, solids
 export nodeIdxs, edgeIdxs, faceIdxs, solidIdxs
+export populatepredfinedgroups!
 
 # Parts
 include("mesh.jl")

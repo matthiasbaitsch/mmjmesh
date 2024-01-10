@@ -8,6 +8,8 @@ This chapter is incomplete and probably not worth reading.
 include("setup.jl")
 ```
 
+## Basic usage
+
 Create mesh
 
 ```{julia}
@@ -15,14 +17,6 @@ coords = [0.0 1.0 2.0 0.1 0.9 1.9; 0.0 0.1 0.0 0.9 1.0 0.9]
 elts = [[1, 2, 5, 4], [2, 3, 6], [2, 6, 5]]
 m = Mesh(coords, elts, 2)
 mplot(m) |> mconf()
-```
-
-Read mesh from Gmsh file
-
-```{julia}
-include("setup.jl")
-m = Mesh("data/gmsh/complex-g1.msh")
-mplot(m, edgesvisible=true) |> mconf()
 ```
 
 Coordinates of a node
@@ -47,4 +41,12 @@ for e ∈ elements(m)
     println("- ", faceIdxs(e))
 end
 ```
+
+## Read mesh from Gmsh file
+
+```{julia}
+m = Mesh("../data/gmsh/complex-g1.msh")
+mplot(m, edgesvisible=true) |> mconf()
+```
+
 

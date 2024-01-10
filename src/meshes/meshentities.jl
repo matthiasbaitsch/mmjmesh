@@ -16,6 +16,11 @@ struct MeshEntity{DT,DG,NN}
         new{pdim,DG,length(links(mesh.topology, pdim, 0), index)}(mesh, index)
 end
 
+const Node{DG} = MeshEntity{0,DG,0}
+const Edge{DG,NN} = MeshEntity{1,DG,NN}
+const Face{DG,NN} = MeshEntity{2,DG,NN}
+const Solid{DG,NN} = MeshEntity{2,DG,NN}
+
 # Get entity
 entity(m::Mesh, pdim::Int, index::Int) = MeshEntity(m, pdim, index)
 
@@ -23,7 +28,7 @@ entity(m::Mesh, pdim::Int, index::Int) = MeshEntity(m, pdim, index)
 indexes(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index]
 
 # Length of an edge
-Base.length(e::MeshEntity{1, DG, 2}) where {DG} = norm(diff(coordinates(e), dims=2))
+Base.length(e::MeshEntity{1,DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
 
 # Show
 name(e::MeshEntity) = name(typeof(e))
@@ -60,6 +65,8 @@ entities(m::Mesh, pdim::Int) = MeshEntityList(m, pdim, 1:nentities(m, pdim))
 entities(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = MeshEntityList(me.mesh, pdim, indexes(me, pdim))
 
 # Coordinates
+coordinate(n::Node, c::Int) = n.mesh.geometry.points.coordinates[c, n.index]
+coordinates(n::Node) = n.mesh.geometry.points.coordinates[:, n.index]
+
 coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, nodeIdxs(me)]
-coordinates(me::MeshEntity{0, DG, NN}) where {DG,NN} = me.mesh.geometry.points.coordinates[:, me.index]
 coordinates(me::MeshEntity, index::Int) = me.mesh.geometry.points.coordinates[:, index]

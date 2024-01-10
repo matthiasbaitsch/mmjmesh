@@ -96,3 +96,25 @@ $$
     \right).
 $$
 
+## Demo for 2D meshes
+
+Create mesh on rectangular grid
+
+```{julia}
+a = 80
+m = makemeshonrectangle(9.0, 4.5, 2a, a)
+mplot(m) |> mconf()
+```
+
+Read mesh from Gmsh
+
+```{julia}
+m = Mesh("../data/gmsh/advanced.msh")
+mplot(m) |> mconf()
+```
+
+Indexes of nodes on boundary
+```{julia}
+m.groups[:boundarynodes]
+```
+

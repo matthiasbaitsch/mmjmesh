@@ -50,3 +50,11 @@ m1 = makemeshonrectangle(4, 2, 2a, a)
     featureedgecolor=:red, featureedgelinewidth=6,
     facecolormap=:bluesreds
 ) |> mconf()
+
+
+# XXX
+# a = 80
+# m = makemeshonrectangle(9.0, 4.5, 2a, a)
+# mplot(m)
+# bn = m.groups[:boundarynodes]
+# scatter!(coordinates(m)[:, bn], color=:orange)

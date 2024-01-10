@@ -9,6 +9,8 @@ import MMJMesh.Meshes: Mesh
 import MMJMesh.MMJBase: SeqIntSet
 import MMJMesh.Gmsh: nodetags, dimension, coordinates
 
+export Mesh
+
 # Parts
 include("objecttable.jl")
 include("arrayscanner.jl")
