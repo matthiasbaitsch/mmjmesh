@@ -99,7 +99,7 @@ function MakieCore.plot!(plot::MPlot)
         plot.lineplotvisible = false
         setifautomatic(:featureedgesvisible, true)
         setifautomatic(:edgesvisible, nfaces(mesh) <= 100)
-        setifautomatic(:edgecolor, :gray50)
+        setifautomatic(:edgecolor, MakieCore.theme(plot, :linecolor))
         setifautomatic(:edgelinewidth, 0.75)
         setifautomatic(:featureedgelinewidth, 3 * plot.edgelinewidth[])
         setifautomatic(:facesvisible, true)
