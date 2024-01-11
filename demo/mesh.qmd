@@ -45,8 +45,31 @@ end
 ## Read mesh from Gmsh file
 
 ```{julia}
-m = Mesh("../data/gmsh/complex-g1.msh")
+bd = dirname(@__FILE__)
+m = Mesh(bd * "/../data/gmsh/complex-g1.msh")
 mplot(m, edgesvisible=true) |> mconf()
+```
+
+## Groups and predefined groups
+
+Mesh entities can be collected in groups some of which are predefined.
+
+```{julia}
+keys(m.groups.recipes)
+```
+
+```{julia}
+show(m.groups[:boundarynodes])
+```
+
+Groups can be used filter access
+
+```{julia}
+g = m.groups[:boundarynodes]
+coords = coordinates(m)
+p = mplot(m)
+cm.scatter!(p.axis, coords[:, g], color = :hotpink)
+p |> mconf()
 ```
 
 

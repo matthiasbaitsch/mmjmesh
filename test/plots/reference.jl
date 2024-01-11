@@ -51,10 +51,11 @@ m1 = makemeshonrectangle(4, 2, 2a, a)
     facecolormap=:bluesreds
 ) |> mconf()
 
-
-# XXX
-# a = 80
-# m = makemeshonrectangle(9.0, 4.5, 2a, a)
-# mplot(m)
-# bn = m.groups[:boundarynodes]
-# scatter!(coordinates(m)[:, bn], color=:orange)
+# Plot boundary nodes
+a = 20
+m = makemeshonrectangle(9.0, 4.5, 2a, a)
+p = mplot(m)
+x = coordinates(m)
+bn = m.groups[:boundarynodes]
+scatter!(p.axis, x[:, bn], color=:magenta)
+@test_reference ref("m2d-008.png") p |> mconf()

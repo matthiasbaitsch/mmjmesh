@@ -33,6 +33,10 @@ function populatepredfinedgroups!(m::Mesh)
             append!(bn, l)
         end
     end
+
+    # TODO
+    m.groups.recipes[:boundarynodes] = sin
     m.groups[:boundarynodes] = EntityGroup(0, bn)
+    m.groups.recipes[:boundaryedges] = sin
     m.groups[:boundaryedges] = EntityGroup(1, be)
 end

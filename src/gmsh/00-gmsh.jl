@@ -7,8 +7,8 @@ using LinearAlgebra
 using PrettyTables
 import MMJMesh.Meshes: Mesh
 import MMJMesh.MMJBase: SeqIntSet
-import MMJMesh.Gmsh: nodetags, dimension, coordinates
 
+# Exports
 export Mesh
 
 # Parts
