@@ -1,5 +1,3 @@
-module TopologyTests
-
 using Test
 
 using MMJMesh
@@ -25,7 +23,7 @@ addlinks!(t, 2, 0, [[1, 2, 5, 4], [5, 2, 3], [6, 5, 3]])
 @testset "Basic" begin
     @test isanonymous(t, 0) == false
     @test isanonymous(t, 1) == true
-    @test isanonymous(t, 2) == false
+    @test isanonymous(t, 2) == false    
     @test nentities(t, 0) == 6
     @test entity(t, 0, 2) == 2
     @test nentities(t, 1, false) == 0
@@ -34,6 +32,10 @@ addlinks!(t, 2, 0, [[1, 2, 5, 4], [5, 2, 3], [6, 5, 3]])
     @test nentities(t, 3) == 0
     @test links(t, 2, 0) == ConnectivityList([[1, 2, 5, 4], [5, 2, 3], [6, 5, 3]])
     @test links(t, 2, 0)[1] == [1, 2, 5, 4]
+    @test nlinks(t, 0, 1, 1) == 2
+    @test nlinks(t, 0, 2, 1) == 1
+    @test nlinks(t, 2, 0, 1) == 4
+    @test nlinks(t, 2, 0, 2) == 3
 end
 
 @testset "Node -> Face" begin
@@ -100,6 +102,4 @@ end
     @test cl[1] == [2]
     @test cl[2] == [1, 3]
     @test cl[3] == [2]
-end
-
 end

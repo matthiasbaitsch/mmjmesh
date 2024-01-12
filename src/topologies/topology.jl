@@ -115,6 +115,8 @@ Entity IDs are generated automatically. The parameter `cl` can be a `Connectivit
 addlinks!(t::Topology, d0::Int, d1::Int, cl::ConnectivityList) = addlinks!(t, d0, d1, collect(1:length(cl)), cl)
 addlinks!(t::Topology, d0::Int, d1::Int, cl::Vector{Vector{Int}}) = addlinks!(t, d0, d1, ConnectivityList(cl))
 
+nlinks(t::Topology, d1::Int, d2::Int, idx::Int) = length(links(t, d1, d2), idx)
+
 """
     links(t::Topology, d0::Int, d1::Int)
 

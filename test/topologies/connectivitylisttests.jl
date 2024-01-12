@@ -1,5 +1,3 @@
-module ConnectivityListTests
-
 using Test
 using MMJMesh.Topologies
 
@@ -46,6 +44,4 @@ end
     cl1 = ConnectivityList([[1, 2, 5, 4], [2, 3, 5], [3, 6, 5]])
     cl2 = ConnectivityList([[1, 2, 5, 4], [2, 3, 5], [3, 6, 5]])
     @test cl1 == cl2
-end
-
 end
