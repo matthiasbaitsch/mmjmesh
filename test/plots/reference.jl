@@ -1,10 +1,11 @@
 using ReferenceTests
-using MMJMesh
-using MMJMesh.Utilities
-using MMJMesh.Plots
-using MMJMesh.Meshes
-using CairoMakie
 using Random
+using CairoMakie
+using MMJMesh
+using MMJMesh.Plots
+using MMJMesh.Groups
+using MMJMesh.Meshes
+using MMJMesh.Utilities
 
 Random.seed!(1234)
 ref(f) = joinpath("../../data/references/plots", f)
@@ -59,3 +60,19 @@ x = coordinates(m)
 bn = m.groups[:boundarynodes]
 scatter!(p.axis, x[:, bn], color=:magenta)
 @test_reference ref("m2d-008.png") p |> mconf()
+
+# Face groups
+a = 5
+m = makemeshonrectangle(4, 2, 2a, a)
+m.groups[:g1] = FaceGroup([1, 2, 3, 6, 22])
+m.groups[:g2] = FaceGroup([5, 6, 7, 8, 22, 33])
+m.groups[:g3] = FaceGroup([34])
+@test_reference ref("m2d-009.png") mplot(m) |> mconf()
+@test_reference ref("m2d-010.png") mplot(m, facecolor=:orange) |> mconf()
+
+# Edge
+a = 5
+m = makemeshonrectangle(4, 2, 2a, a)
+m.groups[:g1] = EdgeGroup([1, 2, 3, 6, 22])
+m.groups[:g2] = EdgeGroup([22, 44, 2, 6, 7, 8])
+mplot(m) |> mconf()

@@ -1,8 +1,6 @@
-using MMJMesh
-using MMJMesh.Meshes
-using MMJMesh.Utilities
+module GroupsTests
 
+using Test
 
-m = makemeshonrectan
+@testset "Basic" include("basictests.jl")
 
-print

@@ -10,9 +10,10 @@ using MMJMesh
 using MMJMesh.MMJBase
 using MMJMesh.Topologies
 using MMJMesh.Geometries
+using MMJMesh.Groups
 using MMJMesh.Associations
 
-import MMJMesh.Groups: EntityGroup, EntityGroupCollection
+import MMJMesh.Groups: EntityGroup, EntityGroupCollection, dim, ispredefined
 
 # Exports
 ## mesh.jl
@@ -26,11 +27,12 @@ export nnodes, nedges, nfaces, nsolids
 export node, edge, face, solid
 export nodes, edges, faces, solids
 export nodeIdxs, edgeIdxs, faceIdxs, solidIdxs
-export populatepredfinedgroups!
+export populatepredfinedgroups!, collectgroups
 
 # Parts
 include("mesh.jl")
 include("meshentities.jl")
 include("common.jl")
+include("entitygroups.jl")
 
 end

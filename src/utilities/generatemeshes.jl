@@ -18,6 +18,9 @@ function makemeshoninterval(a::Number, b::Number, n::Int, g = t -> [t; 0.0])
     end
     addlinks!(m.topology, 1, 0, cl)
 
+    # Housekeeping
+    populatepredfinedgroups!(m)
+
     # Done
     return m
 end
@@ -63,7 +66,7 @@ function makemeshonrectangle(w::Number, h::Number, nx::Int, ny::Int, mt::Meshtyp
     end
     addlinks!(m.topology, 2, 0, cl)
 
-    # TODO: ???
+    # Housekeeping
     populatepredfinedgroups!(m)
 
     # Done

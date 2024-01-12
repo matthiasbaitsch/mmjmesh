@@ -4,9 +4,9 @@ using Test
 import CairoMakie
 
 using MMJMesh
+using MMJMesh.Plots
 using MMJMesh.Meshes
 using MMJMesh.Utilities
-using MMJMesh.Plots
 
 @testset "Basic" begin
 

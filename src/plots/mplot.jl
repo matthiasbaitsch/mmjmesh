@@ -23,8 +23,8 @@ MakieCore.@recipe(MPlot, mesh, scalars) do scene
 
         # Faces
         facesvisible=MakieCore.automatic,
-        facecolor=:seashell2,
-        facecolormap=MakieCore.theme(scene, :colormap),
+        facecolor=MakieCore.automatic,
+        facecolormap=MakieCore.automatic,
 
         # Lineplot
         lineplotvisible=MakieCore.automatic,
@@ -58,7 +58,7 @@ function mconf(; colorbar=true, dataaspect=true, blank=true, title="")
             Makie.hidedecorations!(ax)
             Makie.hidespines!(ax)
         end
-        if colorbar
+        if colorbar && !scene.plot[:colorbygroups][]
             # Hack using the fact that the mesh is always plotted first
             p = scene.plot.plots[1]
             if !isnothing(Makie.extract_colormap_recursive(p))
@@ -80,9 +80,11 @@ function MakieCore.plot!(plot::MPlot)
     mesh = plot.mesh[]
 
     # Helper
-    setifautomatic(key, value) = (plot.attributes[key][] == MakieCore.automatic) && (plot.attributes[key] = value)
+    isautomatic(key) = (plot.attributes[key][] == MakieCore.automatic)
+    setifautomatic(key, value) = isautomatic(key) && (plot.attributes[key] = value)
 
     # Configure
+    plot[:colorbygroups] = false
     setifautomatic(:nodesvisible, nnodes(mesh) <= 50)
     if pdim(mesh) == 1                              # 1D mesh
         plot.edgesvisible = true
@@ -96,6 +98,17 @@ function MakieCore.plot!(plot::MPlot)
         end
         setifautomatic(:edgelinewidth, 3)
     elseif pdim(mesh) == 2                          # 2D mesh
+        
+        # Coloring by groups
+        if isautomatic(:facecolor) && hasgroups(mesh.groups, 2)
+            setifautomatic(:facecolormap, :Pastel1_9)
+            plot[:colorbygroups] = true
+        else
+            setifautomatic(:facecolor, :seashell2)
+            setifautomatic(:facecolormap, MakieCore.theme(plot, :colormap))
+        end
+        
+        # Others
         plot.lineplotvisible = false
         setifautomatic(:featureedgesvisible, true)
         setifautomatic(:edgesvisible, nfaces(mesh) <= 100)
@@ -245,13 +258,24 @@ function plotfaces(plot::MPlot)
     mesh = plot.mesh[]
     color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
 
-    # Test if we have data
+    # Test if we have data and overall color
     haveData = color isa Vector
+    haveColor = plot.facecolor[] != MakieCore.automatic
 
     # Helpers
     coords = coordinates(mesh)
     Nn = nnodes(mesh)
     Nf = nfaces(mesh)
+
+    # Color by groups
+    if !haveData && !haveColor && hasgroups(mesh.groups, 2)
+        function idvector(s::AbstractVector)
+            d = Dict([(j, i) for (i, j) in enumerate(Set(s))])
+            return [d[k] for k in s]
+        end
+        color = idvector(collectgroups(mesh, d=2))
+        haveData = true
+    end
 
     # Collect triangles    
     if !haveData || length(color) == Nn                           # No color or nodal color
@@ -306,13 +330,14 @@ function plotedges(plot::MPlot, featureedges::Bool)
 
     # Coordinates and links from edges to faces
     coords = coordinates(mesh)
-    l12 = featureedges ? links(mesh.topology, 1, 2) : ConnectivityList()
+    beg = mesh.groups[:boundaryedges]
 
-    # Collect coordinates - currently only 2D
+    # Collect coordinates
+    # TODO 3D: Generalize
     xx = Vector{Float64}()
     yy = Vector{Float64}()
     for (i, l) in enumerate(links(mesh.topology, 1, 0))
-        if !featureedges || length(l12, i) == 1
+        if !featureedges || i ∈ beg
             x1 = coords[:, l[1]]
             x2 = coords[:, l[2]]
             push!(xx, x1[1], x2[1], NaN)

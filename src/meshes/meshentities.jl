@@ -16,19 +16,17 @@ struct MeshEntity{DT,DG,NN}
         new{pdim,DG,length(links(mesh.topology, pdim, 0), index)}(mesh, index)
 end
 
+# Names
 const Node{DG} = MeshEntity{0,DG,0}
 const Edge{DG,NN} = MeshEntity{1,DG,NN}
 const Face{DG,NN} = MeshEntity{2,DG,NN}
 const Solid{DG,NN} = MeshEntity{2,DG,NN}
 
-# Get entity
+# Basic
 entity(m::Mesh, pdim::Int, index::Int) = MeshEntity(m, pdim, index)
-
-# Indexes
+nentities(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = nlinks(me.mesh.topology, DT, pdim, me.index)
 indexes(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index]
-
-# Length of an edge
-Base.length(e::MeshEntity{1,DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
+Base.length(e::Edge{DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
 
 # Show
 name(e::MeshEntity) = name(typeof(e))
