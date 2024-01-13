@@ -1,7 +1,7 @@
 """
 SeqIntSet(a::AbstractVector{Int}; sorted=false)
 
-Set of integers which handles sets containing sequences like ```{-100, -99, … , 3, 9, 10, … , 1001}``` efficiently.
+Set of integers which handles sets containing sequences, for example ```{-100, -99, -98, … , 2, 3, 9, 10, 12, … , 98, 100}```, efficiently.
 """
 struct SeqIntSet <: AbstractVector{Int}
     count::Vector{Int}
@@ -43,40 +43,68 @@ function sequenceofvalue(target::Int, set::SeqIntSet)
     return -1
 end
 
-Base.length(s::SeqIntSet) = s.count[end]
-Base.size(s::SeqIntSet) = (length(s),)
-Base.isempty(s::SeqIntSet) = length(s) == 0
-Base.in(target::Int, set::SeqIntSet) = sequenceofvalue(target, set) != -1
+struct Seq
+    first::Int
+    inc::Int
+    last::Int
+    Seq(first::Int, inc::Int, last::Int) = new(first, inc, last - (last - first) % inc)
+end
 
-# TODO: Implement this reasonably
-Base.getindex(s::SeqIntSet, i::Int) = collect(s)[i]
+Base.first(s::Seq) = s.first
+Base.last(s::Seq) = s.last
+Base.in(i::Int, s::Seq) = s.first <= i <= s.last && (i - s.first) % s.inc == 0
 
-function Base.show(io::IO, s::SeqIntSet)
-    if (isempty(s))
-        print(io, "[]")
+function Base.show(io::IO, s::Seq)
+    if s.first == s.last
+        print(io, s.first)
+    elseif s.inc == 1
+        print(io, s.first, ":", s.last)
     else
-        tostring(p) = p.first == p.second ? string(p.first) : string(p.first) * ":" * string(p.second)
-        array = tostring.(s.sequences)
-        pstring = "[" * popfirst!(array)
-        for a ∈ array
-            pstring *= ", " * a
-        end
-        pstring *= "]"
-        print(io, pstring)
+        print(io, s.first, ":", s.inc, ":", s.last)
     end
 end
 
+
+nsequences(set::SeqIntSet) = length(set.sequences)
+function sequence(set::SeqIntSet, i::Int) 
+    s = set.sequences[i]
+    return Seq(s.first, 1, s.second)
+end
+
+function sequences(s::SeqIntSet)
+    return [Seq(p.first, 1, p.second) for p ∈ s.sequences]
+end
+
+Base.first(set::SeqIntSet) = first(first(set.sequences))
+Base.length(s::SeqIntSet) = s.count[end]
+Base.size(s::SeqIntSet) = (length(s),)
+Base.isempty(s::SeqIntSet) = (length(s) == 0)
+Base.in(target::Int, set::SeqIntSet) = sequenceofvalue(target, set) != -1
+Base.getindex(s::SeqIntSet, i::Int) = collect(s)[i]
+
+function Base.show(io::IO, ::MIME{Symbol("text/plain")}, set::SeqIntSet) 
+    print(io, "SeqIntSet(ns=$(nsequences(set)), ne=$(length(set)))\n")
+    print(io, join(sequences(set), "\n"))
+end
+Base.show(io::IO, set::SeqIntSet) = print(io, "[$(join(sequences(set), ", "))]")
+
+# TODO: direct access
+Base.first(set::SeqIntSet, idx::Int) = first(sequence(set, idx))
+inc(set::SeqIntSet, idx::Int) = sequence(set, idx).inc
+Base.last(set::SeqIntSet, idx::Int) = last(sequence(set, idx))
+Base.last(set::SeqIntSet) = last(set.sequences[end])
+
 # Iterator using the pair (position, value) as state
 Base.eltype(::SeqIntSet) = Int
-Base.iterate(set::SeqIntSet) = isempty(set) ? nothing : (set.sequences[1].first, (1, set.sequences[1].first))
+Base.iterate(set::SeqIntSet) = isempty(set) ? nothing : (first(set), (1, first(set)))
 function Base.iterate(set::SeqIntSet, state)
     pos, val = state
-    if pos <= length(set.sequences) && val < set.sequences[end].second
-        if val == set.sequences[pos].second
-            pos += 1
-            val = set.sequences[pos].first
+    if pos <= nsequences(set) && val < last(set)
+        if val == last(set, pos)
+            pos += inc(set, pos)
+            val = first(set, pos)
         else
-            val += 1
+            val += inc(set, pos)
         end
         return (val, (pos, val))
     else
