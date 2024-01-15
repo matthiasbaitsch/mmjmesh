@@ -113,7 +113,6 @@ end
     @test entities(t, 1) == 1:5
 end
 
-
 @testset "Incremental construction" begin
     t = Topology(2, 6)
     addlinks!(t, 2, 0, [[1, 2, 5, 4], [5, 2, 3], [6, 5, 3]])
