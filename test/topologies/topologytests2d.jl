@@ -23,7 +23,7 @@ addlinks!(t, 2, 0, [[1, 2, 5, 4], [5, 2, 3], [6, 5, 3]])
 @testset "Basic" begin
     @test isanonymous(t, 0) == false
     @test isanonymous(t, 1) == true
-    @test isanonymous(t, 2) == false    
+    @test isanonymous(t, 2) == false
     @test nentities(t, 0) == 6
     @test entity(t, 0, 2) == 2
     @test nentities(t, 1, false) == 0
@@ -102,4 +102,25 @@ end
     @test cl[1] == [2]
     @test cl[2] == [1, 3]
     @test cl[3] == [2]
+end
+
+@testset "Multiple addlinks!" begin
+    t = Topology(2, 6)
+    @test nentities(t, 1) == 0
+    addlinks!(t, 1, 0, [[4, 1], [3, 2]])
+    addlinks!(t, 1, 0, [[5, 2], [5, 3], [5, 4]])
+    @test nentities(t, 1) == 5
+    @test entities(t, 1) == 1:5
+end
+
+
+@testset "Incremental construction" begin
+    t = Topology(2, 6)
+    addlinks!(t, 2, 0, [[1, 2, 5, 4], [5, 2, 3], [6, 5, 3]])
+    addlinks!(t, 1, 0, [[4, 1], [3, 2]])
+    @test nentities(t, 1) == 2
+    @test entities(t, 1) == 1:2
+    links(t, 2, 1)
+    @test nentities(t, 1) == 8
+    @test entities(t, 1) == 1:8
 end

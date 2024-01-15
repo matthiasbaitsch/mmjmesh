@@ -145,3 +145,12 @@ Base.iterate(cl::ConnectivityList, state=1) = state > length(cl) ? nothing : (cl
 #         end
 #     end
 # end
+
+function Base.show(io::IO, ::MIME{Symbol("text/plain")}, cl::ConnectivityList)
+    println(io, "$(length(cl))-element ConnectivityList:")
+    print(io, " " * join(collect(cl), "\n "))
+end
+
+function Base.show(io::IO, cl::ConnectivityList)
+    print(io, "[$(join(collect(cl), ", "))]")
+end

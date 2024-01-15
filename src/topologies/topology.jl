@@ -77,7 +77,7 @@ function nentities(t::Topology{D}, d::Int, anonymous::Bool=true) where {D}
     if d <= D
         if haskey(t.entities, d)
             return length(t.entities[d])
-        elseif anonymous
+        elseif anonymous && nentities(t, D, false) > 0
             return length(links(t, d, 0))
         else
             return 0
@@ -87,6 +87,7 @@ function nentities(t::Topology{D}, d::Int, anonymous::Bool=true) where {D}
     end
 end
 
+entities(t::Topology, dim::Int) = t.entities[dim]
 entity(t::Topology, dim::Int, idx::Int) = t.entities[dim][idx]
 
 # -------------------------------------------------------------------------------------------------
@@ -100,21 +101,39 @@ Add links from entities of dimension `d0` to entities of dimension `d1` by speci
 entities `ids` and the `ConnectivityList` `cl`.
 """
 function addlinks!(t::Topology{D}, d0::Int, d1::Int, ids::Vector{Int}, cl::ConnectivityList) where {D}
-    @assert d0 <= D && d0 > d1 "Only downward links with d0 < $D are allowed."
-    t.entities[d0] = ids
-    t.links[(d0, d1)] = cl
+    @assert d0 ≤ D && d0 > d1 "Only downward links with d0 ≤ $D are allowed."
+
+    if !haskey(t.links, (d0, d1))                   # First time: Set
+        t.entities[d0] = ids
+        t.links[(d0, d1)] = cl
+    else                                            # Subsequent times: Append
+        append!(t.entities[d0], ids)
+        for links in cl
+            push!(t.links[(d0, d1)], links)
+        end
+    end
     return nothing
 end
 
 """
-    addlinks!(t::Topology, d0::Int, d1::Int, cl)
+    addlinks!(t::Topology, d0::Int, d1::Int, cl::ConnectivityList)
+    addlinks!(t::Topology, d0::Int, d1::Int, cl::Vector{Vector{Int}})
 
-Add links from entities of dimension `d0` to entities of dimension `d1` by specifying the connectivity list.
-Entity IDs are generated automatically. The parameter `cl` can be a `ConnectivityList` or a vector of integer vectors.
+Add links from entities of dimension `d0` to entities of dimension `d1` by specifying the connectivity list. Entity IDs are generated automatically.
 """
-addlinks!(t::Topology, d0::Int, d1::Int, cl::ConnectivityList) = addlinks!(t, d0, d1, collect(1:length(cl)), cl)
+addlinks!(t::Topology, d0::Int, d1::Int, cl::ConnectivityList) = addlinks!(
+    t, d0, d1,
+    collect(nentities(t, d0, false) .+ (1:length(cl))),
+    cl
+)
 addlinks!(t::Topology, d0::Int, d1::Int, cl::Vector{Vector{Int}}) = addlinks!(t, d0, d1, ConnectivityList(cl))
 
+# XXX Make idx second parameter
+"""
+    nlinks(t::Topology, d0::Int, d1::Int, idx::Int)
+
+Number of links from entity idx of dimension d0 to entities of dimension d1.
+"""
 nlinks(t::Topology, d1::Int, d2::Int, idx::Int) = length(links(t, d1, d2), idx)
 
 """
@@ -144,12 +163,18 @@ function links(t::Topology{D}, d0::Int, d1::Int) where {D}
         end
         cl = ConnectivityList(linkslist)
     elseif d0 > d1 && d1 > 0                                        # a.2) Links entities of lower dimension
-        im = inverse(links(t, d1, 0))
         linkslist = Vector{Vector{Int}}()
-        for gl ∈ links(t, d0, 0)
+        l0td1 = inverse(links(t, d1, 0))
+        for ld0t0 ∈ links(t, d0, 0)
             llinks = Vector{Int}()
-            for idxs ∈ links(entitytopology(D, length(gl)), d1, 0)
-                push!(llinks, im[Set(gl[idxs])])
+            for lpos ∈ links(entitytopology(D, length(ld0t0)), d1, 0)
+                ld1t0 = ld0t0[lpos]
+                kld1t0 = Set(ld1t0)
+                if !haskey(l0td1, kld1t0)
+                    l0td1[kld1t0] = length(l0td1) + 1
+                    addlinks!(t, d1, 0, [ld1t0])
+                end
+                push!(llinks, l0td1[kld1t0])
             end
             push!(linkslist, llinks)
         end
