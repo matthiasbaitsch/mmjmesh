@@ -2,7 +2,7 @@ module Groups
 
 import MMJMesh.MMJBase: SeqIntSet
 
-export NodeGroup, EdgeGroup, FaceGroup, SolidGroup, hasgroups, groupnames
+export NodeGroup, EdgeGroup, FaceGroup, SolidGroup, hasgroups, groupnames, ngroups
 
 # -------------------------------------------------------------------------------------------------
 # EntityGroup
@@ -28,9 +28,12 @@ Base.isempty(g::EntityGroup) = isempty(g.indexes)
 Base.in(target::Int, g::EntityGroup) = in(target, g.indexes)
 Base.getindex(g::EntityGroup, i::Int) = g.indexes[i]
 Base.show(io::IO, g::EntityGroup{DT}) where {DT} = (print(io, "EntityGroup{$DT}"); show(io, g.indexes))
-Base.eltype(::EntityGroup) = Int
+Base.eltype(g::EntityGroup) = eltype(g.indexes)
 Base.iterate(g::EntityGroup) = iterate(g.indexes)
 Base.iterate(g::EntityGroup, state) = iterate(g.indexes, state)
+Base.union(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dim(g1)}(union(g1.indexes, g2.indexes))
+Base.intersect(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dim(g1)}(intersect(g1.indexes, g2.indexes))
+Base.setdiff(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dim(g1)}(setdiff(g1.indexes, g2.indexes))
 
 # Own functions
 dim(::EntityGroup{DT}) where {DT} = DT
@@ -78,6 +81,8 @@ function groupnames(gc::EntityGroupCollection; d::Int=-1, predefined::Bool=false
     end
     return names
 end
+
+ngroups(gc::EntityGroupCollection; d::Int=-1, predefined::Bool=false) = length(groupnames(gc, d=d, predefined=predefined))
 
 ispredefined(gc::EntityGroupCollection, key::Symbol) = haskey(gc.recipes, key)
 

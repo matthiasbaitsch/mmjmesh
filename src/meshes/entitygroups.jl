@@ -3,6 +3,7 @@ import MMJMesh.Groups: addrecipe!, groupnames
 module Detail
 using MMJMesh.Meshes
 
+
 function collectboundary(m::Mesh{1,DG}) where DG
     bn = Vector{Int}()
     for e ∈ nodes(m)
@@ -12,6 +13,7 @@ function collectboundary(m::Mesh{1,DG}) where DG
     end
     return bn, Int[], Int[]
 end
+
 
 function collectboundary(m::Mesh{2,DG}) where DG
     bn = Vector{Int}()

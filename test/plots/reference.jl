@@ -11,6 +11,7 @@ Random.seed!(1234)
 ref(f) = joinpath("../../data/references/plots", f)
 update_theme!(colormap=:jet)
 
+
 # -------------------------------------------------------------------------------------------------
 # 1D meshes
 # -------------------------------------------------------------------------------------------------
@@ -70,9 +71,11 @@ m.groups[:g3] = FaceGroup([34])
 @test_reference ref("m2d-009.png") mplot(m) |> mconf()
 @test_reference ref("m2d-010.png") mplot(m, facecolor=:orange) |> mconf()
 
-# Edge
+# Edge groups
 a = 5
 m = makemeshonrectangle(4, 2, 2a, a)
-m.groups[:g1] = EdgeGroup([1, 2, 3, 6, 22])
-m.groups[:g2] = EdgeGroup([22, 44, 2, 6, 7, 8])
-mplot(m) |> mconf()
+m.groups[:g1] = EdgeGroup(1:10)
+m.groups[:g2] = EdgeGroup(8:16)
+m.groups[:g3] = EdgeGroup(62:71)
+@test_reference ref("m2d-011.png") mplot(m) |> mconf()
+@test_reference ref("m2d-012.png") mplot(m, featureedgecolor=:orange) |> mconf()

@@ -18,7 +18,7 @@ MakieCore.@recipe(MPlot, mesh, scalars) do scene
 
         # Featureedges
         featureedgesvisible=MakieCore.automatic,
-        featureedgecolor=MakieCore.theme(scene, :linecolor),
+        featureedgecolor=MakieCore.automatic,
         featureedgelinewidth=MakieCore.automatic,
 
         # Faces
@@ -98,7 +98,7 @@ function MakieCore.plot!(plot::MPlot)
         end
         setifautomatic(:edgelinewidth, 3)
     elseif pdim(mesh) == 2                          # 2D mesh
-        
+
         # Coloring by groups
         if isautomatic(:facecolor) && hasgroups(mesh.groups, 2)
             setifautomatic(:facecolormap, :Pastel1_9)
@@ -107,7 +107,7 @@ function MakieCore.plot!(plot::MPlot)
             setifautomatic(:facecolor, :seashell2)
             setifautomatic(:facecolormap, MakieCore.theme(plot, :colormap))
         end
-        
+
         # Others
         plot.lineplotvisible = false
         setifautomatic(:featureedgesvisible, true)
@@ -254,6 +254,11 @@ function plotlineplot(plot::MPlot)
     end
 end
 
+function _idvector(s::AbstractVector)
+    d = Dict([(j, i) for (i, j) in enumerate(Set(s))])
+    return [d[k] for k in s]
+end
+
 function plotfaces(plot::MPlot)
     mesh = plot.mesh[]
     color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
@@ -269,11 +274,7 @@ function plotfaces(plot::MPlot)
 
     # Color by groups
     if !haveData && !haveColor && hasgroups(mesh.groups, 2)
-        function idvector(s::AbstractVector)
-            d = Dict([(j, i) for (i, j) in enumerate(Set(s))])
-            return [d[k] for k in s]
-        end
-        color = idvector(collectgroups(mesh, d=2))
+        color = _idvector(collectgroups(mesh, d=2))
         haveData = true
     end
 
@@ -328,32 +329,44 @@ end
 function plotedges(plot::MPlot, featureedges::Bool)
     mesh = plot.mesh[]
 
-    # Coordinates and links from edges to faces
-    coords = coordinates(mesh)
-    beg = mesh.groups[:boundaryedges]
+    if featureedges
+        indexes = mesh.groups[:boundaryedges]
+        for n in groupnames(mesh.groups, d=1, predefined=false)
+            indexes = indexes ∪ mesh.groups[n]
+        end
+    else
+        indexes = 1:nedges(mesh)
+    end
 
     # Collect coordinates
     # TODO 3D: Generalize
-    xx = Vector{Float64}()
-    yy = Vector{Float64}()
-    for (i, l) in enumerate(links(mesh.topology, 1, 0))
-        if !featureedges || i ∈ beg
-            x1 = coords[:, l[1]]
-            x2 = coords[:, l[2]]
-            push!(xx, x1[1], x2[1], NaN)
-            push!(yy, x1[2], x2[2], NaN)
-        end
+    xx = Real[]
+    yy = Real[]
+    for i ∈ indexes
+        e = edge(mesh, i)
+        x1 = coordinates(e, 1)
+        x2 = coordinates(e, 2)
+        push!(xx, x1[1], x2[1], NaN)
+        push!(yy, x1[2], x2[2], NaN)
     end
 
     # Plot attributes
     if featureedges
-        lw = plot.featureedgelinewidth[]
         lc = plot.featureedgecolor[]
+        lw = plot.featureedgelinewidth[]
+        if lc == MakieCore.automatic
+            if ngroups(mesh.groups, d=1) > 0
+                ids = _idvector(collectgroups(mesh, d=1, predefined=true))
+                lc = reshape(repeat(ids[indexes], 1, 3)', :)
+            else
+                lc = :black
+            end
+        end
     else
         lw = plot.edgelinewidth[]
         lc = plot.edgecolor[]
     end
 
     # Plot
-    Makie.lines!(plot, xx, yy, linewidth=lw, color=lc)
+    Makie.lines!(plot, xx, yy, linewidth=lw, color=lc, colormap=:Set1_9)
 end

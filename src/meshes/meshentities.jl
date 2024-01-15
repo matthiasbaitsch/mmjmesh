@@ -25,6 +25,7 @@ const Solid{DG,NN} = MeshEntity{2,DG,NN}
 # Basic
 entity(m::Mesh, pdim::Int, index::Int) = MeshEntity(m, pdim, index)
 nentities(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = nlinks(me.mesh.topology, DT, pdim, me.index)
+index(me::MeshEntity{DT,DG,NN}, pdim::Int, i::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index][i]
 indexes(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index]
 Base.length(e::Edge{DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
 
@@ -66,5 +67,5 @@ entities(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = MeshEntityList(
 coordinate(n::Node, c::Int) = n.mesh.geometry.points.coordinates[c, n.index]
 coordinates(n::Node) = n.mesh.geometry.points.coordinates[:, n.index]
 
-coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, nodeIdxs(me)]
-coordinates(me::MeshEntity, index::Int) = me.mesh.geometry.points.coordinates[:, index]
+coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, indexes(me, 0)]
+coordinates(me::MeshEntity, i::Int) = me.mesh.geometry.points.coordinates[:, index(me, 0, i)]
