@@ -28,8 +28,8 @@ e42 = element(m, 42)
 a = 5
 m = makemeshonrectangle(9.0, 4.5, 2a, a)
 
-@test m.groups.entries[:boundarynodes] == nothing
-@test m.groups.entries[:boundaryedges] == nothing
+@test isnothing(m.groups.entries[:boundarynodes])
+@test isnothing(m.groups.entries[:boundaryedges])
 @test length(m.groups[:boundarynodes]) == 30
 @test length(m.groups[:boundaryedges]) == 30
 

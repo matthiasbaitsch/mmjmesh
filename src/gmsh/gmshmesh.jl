@@ -109,7 +109,7 @@ const PT_CONF = set_pt_conf(crop=:horizontal)
 
 Base.show(io::IO, mf::MeshFormat) = print(io, "# MeshFormat\n\n  version: $(mf.version)\n filetype: $(mf.filetype)\n datasize: $(mf.datasize)\n")
 Base.show(io::IO, pn::PhysicalName) = print(io, "PhysicalName[dimension=$(pn.dimension), tag=$(pn.tag), name=$(pn.name)]")
-Base.show(io::IO, bb::BoundingBox) = Base.show(io, bb.bounds)
+Base.show(io::IO, bb::BoundingBox) = print(io, bb.bounds)
 
 
 # PhysicalNameCollection methods

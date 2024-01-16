@@ -22,4 +22,4 @@ function nextarray!(as::ArrayScanner)
     return a
 end
 
-Base.show(::IO, as::ArrayScanner) = Base.show(as.array[as.p:end])
+Base.show(::IO, as::ArrayScanner) = print(io, as.array[as.p:end])
