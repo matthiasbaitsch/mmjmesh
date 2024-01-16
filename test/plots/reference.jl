@@ -6,6 +6,7 @@ using MMJMesh.Plots
 using MMJMesh.Groups
 using MMJMesh.Meshes
 using MMJMesh.Utilities
+using MMJMesh.Gmsh
 
 Random.seed!(1234)
 ref(f) = joinpath("../../data/references/plots", f)
@@ -79,3 +80,9 @@ m.groups[:g2] = EdgeGroup(8:16)
 m.groups[:g3] = EdgeGroup(62:71)
 @test_reference ref("m2d-011.png") mplot(m) |> mconf()
 @test_reference ref("m2d-012.png") mplot(m, featureedgecolor=:orange) |> mconf()
+
+# Gmesh meshes with groups
+m = MMJMesh.Gmsh.Mesh("data/gmsh/advanced.msh")
+@test_reference ref("m2d-013.png") mplot(m) |> mconf()
+m = MMJMesh.Gmsh.Mesh("data/gmsh/complex-g1.msh")
+@test_reference ref("m2d-014.png") mplot(m) |> mconf()
