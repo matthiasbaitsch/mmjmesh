@@ -16,7 +16,7 @@ struct Mesh{DT,DG}
     data::MeshData
 end
 
-Mesh(dt::Int, dg::Int, nn::Int=0) = Mesh{dt,dg}(Topology(dt, nn), Geometry(dg, nn))
+Mesh(dt::Int, dg::Int, nn::Int=0) = Mesh{dt,dg}(Topology(dt, nn), Geometry(dg, nn), EntityGroupCollection(), MeshData())
 
 Mesh(coordinates::Matrix, dt::Int) =
     Mesh{dt,size(coordinates, 1)}(
@@ -51,9 +51,11 @@ function Base.show(io::IO, m::Mesh{DT,DG}) where {DT,DG}
     println(io, s1)
     println(io, "Mesh{", DT, ", ", DG, "}")
     println(io, s1)
-    show(io, m.topology)
+    print(io, m.topology)
     println(io, s2)
-    show(io, m.geometry)
+    print(io, m.geometry)
+    println(io, s2)
+    print(io, m.groups)
     println(io, s1)
 end
 
