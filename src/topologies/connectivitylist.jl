@@ -13,22 +13,30 @@ struct ConnectivityList <: AbstractVector{Vector{Int}}
     entries::Vector{Int}
 end
 
+
 """
     ConnectivityList()
+    ConnectivityList(linkslist::Vector{Vector{Int}})
+    ConnectivityList(linkslist::AbstractMatrix{Int})
 
-Construct empty `ConnectivityList`.
+Construct `ConnectivityList`.
 """
 ConnectivityList() = ConnectivityList([1], Int[])
 
-"""
-    ConnectivityList(linkslist::Vector{Vector{Int}})
 
-Construct `ConnectivityList` from a list of links.
-"""
 function ConnectivityList(linkslist::Vector{Vector{Int}})
     cl = ConnectivityList()
     for links in linkslist
         push!(cl, links)
+    end
+    return cl
+end
+
+
+function ConnectivityList(limkmatrix::AbstractMatrix{Int})
+    cl = ConnectivityList()
+    for i in axes(limkmatrix, 1)
+        push!(cl, limkmatrix[i, :])
     end
     return cl
 end
