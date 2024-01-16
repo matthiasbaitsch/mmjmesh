@@ -82,7 +82,8 @@ m.groups[:g3] = EdgeGroup(62:71)
 @test_reference ref("m2d-012.png") mplot(m, featureedgecolor=:orange) |> mconf()
 
 # Gmesh meshes with groups
-m = MMJMesh.Gmsh.Mesh("data/gmsh/advanced.msh")
+meshpath(m) = joinpath(@__DIR__(), "../../data/gmsh", m)
+m = MMJMesh.Gmsh.Mesh(meshpath("advanced.msh"))
 @test_reference ref("m2d-013.png") mplot(m) |> mconf()
-m = MMJMesh.Gmsh.Mesh("data/gmsh/complex-g1.msh")
+m = MMJMesh.Gmsh.Mesh(meshpath("complex-g1.msh"))
 @test_reference ref("m2d-014.png") mplot(m) |> mconf()
