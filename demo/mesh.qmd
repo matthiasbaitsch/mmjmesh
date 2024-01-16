@@ -65,10 +65,8 @@ Groups can be used to filter access
 
 ```{julia}
 m = Mesh(meshpath("complex-g1.msh"))
-g = m.groups[:boundarynodes]
-coords = coordinates(m)
 p = mplot(m)
-cm.scatter!(p.axis, coords[:, g], color = :hotpink)
+cm.scatter!(p.axis, coordinates(m, :boundarynodes), color = :hotpink)
 p |> mconf()
 ```
 
