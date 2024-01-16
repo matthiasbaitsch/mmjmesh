@@ -13,17 +13,17 @@ struct Mesh{DT,DG}
     topology::Topology{DT}
     geometry::Geometry{DG}
     groups::EntityGroupCollection
-    data::MeshData
+    data::Data
 end
 
-Mesh(dt::Int, dg::Int, nn::Int=0) = Mesh{dt,dg}(Topology(dt, nn), Geometry(dg, nn), EntityGroupCollection(), MeshData(Mesh{dt,dg}))
+Mesh(dt::Int, dg::Int, nn::Int=0) = Mesh{dt,dg}(Topology(dt, nn), Geometry(dg, nn), EntityGroupCollection(), Data(Mesh{dt,dg}))
 
 Mesh(coordinates::Matrix, dt::Int) =
     Mesh{dt,size(coordinates, 1)}(
         Topology(dt, size(coordinates, 2)),
         Geometry(coordinates),
         EntityGroupCollection(),
-        MeshData(Mesh{dt,size(coordinates, 1)})
+        Data(Mesh{dt,size(coordinates, 1)})
     )
 
 function Mesh(coordinates::Matrix, elements::Vector{Vector{Int}}, dt::Int)
