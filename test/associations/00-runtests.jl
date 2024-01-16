@@ -1,16 +1,29 @@
-module AssociationsTests
-
 using Test
-
 using MMJMesh
-using MMJMesh.Meshes
-using MMJMesh.Utilities
 using MMJMesh.Associations
 
-m = makemeshoninterval(0.0, 1.2, 10)
 
-m.data[:test] = 1
-@test m.data[:test] == 1
+# Global data
+md = MeshData(Int)
+md[:foo] = 42
 
+@test md[:foo] == 42
+
+
+# Mapping based on dimension and set
+function makesetmapping(dim::Int, set::Set, value::Any)
+    function mapping(p...)
+        (_, d, i) = p
+        if d == dim && i in set
+            return value
+        end
+        return nothing
+    end
 end
+addmapping!(md, :bar, makesetmapping(2, Set([1, 2, 33]), 43))
 
+@test md[:bar, 2, 1] == 43
+@test md[:bar, 2, 2] == 43
+@test md[:bar, 2, 33] == 43
+@test isnothing(md[:bar, 2, 3])
+@test isnothing(md[:bar, 1, 1])
