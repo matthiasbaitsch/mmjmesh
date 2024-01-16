@@ -206,7 +206,7 @@ struct DerivativeAt &lt;: AbstractMapping{AbstractMapping,Real,Everything()}
     x::Real
 end
 MMJMesh.Mathematics.valueat(u::DerivativeAt, f) = f'(u.x)</code></pre>
-<p>Compute polynomials from Vandermonde matrix</p>
+<p>Compute polynomials</p>
 <pre class="{julia}"><code>h = 2.0
 N = [ValueAt.(0:h/2:h); DerivativeAt.([0, h])] |&gt; vcat
 P = monomials(0:length(N)-1, 0 .. h)

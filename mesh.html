@@ -136,7 +136,10 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#basic-usage" id="toc-basic-usage" class="nav-link active" data-scroll-target="#basic-usage"><span class="header-section-number">2.1</span> Basic usage</a></li>
   <li><a href="#read-mesh-from-gmsh-file" id="toc-read-mesh-from-gmsh-file" class="nav-link" data-scroll-target="#read-mesh-from-gmsh-file"><span class="header-section-number">2.2</span> Read mesh from Gmsh file</a></li>
-  <li><a href="#groups-and-predefined-groups" id="toc-groups-and-predefined-groups" class="nav-link" data-scroll-target="#groups-and-predefined-groups"><span class="header-section-number">2.3</span> Groups and predefined groups</a></li>
+  <li><a href="#groups-and-predefined-groups" id="toc-groups-and-predefined-groups" class="nav-link" data-scroll-target="#groups-and-predefined-groups"><span class="header-section-number">2.3</span> Groups and predefined groups</a>
+  <ul class="collapse">
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><span class="header-section-number">2.3.1</span> Data</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -207,8 +210,28 @@ m.groups[:f2] = FaceGroup(200:600)
 m.groups[:e1] = EdgeGroup(600:800)
 m.groups[:e2] = EdgeGroup(700:900)
 mplot(m) |&gt; mconf()</code></pre>
+<section id="data" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="data"><span class="header-section-number">2.3.1</span> Data</h3>
+<pre class="{julia}"><code>m = Mesh(meshpath("complex-g1.msh"))
+
+println("s1: ", m.groups[:s1].indexes)
+println("s2: ", m.groups[:s2].indexes)
+println("s3: ", m.groups[:s3].indexes)
+
+m.data[:kefunc, :s1] = "f1";
+m.data[:kefunc, :s2] = "f2";
+m.data[:kefunc, :s3] = "f3";
+
+e0005 = element(m, 0005)
+e0490 = element(m, 0490)
+e1132 = element(m, 1132)
+
+println("e0005.data[:kefunc] = ", e0005.data[:kefunc])
+println("e0490.data[:kefunc] = ", e0490.data[:kefunc])
+println("e1132.data[:kefunc] = ", e1132.data[:kefunc])</code></pre>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
