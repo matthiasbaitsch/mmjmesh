@@ -100,17 +100,21 @@ entity(t::Topology, dim::Int, idx::Int) = t.entities[dim][idx]
 Add links from entities of dimension `d0` to entities of dimension `d1` by specifying the
 entities `ids` and the `ConnectivityList` `cl`.
 """
-function addlinks!(t::Topology{D}, d0::Int, d1::Int, ids::Vector{Int}, cl::ConnectivityList) where {D}
+function addlinks!(t::Topology{D}, d0::Int, d1::Int, ids::AbstractVector{Int}, cl::ConnectivityList) where {D}
     @assert d0 ≤ D && d0 > d1 "Only downward links with d0 ≤ $D are allowed."
 
     if !haskey(t.links, (d0, d1))                   # First time: Set
+        oldsize = 0
         t.entities[d0] = ids
         t.links[(d0, d1)] = cl
     else                                            # Subsequent times: Append
+        oldsize = length(t.entities[d0])
         append!(t.entities[d0], ids)
         append!(t.links[(d0, d1)], cl)
     end
-    return nothing
+    newsize = length(t.entities[d0])
+
+    return oldsize+1:newsize
 end
 
 # TODO: Use AbstractVector
