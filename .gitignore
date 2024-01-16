@@ -1,2 +1,7 @@
 Manifest.toml
 foo.jl
+demo/*_files
+demo/site_libs
+demo/*.ipynb
+dem0/*.html
+
