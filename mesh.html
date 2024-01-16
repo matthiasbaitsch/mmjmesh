@@ -185,8 +185,7 @@ end</code></pre>
 </section>
 <section id="read-mesh-from-gmsh-file" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="read-mesh-from-gmsh-file"><span class="header-section-number">2.2</span> Read mesh from Gmsh file</h2>
-<pre class="{julia}"><code>bd = dirname(@__FILE__)
-m = Mesh(bd * "/../data/gmsh/complex-g1.msh")
+<pre class="{julia}"><code>m = Mesh(meshpath("complex-g1.msh"))
 mplot(m, edgesvisible=true) |&gt; mconf()</code></pre>
 </section>
 <section id="groups-and-predefined-groups" class="level2" data-number="2.3">
@@ -194,12 +193,20 @@ mplot(m, edgesvisible=true) |&gt; mconf()</code></pre>
 <p>Mesh entities can be collected in groups some of which are predefined.</p>
 <pre class="{julia}"><code>keys(m.groups.recipes)</code></pre>
 <pre class="{julia}"><code>show(m.groups[:boundarynodes])</code></pre>
-<p>Groups can be used filter access</p>
-<pre class="{julia}"><code>g = m.groups[:boundarynodes]
+<p>Groups can be used to filter access</p>
+<pre class="{julia}"><code>m = Mesh(meshpath("complex-g1.msh"))
+g = m.groups[:boundarynodes]
 coords = coordinates(m)
 p = mplot(m)
 cm.scatter!(p.axis, coords[:, g], color = :hotpink)
 p |&gt; mconf()</code></pre>
+<p>Additional groups can be defined</p>
+<pre class="{julia}"><code>using MMJMesh.Groups
+m.groups[:f1] = FaceGroup(100:300)
+m.groups[:f2] = FaceGroup(200:600)
+m.groups[:e1] = EdgeGroup(600:800)
+m.groups[:e2] = EdgeGroup(700:900)
+mplot(m) |&gt; mconf()</code></pre>
 
 
 </section>

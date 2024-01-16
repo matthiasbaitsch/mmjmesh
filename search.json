@@ -32,14 +32,14 @@
     "href": "mesh.html#read-mesh-from-gmsh-file",
     "title": "2  The Mesh interface",
     "section": "2.2 Read mesh from Gmsh file",
-    "text": "2.2 Read mesh from Gmsh file\nbd = dirname(@__FILE__)\nm = Mesh(bd * \"/../data/gmsh/complex-g1.msh\")\nmplot(m, edgesvisible=true) |&gt; mconf()"
+    "text": "2.2 Read mesh from Gmsh file\nm = Mesh(meshpath(\"complex-g1.msh\"))\nmplot(m, edgesvisible=true) |&gt; mconf()"
   },
   {
     "objectID": "mesh.html#groups-and-predefined-groups",
     "href": "mesh.html#groups-and-predefined-groups",
     "title": "2  The Mesh interface",
     "section": "2.3 Groups and predefined groups",
-    "text": "2.3 Groups and predefined groups\nMesh entities can be collected in groups some of which are predefined.\nkeys(m.groups.recipes)\nshow(m.groups[:boundarynodes])\nGroups can be used filter access\ng = m.groups[:boundarynodes]\ncoords = coordinates(m)\np = mplot(m)\ncm.scatter!(p.axis, coords[:, g], color = :hotpink)\np |&gt; mconf()"
+    "text": "2.3 Groups and predefined groups\nMesh entities can be collected in groups some of which are predefined.\nkeys(m.groups.recipes)\nshow(m.groups[:boundarynodes])\nGroups can be used to filter access\nm = Mesh(meshpath(\"complex-g1.msh\"))\ng = m.groups[:boundarynodes]\ncoords = coordinates(m)\np = mplot(m)\ncm.scatter!(p.axis, coords[:, g], color = :hotpink)\np |&gt; mconf()\nAdditional groups can be defined\nusing MMJMesh.Groups\nm.groups[:f1] = FaceGroup(100:300)\nm.groups[:f2] = FaceGroup(200:600)\nm.groups[:e1] = EdgeGroup(600:800)\nm.groups[:e2] = EdgeGroup(700:900)\nmplot(m) |&gt; mconf()"
   },
   {
     "objectID": "plot.html#plot-a-1d-mesh",
