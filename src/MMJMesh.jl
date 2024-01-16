@@ -7,7 +7,6 @@ include("mmjbase/00-mmjbase.jl")
 include("topologies/00-topologies.jl")
 include("geometries/00-geometries.jl")
 include("mathematics/00-mathematics.jl")
-include("associations/00-associations.jl")
 include("groups/00-groups.jl")
 include("meshes/00-meshes.jl")
 

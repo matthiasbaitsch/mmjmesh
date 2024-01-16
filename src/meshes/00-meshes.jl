@@ -11,7 +11,6 @@ using MMJMesh.MMJBase
 using MMJMesh.Topologies
 using MMJMesh.Geometries
 using MMJMesh.Groups
-using MMJMesh.Associations
 
 import MMJMesh.Groups: EntityGroup, EntityGroupCollection, ispredefined
 
@@ -31,6 +30,7 @@ export nodeIdxs, edgeIdxs, faceIdxs, solidIdxs
 export collectgroups, groupids, populatepredfinedgroups!
 
 # Parts
+include("data.jl")
 include("mesh.jl")
 include("entitydata.jl")
 include("meshentities.jl")

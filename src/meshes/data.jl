@@ -1,7 +1,3 @@
-module Associations
-
-export MeshData, addmapping!
-
 mutable struct MeshData{T}
     source::Union{Nothing, T}
     mappings::Dict{Symbol, Function}
@@ -14,4 +10,6 @@ Base.setindex!(md::MeshData, value, name::Symbol) = addmapping!(md, name, (p...)
 
 Base.getindex(md::MeshData, name::Symbol, params...) = md.mappings[name](md.source, params...)
 
-end
+
+
+

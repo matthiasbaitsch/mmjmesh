@@ -1,7 +1,9 @@
 using Test
 using MMJMesh
-using MMJMesh.Associations
+using MMJMesh.Meshes
 
+
+import MMJMesh.Meshes: MeshData, addmapping!
 
 # Global data
 md = MeshData(Int)
