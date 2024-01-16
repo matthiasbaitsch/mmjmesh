@@ -254,11 +254,6 @@ function plotlineplot(plot::MPlot)
     end
 end
 
-function _idvector(s::AbstractVector)
-    d = Dict([(j, i) for (i, j) in enumerate(Set(s))])
-    return [d[k] for k in s]
-end
-
 function plotfaces(plot::MPlot)
     mesh = plot.mesh[]
     color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
@@ -274,7 +269,7 @@ function plotfaces(plot::MPlot)
 
     # Color by groups
     if !haveData && !haveColor && hasgroups(mesh.groups, 2)
-        color = _idvector(collectgroups(mesh, d=2))
+        color = groupids(mesh, d=2)
         haveData = true
     end
 
@@ -329,6 +324,7 @@ end
 function plotedges(plot::MPlot, featureedges::Bool)
     mesh = plot.mesh[]
 
+    # Collect indexes of edges to plot
     if featureedges
         indexes = mesh.groups[:boundaryedges]
         for n in groupnames(mesh.groups, d=1, predefined=false)
@@ -356,7 +352,7 @@ function plotedges(plot::MPlot, featureedges::Bool)
         lw = plot.featureedgelinewidth[]
         if lc == MakieCore.automatic
             if ngroups(mesh.groups, d=1) > 0
-                ids = _idvector(collectgroups(mesh, d=1, predefined=true))
+                ids = groupids(mesh, d=1, predefined=true)
                 lc = reshape(repeat(ids[indexes], 1, 3)', :)
             else
                 lc = :black
@@ -368,5 +364,5 @@ function plotedges(plot::MPlot, featureedges::Bool)
     end
 
     # Plot
-    Makie.lines!(plot, xx, yy, linewidth=lw, color=lc, colormap=:Set1_9)
+    Makie.lines!(plot, xx, yy, linewidth=lw, color=lc, colormap=:tab10)
 end

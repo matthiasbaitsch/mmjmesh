@@ -108,13 +108,12 @@ function addlinks!(t::Topology{D}, d0::Int, d1::Int, ids::Vector{Int}, cl::Conne
         t.links[(d0, d1)] = cl
     else                                            # Subsequent times: Append
         append!(t.entities[d0], ids)
-        for links in cl
-            push!(t.links[(d0, d1)], links)
-        end
+        append!(t.links[(d0, d1)], cl)
     end
     return nothing
 end
 
+# TODO: Use AbstractVector
 """
     addlinks!(t::Topology, d0::Int, d1::Int, cl::ConnectivityList)
     addlinks!(t::Topology, d0::Int, d1::Int, cl::Vector{Vector{Int}})
@@ -128,7 +127,7 @@ addlinks!(t::Topology, d0::Int, d1::Int, cl::ConnectivityList) = addlinks!(
 )
 addlinks!(t::Topology, d0::Int, d1::Int, cl::Vector{Vector{Int}}) = addlinks!(t, d0, d1, ConnectivityList(cl))
 
-# XXX Make idx second parameter
+# TODO: Make idx second parameter
 """
     nlinks(t::Topology, d0::Int, d1::Int, idx::Int)
 

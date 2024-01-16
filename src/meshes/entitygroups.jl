@@ -1,10 +1,7 @@
 import MMJMesh.Groups: addrecipe!, groupnames
 
-module Detail
-using MMJMesh.Meshes
 
-
-function collectboundary(m::Mesh{1,DG}) where DG
+function _collectboundary(m::Mesh{1,DG}) where {DG}
     bn = Vector{Int}()
     for e ∈ nodes(m)
         if nedges(e) == 1
@@ -15,7 +12,7 @@ function collectboundary(m::Mesh{1,DG}) where DG
 end
 
 
-function collectboundary(m::Mesh{2,DG}) where DG
+function _collectboundary(m::Mesh{2,DG}) where {DG}
     bn = Vector{Int}()
     be = Vector{Int}()
     for e ∈ edges(m)
@@ -27,12 +24,16 @@ function collectboundary(m::Mesh{2,DG}) where DG
     return bn, be, Int[]
 end
 
+
+function _idvector(s::AbstractVector)
+    d = Dict([(j, i) for (i, j) in enumerate(Set(s))])
+    return [d[k] for k in s]
 end
 
 
 function populatepredfinedgroups!(m::Mesh)
     function recipe()
-        bn, be, bf = Detail.collectboundary(m)
+        bn, be, bf = _collectboundary(m)
         m.groups[:boundarynodes] = EntityGroup(0, bn)
         m.groups[:boundaryedges] = EntityGroup(1, be)
         m.groups[:boundaryfaces] = EntityGroup(2, bf)
@@ -52,5 +53,8 @@ function collectgroups(m::Mesh; d::Int=-1, predefined::Bool=false)
     end
     return namelists
 end
+
+
+groupids(m::Mesh; d::Int=-1, predefined::Bool=false) = _idvector(collectgroups(m, d=d, predefined=predefined))
 
 

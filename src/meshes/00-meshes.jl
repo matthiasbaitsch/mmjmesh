@@ -27,7 +27,8 @@ export nnodes, nedges, nfaces, nsolids
 export node, edge, face, solid
 export nodes, edges, faces, solids
 export nodeIdxs, edgeIdxs, faceIdxs, solidIdxs
-export populatepredfinedgroups!, collectgroups
+## entitygroups.jl
+export populatepredfinedgroups!, collectgroups, groupids
 
 # Parts
 include("mesh.jl")

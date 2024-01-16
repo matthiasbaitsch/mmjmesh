@@ -65,11 +65,23 @@ show(m.groups[:boundarynodes])
 Groups can be used filter access
 
 ```{julia}
+m = Mesh(bd * "/../data/gmsh/complex-g1.msh")
 g = m.groups[:boundarynodes]
 coords = coordinates(m)
 p = mplot(m)
 cm.scatter!(p.axis, coords[:, g], color = :hotpink)
 p |> mconf()
+```
+
+Groups can be defined
+
+```{julia}
+using MMJMesh.Groups
+m.groups[:f1] = FaceGroup(10:20)
+m.groups[:f2] = FaceGroup(50:80)
+m.groups[:e1] = EdgeGroup(10:20)
+m.groups[:e2] = EdgeGroup(50:60)
+mplot(m) |> mconf()
 ```
 
 

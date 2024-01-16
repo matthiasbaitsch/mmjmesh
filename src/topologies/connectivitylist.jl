@@ -75,6 +75,13 @@ function Base.push!(cl::ConnectivityList, links::Vector{Int})
     return nothing
 end
 
+function Base.append!(cl::ConnectivityList, links::AbstractVector{Vector{Int}})
+    for l in links
+        push!(cl, l)
+    end
+    return nothing
+end
+
 """
     length(cl)
 
