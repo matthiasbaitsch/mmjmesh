@@ -109,10 +109,11 @@ end
 # IO
 # -------------------------------------------------------------------------------------------------
 
-function Base.show(io::IO, g::Geometry{D}) where {D}
-    println(io, "Geometry{$D}")
-    println(io, "$(length(g, 0)) Points")
-    println(io, g.points.coordinates[:, 1:g.points.n])
+function Base.show(io::IO, g::Geometry{D}) where D
+    println(io, "Geometry{$D} with $(length(g, 0)) Points")
+    for i ∈ 1:D
+        println(io, "x$i: $(g.points.coordinates[i, 1:g.points.n])")
+    end    
 end
 
 

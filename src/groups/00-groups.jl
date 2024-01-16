@@ -65,6 +65,14 @@ function Base.setindex!(gc::EntityGroupCollection, g::EntityGroup, key::Symbol)
     gc.entries[key] = g
 end
 
+function Base.show(io::IO, gc::EntityGroupCollection)
+    println(io, "EntityGroupCollection")
+    for key in sort(keys(gc.entries) |> collect)
+        g = gc.entries[key]
+        println(io, "  $key: $g")
+    end 
+end
+
 # Own functions
 
 function addrecipe!(gc::EntityGroupCollection, key::Symbol, recipe::Function)
