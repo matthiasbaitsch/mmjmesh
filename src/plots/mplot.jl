@@ -83,6 +83,10 @@ function MakieCore.plot!(plot::MPlot)
     isautomatic(key) = (plot.attributes[key][] == MakieCore.automatic)
     setifautomatic(key, value) = isautomatic(key) && (plot.attributes[key] = value)
 
+    # Flag if we have data
+    color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
+    plot[:havedata] = color isa Vector
+
     # Configure
     plot[:colorbygroups] = false
     setifautomatic(:nodesvisible, nnodes(mesh) <= 50)
@@ -100,7 +104,7 @@ function MakieCore.plot!(plot::MPlot)
     elseif pdim(mesh) == 2                          # 2D mesh
 
         # Coloring by groups
-        if isautomatic(:facecolor) && hasgroups(mesh.groups, 2)
+        if !plot[:havedata][] && isautomatic(:facecolor) && hasgroups(mesh.groups, 2)
             setifautomatic(:facecolormap, :Pastel1_9)
             plot[:colorbygroups] = true
         else
