@@ -72,7 +72,7 @@ end
 MMJMesh.Mathematics.valueat(u::DerivativeAt, f) = f'(u.x)
 ```
 
-Compute polynomials from Vandermonde matrix
+Compute polynomials
 
 ```{julia}
 h = 2.0
