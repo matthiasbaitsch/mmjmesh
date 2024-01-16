@@ -6,7 +6,25 @@ using MMJMesh.Utilities
 import MMJMesh.Meshes: collectgroups
 
 
-# Test boundarynodes and edges
+# -------------------------------------------------------------------------------------------------
+# Entities and groups
+# -------------------------------------------------------------------------------------------------
+a = 5
+m = makemeshonrectangle(9.0, 4.5, 2a, a)
+m.groups[:g1] = FaceGroup([1, 2, 3, 13, 14, 7, 15])
+m.groups[:g2] = FaceGroup([2, 13, 7, 5])
+m.groups[:g3] = EdgeGroup([1, 2, 3, 13, 14, 7, 15])
+
+e13 = element(m, 13)
+e42 = element(m, 42)
+@test e13 ∈ m.groups[:g1]
+@test e13 ∉ m.groups[:g3]
+@test e42 ∉ m.groups[:g1]
+
+
+# -------------------------------------------------------------------------------------------------
+# Boundary groups
+# -------------------------------------------------------------------------------------------------
 a = 5
 m = makemeshonrectangle(9.0, 4.5, 2a, a)
 
@@ -15,7 +33,10 @@ m = makemeshonrectangle(9.0, 4.5, 2a, a)
 @test length(m.groups[:boundarynodes]) == 30
 @test length(m.groups[:boundaryedges]) == 30
 
-# Test collectgroups
+
+# -------------------------------------------------------------------------------------------------
+# Collectgroups
+# -------------------------------------------------------------------------------------------------
 a = 5
 m = makemeshonrectangle(9.0, 4.5, 2a, a)
 

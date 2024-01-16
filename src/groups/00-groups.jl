@@ -4,6 +4,7 @@ import MMJMesh.MMJBase: SeqIntSet
 
 export NodeGroup, EdgeGroup, FaceGroup, SolidGroup, hasgroups, groupnames, ngroups
 
+
 # -------------------------------------------------------------------------------------------------
 # EntityGroup
 # -------------------------------------------------------------------------------------------------
@@ -31,12 +32,12 @@ Base.show(io::IO, g::EntityGroup{DT}) where {DT} = (print(io, "EntityGroup{$DT}"
 Base.eltype(g::EntityGroup) = eltype(g.indexes)
 Base.iterate(g::EntityGroup) = iterate(g.indexes)
 Base.iterate(g::EntityGroup, state) = iterate(g.indexes, state)
-Base.union(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dim(g1)}(union(g1.indexes, g2.indexes))
-Base.intersect(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dim(g1)}(intersect(g1.indexes, g2.indexes))
-Base.setdiff(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dim(g1)}(setdiff(g1.indexes, g2.indexes))
+Base.union(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dimension(g1)}(union(g1.indexes, g2.indexes))
+Base.intersect(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dimension(g1)}(intersect(g1.indexes, g2.indexes))
+Base.setdiff(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dimension(g1)}(setdiff(g1.indexes, g2.indexes))
 
 # Own functions
-dim(::EntityGroup{DT}) where {DT} = DT
+dimension(::EntityGroup{DT}) where DT = DT
 
 # -------------------------------------------------------------------------------------------------
 # EntityGroupCollection
@@ -83,7 +84,7 @@ end
 function groupnames(gc::EntityGroupCollection; d::Int=-1, predefined::Bool=false)
     names = Vector{Symbol}()
     for name in keys(gc.entries)
-        if (predefined || !ispredefined(gc, name)) && (d == -1 || dim(gc[name]) == d)
+        if (predefined || !ispredefined(gc, name)) && (d == -1 || dimension(gc[name]) == d)
             push!(names, name)
         end
     end

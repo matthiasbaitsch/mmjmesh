@@ -1,3 +1,6 @@
+using MMJMesh
+using MMJMesh.Meshes
+
 # -------------------------------------------------------------------------------------------------
 # MeshEntity struct
 # -------------------------------------------------------------------------------------------------
@@ -11,9 +14,10 @@ space connected to `NN` nodes.
 struct MeshEntity{DT,DG,NN}
     mesh::Mesh
     index::Int
+    data::MeshEntityData{DT}
 
-    MeshEntity(mesh::Mesh{DT,DG}, pdim::Int, index::Int) where {DT,DG} =
-        new{pdim,DG,length(links(mesh.topology, pdim, 0), index)}(mesh, index)
+    MeshEntity(mesh::Mesh{DT,DG}, pdim::Int, idx::Int) where {DT,DG} =
+        new{pdim,DG,nlinks(mesh.topology, pdim, 0, idx)}(mesh, idx, MeshEntityData{pdim}(mesh, idx))
 end
 
 # Names
@@ -23,10 +27,12 @@ const Face{DG,NN} = MeshEntity{2,DG,NN}
 const Solid{DG,NN} = MeshEntity{2,DG,NN}
 
 # Basic
-entity(m::Mesh, pdim::Int, index::Int) = MeshEntity(m, pdim, index)
+entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx)
 nentities(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = nlinks(me.mesh.topology, DT, pdim, me.index)
 index(me::MeshEntity{DT,DG,NN}, pdim::Int, i::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index][i]
 indexes(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index]
+pdim(::MeshEntity{DT,DG,NN}) where {DT,DG,NN} = DT
+gdim(::MeshEntity{DT,DG,NN}) where {DT,DG,NN} = DG
 Base.length(e::Edge{DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
 
 # Show
@@ -66,6 +72,5 @@ entities(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = MeshEntityList(
 # Coordinates
 coordinate(n::Node, c::Int) = n.mesh.geometry.points.coordinates[c, n.index]
 coordinates(n::Node) = n.mesh.geometry.points.coordinates[:, n.index]
-
 coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, indexes(me, 0)]
 coordinates(me::MeshEntity, i::Int) = me.mesh.geometry.points.coordinates[:, index(me, 0, i)]

@@ -13,7 +13,7 @@ using MMJMesh.Geometries
 using MMJMesh.Groups
 using MMJMesh.Associations
 
-import MMJMesh.Groups: EntityGroup, EntityGroupCollection, dim, ispredefined
+import MMJMesh.Groups: EntityGroup, EntityGroupCollection, ispredefined
 
 # Exports
 ## mesh.jl
@@ -28,10 +28,11 @@ export node, edge, face, solid
 export nodes, edges, faces, solids
 export nodeIdxs, edgeIdxs, faceIdxs, solidIdxs
 ## entitygroups.jl
-export populatepredfinedgroups!, collectgroups, groupids
+export collectgroups, groupids, populatepredfinedgroups!
 
 # Parts
 include("mesh.jl")
+include("entitydata.jl")
 include("meshentities.jl")
 include("common.jl")
 include("entitygroups.jl")
