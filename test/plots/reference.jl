@@ -9,8 +9,9 @@ using MMJMesh.Utilities
 using MMJMesh.Gmsh
 
 Random.seed!(1234)
-ref(f) = joinpath("../../data/references/plots", f)
 update_theme!(colormap=:jet)
+ref(f) = joinpath("../../data/references/plots", f)
+meshpath(m) = joinpath(@__DIR__(), "../../data/gmsh", m)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -82,8 +83,13 @@ m.groups[:g3] = EdgeGroup(62:71)
 @test_reference ref("m2d-012.png") mplot(m, featureedgecolor=:orange) |> mconf()
 
 # Gmesh meshes with groups
-meshpath(m) = joinpath(@__DIR__(), "../../data/gmsh", m)
 m = MMJMesh.Gmsh.Mesh(meshpath("advanced.msh"))
 @test_reference ref("m2d-013.png") mplot(m) |> mconf()
 m = MMJMesh.Gmsh.Mesh(meshpath("complex-g1.msh"))
 @test_reference ref("m2d-014.png") mplot(m) |> mconf()
+
+# Gmesh with nodes on edge group
+m = Mesh(meshpath("multi_lambda.msh"))
+p = mplot(m, edgesvisible=true) |> mconf()
+scatter!(p.axis, coordinates(m)[:, m.groups[:ΓD0]])
+@test_reference ref("m2d-015.png") p |> mconf()

@@ -26,12 +26,18 @@ function Mesh(filepath::String)
     D = dimension(gm)
     m = Mesh(coordinates(gm), D)
 
+    ng(name) = Symbol(string(name) * "0")
+
     # Collect empty groups
     groupnamesbytag = Dict{Int,Symbol}()
     for g ∈ gm.physicalnames.names
         name = Symbol(g.name)
         m.groups[name] = EntityGroup(g.dimension, Int[])
         groupnamesbytag[g.tag] = name
+
+        if g.dimension == 1
+            m.groups[ng(name)] = EntityGroup(0, Int[])
+        end
     end
 
     # Collect entities
@@ -46,6 +52,11 @@ function Mesh(filepath::String)
             for tag ∈ gm.entities[d0][eb.entityTag].physicaltags
                 name = groupnamesbytag[tag]
                 m.groups[name] = m.groups[name] ∪ EntityGroup(d0, indexes)
+
+                if d0 == 1
+                    nn = ng(name)
+                    m.groups[nn] = m.groups[nn] ∪ EntityGroup(0, reshape(eb.nodetags, :))
+                end
             end
         end
     end
