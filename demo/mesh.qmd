@@ -45,8 +45,7 @@ end
 ## Read mesh from Gmsh file
 
 ```{julia}
-bd = dirname(@__FILE__)
-m = Mesh(bd * "/../data/gmsh/complex-g1.msh")
+m = Mesh(meshpath("complex-g1.msh"))
 mplot(m, edgesvisible=true) |> mconf()
 ```
 
@@ -65,7 +64,7 @@ show(m.groups[:boundarynodes])
 Groups can be used filter access
 
 ```{julia}
-m = Mesh(bd * "/../data/gmsh/complex-g1.msh")
+m = Mesh(meshpath("complex-g1.msh"))
 g = m.groups[:boundarynodes]
 coords = coordinates(m)
 p = mplot(m)

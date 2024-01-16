@@ -9,3 +9,5 @@ using MMJMesh.Mathematics
 
 cm.set_theme!(cm.theme_minimal())
 cm.update_theme!(colormap=:jet)
+
+meshpath(m) = joinpath(@__DIR__(), "../data/gmsh", m)
