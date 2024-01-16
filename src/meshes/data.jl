@@ -9,6 +9,7 @@ mutable struct Data{T}
     Data(t::Type) = new{t}(nothing, Dict{Symbol,Array{Function}}())
 end
 
+
 # Shortcut to associate everything with a value
 Base.setindex!(md::Data, value, name::Symbol) = addmapping!(md, name, (_...) -> value)
 

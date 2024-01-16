@@ -38,13 +38,15 @@ function Mesh(filepath::String)
     for eb ∈ gm.elementblocks.blocks
         d0 = eb.entitydim
 
-        # Links
-        indexes = addlinks!(m.topology, d0, 0, eb.tags, ConnectivityList(eb.nodetags))
+        if d0 > 0
+            # Links
+            indexes = addlinks!(m.topology, d0, 0, eb.tags, ConnectivityList(eb.nodetags))
 
-        # Groups
-        for tag ∈ gm.entities[d0][eb.entityTag].physicaltags
-            name = groupnamesbytag[tag]
-            m.groups[name] = m.groups[name] ∪ EntityGroup(d0, indexes)
+            # Groups
+            for tag ∈ gm.entities[d0][eb.entityTag].physicaltags
+                name = groupnamesbytag[tag]
+                m.groups[name] = m.groups[name] ∪ EntityGroup(d0, indexes)
+            end
         end
     end
 
