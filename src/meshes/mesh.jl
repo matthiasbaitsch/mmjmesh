@@ -13,7 +13,7 @@ struct Mesh{DT,DG}
     topology::Topology{DT}
     geometry::Geometry{DG}
     groups::EntityGroupCollection
-    data::Data
+    data::Data{Mesh{DT,DG}}
 end
 
 Mesh(dt::Int, dg::Int, nn::Int=0) = Mesh{dt,dg}(Topology(dt, nn), Geometry(dg, nn), EntityGroupCollection(), Data(Mesh{dt,dg}))

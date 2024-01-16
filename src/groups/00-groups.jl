@@ -2,7 +2,7 @@ module Groups
 
 import MMJMesh.MMJBase: SeqIntSet
 
-export NodeGroup, EdgeGroup, FaceGroup, SolidGroup, hasgroups, groupnames, ngroups
+export EntityGroup, EntityGroupCollection, NodeGroup, EdgeGroup, FaceGroup, SolidGroup, hasgroups, groupnames, ngroups
 
 
 # -------------------------------------------------------------------------------------------------

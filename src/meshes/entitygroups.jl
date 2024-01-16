@@ -1,10 +1,3 @@
-using MMJMesh
-using MMJMesh.Meshes
-using MMJMesh.Groups
-
-import MMJMesh.Groups: EntityGroup, addrecipe!, dimension
-
-
 Base.in(target::MeshEntity, g::EntityGroup) = (pdim(target) == dimension(g) && target.index ∈ g.indexes)
 
 

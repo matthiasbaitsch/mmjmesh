@@ -12,7 +12,7 @@ using MMJMesh.Topologies
 using MMJMesh.Geometries
 using MMJMesh.Groups
 
-import MMJMesh.Groups: EntityGroup, EntityGroupCollection, ispredefined
+import MMJMesh.Groups: EntityGroup, EntityGroupCollection, ispredefined, addrecipe!, dimension
 
 # Exports
 ## mesh.jl
