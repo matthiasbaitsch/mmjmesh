@@ -83,4 +83,24 @@ m.groups[:e2] = EdgeGroup(700:900)
 mplot(m) |> mconf()
 ```
 
+### Data
 
+```{julia}
+m = Mesh(meshpath("complex-g1.msh"))
+
+println("s1: ", m.groups[:s1].indexes)
+println("s2: ", m.groups[:s2].indexes)
+println("s3: ", m.groups[:s3].indexes)
+
+m.data[:kefunc, :s1] = "f1";
+m.data[:kefunc, :s2] = "f2";
+m.data[:kefunc, :s3] = "f3";
+
+e0005 = element(m, 0005)
+e0490 = element(m, 0490)
+e1132 = element(m, 1132)
+
+println("e0005.data[:kefunc] = ", e0005.data[:kefunc])
+println("e0490.data[:kefunc] = ", e0490.data[:kefunc])
+println("e1132.data[:kefunc] = ", e1132.data[:kefunc])
+```

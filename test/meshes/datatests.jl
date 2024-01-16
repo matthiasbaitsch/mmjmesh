@@ -2,7 +2,7 @@ using Test
 using MMJMesh
 using MMJMesh.Meshes
 
-import MMJMesh.Meshes: Data, addmapping!, setbase!
+import MMJMesh.Meshes: Data, addmapping!
 
 
 # -------------------------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ function makesetmapping(dim::Int, set::Set, value::Any)
     end
 end
 
-setbase!(md, 11)
+md.base = 11
 addmapping!(md, :bar, makesetmapping(2, Set([1, 2, 33]), 43))
 
 @test md[:bar, 2, 1] == 11 + 43
