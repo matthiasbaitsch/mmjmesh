@@ -1,6 +1,5 @@
 using ReferenceTests
 using Random
-using CairoMakie
 using MMJMesh
 using MMJMesh.Plots
 using MMJMesh.Groups
@@ -8,9 +7,15 @@ using MMJMesh.Meshes
 using MMJMesh.Utilities
 using MMJMesh.Gmsh
 
+import CairoMakie as cm
+
+
+# -------------------------------------------------------------------------------------------------
+# Set up
+# -------------------------------------------------------------------------------------------------
 Random.seed!(1234)
-update_theme!(colormap=:jet)
-ref(f) = joinpath("../../data/references/plots", f)
+cm.update_theme!(colormap=:jet)
+ref(f) = joinpath(@__DIR__(), "../../data/references/plots", f)
 meshpath(m) = joinpath(@__DIR__(), "../../data/gmsh", m)
 
 
@@ -61,7 +66,7 @@ m = makemeshonrectangle(9.0, 4.5, 2a, a)
 p = mplot(m)
 x = coordinates(m)
 bn = m.groups[:boundarynodes]
-scatter!(p.axis, x[:, bn], color=:magenta)
+cm.scatter!(p.axis, x[:, bn], color=:magenta)
 @test_reference ref("m2d-008.png") p |> mconf()
 
 # Face groups
@@ -89,8 +94,8 @@ m = MMJMesh.Gmsh.Mesh(meshpath("complex-g1.msh"))
 @test_reference ref("m2d-014.png") mplot(m) |> mconf()
 
 # Gmesh with nodes on edge group
-m = Mesh(meshpath("multi_lambda.msh"))
+m = MMJMesh.Gmsh.Mesh(meshpath("multi_lambda.msh"))
 p = mplot(m, edgesvisible=true) |> mconf()
-scatter!(p.axis, coordinates(m)[:, m.groups[:ΓD0]])
+cm.scatter!(p.axis, coordinates(m)[:, m.groups[:ΓD0]])
 @test_reference ref("m2d-015.png") p |> mconf()
 @test_reference ref("m2d-016.png") mplot(m, rand(nnodes(m))) |> mconf()

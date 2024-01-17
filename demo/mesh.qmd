@@ -81,7 +81,9 @@ m.groups[:e2] = EdgeGroup(700:900)
 mplot(m) |> mconf()
 ```
 
-### Data
+## Data
+
+Example how to attach data to groups.
 
 ```{julia}
 m = Mesh(meshpath("complex-g1.msh"))
