@@ -1,6 +1,8 @@
 module MMJBase
 
 # Exports
+## seqintset.jl
+export SeqIntSet
 ## functions.jl
 export atol
 ## macros.jl

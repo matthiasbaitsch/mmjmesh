@@ -1,10 +1,3 @@
-module Groups
-
-import MMJMesh.MMJBase: SeqIntSet
-
-export EntityGroup, EntityGroupCollection, NodeGroup, EdgeGroup, FaceGroup, SolidGroup, hasgroups, groupnames, ngroups
-
-
 # -------------------------------------------------------------------------------------------------
 # EntityGroup
 # -------------------------------------------------------------------------------------------------
@@ -13,7 +6,6 @@ struct EntityGroup{DT} <: AbstractVector{Int}
     indexes::SeqIntSet
     EntityGroup{DT}(a::AbstractVector{Int}) where {DT} = new{DT}(SeqIntSet(a))
 end
-
 EntityGroup(dt::Int, a::AbstractVector{Int}) = EntityGroup{dt}(SeqIntSet(a))
 
 # Short names
@@ -22,13 +14,11 @@ const EdgeGroup = EntityGroup{1}
 const FaceGroup = EntityGroup{2}
 const SolidGroup = EntityGroup{3}
 
-# Functions from Base
+# Delegate methods
 Base.length(g::EntityGroup) = length(g.indexes)
 Base.size(g::EntityGroup) = size(g.indexes)
 Base.isempty(g::EntityGroup) = isempty(g.indexes)
-Base.in(target::Int, g::EntityGroup) = in(target, g.indexes)
 Base.getindex(g::EntityGroup, i::Int) = g.indexes[i]
-Base.show(io::IO, g::EntityGroup{DT}) where {DT} = (print(io, "EntityGroup{$DT}"); show(io, g.indexes))
 Base.eltype(g::EntityGroup) = eltype(g.indexes)
 Base.iterate(g::EntityGroup) = iterate(g.indexes)
 Base.iterate(g::EntityGroup, state) = iterate(g.indexes, state)
@@ -36,8 +26,18 @@ Base.union(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dimension(g1)}(union(
 Base.intersect(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dimension(g1)}(intersect(g1.indexes, g2.indexes))
 Base.setdiff(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dimension(g1)}(setdiff(g1.indexes, g2.indexes))
 
+# 
+Base.in(target::Int, g::EntityGroup{DT}) where {DT} = in(target, g.indexes)
+
+# Show
+_name(::NodeGroup) = "NodeGroup"
+_name(::EdgeGroup) = "EdgeGroup"
+_name(::FaceGroup) = "FaceGroup"
+_name(::SolidGroup) = "SolidGroup"
+Base.show(io::IO, g::EntityGroup{DT}) where {DT} = print(io, "$(_name(g))$(g.indexes)")
+
 # Own functions
-dimension(::EntityGroup{DT}) where DT = DT
+dimension(::EntityGroup{DT}) where {DT} = DT
 
 # -------------------------------------------------------------------------------------------------
 # EntityGroupCollection
@@ -71,7 +71,7 @@ function Base.show(io::IO, gc::EntityGroupCollection)
     for key in sort(keys(gc.entries) |> collect)
         g = gc.entries[key]
         println(io, "  $key: $g")
-    end 
+    end
 end
 
 # Own functions
@@ -91,13 +91,7 @@ function groupnames(gc::EntityGroupCollection; d::Int=-1, predefined::Bool=false
     return names
 end
 
-ngroups(gc::EntityGroupCollection; d::Int=-1, predefined::Bool=false) = length(groupnames(gc, d=d, predefined=predefined))
-
 ispredefined(gc::EntityGroupCollection, key::Symbol) = haskey(gc.recipes, key)
-
+ngroups(gc::EntityGroupCollection; d::Int=-1, predefined::Bool=false) = length(groupnames(gc, d=d, predefined=predefined))
 hasgroups(gc::EntityGroupCollection, d::Int; predefined::Bool=false) = !isempty(groupnames(gc, d=d, predefined=predefined))
-
-
-end
-
 

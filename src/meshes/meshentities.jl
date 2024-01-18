@@ -17,15 +17,16 @@ struct MeshEntity{DT,DG,NN}
         new{pdim,DG,nlinks(mesh.topology, pdim, 0, idx)}(mesh, idx, EntityData{pdim}(mesh, idx))
 end
 
-# Names
+# Short names
 const Node{DG} = MeshEntity{0,DG,0}
 const Edge{DG,NN} = MeshEntity{1,DG,NN}
 const Face{DG,NN} = MeshEntity{2,DG,NN}
-const Solid{DG,NN} = MeshEntity{2,DG,NN}
+const Solid{DG,NN} = MeshEntity{3,DG,NN}
 
 # Basic
 entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx)
 nentities(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = nlinks(me.mesh.topology, DT, pdim, me.index)
+index(me::MeshEntity) = me.index
 index(me::MeshEntity{DT,DG,NN}, pdim::Int, i::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index][i]
 indexes(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index]
 pdim(::MeshEntity{DT,DG,NN}) where {DT,DG,NN} = DT
@@ -33,12 +34,11 @@ gdim(::MeshEntity{DT,DG,NN}) where {DT,DG,NN} = DG
 Base.length(e::Edge{DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
 
 # Show
-name(e::MeshEntity) = name(typeof(e))
-name(::Type{MeshEntity{0,DG,NN}}) where {DG,NN} = "Node"
-name(::Type{MeshEntity{1,DG,NN}}) where {DG,NN} = "Edge"
-name(::Type{MeshEntity{2,DG,NN}}) where {DG,NN} = "Face"
-name(::Type{MeshEntity{3,DG,NN}}) where {DG,NN} = "Solid"
-Base.show(io::IO, e::MeshEntity) = print(io, "$(name(e))[$(e.index)]")
+_name(::Node) = "Node"
+_name(::Edge) = "Edge"
+_name(::Face) = "Face"
+_name(::Solid) = "Solie"
+Base.show(io::IO, e::MeshEntity) = print(io, "$(_name(e))[$(e.index)]")
 
 
 # -------------------------------------------------------------------------------------------------

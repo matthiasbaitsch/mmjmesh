@@ -1,11 +1,9 @@
 module MMJMeshRunTests
 
 using Test
-# using Aqua
 using MMJMesh
 
 @testset "MMJMesh" begin    
-    # TODO Aqua.test_all(MMJMesh)
     @testset "Geometries" include("geometries/00-runtests.jl")
     @testset "Topologies" include("topologies/00-runtests.jl")    
     @testset "Meshes" include("meshes/00-runtests.jl")

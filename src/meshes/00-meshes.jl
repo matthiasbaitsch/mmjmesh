@@ -1,25 +1,22 @@
 module Meshes
 
 # Modules needed by this module
-## Other
 using LinearAlgebra
-import Base.length
-import Base.size
-## Own
+
 using MMJMesh
 using MMJMesh.MMJBase
 using MMJMesh.Topologies
 using MMJMesh.Geometries
-using MMJMesh.Groups
-
-import MMJMesh.Groups: EntityGroup, EntityGroupCollection, ispredefined, addrecipe!, dimension
 
 # Exports
+## groups.jl
+export EntityGroup, NodeGroup, EdgeGroup, FaceGroup, SolidGroup
+export ngroups, groupnames, hasgroups
 ## mesh.jl
 export Mesh
 export pdim, gdim, nelements, element, elements
 ## meshentities.jl
-export MeshEntity
+export MeshEntity, Node, Edge, Face, Solid
 ## common.jl
 export coordinate, coordinates
 export nnodes, nedges, nfaces, nsolids
@@ -31,6 +28,7 @@ export collectgroups, groupids, populatepredfinedgroups!
 
 # Parts
 include("data.jl")
+include("groups.jl")
 include("mesh.jl")
 include("entitydata.jl")
 include("meshentities.jl")

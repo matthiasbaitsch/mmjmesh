@@ -2,7 +2,6 @@ using Test
 
 using MMJMesh
 using MMJMesh.Meshes
-using MMJMesh.Groups
 using MMJMesh.Utilities
 
 

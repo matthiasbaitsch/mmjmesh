@@ -6,13 +6,12 @@ using Tables
 using LinearAlgebra
 using PrettyTables
 
+using MMJMesh
+using MMJMesh.Meshes
+using MMJMesh.MMJBase
 using MMJMesh.Topologies
-import MMJMesh.Meshes: Mesh, populatepredfinedgroups!
-import MMJMesh.MMJBase: SeqIntSet
-import MMJMesh.Groups: EntityGroup
 
 # Exports
-export Mesh
 
 # Parts
 include("objecttable.jl")
@@ -21,7 +20,7 @@ include("gmshmesh.jl")
 include("readmesh.jl")
 
 # Create Mesh
-function Mesh(filepath::String)
+function MMJMesh.Meshes.Mesh(filepath::String)
     gm = readmesh(filepath)
     D = dimension(gm)
     m = Mesh(coordinates(gm), D)

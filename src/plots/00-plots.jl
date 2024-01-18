@@ -8,7 +8,6 @@ using LinearAlgebra
 using IntervalSets
 ## Own
 using MMJMesh.Meshes
-using MMJMesh.Groups
 using MMJMesh.MMJBase
 using MMJMesh.Topologies
 using MMJMesh.Mathematics

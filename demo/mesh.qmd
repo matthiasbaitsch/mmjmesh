@@ -73,7 +73,6 @@ p |> mconf()
 Additional groups can be defined
 
 ```{julia}
-using MMJMesh.Groups
 m.groups[:f1] = FaceGroup(100:300)
 m.groups[:f2] = FaceGroup(200:600)
 m.groups[:e1] = EdgeGroup(600:800)

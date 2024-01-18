@@ -1,13 +1,12 @@
-using ReferenceTests
 using Random
+using ReferenceTests
+import CairoMakie as cm
+
 using MMJMesh
+using MMJMesh.Gmsh
 using MMJMesh.Plots
-using MMJMesh.Groups
 using MMJMesh.Meshes
 using MMJMesh.Utilities
-using MMJMesh.Gmsh
-
-import CairoMakie as cm
 
 
 # -------------------------------------------------------------------------------------------------
@@ -88,13 +87,13 @@ m.groups[:g3] = EdgeGroup(62:71)
 @test_reference ref("m2d-012.png") mplot(m, featureedgecolor=:orange) |> mconf()
 
 # Gmesh meshes with groups
-m = MMJMesh.Gmsh.Mesh(meshpath("advanced.msh"))
+m = Mesh(meshpath("advanced.msh"))
 @test_reference ref("m2d-013.png") mplot(m) |> mconf()
-m = MMJMesh.Gmsh.Mesh(meshpath("complex-g1.msh"))
+m = Mesh(meshpath("complex-g1.msh"))
 @test_reference ref("m2d-014.png") mplot(m) |> mconf()
 
 # Gmesh with nodes on edge group
-m = MMJMesh.Gmsh.Mesh(meshpath("multi_lambda.msh"))
+m = Mesh(meshpath("multi_lambda.msh"))
 p = mplot(m, edgesvisible=true) |> mconf()
 cm.scatter!(p.axis, coordinates(m)[:, m.groups[:ΓD0]])
 @test_reference ref("m2d-015.png") p |> mconf()
