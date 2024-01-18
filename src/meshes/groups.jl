@@ -2,42 +2,41 @@
 # EntityGroup
 # -------------------------------------------------------------------------------------------------
 
-struct EntityGroup{DT} <: AbstractVector{Int}
+struct EntityGroup{T} <: AbstractVector{Int}
     indexes::SeqIntSet
-    EntityGroup{DT}(a::AbstractVector{Int}) where {DT} = new{DT}(SeqIntSet(a))
+    EntityGroup{T}(a::AbstractVector{Int}) where {T} = new{T}(SeqIntSet(a))
 end
-EntityGroup(dt::Int, a::AbstractVector{Int}) = EntityGroup{dt}(SeqIntSet(a))
 
-# Short names
-const NodeGroup = EntityGroup{0}
-const EdgeGroup = EntityGroup{1}
-const FaceGroup = EntityGroup{2}
-const SolidGroup = EntityGroup{3}
 
+# -------------------------------------------------------------------------------------------------
 # Delegate methods
+# -------------------------------------------------------------------------------------------------
+
+# AbstractArray
 Base.length(g::EntityGroup) = length(g.indexes)
 Base.size(g::EntityGroup) = size(g.indexes)
 Base.isempty(g::EntityGroup) = isempty(g.indexes)
 Base.getindex(g::EntityGroup, i::Int) = g.indexes[i]
+
+# Iterator
 Base.eltype(g::EntityGroup) = eltype(g.indexes)
 Base.iterate(g::EntityGroup) = iterate(g.indexes)
 Base.iterate(g::EntityGroup, state) = iterate(g.indexes, state)
-Base.union(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dimension(g1)}(union(g1.indexes, g2.indexes))
-Base.intersect(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dimension(g1)}(intersect(g1.indexes, g2.indexes))
-Base.setdiff(g1::EntityGroup, g2::EntityGroup) = EntityGroup{dimension(g1)}(setdiff(g1.indexes, g2.indexes))
 
-# 
-Base.in(target::Int, g::EntityGroup{DT}) where {DT} = in(target, g.indexes)
+# Set operations
+Base.union(g1::EntityGroup{T}, g2::EntityGroup{T}) where {T} =
+    EntityGroup{T}(union(g1.indexes, g2.indexes))
+Base.intersect(g1::EntityGroup{T}, g2::EntityGroup{T}) where {T} =
+    EntityGroup{T}(intersect(g1.indexes, g2.indexes))
+Base.setdiff(g1::EntityGroup{T}, g2::EntityGroup{T}) where {T} =
+    EntityGroup{T}(setdiff(g1.indexes, g2.indexes))
+
+# In 
+Base.in(target::T1, g::EntityGroup{T2}) where {T1,T2} = T1 <: T2 && in(target.index, g.indexes)
 
 # Show
-_name(::NodeGroup) = "NodeGroup"
-_name(::EdgeGroup) = "EdgeGroup"
-_name(::FaceGroup) = "FaceGroup"
-_name(::SolidGroup) = "SolidGroup"
-Base.show(io::IO, g::EntityGroup{DT}) where {DT} = print(io, "$(_name(g))$(g.indexes)")
+Base.show(io::IO, g::EntityGroup{T}) where {T} = print(io, "$(T)Group$(g.indexes)")
 
-# Own functions
-dimension(::EntityGroup{DT}) where {DT} = DT
 
 # -------------------------------------------------------------------------------------------------
 # EntityGroupCollection
@@ -84,7 +83,8 @@ end
 function groupnames(gc::EntityGroupCollection; d::Int=-1, predefined::Bool=false)
     names = Vector{Symbol}()
     for name in keys(gc.entries)
-        if (predefined || !ispredefined(gc, name)) && (d == -1 || dimension(gc[name]) == d)
+        g = gc[name]
+        if (predefined || !ispredefined(gc, name)) && (d == -1 || (!isempty(g) && edim(g) == d))
             push!(names, name)
         end
     end

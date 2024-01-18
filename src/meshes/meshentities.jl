@@ -34,11 +34,7 @@ gdim(::MeshEntity{DT,DG,NN}) where {DT,DG,NN} = DG
 Base.length(e::Edge{DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
 
 # Show
-_name(::Node) = "Node"
-_name(::Edge) = "Edge"
-_name(::Face) = "Face"
-_name(::Solid) = "Solie"
-Base.show(io::IO, e::MeshEntity) = print(io, "$(_name(e))[$(e.index)]")
+Base.show(io::IO, e::T) where {T<:MeshEntity} = print(io, "$(T)[$(e.index)]")
 
 
 # -------------------------------------------------------------------------------------------------

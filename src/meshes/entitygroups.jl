@@ -1,7 +1,18 @@
-Base.in(target::MeshEntity, g::EntityGroup) = (pdim(target) == dimension(g) && target.index ∈ g.indexes)
+const NodeGroup = EntityGroup{Node}
+const EdgeGroup = EntityGroup{Edge}
+const FaceGroup = EntityGroup{Face}
+const SolidGroup = EntityGroup{Solid}
 
 
-function _collectboundary(m::Mesh{1,DG}) where {DG}
+# To my understanding, that should work like this
+# edim(::EntityGroup{MeshEntity{DT}}) where {DT} = DT
+edim(::NodeGroup) = 0
+edim(::EdgeGroup) = 1
+edim(::FaceGroup) = 2
+edim(::SolidGroup) = 3
+
+
+function _collectboundary(m::Mesh{1})
     bn = Vector{Int}()
     for e ∈ nodes(m)
         if nedges(e) == 1
@@ -12,7 +23,7 @@ function _collectboundary(m::Mesh{1,DG}) where {DG}
 end
 
 
-function _collectboundary(m::Mesh{2,DG}) where {DG}
+function _collectboundary(m::Mesh{2})
     bn = Vector{Int}()
     be = Vector{Int}()
     for e ∈ edges(m)
@@ -34,9 +45,9 @@ end
 function populatepredfinedgroups!(m::Mesh)
     function recipe()
         bn, be, bf = _collectboundary(m)
-        m.groups[:boundarynodes] = EntityGroup(0, bn)
-        m.groups[:boundaryedges] = EntityGroup(1, be)
-        m.groups[:boundaryfaces] = EntityGroup(2, bf)
+        m.groups[:boundarynodes] = NodeGroup(bn)
+        m.groups[:boundaryedges] = EdgeGroup(be)
+        m.groups[:boundaryfaces] = FaceGroup(bf)
     end
     addrecipe!(m.groups, :boundarynodes, recipe)
     addrecipe!(m.groups, :boundaryedges, recipe)

@@ -31,11 +31,11 @@ function MMJMesh.Meshes.Mesh(filepath::String)
     groupnamesbytag = Dict{Int,Symbol}()
     for g ∈ gm.physicalnames.names
         name = Symbol(g.name)
-        m.groups[name] = EntityGroup(g.dimension, Int[])
+        m.groups[name] = EntityGroup{MeshEntity{g.dimension}}(Int[])
         groupnamesbytag[g.tag] = name
 
         if g.dimension == 1
-            m.groups[ng(name)] = EntityGroup(0, Int[])
+            m.groups[ng(name)] = NodeGroup(Int[])
         end
     end
 
@@ -50,11 +50,11 @@ function MMJMesh.Meshes.Mesh(filepath::String)
             # Groups
             for tag ∈ gm.entities[d0][eb.entityTag].physicaltags
                 name = groupnamesbytag[tag]
-                m.groups[name] = m.groups[name] ∪ EntityGroup(d0, indexes)
+                m.groups[name] = m.groups[name] ∪ EntityGroup{MeshEntity{d0}}(indexes)
 
                 if d0 == 1
                     nn = ng(name)
-                    m.groups[nn] = m.groups[nn] ∪ EntityGroup(0, reshape(eb.nodetags, :))
+                    m.groups[nn] = m.groups[nn] ∪ NodeGroup(reshape(eb.nodetags, :))
                 end
             end
         end

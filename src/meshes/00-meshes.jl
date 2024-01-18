@@ -14,7 +14,7 @@ export EntityGroup, NodeGroup, EdgeGroup, FaceGroup, SolidGroup
 export ngroups, groupnames, hasgroups
 ## mesh.jl
 export Mesh
-export pdim, gdim, nelements, element, elements
+export pdim, gdim, nelements, element, elements, entity, entities
 ## meshentities.jl
 export MeshEntity, Node, Edge, Face, Solid
 ## common.jl
@@ -24,7 +24,7 @@ export node, edge, face, solid
 export nodes, edges, faces, solids
 export nodeIdxs, edgeIdxs, faceIdxs, solidIdxs
 ## entitygroups.jl
-export collectgroups, groupids, populatepredfinedgroups!
+export collectgroups, groupids, populatepredfinedgroups!, edim
 
 # Parts
 include("data.jl")
