@@ -200,8 +200,7 @@ p = mplot(m)
 cm.scatter!(p.axis, coordinates(m, :boundarynodes), color = :hotpink)
 p |&gt; mconf()</code></pre>
 <p>Additional groups can be defined</p>
-<pre class="{julia}"><code>using MMJMesh.Groups
-m.groups[:f1] = FaceGroup(100:300)
+<pre class="{julia}"><code>m.groups[:f1] = FaceGroup(100:300)
 m.groups[:f2] = FaceGroup(200:600)
 m.groups[:e1] = EdgeGroup(600:800)
 m.groups[:e2] = EdgeGroup(700:900)
