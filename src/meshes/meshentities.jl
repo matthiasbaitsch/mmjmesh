@@ -27,10 +27,10 @@ const Solid{DG,NN} = MeshEntity{3,DG,NN}
 entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx)
 nentities(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = nlinks(me.mesh.topology, DT, pdim, me.index)
 index(me::MeshEntity) = me.index
-index(me::MeshEntity{DT,DG,NN}, pdim::Int, i::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index][i]
-indexes(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index]
-pdim(::MeshEntity{DT,DG,NN}) where {DT,DG,NN} = DT
-gdim(::MeshEntity{DT,DG,NN}) where {DT,DG,NN} = DG
+index(me::MeshEntity{DT}, pdim::Int, i::Int) where {DT} = links(me.mesh.topology, DT, pdim)[me.index][i]
+indexes(me::MeshEntity{DT}, pdim::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index]
+pdim(::MeshEntity{DT}) where {DT} = DT
+gdim(::MeshEntity{DT,DG}) where {DT,DG} = DG
 Base.length(e::Edge{DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
 
 # Show
@@ -60,9 +60,9 @@ Base.iterate(el::MeshEntityList, state=1) = state > length(el) ? nothing : (el[s
 
 # Get entities
 entities(m::Mesh, pdim::Int) = MeshEntityList(m, pdim, 1:nentities(m, pdim))
-entities(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = MeshEntityList(me.mesh, pdim, indexes(me, pdim))
+entities(me::MeshEntity, pdim::Int) = MeshEntityList(me.mesh, pdim, indexes(me, pdim))
 
-# Coordinates
+# Coordinates XXX
 coordinate(n::Node, c::Int) = n.mesh.geometry.points.coordinates[c, n.index]
 coordinates(n::Node) = n.mesh.geometry.points.coordinates[:, n.index]
 coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, indexes(me, 0)]

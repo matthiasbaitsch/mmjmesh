@@ -11,7 +11,7 @@ end
 
 
 # Shortcut to associate everything with a value
-Base.setindex!(md::Data, value, name::Symbol) = addmapping!(md, name, (_...) -> value)
+Base.setindex!(d::Data, value, name::Symbol) = addmapping!(d, name, (_...) -> value)
 
 
 function addmapping!(d::Data, name::Symbol, m::Function)
