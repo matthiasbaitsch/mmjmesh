@@ -95,3 +95,15 @@ ispredefined(gc::EntityGroupCollection, key::Symbol) = haskey(gc.recipes, key)
 ngroups(gc::EntityGroupCollection; d::Int=-1, predefined::Bool=false) = length(groupnames(gc, d=d, predefined=predefined))
 hasgroups(gc::EntityGroupCollection, d::Int; predefined::Bool=false) = !isempty(groupnames(gc, d=d, predefined=predefined))
 
+"""
+    groupsof(e, gc::EntityGroupCollection)
+
+Names of groups entity e belongs to sorted by group size. That is, the most specific
+group is returned first.
+"""
+groupsof(e, gc::EntityGroupCollection) = return sort!(
+    [name for name ∈ groupnames(gc, d=pdim(e), predefined=true) if e ∈ gc[name]], 
+    lt = (n1, n2) -> length(gc[n1]) < length(gc[n2])
+)
+
+groupof(e, gc::EntityGroupCollection) = groupsof(e, gc)[1]

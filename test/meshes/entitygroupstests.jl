@@ -46,9 +46,9 @@ a = 5
 m = makemeshonrectangle(9.0, 4.5, 2a, a)
 @test groupnames(m.groups) == []
 @test groupnames(m.groups, d=1) == []
-@test groupnames(m.groups, d=1, predefined=true) == [:boundaryedges]
+@test groupnames(m.groups, d=1, predefined=true) == [:edges, :boundaryedges]
 @test groupnames(m.groups, predefined=true) |> sort ==
-      [:boundaryedges, :boundaryfaces, :boundarynodes]
+      [:boundaryedges, :boundaryfaces, :boundarynodes, :edges, :faces, :nodes, :solids]
 @test !hasgroups(m.groups, 0)
 @test !hasgroups(m.groups, 1)
 @test !hasgroups(m.groups, 2)
@@ -61,8 +61,8 @@ m.groups[:g2] = FaceGroup([2, 13, 7, 5])
 m.groups[:g3] = EdgeGroup([4, 5, 9])
 @test groupnames(m.groups) |> sort == [:g1, :g2, :g3]
 @test groupnames(m.groups, predefined=true) |> sort ==
-      [:boundaryedges, :boundaryfaces, :boundarynodes, :g1, :g2, :g3]
-@test groupnames(m.groups, d=1, predefined=true) |> sort == [:boundaryedges, :g3]
+      [:boundaryedges, :boundaryfaces, :boundarynodes, :edges, :faces, :g1, :g2, :g3, :nodes, :solids]
+@test groupnames(m.groups, d=1, predefined=true) |> sort == [:boundaryedges, :edges, :g3]
 
 # Collect groups
 a = 5
@@ -73,4 +73,33 @@ fg = collectgroups(m, d=2)
 @test fg[1] == [:g1]
 @test fg[2] == [:g2, :g1]
 ng = collectgroups(m, d=0, predefined=true)
-@test ng[1] == [:boundarynodes]
+@test ng[1] |> sort == [:boundarynodes, :nodes]
+
+# Group by entity
+f5 = face(m, 5)
+f7 = face(m, 7)
+f33 = face(m, 33)
+gs1 = groupsof(f5, m.groups)
+gs2 = groupsof(f7, m.groups)
+gs3 = groupsof(f33, m.groups)
+@test gs1 == [:g2, :faces]
+@test gs2 == [:g2, :g1, :faces]
+@test gs3 == [:faces]
+@test groupof(f5, m.groups) == :g2
+@test groupof(f7, m.groups) == :g2
+@test groupof(f33, m.groups) == :faces
+
+
+# -------------------------------------------------------------------------------------------------
+# Dimension groups
+# -------------------------------------------------------------------------------------------------
+
+g = m.groups[:edges]
+for f ∈ edges(m)
+      @test f ∈ g
+end
+
+g = m.groups[:faces]
+for f ∈ faces(m)
+      @test f ∈ g
+end

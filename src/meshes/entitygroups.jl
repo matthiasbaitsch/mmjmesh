@@ -6,6 +6,7 @@ const SolidGroup = EntityGroup{Solid}
 
 # To my understanding, that should work like this
 # edim(::EntityGroup{MeshEntity{DT}}) where {DT} = DT
+# Why not?
 edim(::NodeGroup) = 0
 edim(::EdgeGroup) = 1
 edim(::FaceGroup) = 2
@@ -43,15 +44,23 @@ end
 
 
 function populatepredfinedgroups!(m::Mesh)
-    function recipe()
+
+    # On the boundary
+    function boundaryrecipe()
         bn, be, bf = _collectboundary(m)
         m.groups[:boundarynodes] = NodeGroup(bn)
         m.groups[:boundaryedges] = EdgeGroup(be)
         m.groups[:boundaryfaces] = FaceGroup(bf)
     end
-    addrecipe!(m.groups, :boundarynodes, recipe)
-    addrecipe!(m.groups, :boundaryedges, recipe)
-    addrecipe!(m.groups, :boundaryfaces, recipe)
+    addrecipe!(m.groups, :boundarynodes, boundaryrecipe)
+    addrecipe!(m.groups, :boundaryedges, boundaryrecipe)
+    addrecipe!(m.groups, :boundaryfaces, boundaryrecipe)
+
+    # By dimension
+    addrecipe!(m.groups, :nodes, () -> (m.groups[:nodes] = NodeGroup(1:nnodes(m))))
+    addrecipe!(m.groups, :edges, () -> (m.groups[:edges] = EdgeGroup(1:nedges(m))))
+    addrecipe!(m.groups, :faces, () -> (m.groups[:faces] = FaceGroup(1:nfaces(m))))
+    addrecipe!(m.groups, :solids, () -> (m.groups[:solids] = SolidGroup(1:nsolids(m))))
 end
 
 

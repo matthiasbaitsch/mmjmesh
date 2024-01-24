@@ -12,6 +12,7 @@ using MMJMesh.Geometries
 ## groups.jl
 export EntityGroup, NodeGroup, EdgeGroup, FaceGroup, SolidGroup
 export ngroups, groupnames, hasgroups
+export groupof, groupsof
 ## mesh.jl
 export Mesh
 export pdim, gdim, nelements, element, elements, entity, entities
