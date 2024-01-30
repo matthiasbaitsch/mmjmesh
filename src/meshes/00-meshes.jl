@@ -23,7 +23,7 @@ export coordinate, coordinates
 export nnodes, nedges, nfaces, nsolids
 export node, edge, face, solid
 export nodes, edges, faces, solids
-export nodeIdxs, edgeIdxs, faceIdxs, solidIdxs
+export nodeindices, edgeindices, faceindices, solidindices
 ## entitygroups.jl
 export collectgroups, groupids, populatepredfinedgroups!, edim
 

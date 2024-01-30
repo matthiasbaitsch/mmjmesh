@@ -17,7 +17,7 @@ function _collectboundary(m::Mesh{1})
     bn = Vector{Int}()
     for e ∈ nodes(m)
         if nedges(e) == 1
-            append!(bn, nodeIdxs(e))
+            append!(bn, nodeindices(e))
         end
     end
     return bn, Int[], Int[]
@@ -30,7 +30,7 @@ function _collectboundary(m::Mesh{2})
     for e ∈ edges(m)
         if nfaces(e) == 1
             push!(be, e.index)
-            append!(bn, nodeIdxs(e))
+            append!(bn, nodeindices(e))
         end
     end
     return bn, be, Int[]

@@ -3,7 +3,7 @@
 # -------------------------------------------------------------------------------------------------
 
 struct EntityGroup{T} <: AbstractVector{Int}
-    indexes::SeqIntSet
+    indices::SeqIntSet
     EntityGroup{T}(a::AbstractVector{Int}) where {T} = new{T}(SeqIntSet(a))
 end
 
@@ -13,29 +13,29 @@ end
 # -------------------------------------------------------------------------------------------------
 
 # AbstractArray
-Base.length(g::EntityGroup) = length(g.indexes)
-Base.size(g::EntityGroup) = size(g.indexes)
-Base.isempty(g::EntityGroup) = isempty(g.indexes)
-Base.getindex(g::EntityGroup, i::Int) = g.indexes[i]
+Base.length(g::EntityGroup) = length(g.indices)
+Base.size(g::EntityGroup) = size(g.indices)
+Base.isempty(g::EntityGroup) = isempty(g.indices)
+Base.getindex(g::EntityGroup, i::Int) = g.indices[i]
 
 # Iterator
-Base.eltype(g::EntityGroup) = eltype(g.indexes)
-Base.iterate(g::EntityGroup) = iterate(g.indexes)
-Base.iterate(g::EntityGroup, state) = iterate(g.indexes, state)
+Base.eltype(g::EntityGroup) = eltype(g.indices)
+Base.iterate(g::EntityGroup) = iterate(g.indices)
+Base.iterate(g::EntityGroup, state) = iterate(g.indices, state)
 
 # Set operations
 Base.union(g1::EntityGroup{T}, g2::EntityGroup{T}) where {T} =
-    EntityGroup{T}(union(g1.indexes, g2.indexes))
+    EntityGroup{T}(union(g1.indices, g2.indices))
 Base.intersect(g1::EntityGroup{T}, g2::EntityGroup{T}) where {T} =
-    EntityGroup{T}(intersect(g1.indexes, g2.indexes))
+    EntityGroup{T}(intersect(g1.indices, g2.indices))
 Base.setdiff(g1::EntityGroup{T}, g2::EntityGroup{T}) where {T} =
-    EntityGroup{T}(setdiff(g1.indexes, g2.indexes))
+    EntityGroup{T}(setdiff(g1.indices, g2.indices))
 
 # In 
-Base.in(target::T1, g::EntityGroup{T2}) where {T1,T2} = T1 <: T2 && in(target.index, g.indexes)
+Base.in(target::T1, g::EntityGroup{T2}) where {T1,T2} = T1 <: T2 && in(target.index, g.indices)
 
 # Show
-Base.show(io::IO, g::EntityGroup{T}) where {T} = print(io, "$(T)Group$(g.indexes)")
+Base.show(io::IO, g::EntityGroup{T}) where {T} = print(io, "$(T)Group$(g.indices)")
 
 
 # -------------------------------------------------------------------------------------------------

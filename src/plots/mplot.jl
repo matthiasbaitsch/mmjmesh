@@ -328,21 +328,21 @@ end
 function plotedges(plot::MPlot, featureedges::Bool)
     mesh = plot.mesh[]
 
-    # Collect indexes of edges to plot
+    # Collect indices of edges to plot
     if featureedges
-        indexes = mesh.groups[:boundaryedges]
+        indices = mesh.groups[:boundaryedges]
         for n in groupnames(mesh.groups, d=1, predefined=false)
-            indexes = indexes ∪ mesh.groups[n]
+            indices = indices ∪ mesh.groups[n]
         end
     else
-        indexes = 1:nedges(mesh)
+        indices = 1:nedges(mesh)
     end
 
     # Collect coordinates
     # TODO 3D: Generalize
     xx = Real[]
     yy = Real[]
-    for i ∈ indexes
+    for i ∈ indices
         e = edge(mesh, i)
         x1 = coordinates(e, 1)
         x2 = coordinates(e, 2)
@@ -357,7 +357,7 @@ function plotedges(plot::MPlot, featureedges::Bool)
         if lc == MakieCore.automatic
             if ngroups(mesh.groups, d=1) > 0
                 ids = groupids(mesh, d=1, predefined=true)
-                lc = reshape(repeat(ids[indexes], 1, 3)', :)
+                lc = reshape(repeat(ids[indices], 1, 3)', :)
             else
                 lc = :black
             end

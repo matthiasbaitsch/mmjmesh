@@ -25,10 +25,10 @@ const Solid{DG,NN} = MeshEntity{3,DG,NN}
 
 # Basic
 entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx)
-nentities(me::MeshEntity{DT,DG,NN}, pdim::Int) where {DT,DG,NN} = nlinks(me.mesh.topology, DT, pdim, me.index)
+nentities(me::MeshEntity{DT}, pdim::Int) where {DT} = nlinks(me.mesh.topology, DT, pdim, me.index)
 index(me::MeshEntity) = me.index
 index(me::MeshEntity{DT}, pdim::Int, i::Int) where {DT} = links(me.mesh.topology, DT, pdim)[me.index][i]
-indexes(me::MeshEntity{DT}, pdim::Int) where {DT,DG,NN} = links(me.mesh.topology, DT, pdim)[me.index]
+indices(me::MeshEntity{DT}, pdim::Int) where {DT} = links(me.mesh.topology, DT, pdim)[me.index]
 pdim(::MeshEntity{DT}) where {DT} = DT
 gdim(::MeshEntity{DT,DG}) where {DT,DG} = DG
 Base.length(e::Edge{DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
@@ -48,22 +48,22 @@ List of entities of a finite element mesh of parametric dimension `DT`.
 """
 struct MeshEntityList{DT} <: AbstractVector{MeshEntity}
     mesh::Mesh
-    indexes::AbstractVector{Int}
-    MeshEntityList(mesh::Mesh, pdim::Int, indexes::AbstractVector{Int}) = new{pdim}(mesh, indexes)
+    indices::AbstractVector{Int}
+    MeshEntityList(mesh::Mesh, pdim::Int, indices::AbstractVector{Int}) = new{pdim}(mesh, indices)
 end
 
 # AbstractArray interface
-Base.length(el::MeshEntityList) = length(el.indexes)
+Base.length(el::MeshEntityList) = length(el.indices)
 Base.size(el::MeshEntityList) = (length(el),)
-Base.getindex(el::MeshEntityList{DT}, i::Int) where {DT} = entity(el.mesh, DT, el.indexes[i])
+Base.getindex(el::MeshEntityList{DT}, i::Int) where {DT} = entity(el.mesh, DT, el.indices[i])
 Base.iterate(el::MeshEntityList, state=1) = state > length(el) ? nothing : (el[state], state + 1)
 
 # Get entities
 entities(m::Mesh, pdim::Int) = MeshEntityList(m, pdim, 1:nentities(m, pdim))
-entities(me::MeshEntity, pdim::Int) = MeshEntityList(me.mesh, pdim, indexes(me, pdim))
+entities(me::MeshEntity, pdim::Int) = MeshEntityList(me.mesh, pdim, indices(me, pdim))
 
 # Coordinates XXX
 coordinate(n::Node, c::Int) = n.mesh.geometry.points.coordinates[c, n.index]
 coordinates(n::Node) = n.mesh.geometry.points.coordinates[:, n.index]
-coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, indexes(me, 0)]
+coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, indices(me, 0)]
 coordinates(me::MeshEntity, i::Int) = me.mesh.geometry.points.coordinates[:, index(me, 0, i)]

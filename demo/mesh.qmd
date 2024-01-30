@@ -31,14 +31,14 @@ Coordinates of a face
 coordinates(face(m, 3))
 ```
 
-Process faces and print node and edge indexes
+Process faces and print node and edge indices
 
 ```{julia}
 for e ∈ elements(m)
     println(e)
-    println("- ", nodeIdxs(e))
-    println("- ", edgeIdxs(e))
-    println("- ", faceIdxs(e))
+    println("- ", nodeindices(e))
+    println("- ", edgeindices(e))
+    println("- ", faceindices(e))
 end
 ```
 
@@ -87,9 +87,9 @@ Example how to attach data to groups.
 ```{julia}
 m = Mesh(meshpath("complex-g1.msh"))
 
-println("s1: ", m.groups[:s1].indexes)
-println("s2: ", m.groups[:s2].indexes)
-println("s3: ", m.groups[:s3].indexes)
+println("s1: ", m.groups[:s1].indices)
+println("s2: ", m.groups[:s2].indices)
+println("s3: ", m.groups[:s3].indices)
 
 m.data[:kefunc, :s1] = "f1";
 m.data[:kefunc, :s2] = "f2";

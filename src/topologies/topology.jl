@@ -13,7 +13,7 @@ Mesh entities have a parametric dimension ``d``. We use the terminology
 
 Connections between entities (of two not necessarily different dimensions) 
 are stored in `ConnectivityList`s. A `ConnectivityList` contains links
-which are arrays of indexes of other mesh entities. Hence, in the code, 
+which are arrays of indices of other mesh entities. Hence, in the code, 
 a connectivity list is called `linkslist`, one element in the list is called `links`.
 
 When constructing a topology, entities are added by specifying their IDs and 

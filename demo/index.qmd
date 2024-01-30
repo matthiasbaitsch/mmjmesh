@@ -30,11 +30,11 @@ Elements of the mesh can be easily processed in a loop:
 
 ```{julia}
 for e ∈ elements(m)
-    println(e, " with n = ", nodeIdxs(e), " and l = ", length(e))
+    println(e, " with n = ", nodeindices(e), " and l = ", length(e))
 end
 ```
 
-Various functions like `nodeIdxs` and `length` exist to access properties. If you are used to an object-oriented language like Java it might be helpful to understand that `nodeIdxs(e)` in Julia is equivalent to `e.nodeIdxs()` in an OO language.
+Various functions like `nodeindices` and `length` exist to access properties. If you are used to an object-oriented language like Java it might be helpful to understand that `nodeindices(e)` in Julia is equivalent to `e.nodeindices()` in an OO language.
 
 Node coordinates are retrieved using the `coordinates` method:
 
@@ -113,7 +113,7 @@ m = Mesh("../data/gmsh/advanced.msh")
 mplot(m) |> mconf()
 ```
 
-Indexes of nodes on boundary
+Indices of nodes on boundary
 ```{julia}
 m.groups[:boundarynodes]
 ```

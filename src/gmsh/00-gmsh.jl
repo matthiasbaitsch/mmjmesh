@@ -45,12 +45,12 @@ function MMJMesh.Meshes.Mesh(filepath::String)
 
         if d0 > 0
             # Links
-            indexes = addlinks!(m.topology, d0, 0, eb.tags, ConnectivityList(eb.nodetags))
+            indices = addlinks!(m.topology, d0, 0, eb.tags, ConnectivityList(eb.nodetags))
 
             # Groups
             for tag ∈ gm.entities[d0][eb.entityTag].physicaltags
                 name = groupnamesbytag[tag]
-                m.groups[name] = m.groups[name] ∪ EntityGroup{MeshEntity{d0}}(indexes)
+                m.groups[name] = m.groups[name] ∪ EntityGroup{MeshEntity{d0}}(indices)
 
                 if d0 == 1
                     nn = ng(name)

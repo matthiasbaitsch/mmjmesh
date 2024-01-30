@@ -152,13 +152,13 @@ end
 fromroots(r::AbstractArray{<:Real}, d=R) = Polynomial(Polynomials.fromroots(r), d)
 
 function lagrangepolynomials(c::AbstractArray{<:Real}, d=R)
-    indexes = 1:length(c)
+    indices = 1:length(c)
     normalize(f, x) = 1 / f(x) * f
     return [
         normalize(
-            fromroots(c[filter(j -> j != i, indexes)], d), 
+            fromroots(c[filter(j -> j != i, indices)], d), 
             c[i]
-        ) for i in indexes
+        ) for i in indices
     ]
 end
 

@@ -40,11 +40,11 @@ function Mesh(coordinates::Matrix, elements::Vector{Vector{Int}}, dt::Int)
 end
 
 nentities(m::Mesh, dim::Int) = Topologies.nentities(m.topology, dim, true)
-indexes(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
+indices(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
 pdim(::Mesh{DT,DG}) where {DT,DG} = DT
 gdim(::Mesh{DT,DG}) where {DT,DG} = DG
 
-coordinates(m::Mesh) = m.geometry.points.coordinates[:, nodeIdxs(m)]
+coordinates(m::Mesh) = m.geometry.points.coordinates[:, nodeindices(m)]
 coordinates(m::Mesh, group::Symbol) = m.geometry.points.coordinates[:, m.groups[group]]
 coordinates(m::Mesh, index::Int) = m.geometry.points.coordinates[:, index]
 
