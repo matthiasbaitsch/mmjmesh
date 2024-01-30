@@ -38,7 +38,7 @@ m = makemeshonrectangle(9.0, 4.5, 2a, a)
 
 
 # -------------------------------------------------------------------------------------------------
-# EntityGroupCollection
+# GroupCollection
 # -------------------------------------------------------------------------------------------------
 
 # Test predefined only
@@ -49,11 +49,11 @@ m = makemeshonrectangle(9.0, 4.5, 2a, a)
 @test groupnames(m.groups, d=1, predefined=true) == [:edges, :boundaryedges]
 @test groupnames(m.groups, predefined=true) |> sort ==
       [:boundaryedges, :boundaryfaces, :boundarynodes, :edges, :faces, :nodes, :solids]
-@test !hasgroups(m.groups, 0)
-@test !hasgroups(m.groups, 1)
-@test !hasgroups(m.groups, 2)
-@test hasgroups(m.groups, 0, predefined=true)
-@test hasgroups(m.groups, 1, predefined=true)
+@test !hasgroups(m.groups, d=0)
+@test !hasgroups(m.groups, d=1)
+@test !hasgroups(m.groups, d=2)
+@test hasgroups(m.groups, d=0, predefined=true)
+@test hasgroups(m.groups, d=1, predefined=true)
 
 # Test with more groups
 m.groups[:g1] = NodeGroup([1, 2, 3, 13, 14, 7, 15])

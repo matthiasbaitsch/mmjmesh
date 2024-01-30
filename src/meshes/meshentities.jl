@@ -24,7 +24,6 @@ const Face{DG,NN} = MeshEntity{2,DG,NN}
 const Solid{DG,NN} = MeshEntity{3,DG,NN}
 
 # Basic
-entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx)
 nentities(me::MeshEntity{DT}, pdim::Int) where {DT} = nlinks(me.mesh.topology, DT, pdim, me.index)
 index(me::MeshEntity) = me.index
 index(me::MeshEntity{DT}, pdim::Int, i::Int) where {DT} = links(me.mesh.topology, DT, pdim)[me.index][i]

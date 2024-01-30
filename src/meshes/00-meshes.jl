@@ -10,14 +10,12 @@ using MMJMesh.Geometries
 
 # Exports
 ## groups.jl
-export EntityGroup, NodeGroup, EdgeGroup, FaceGroup, SolidGroup
-export ngroups, groupnames, hasgroups
-export groupof, groupsof
+export Group, GroupCollection, addrecipe!, clearcache!, names
 ## mesh.jl
 export Mesh
 export pdim, gdim, nelements, element, elements, entity, entities
 ## meshentities.jl
-export MeshEntity, Node, Edge, Face, Solid
+export MeshEntity, Node, Edge, Face, Solid, index
 ## common.jl
 export coordinate, coordinates
 export nnodes, nedges, nfaces, nsolids
@@ -26,6 +24,9 @@ export nodes, edges, faces, solids
 export nodeindices, edgeindices, faceindices, solidindices
 ## entitygroups.jl
 export collectgroups, groupids, populatepredfinedgroups!, edim
+export ngroups, groupnames, hasgroups
+export groupof, groupsof
+export NodeGroup, EdgeGroup, FaceGroup, SolidGroup
 
 # Parts
 include("data.jl")

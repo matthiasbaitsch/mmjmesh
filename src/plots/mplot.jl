@@ -104,7 +104,7 @@ function MakieCore.plot!(plot::MPlot)
     elseif pdim(mesh) == 2                          # 2D mesh
 
         # Coloring by groups
-        if !plot[:havedata][] && isautomatic(:facecolor) && hasgroups(mesh.groups, 2)
+        if !plot[:havedata][] && isautomatic(:facecolor) && hasgroups(mesh.groups, d=2)
             setifautomatic(:facecolormap, :Pastel1_9)
             plot[:colorbygroups] = true
         else
@@ -272,8 +272,8 @@ function plotfaces(plot::MPlot)
     Nf = nfaces(mesh)
 
     # Color by groups
-    if !haveData && !haveColor && hasgroups(mesh.groups, 2)
-        color = groupids(mesh, d=2)
+    if !haveData && !haveColor && hasgroups(mesh.groups, d=2)
+        color = groupids(mesh, d=2, predefined=false)
         haveData = true
     end
 

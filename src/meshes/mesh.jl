@@ -12,14 +12,14 @@ Mesh of parametric dimension ``d_t`` embedded in ``d_g`` dimensional space.
 struct Mesh{DT,DG}
     topology::Topology{DT}
     geometry::Geometry{DG}
-    groups::EntityGroupCollection
+    groups::GroupCollection
     data::Data{Mesh{DT,DG}}
 end
 
 function Mesh(dt::Int, dg::Int, nn::Int=0)
     t = Topology(dt, nn)
     g = Geometry(dg, nn)
-    p = EntityGroupCollection()
+    p = GroupCollection()
     d = Data(Mesh{dt,dg})
     m = Mesh{dt,dg}(t, g, p, d)
     d.base = m
@@ -40,6 +40,7 @@ function Mesh(coordinates::Matrix, elements::Vector{Vector{Int}}, dt::Int)
 end
 
 nentities(m::Mesh, dim::Int) = Topologies.nentities(m.topology, dim, true)
+entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx)
 indices(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
 pdim(::Mesh{DT,DG}) where {DT,DG} = DT
 gdim(::Mesh{DT,DG}) where {DT,DG} = DG
