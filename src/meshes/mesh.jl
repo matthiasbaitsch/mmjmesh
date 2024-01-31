@@ -13,16 +13,14 @@ struct Mesh{DT,DG}
     topology::Topology{DT}
     geometry::Geometry{DG}
     groups::GroupCollection
-    data::Data
+    data::MeshData{Mesh{DT,DG}}
 end
 
 function Mesh(dt::Int, dg::Int, nn::Int=0)
-    t = Topology(dt, nn)
-    g = Geometry(dg, nn)
-    p = GroupCollection()
-    d = Data()
-    m = Mesh{dt,dg}(t, g, p, d)
-    return m
+    T = Mesh{dt,dg}
+    mesh = T(Topology(dt, nn), Geometry(dg, nn), GroupCollection(), MeshData{T}())
+    mesh.data.mesh = mesh
+    return mesh
 end
 
 function Mesh(coordinates::Matrix, dt::Int)

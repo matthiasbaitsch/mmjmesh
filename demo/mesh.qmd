@@ -82,7 +82,20 @@ mplot(m) |> mconf()
 
 ## Data
 
-Example how to attach data to groups.
+Example how to attach data to mesh entities:
+
+```{julia}
+m = Mesh(meshpath("complex-g1.msh"))
+
+n1 = node(m, 1)
+n2 = node(m, 2)
+n1.data[:d1] = 42
+
+println("n1.data[:d1] = ", n1.data[:d1])
+println("n2.data[:d1] = ", n2.data[:d1])
+```
+
+Example how to attach data to groups:
 
 ```{julia}
 m = Mesh(meshpath("complex-g1.msh"))

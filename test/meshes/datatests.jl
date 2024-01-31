@@ -2,12 +2,12 @@ using Test
 using MMJMesh
 using MMJMesh.Meshes
 
-import MMJMesh.Meshes: Data
+import MMJMesh.Meshes: MeshData
 
 # -------------------------------------------------------------------------------------------------
 # Global data
 # -------------------------------------------------------------------------------------------------
-md = Data()
+md = MeshData{Int}()
 md[:foo] = 42
 
 @test md[:foo] == 42

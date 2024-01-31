@@ -32,9 +32,9 @@ export NodeGroup, EdgeGroup, FaceGroup, SolidGroup
 include("data.jl")
 include("groups.jl")
 include("mesh.jl")
-include("entitydata.jl")
 include("meshentities.jl")
-include("common.jl")
 include("entitygroups.jl")
+include("entitydata.jl")
+include("common.jl")
 
 end
