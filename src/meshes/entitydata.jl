@@ -1,25 +1,38 @@
-struct EntityData{DT}
-    mesh::Mesh
-    index::Int
+# -------------------------------------------------------------------------------------------------
+# EntityData struct
+# -------------------------------------------------------------------------------------------------
+
+mutable struct EntityData{T}
+    entity::Union{T,Nothing}
+    EntityData{T}() where {T} = new{T}(nothing)
 end
 
-Base.getindex(ed::EntityData{DT}, name::Symbol) where {DT} = ed.mesh.data[name, DT, ed.index]
+Base.getindex(ed::EntityData, name::Symbol) = ed.entity.mesh.data[name, ed.entity]
 
+
+# -------------------------------------------------------------------------------------------------
+# Data associated with groups of entities
+# -------------------------------------------------------------------------------------------------
+
+struct GroupData{T}
+    values::Dict{Symbol,T}
+    GroupData{T}() where {T} = new{T}(Dict{Symbol,T}())
+end
+
+function (gd::GroupData{T})(e::ET) where {T,ET}
+    for g ∈ groups(e)
+        haskey(gd.values, g) && return gd.values[g]
+    end
+end
 
 """
     m.data[:foo, :bar] = value
 
 Associate `value` with the name `:foo` for entities in group `:bar`.
 """
-function Base.setindex!(d::Data{Mesh{DT,DG}}, value, name::Symbol, group::Symbol) where {DT,DG}
-    mesh = d.base
-    group = mesh.groups[group]    
-    function getvalue(m::Mesh, dt::Int, index::Int)
-        if entity(m, dt, index) ∈ group
-            return value
-        end
-        return nothing
+function Base.setindex!(d::Data, value::T, name::Symbol, group::Symbol) where {T}
+    if !haskey(d.mappings, name)
+        d.mappings[name] = GroupData{T}()
     end
-    addmapping!(d, name, getvalue)
+    d.mappings[name].values[group] = value
 end
-

@@ -5,10 +5,10 @@ using MMJMesh.Meshes
 
 
 # Test struct
-struct Foo{T}
+struct Bar{T}
     index::Int
 end
-MMJMesh.Meshes.index(f::Foo) = f.index
+MMJMesh.Meshes.index(f::Bar) = f.index
 
 
 # -------------------------------------------------------------------------------------------------
@@ -16,21 +16,21 @@ MMJMesh.Meshes.index(f::Foo) = f.index
 # -------------------------------------------------------------------------------------------------
 
 # Set up
-f11 = Foo{1}(1)
-f21 = Foo{2}(1)
-f13 = Foo{1}(3)
-f31 = Foo{3}(1)
-f33 = Foo{3}(3)
+f11 = Bar{1}(1)
+f21 = Bar{2}(1)
+f13 = Bar{1}(3)
+f31 = Bar{3}(1)
+f33 = Bar{3}(3)
 
-# Group of general type Foo
-g = Group{Foo}(1:2);
+# Group of general type Bar
+g = Group{Bar}(1:2);
 @test 99 ∉ g
 @test f11 ∈ g
 @test f21 ∈ g
 @test f13 ∉ g
 
-# Group of specialized type Foo{1}
-g = Group{Foo{1}}(1:2);
+# Group of specialized type Bar{1}
+g = Group{Bar{1}}(1:2);
 @test 99 ∉ g
 @test f11 ∈ g
 @test f21 ∉ g
@@ -45,19 +45,19 @@ gc = GroupCollection()
 
 function tr()
     global gc
-    gc.entries[:zab] = Group{Foo{1}}(1:2)
+    gc.entries[:zab] = Group{Bar{1}}(1:2)
     return nothing
 end
 
-gc[:foo] = Group{Foo{1}}(1:2)
-gc[:bar] = Group{Foo{2}}(1:2)
-addrecipe!(gc, :baz, () -> Group{Foo{3}}(1:length(a)))  
+gc[:Bar] = Group{Bar{1}}(1:2)
+gc[:bar] = Group{Bar{2}}(1:2)
+addrecipe!(gc, :baz, () -> Group{Bar{3}}(1:length(a)))  
 addrecipe!(gc, :zab, tr)  
 
-@test length(gc[:foo]) == 2
-@test f11 ∈ gc[:foo]
-@test f21 ∉ gc[:foo]
-@test f13 ∉ gc[:foo]
+@test length(gc[:Bar]) == 2
+@test f11 ∈ gc[:Bar]
+@test f21 ∉ gc[:Bar]
+@test f13 ∉ gc[:Bar]
 
 @test length(gc[:bar]) == 2
 @test f11 ∉ gc[:bar]

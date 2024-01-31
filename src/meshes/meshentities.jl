@@ -11,10 +11,14 @@ space connected to `NN` nodes.
 struct MeshEntity{DT,DG,NN}
     mesh::Mesh
     index::Int
-    data::EntityData{DT}
+    data::EntityData
+end
 
-    MeshEntity(mesh::Mesh{DT,DG}, pdim::Int, idx::Int) where {DT,DG} =
-        new{pdim,DG,nlinks(mesh.topology, pdim, 0, idx)}(mesh, idx, EntityData{pdim}(mesh, idx))
+function MeshEntity(mesh::Mesh{DT,DG}, pdim::Int, idx::Int) where {DT,DG} 
+    nn = nlinks(mesh.topology, pdim, 0, idx)    
+    me = MeshEntity{pdim,DG,nn}(mesh, idx, EntityData{MeshEntity{pdim,DG,nn}}())
+    me.data.entity = me
+    return me
 end
 
 # Short names

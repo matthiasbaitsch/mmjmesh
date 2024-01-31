@@ -2,34 +2,38 @@ using Test
 using MMJMesh
 using MMJMesh.Meshes
 
-import MMJMesh.Meshes: Data, addmapping!
-
+import MMJMesh.Meshes: Data
 
 # -------------------------------------------------------------------------------------------------
 # Global data
 # -------------------------------------------------------------------------------------------------
-md = Data(Int)
+md = Data()
 md[:foo] = 42
+
 @test md[:foo] == 42
+@test md[:foo, 22] == 42
 
 
 # -------------------------------------------------------------------------------------------------
-# Mapping based on dimension and set
+# Actual mapping using a callable object
 # -------------------------------------------------------------------------------------------------
-function makesetmapping(dim::Int, set::Set, value::Any)
-    function mapping(base::Int, d::Int, i::Int)
-        if d == dim && i in set
-            return base + value
-        end
-        return nothing
-    end
+
+mutable struct Foo
+    a::Int
+    b::Vector{Int}
+    value::Int
 end
 
-md.base = 11
-addmapping!(md, :bar, makesetmapping(2, Set([1, 2, 33]), 43))
+(f::Foo)(p1::Int, p2::Int) = p1 == f.a && p2 in f.b ? f.value : nothing
 
-@test md[:bar, 2, 1] == 11 + 43
-@test md[:bar, 2, 2] == 11 + 43
-@test md[:bar, 2, 33] == 11 + 43
-@test isnothing(md[:bar, 2, 3])
-@test isnothing(md[:bar, 1, 1])
+md.mappings[:bar] = Foo(2, [1, 2, 33], 43)
+
+@test md[:bar, 2, 1] == 43
+@test md[:bar, 2, 2] == 43
+@test md[:bar, 2, 33] == 43
+@test isnothing(md[:bar, 3, 33])
+
+md.mappings[:bar].value = 44
+@test md[:bar, 2, 1] == 44
+
+

@@ -13,16 +13,15 @@ struct Mesh{DT,DG}
     topology::Topology{DT}
     geometry::Geometry{DG}
     groups::GroupCollection
-    data::Data{Mesh{DT,DG}}
+    data::Data
 end
 
 function Mesh(dt::Int, dg::Int, nn::Int=0)
     t = Topology(dt, nn)
     g = Geometry(dg, nn)
     p = GroupCollection()
-    d = Data(Mesh{dt,dg})
+    d = Data()
     m = Mesh{dt,dg}(t, g, p, d)
-    d.base = m
     return m
 end
 

@@ -1,34 +1,12 @@
 """
     Data{T}
 
-Data associates a `name` with a mapping  `(base, parameters...)` to `value`.
+Data associates a `name` with a mapping  `(base, params...) -> Union{Nothing, Any}`.
 """
-mutable struct Data{T}
-    base::Union{Nothing,T}
-    mappings::Dict{Symbol,Array{Function}}
-    Data(t::Type) = new{t}(nothing, Dict{Symbol,Array{Function}}())
+mutable struct Data
+    mappings::Dict{Symbol,Any}
+    Data() = new(Dict{Symbol,Any}())
 end
 
-
-# Shortcut to associate everything with a value
-Base.setindex!(d::Data, value, name::Symbol) = addmapping!(d, name, (_...) -> value)
-
-
-function addmapping!(d::Data, name::Symbol, m::Function)
-    !haskey(d.mappings, name) && (d.mappings[name] = Function[])
-    push!(d.mappings[name], m)
-end
-
-
-function Base.getindex(d::Data, name::Symbol, params...)
-    # TODO This is not efficient for many groups associated with the same name
-    for m ∈ d.mappings[name]
-        r = m(d.base, params...)
-        !isnothing(r) && return r
-    end
-    return nothing
-end
-
-
-
-
+Base.setindex!(d::Data, value::Any, name::Symbol) = d.mappings[name] = (_...) -> value
+Base.getindex(d::Data, name::Symbol, params...) = d.mappings[name](params...)

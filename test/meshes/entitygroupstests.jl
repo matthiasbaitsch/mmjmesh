@@ -79,15 +79,15 @@ ng = collectgroups(m, d=0, predefined=true)
 f5 = face(m, 5)
 f7 = face(m, 7)
 f33 = face(m, 33)
-gs1 = groupsof(f5, m.groups)
-gs2 = groupsof(f7, m.groups)
-gs3 = groupsof(f33, m.groups)
+gs1 = groups(f5)
+gs2 = groups(f7)
+gs3 = groups(f33)
 @test gs1 == [:g2, :faces]
 @test gs2 == [:g2, :g1, :faces]
 @test gs3 == [:faces]
-@test groupof(f5, m.groups) == :g2
-@test groupof(f7, m.groups) == :g2
-@test groupof(f33, m.groups) == :faces
+@test group(f5) == :g2
+@test group(f7) == :g2
+@test group(f33) == :faces
 
 
 # -------------------------------------------------------------------------------------------------

@@ -118,19 +118,19 @@ groupids(m::Mesh; d::Int=-1, predefined::Bool=false) =
 
 
 """
-    groupsof(e, gc::GroupCollection)
+    groups(e::MeshEntity)
 
 Names of groups entity e belongs to sorted by group size. That is, the most specific
 group is returned first.
 """
-groupsof(e::MeshEntity{DT}, gc::GroupCollection) where {DT} = return sort!(
-    [name for name ∈ groupnames(gc, d=DT, predefined=true) if e ∈ gc[name]],
-    lt=(n1, n2) -> length(gc[n1]) < length(gc[n2])
+groups(e::MeshEntity{DT}) where {DT} = return sort!(
+    [name for name ∈ groupnames(e.mesh.groups, d=DT, predefined=true) if e ∈ e.mesh.groups[name]],
+    lt=(n1, n2) -> length(e.mesh.groups[n1]) < length(e.mesh.groups[n2])
 )
 
 """
-    groupof(e, gc::GroupCollection)
+    group(e, gc::GroupCollection)
 
 Returns the smallest group containing e.
 """
-groupof(e, gc::GroupCollection) = groupsof(e, gc)[1]
+group(e) = groups(e)[1]
