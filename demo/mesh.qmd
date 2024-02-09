@@ -89,10 +89,13 @@ m = Mesh(meshpath("complex-g1.msh"))
 
 n1 = node(m, 1)
 n2 = node(m, 2)
+e22 = element(m, 22)
 n1.data[:d1] = 42
+e22.data[:d2] = 61
 
-println("n1.data[:d1] = ", n1.data[:d1])
-println("n2.data[:d1] = ", n2.data[:d1])
+println(" n1.data[:d1] = ", n1.data[:d1])
+println(" n2.data[:d1] = ", n2.data[:d1])
+println("e22.data[:d2] = ", e22.data[:d2])
 ```
 
 Example how to attach data to groups:
