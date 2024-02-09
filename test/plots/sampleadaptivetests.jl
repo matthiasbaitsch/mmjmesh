@@ -1,6 +1,8 @@
 using Test
 using LinearAlgebra
 
+using MMJMesh
+using MMJMesh.Plots
 import MMJMesh.Plots: valuerange, approximationerror, safeeval, X1, X2, W1, W2
 
 # TODO: Tests do not make that much sense
@@ -13,6 +15,8 @@ function nint(f, a, b)
     w * dot(W1, y1), w * dot(W2, y2)
 end
 check(a, b) = a[1] ≈ b[1] && a[2] ≈ b[2]
+
+@test !isnothing(W1[1])
 @test check(nint(x -> x, 0, 2), (2.0, 2.0))
 
 # Helper functions
@@ -30,4 +34,5 @@ function ae(f, a, b)
     y = f.(x)
     return approximationerror(h, X, W, y)
 end
+
 @test abs(ae(sin, 0, 1) - 0.043) < 1e-3

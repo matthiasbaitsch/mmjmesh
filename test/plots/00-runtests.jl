@@ -28,7 +28,7 @@ using MMJMesh.Utilities
 
 end
 
-@testset "Sample" include("sampleadaptive.jl")
-@testset "Reference" include("reference.jl")
+@testset "Sample" include("sampleadaptivetests.jl")
+@testset "Reference" include("referencetests.jl")
 
 end
