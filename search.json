@@ -74,7 +74,7 @@
     "href": "mesh.html#data",
     "title": "2  The Mesh interface",
     "section": "2.4 Data",
-    "text": "2.4 Data\nExample how to attach data to groups.\nm = Mesh(meshpath(\"complex-g1.msh\"))\n\nprintln(\"s1: \", m.groups[:s1].indices)\nprintln(\"s2: \", m.groups[:s2].indices)\nprintln(\"s3: \", m.groups[:s3].indices)\n\nm.data[:kefunc, :s1] = \"f1\";\nm.data[:kefunc, :s2] = \"f2\";\nm.data[:kefunc, :s3] = \"f3\";\n\ne0005 = element(m, 0005)\ne0490 = element(m, 0490)\ne1132 = element(m, 1132)\n\nprintln(\"e0005.data[:kefunc] = \", e0005.data[:kefunc])\nprintln(\"e0490.data[:kefunc] = \", e0490.data[:kefunc])\nprintln(\"e1132.data[:kefunc] = \", e1132.data[:kefunc])",
+    "text": "2.4 Data\nExample how to attach data to mesh entities:\nm = Mesh(meshpath(\"complex-g1.msh\"))\n\nn1 = node(m, 1)\nn2 = node(m, 2)\nn1.data[:d1] = 42\n\nprintln(\"n1.data[:d1] = \", n1.data[:d1])\nprintln(\"n2.data[:d1] = \", n2.data[:d1])\nExample how to attach data to groups:\nm = Mesh(meshpath(\"complex-g1.msh\"))\n\nprintln(\"s1: \", m.groups[:s1].indices)\nprintln(\"s2: \", m.groups[:s2].indices)\nprintln(\"s3: \", m.groups[:s3].indices)\n\nm.data[:kefunc, :s1] = \"f1\";\nm.data[:kefunc, :s2] = \"f2\";\nm.data[:kefunc, :s3] = \"f3\";\n\ne0005 = element(m, 0005)\ne0490 = element(m, 0490)\ne1132 = element(m, 1132)\n\nprintln(\"e0005.data[:kefunc] = \", e0005.data[:kefunc])\nprintln(\"e0490.data[:kefunc] = \", e0490.data[:kefunc])\nprintln(\"e1132.data[:kefunc] = \", e1132.data[:kefunc])",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>The Mesh interface</span>"
     ]

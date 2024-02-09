@@ -217,7 +217,16 @@ mplot(m) |&gt; mconf()</code></pre>
 </section>
 <section id="data" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="data"><span class="header-section-number">2.4</span> Data</h2>
-<p>Example how to attach data to groups.</p>
+<p>Example how to attach data to mesh entities:</p>
+<pre class="{julia}"><code>m = Mesh(meshpath("complex-g1.msh"))
+
+n1 = node(m, 1)
+n2 = node(m, 2)
+n1.data[:d1] = 42
+
+println("n1.data[:d1] = ", n1.data[:d1])
+println("n2.data[:d1] = ", n2.data[:d1])</code></pre>
+<p>Example how to attach data to groups:</p>
 <pre class="{julia}"><code>m = Mesh(meshpath("complex-g1.msh"))
 
 println("s1: ", m.groups[:s1].indices)
