@@ -1,6 +1,6 @@
 # Macros for error reporting, borrowed from Gridap.jl
 
-macro abstractmethod(message="This function belongs to an interface definition and cannot be used.")
+macro abstractmethod(message="This function is an abstract method")
   quote
     error($(esc(message)))
   end
