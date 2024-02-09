@@ -36,15 +36,15 @@ integrate(f, 0 .. 1)
 ```{julia}
 p = [0, 1, 2]
 f = plot(fromroots(p, -0.1 .. 2.1))
-CairoMakie.scatter!(p, 0 * p, color=:tomato)
+cm.scatter!(p, 0 * p, color=:tomato)
 f
 ```
 
 ```{julia}
 p = [0, 1.5, 2]
 f = plot(lagrangepolynomials(p, 0 .. 2)...)
-CairoMakie.scatter!(p, 0 * p, color=:tomato)
-CairoMakie.scatter!(p, 1 .+ 0 * p, color=:blue)
+cm.scatter!(p, 0 * p, color=:tomato)
+cm.scatter!(p, 1 .+ 0 * p, color=:blue)
 f
 ```
 
@@ -61,12 +61,13 @@ plot(monomials(0:100, 0 .. 1)...)
 Define linear forms
 
 ```{julia}
-struct ValueAt <: AbstractMapping{AbstractMapping,Real,Everything()}
+
+struct ValueAt <: AbstractMapping{AbstractMapping,Real,AllOf{AbstractMapping}()}
     x::Real
 end
 MMJMesh.Mathematics.valueat(u::ValueAt, f) = f(u.x)
 
-struct DerivativeAt <: AbstractMapping{AbstractMapping,Real,Everything()}
+struct DerivativeAt <: AbstractMapping{AbstractMapping,Real,AllOf{AbstractMapping}()}
     x::Real
 end
 MMJMesh.Mathematics.valueat(u::DerivativeAt, f) = f'(u.x)
