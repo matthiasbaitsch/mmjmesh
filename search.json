@@ -124,7 +124,7 @@
     "href": "mathematics.html",
     "title": "4  Mathematics",
     "section": "",
-    "text": "4.1 Mappings\ns = Sin(0 .. 3π)\nc = Cos(0 .. 3π)\n\nf = 2s\ng = s + f'\np = 1 / 20 * Polynomial([2, -1], 1 .. 8) * Polynomial([3, -1]) * Polynomial([4.5, -1]) * Polynomial([8, -1])\n\nplot(c, s, g, p)\nf = Polynomial([0, 1], -1 .. 1)\nF = antiderivative(f)\nplot(f, F)\nintegrate(f, 0 .. 1)\n\n0.5\np = [0, 1, 2]\nf = plot(fromroots(p, -0.1 .. 2.1))\ncm.scatter!(p, 0 * p, color=:tomato)\nf\np = [0, 1.5, 2]\nf = plot(lagrangepolynomials(p, 0 .. 2)...)\ncm.scatter!(p, 0 * p, color=:tomato)\ncm.scatter!(p, 1 .+ 0 * p, color=:blue)\nf",
+    "text": "4.1 Mappings\ns = Sin(0 .. 3π)\nc = Cos(0 .. 3π)\n\nf = 2s\ng = s + f'\np = 1 / 20 * Polynomial([2, -1], 1 .. 8) * Polynomial([3, -1]) * Polynomial([4.5, -1]) * Polynomial([8, -1])\n\nplot(c, s, g, p)\nf = Polynomial([0, 1], -1 .. 1)\nF = antiderivative(f)\nplot(f, F)\nintegrate(f, 0 .. 1)\n\n0.5\np = [0, 1, 2]\nf = plot(fromroots(p, -0.1 .. 2.1))\ncm.scatter!(p, 0 * p, color=:tomato)\nf\np = [0, 1.5, 2]\nf = plot(lagrangepolynomials(p, 0 .. 2)...)\ncm.scatter!(p, [0, 0, 0], color=:tomato)\ncm.scatter!(p, [1, 1, 1], color=:blue)\nf",
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Mathematics</span>"
     ]
