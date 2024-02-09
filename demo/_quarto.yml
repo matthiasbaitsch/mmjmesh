@@ -15,3 +15,5 @@ format:
   html:
     css: style.css
 
+execute:
+  freeze: auto
