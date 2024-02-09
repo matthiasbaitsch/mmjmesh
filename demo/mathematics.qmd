@@ -43,8 +43,8 @@ f
 ```{julia}
 p = [0, 1.5, 2]
 f = plot(lagrangepolynomials(p, 0 .. 2)...)
-cm.scatter!(p, 0 * p, color=:tomato)
-cm.scatter!(p, 1 .+ 0 * p, color=:blue)
+cm.scatter!(p, [0, 0, 0], color=:tomato)
+cm.scatter!(p, [1, 1, 1], color=:blue)
 f
 ```
 
