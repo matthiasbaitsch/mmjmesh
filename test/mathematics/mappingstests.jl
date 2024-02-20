@@ -14,10 +14,9 @@ include("validatemappings.jl")
 # -------------------------------------------------------------------------------------------------
 
 RR = AllOf{Real}()
+ZZ = AllOf{Int}()
 R3 = AllOf{SVector{3,Real}}()
 Z3 = AllOf{SVector{3,Int}}()
-a = [1, 2, 6]
-b = [1, 2, 7]
 
 @test 3 ∈ RR
 @test π ∈ RR
@@ -28,8 +27,12 @@ x = SA[1.1, 2, 8]
 @test x ∈ R3
 @test x ∉ Z3
 
-
+a = [1, 2, 6]
+b = [1, 2, 7]
 @test intersect(RR, RR) === RR
+@test intersect(ZZ, RR) === ZZ
+@test intersect(RR, ZZ) === ZZ
+@test intersect(RR, R3) == Any[]
 @test intersect(RR, RR, RR) === RR
 @test intersect(RR, a) == a
 @test intersect(RR, a, b) == [1, 2]
@@ -61,6 +64,21 @@ rand(5, 5) * monomials(0:4)
 
 
 # -------------------------------------------------------------------------------------------------
+# Interval domains
+# -------------------------------------------------------------------------------------------------
+
+@test 3 ∈ R
+@test 0 ∉ RPlus
+@test -3 ∉ RPlus
+@test 0 ∈ R0Plus
+
+@test intersect(R, [1, 2, 3]) == [1, 2, 3]
+@test intersect(RPlus, [-1, 1, 2, 3]) == [1, 2, 3]
+@test R ∩ [1, 2, 3] == [1, 2, 3]
+@test RPlus ∩ [-1, 1, 2, 3] == [1, 2, 3]
+
+
+# -------------------------------------------------------------------------------------------------
 # Functions R → R
 # -------------------------------------------------------------------------------------------------
 
@@ -78,8 +96,12 @@ p = Polynomial([4, 6, 1, 9, 2, -1])
 validate(p)
 validate(antiderivative(p))
 
-# Roots in domain XXX
-# roots(Polynomial([-1, 0, 1]))
+# Roots and domain
+@test roots(Polynomial([-1, 0, 1])) == [-1, 1]
+@test roots(Polynomial([-1, 0, 1], RPlus)) == [1]
+@test roots(Polynomial([-1, 0, 1], -5 .. 0)) == [-1]
+@test roots(Polynomial([-1, 0, 1]), -5 .. 0) == [-1]
+@test roots(Polynomial([-1, 0, 1]), 4 .. 5) == []
 
 # Lagrange
 p = [0, 1, 3, 4, 5.5]
@@ -92,7 +114,7 @@ end
 # From roots
 c = [1, 2, 3]
 p = fromroots(c)
-# XXX @test roots(p) ≈ c
+@test roots(p) ≈ c
 
 # Monomials
 @test Polynomial([1, 2, 3, 4, 5]) == [1, 2, 3, 4, 5]' * monomials(0:4)
@@ -101,6 +123,7 @@ p = fromroots(c)
 # -------------------------------------------------------------------------------------------------
 # Operations
 # -------------------------------------------------------------------------------------------------
+
 m1 = Sin()
 m2 = Sin()
 m3 = Cos()
@@ -144,5 +167,5 @@ validate(p)
 # Quotient
 p = m1 / m3
 @test p(0.2) ≈ tan(0.2)
-# XXX validate(p, rtol=1e-4)
+validate(p, rtol=1e-4)
 

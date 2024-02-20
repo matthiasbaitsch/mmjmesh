@@ -5,42 +5,73 @@ import Polynomials
 import CairoMakie as cm
 
 
-# XXX ???
-using MMJMesh.MMJBase
-
-
 # XXX move
-export AllOf, AbstractMapping, AbstractMappingFromR, AbstractFunctionToR
-export domaintype, codomaintype, domain, valueat, derivativeat, derivative, R, IHat
+export AllOf
+export AbstractMapping, AbstractMappingFromR, AbstractFunctionToR
+export domaintype, codomaintype, domain, valueat, derivativeat, derivative
+export R, RPlus, R0Plus, IHat
 export antiderivative, integrate, sample, plot, pois, roots
 export Sin, Cos, Polynomial, fromroots, lagrangepolynomials, monomials, degree
 
 
+"""
+Implementation of the concept of mappings as elements of a vector space.
+
+There are many things missing
+
+- Nearly all elementary functions
+
+- Image of function
+
+- Roots of composed functions
+
+- Inverse functions
+
+- Printing
+
+- ...
+
+Needs rework
+
+- Handling of unrestricted domains (AllOf)
+
+"""
+
+
 # -------------------------------------------------------------------------------------------------
-# Set of all elements of type T
+# Set of all objects of type T
+# XXX Get rid of this, bad idea?
 # -------------------------------------------------------------------------------------------------
 
 struct AllOf{T} end
-Base.eltype(::AllOf{T}) where {T} = T
 
+
+# Methods from base
+Base.eltype(::AllOf{T}) where {T} = T
+Base.show(io::IO, ::AllOf{SVector{N,T}}) where {N,T<:Real} = print(io, "ℝ^$N")
+Base.show(io::IO, ::AllOf{SVector{N,T}}) where {N,T<:Int} = print(io, "ℤ^$N")
+Base.show(io::IO, ::AllOf{T}) where {T} = print(io, "AllOf{$T}")
 Base.in(x, ::AllOf{T}) where {T} = typeof(x) <: T
-Base.in(x::AbstractArray, ::AllOf{T}) where {T<:SVector} =
+Base.in(x::AbstractArray, ::AllOf{T}) where {T<:AbstractVector} =
     return eltype(x) <: eltype(T) && length(x) == length(T)
 
-function Base.intersect(a::AllOf, itrs...)  
+
+# Intersect
+Base.intersect(s1::AllOf{T1}, s2::AllOf{T2}) where {T1,T2} = T1 <: T2 ? s1 : T2 <: T1 ? s2 : Any[]
+
+function Base.intersect(a::AllOf, itrs...)
     isempty(itrs) && return a
     length(itrs) == 1 && return itrs[1]
     length(itrs) == 2 && return intersect(itrs[1], itrs[2])
     return intersect(itrs[1], itrs[2:end]...)
 end
 
-
 Base.intersect(s, ::AllOf) = s
 Base.intersect(a::AllOf{T}, ::AllOf{T}) where {T} = a
-
 Base.intersect(a::Tuple{AllOf{T}}) where {T} = a[1]
 
 
+# Union
 Base.union(a::AllOf, itrs...) = a
 Base.union(_, a::AllOf) = a
 Base.union(a::AllOf{T}, ::AllOf{T}) where {T} = a
@@ -243,14 +274,22 @@ Base.:/(m1::AbstractMapping, m2::AbstractMapping) = QuotientMapping(m1, m2)
 
 
 # -------------------------------------------------------------------------------------------------
-# Mappings from R
+# Interval domains
 # -------------------------------------------------------------------------------------------------
 
 # Common domains
 const R = -Inf .. Inf
 const RPlus = Interval{:open,:open}(0, Inf)
-const R0Plus = 0 .. Inf
+const R0Plus = Interval{:closed,:open}(0, Inf)
 const IHat = -1.0 .. 1.0
+
+# Select elements in interval
+Base.intersect(s::AbstractInterval, a::AbstractVector{T}) where {T} = T[x for x in a if x ∈ s]
+
+
+# -------------------------------------------------------------------------------------------------
+# Mappings from R
+# -------------------------------------------------------------------------------------------------
 
 # Base type for functions from R
 const AbstractMappingFromR{Real,CT,D} = AbstractMapping{Real,CT,D}
