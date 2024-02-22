@@ -45,7 +45,7 @@ Abstract type for mappings from a domain `X` to a codomain `Y`. In this implemen
 represented by the type `DT` and `Y` by the type `CT`. The third parameter `D` is a subset of
 `DT` and specifies the actual domain, use `All` if all elements of `DT` are in the domain.
 """
-abstract type AbstractMapping{DT,CT,D} end
+abstract type AbstractMapping{DT,CT,D} <: Function end
 
 
 # Fundamental operations
