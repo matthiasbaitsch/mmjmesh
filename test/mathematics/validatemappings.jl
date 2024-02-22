@@ -9,7 +9,7 @@ function _sample(I::Interval)
     return a .+ (b - a) * xi
 end
 
-function _validatederivatives(m::AbstractMappingFromR, atol::Real, rtol::Real)
+function _validatederivatives(m::MappingFromR, atol::Real, rtol::Real)
     ed1 = m
     for n ∈ 1:5
         fd = central_fdm(8, n)
@@ -28,7 +28,7 @@ function _validatederivatives(m::AbstractMappingFromR, atol::Real, rtol::Real)
     end
 end
 
-function _validateantiderivative(f::AbstractFunctionRToR)
+function _validateantiderivative(f::FunctionRToR)
     fd = central_fdm(8, 1)
     F = antiderivative(f)
     for x ∈ _sample(domain(f))
@@ -38,11 +38,11 @@ function _validateantiderivative(f::AbstractFunctionRToR)
     end
 end
 
-function validate(m::AbstractMappingFromR)
+function validate(m::MappingFromR)
     _validatederivatives(m)
 end
 
-function validate(f::AbstractFunctionRToR; atol::Real=0.0, rtol::Real=1e-5)
+function validate(f::FunctionRToR; atol::Real=0.0, rtol::Real=1e-5)
 
     # Derivatives should always work
     _validatederivatives(f, atol, rtol)

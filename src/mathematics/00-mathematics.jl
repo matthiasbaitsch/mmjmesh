@@ -1,29 +1,26 @@
 module Mathematics
 
-# Modules needed by this module
+
+# Required modules
 using IntervalSets
 using LinearAlgebra
-
-# Functions extended by this module
-import Base.in
-import Base.isequal
-import Base.isapprox
-
 using IntervalSets
+
 import Polynomials
-import CairoMakie as cm
+import CairoMakie as cm # XXX get rid of
 
 
 # Parts
 include("mappings.jl")
 
-# XXX
-export Everything, AbstractMapping, AbstractFunctionRToR, Sin, Cos, Polynomial, monomials, plot
-
-export derivative, antiderivative, integrate, fromroots, lagrangepolynomials
 
 # Exports
-## regions.jl
-# export Region, Interval, dim, discretize
+export All
+export AbstractMapping, MappingFromR, FunctionToR, FunctionRToR
+export domaintype, codomaintype, domain, valueat, derivativeat, derivative
+export R, RPlus, R0Plus, IHat
+export antiderivative, integrate, sample, plot, pois, roots
+export Sin, Cos, Polynomial, fromroots, lagrangepolynomials, monomials, degree
+
 
 end

@@ -10,44 +10,6 @@ include("validatemappings.jl")
 
 
 # -------------------------------------------------------------------------------------------------
-# AllOf
-# -------------------------------------------------------------------------------------------------
-
-RR = AllOf{Real}()
-ZZ = AllOf{Int}()
-R3 = AllOf{SVector{3,Real}}()
-Z3 = AllOf{SVector{3,Int}}()
-
-@test 3 ∈ RR
-@test π ∈ RR
-x = SA[1, 2, 8]
-@test x ∈ R3
-@test x ∈ Z3
-x = SA[1.1, 2, 8]
-@test x ∈ R3
-@test x ∉ Z3
-
-a = [1, 2, 6]
-b = [1, 2, 7]
-@test intersect(RR, RR) === RR
-@test intersect(ZZ, RR) === ZZ
-@test intersect(RR, ZZ) === ZZ
-@test intersect(RR, R3) == Any[]
-@test intersect(RR, RR, RR) === RR
-@test intersect(RR, a) == a
-@test intersect(RR, a, b) == [1, 2]
-@test intersect(RR, (a,)...) == [1, 2, 6]
-@test intersect(a, RR) == a
-@test_throws MethodError intersect(a, b, RR) == a
-@test intersect(RR, a, b) == [1, 2]
-@test union(RR, RR) === RR
-@test union(RR, a) === RR
-@test union(RR, a, b) === RR
-@test union(a, RR) === RR
-@test_throws MethodError union(a, b, RR) === RR
-
-
-# -------------------------------------------------------------------------------------------------
 # Matrix vector product
 # -------------------------------------------------------------------------------------------------
 

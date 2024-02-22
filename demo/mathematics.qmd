@@ -61,23 +61,24 @@ plot(monomials(0:100, 0 .. 1)...)
 Define linear forms
 
 ```{julia}
+import MMJMesh.Mathematics.valueat
 
-struct ValueAt <: AbstractMapping{AbstractMapping,Real,AllOf{AbstractMapping}()}
+struct ValueAtLF <: AbstractMapping{FunctionRToR,Real,All}
     x::Real
 end
-MMJMesh.Mathematics.valueat(u::ValueAt, f) = f(u.x)
+valueat(u::ValueAtLF, f::FunctionRToR) = f(u.x)
 
-struct DerivativeAt <: AbstractMapping{AbstractMapping,Real,AllOf{AbstractMapping}()}
+struct DerivativeAtLF <: AbstractMapping{FunctionRToR,Real,All}
     x::Real
 end
-MMJMesh.Mathematics.valueat(u::DerivativeAt, f) = f'(u.x)
+valueat(u::DerivativeAtLF, f::FunctionRToR) = f'(u.x)
 ```
 
 Compute polynomials
 
 ```{julia}
 h = 2.0
-N = [ValueAt.(0:h/2:h); DerivativeAt.([0, h])] |> vcat
+N = [ValueAtLF.(0:h/2:h); DerivativeAtLF.([0, h])] |> vcat
 P = monomials(0:length(N)-1, 0 .. h)
 M = [n(p) for p in P, n in N]
 H = inv(M) * P

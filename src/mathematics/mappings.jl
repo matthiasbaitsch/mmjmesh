@@ -5,15 +5,6 @@ import Polynomials
 import CairoMakie as cm
 
 
-# XXX move
-export AllOf
-export AbstractMapping, AbstractMappingFromR, AbstractFunctionToR
-export domaintype, codomaintype, domain, valueat, derivativeat, derivative
-export R, RPlus, R0Plus, IHat
-export antiderivative, integrate, sample, plot, pois, roots
-export Sin, Cos, Polynomial, fromroots, lagrangepolynomials, monomials, degree
-
-
 """
 Implementation of the concept of mappings as elements of a vector space.
 
@@ -31,50 +22,16 @@ There are many things missing
 
 - ...
 
-Needs rework
-
-- Handling of unrestricted domains (AllOf)
-
 """
 
 
 # -------------------------------------------------------------------------------------------------
-# Set of all objects of type T
-# XXX Get rid of this, bad idea?
+# Set of all objects
 # -------------------------------------------------------------------------------------------------
 
-struct AllOf{T} end
-
-
-# Methods from base
-Base.eltype(::AllOf{T}) where {T} = T
-Base.show(io::IO, ::AllOf{SVector{N,T}}) where {N,T<:Real} = print(io, "ℝ^$N")
-Base.show(io::IO, ::AllOf{SVector{N,T}}) where {N,T<:Int} = print(io, "ℤ^$N")
-Base.show(io::IO, ::AllOf{T}) where {T} = print(io, "AllOf{$T}")
-Base.in(x, ::AllOf{T}) where {T} = typeof(x) <: T
-Base.in(x::AbstractArray, ::AllOf{T}) where {T<:AbstractVector} =
-    return eltype(x) <: eltype(T) && length(x) == length(T)
-
-
-# Intersect
-Base.intersect(s1::AllOf{T1}, s2::AllOf{T2}) where {T1,T2} = T1 <: T2 ? s1 : T2 <: T1 ? s2 : Any[]
-
-function Base.intersect(a::AllOf, itrs...)
-    isempty(itrs) && return a
-    length(itrs) == 1 && return itrs[1]
-    length(itrs) == 2 && return intersect(itrs[1], itrs[2])
-    return intersect(itrs[1], itrs[2:end]...)
-end
-
-Base.intersect(s, ::AllOf) = s
-Base.intersect(a::AllOf{T}, ::AllOf{T}) where {T} = a
-Base.intersect(a::Tuple{AllOf{T}}) where {T} = a[1]
-
-
-# Union
-Base.union(a::AllOf, itrs...) = a
-Base.union(_, a::AllOf) = a
-Base.union(a::AllOf{T}, ::AllOf{T}) where {T} = a
+struct All end
+Base.in(_, ::All) = true
+Base.in(_, ::typeof(All)) = true
 
 
 # -------------------------------------------------------------------------------------------------
@@ -85,8 +42,8 @@ Base.union(a::AllOf{T}, ::AllOf{T}) where {T} = a
     AbstractMapping{DT,CT,D}
 
 Abstract type for mappings from a domain `X` to a codomain `Y`. In this implementation `X` is
-represented by the type `DT` and `Y` by the type `CT`. The third parameter `D` is a set of elements 
-of `DT` and can be used to incorporate additional information about the domain of interest.
+represented by the type `DT` and `Y` by the type `CT`. The third parameter `D` is a subset of
+`DT` and specifies the actual domain, use `All` if all elements of `DT` are in the domain.
 """
 abstract type AbstractMapping{DT,CT,D} end
 
@@ -292,21 +249,21 @@ Base.intersect(s::AbstractInterval, a::AbstractVector{T}) where {T} = T[x for x 
 # -------------------------------------------------------------------------------------------------
 
 # Base type for functions from R
-const AbstractMappingFromR{Real,CT,D} = AbstractMapping{Real,CT,D}
+const MappingFromR{Real,CT,D} = AbstractMapping{Real,CT,D}
 
 """
-    pois(m::AbstractMappingFromR) -> Real[]
+    pois(m::MappingFromR) -> Real[]
 
 Return the points of interest of the mapping `m`.
 """
-pois(::AbstractMappingFromR) = Real[]
+pois(::MappingFromR) = Real[]
 
 """
-    roots(m::AbstractMappingFromR, I::Union{Nothing,Interval}=nothing) -> Real[]
+    roots(m::MappingFromR, I::Union{Nothing,Interval}=nothing) -> Real[]
 
 Return the roots of the mapping `m` either in `I` or the domain of `m`.
 """
-function roots(m::AbstractMappingFromR, I::Union{Nothing,Interval}=nothing)
+function roots(m::MappingFromR, I::Union{Nothing,Interval}=nothing)
     isnothing(I) && return roots(m, domain(m))
     return I ∩ _roots(m)
 end
@@ -322,20 +279,20 @@ pois(q::QuotientMapping) = pois(q.m1) ∪ pois(q.m2) ∪ roots(q.m2)
 # Functions into R
 # -------------------------------------------------------------------------------------------------
 
-const AbstractFunctionToR{DT,Real,D} = AbstractMapping{DT,Real,D}
+const FunctionToR{DT,Real,D} = AbstractMapping{DT,Real,D}
 
 
 # -------------------------------------------------------------------------------------------------
 # Functions R → R
 # -------------------------------------------------------------------------------------------------
 
-const AbstractFunctionRToR{D} = AbstractMapping{Real,Real,D}
+const FunctionRToR{D} = AbstractMapping{Real,Real,D}
 
 
 # Fundamental operations
 
 """
-    antiderivative(f::AbstractFunctionRToR) -> AbstractFunctionRToR
+    antiderivative(f::FunctionRToR) -> FunctionRToR
 
 An antiderivative of the function `f`.
 """
@@ -343,11 +300,11 @@ function antiderivative end
 
 
 """
-    integrate(f::AbstractFunctionRToR, I::Interval) -> Real
+    integrate(f::FunctionRToR, I::Interval) -> Real
 
 The integral of the function `f` over the interval `I`.
 """
-function integrate(f::AbstractFunctionRToR, I::Interval)
+function integrate(f::FunctionRToR, I::Interval)
     F = antiderivative(f)
     return F(rightendpoint(I)) - F(leftendpoint(I))
 end
@@ -359,7 +316,7 @@ antiderivative(f::Sum{Real,Real}) = antiderivative(f.m1) + antiderivative(f.m2)
 
 
 # TODO: Adaptive sampling
-function sample(f::AbstractFunctionRToR, n=100)
+function sample(f::FunctionRToR, n=100)
     dom = domain(f)
     a, b = width(dom) != Inf ? endpoints(dom) : (0, 5)
     x = LinRange(a, b, n)
@@ -368,7 +325,7 @@ function sample(f::AbstractFunctionRToR, n=100)
 end
 
 # TODO: Recipe
-function plot(f::AbstractFunctionRToR, fs::AbstractFunctionRToR...)
+function plot(f::FunctionRToR, fs::FunctionRToR...)
     n = 100
     f = cm.lines(sample(f, n)...)
     for g ∈ fs
@@ -384,7 +341,7 @@ end
 
 
 # Sine function
-struct Sin{D} <: AbstractFunctionRToR{D}
+struct Sin{D} <: FunctionRToR{D}
     Sin(d=R) = new{d}()
 end
 
@@ -396,7 +353,7 @@ Base.show(io::IO, ::Sin) = print(io, "sin(x)")
 
 
 # Cosine function
-struct Cos{D} <: AbstractFunctionRToR{D}
+struct Cos{D} <: FunctionRToR{D}
     Cos(d=R) = new{d}()
 end
 
@@ -409,7 +366,7 @@ Base.show(io::IO, ::Cos) = print(io, "cos(x)")
 
 
 # Polynomials
-struct Polynomial{D} <: AbstractFunctionRToR{D}
+struct Polynomial{D} <: FunctionRToR{D}
     p::Polynomials.Polynomial
 end
 
