@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.549">
+<meta name="generator" content="quarto-1.4.550">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -206,7 +206,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="mappings" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="mappings"><span class="header-section-number">4.1</span> Mappings</h2>
-<div id="5867f8d8" class="cell" data-execution_count="2">
+<div id="065caf03" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> <span class="fu">Sin</span>(<span class="fl">0</span> <span class="op">..</span> <span class="fl">3</span>π)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> <span class="fu">Cos</span>(<span class="fl">0</span> <span class="op">..</span> <span class="fl">3</span>π)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -223,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="ddb34aac" class="cell" data-execution_count="3">
+<div id="6caa6e27" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">Polynomial</span>([<span class="fl">0</span>, <span class="fl">1</span>], <span class="op">-</span><span class="fl">1</span> <span class="op">..</span> <span class="fl">1</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">antiderivative</span>(f)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -235,13 +235,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="4096a51c" class="cell" data-execution_count="4">
+<div id="10d502aa" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(f, <span class="fl">0</span> <span class="op">..</span> <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>0.5</code></pre>
 </div>
 </div>
-<div id="21e462ad" class="cell" data-execution_count="5">
+<div id="0f49581a" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> [<span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>]</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">plot</span>(<span class="fu">fromroots</span>(p, <span class="op">-</span><span class="fl">0.1</span> <span class="op">..</span> <span class="fl">2.1</span>))</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>cm.<span class="fu">scatter!</span>(p, <span class="fl">0</span> <span class="op">*</span> p, color<span class="op">=:</span>tomato)</span>
@@ -254,7 +254,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="e98f5da7" class="cell" data-execution_count="6">
+<div id="ba1999ef" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> [<span class="fl">0</span>, <span class="fl">1.5</span>, <span class="fl">2</span>]</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">plot</span>(<span class="fu">lagrangepolynomials</span>(p, <span class="fl">0</span> <span class="op">..</span> <span class="fl">2</span>)<span class="op">...</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>cm.<span class="fu">scatter!</span>(p, [<span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>], color<span class="op">=:</span>tomato)</span>
@@ -270,7 +270,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="monomials" class="level3" data-number="4.1.1">
 <h3 data-number="4.1.1" class="anchored" data-anchor-id="monomials"><span class="header-section-number">4.1.1</span> Monomials</h3>
-<div id="055b1de1" class="cell" data-execution_count="7">
+<div id="595fa1dd" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">monomials</span>(<span class="fl">0</span><span class="op">:</span><span class="fl">100</span>, <span class="fl">0</span> <span class="op">..</span> <span class="fl">1</span>)<span class="op">...</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div>
@@ -284,25 +284,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="hermite-like-polynomials-with-middle-node" class="level3" data-number="4.1.2">
 <h3 data-number="4.1.2" class="anchored" data-anchor-id="hermite-like-polynomials-with-middle-node"><span class="header-section-number">4.1.2</span> Hermite like polynomials with middle node</h3>
 <p>Define linear forms</p>
-<div id="b8d9b664" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> ValueAt <span class="op">&lt;:</span><span class="dt"> AbstractMapping{AbstractMapping,Real,AllOf{AbstractMapping}()}</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    x<span class="op">::</span><span class="dt">Real</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>MMJMesh.Mathematics.<span class="fu">valueat</span>(u<span class="op">::</span><span class="dt">ValueAt</span>, f) <span class="op">=</span> <span class="fu">f</span>(u.x)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> DerivativeAt <span class="op">&lt;:</span><span class="dt"> AbstractMapping{AbstractMapping,Real,AllOf{AbstractMapping}()}</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    x<span class="op">::</span><span class="dt">Real</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>MMJMesh.Mathematics.<span class="fu">valueat</span>(u<span class="op">::</span><span class="dt">DerivativeAt</span>, f) <span class="op">=</span> f<span class="op">'</span>(u.x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="549a0b6a" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">MMJMesh.Mathematics.valueat</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> ValueAtLF <span class="op">&lt;:</span><span class="dt"> AbstractMapping{FunctionRToR,Real,All}</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    x<span class="op">::</span><span class="dt">Real</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">valueat</span>(u<span class="op">::</span><span class="dt">ValueAtLF</span>, f<span class="op">::</span><span class="dt">FunctionRToR</span>) <span class="op">=</span> <span class="fu">f</span>(u.x)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> DerivativeAtLF <span class="op">&lt;:</span><span class="dt"> AbstractMapping{FunctionRToR,Real,All}</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    x<span class="op">::</span><span class="dt">Real</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu">valueat</span>(u<span class="op">::</span><span class="dt">DerivativeAtLF</span>, f<span class="op">::</span><span class="dt">FunctionRToR</span>) <span class="op">=</span> f<span class="op">'</span>(u.x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>valueat (generic function with 11 methods)</code></pre>
+</div>
 </div>
 <p>Compute polynomials</p>
-<div id="8640a97a" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fl">2.0</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> [<span class="fu">ValueAt</span>.(<span class="fl">0</span><span class="op">:</span>h<span class="op">/</span><span class="fl">2</span><span class="op">:</span>h); <span class="fu">DerivativeAt</span>.([<span class="fl">0</span>, h])] <span class="op">|&gt;</span> vcat</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> <span class="fu">monomials</span>(<span class="fl">0</span><span class="op">:</span><span class="fu">length</span>(N)<span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span> <span class="op">..</span> h)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> [<span class="fu">n</span>(p) for p <span class="kw">in</span> P, n <span class="kw">in</span> N]</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> <span class="fu">inv</span>(M) <span class="op">*</span> P</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(H<span class="op">...</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="e5ba4ae0" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> [<span class="fu">ValueAtLF</span>.(<span class="fl">0</span><span class="op">:</span>h<span class="op">/</span><span class="fl">2</span><span class="op">:</span>h); <span class="fu">DerivativeAtLF</span>.([<span class="fl">0</span>, h])] <span class="op">|&gt;</span> vcat</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> <span class="fu">monomials</span>(<span class="fl">0</span><span class="op">:</span><span class="fu">length</span>(N)<span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span> <span class="op">..</span> h)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> [<span class="fu">n</span>(p) for p <span class="kw">in</span> P, n <span class="kw">in</span> N]</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> <span class="fu">inv</span>(M) <span class="op">*</span> P</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(H<span class="op">...</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div>
 <figure class="figure">
@@ -706,7 +711,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./plot.html" class="pagination-link  aria-label=" &lt;span="">
+      <a href="./plot.html" class="pagination-link" aria-label="Plotting">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Plotting</span></span>
       </a>          
   </div>

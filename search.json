@@ -134,7 +134,7 @@
     "href": "mathematics.html#mappings",
     "title": "4  Mathematics",
     "section": "",
-    "text": "4.1.1 Monomials\n\nplot(monomials(0:100, 0 .. 1)...)\n\n\n\n\n\n\n\n\n\n\n4.1.2 Hermite like polynomials with middle node\nDefine linear forms\n\nstruct ValueAt &lt;: AbstractMapping{AbstractMapping,Real,AllOf{AbstractMapping}()}\n    x::Real\nend\nMMJMesh.Mathematics.valueat(u::ValueAt, f) = f(u.x)\n\nstruct DerivativeAt &lt;: AbstractMapping{AbstractMapping,Real,AllOf{AbstractMapping}()}\n    x::Real\nend\nMMJMesh.Mathematics.valueat(u::DerivativeAt, f) = f'(u.x)\n\nCompute polynomials\n\nh = 2.0\nN = [ValueAt.(0:h/2:h); DerivativeAt.([0, h])] |&gt; vcat\nP = monomials(0:length(N)-1, 0 .. h)\nM = [n(p) for p in P, n in N]\nH = inv(M) * P\nplot(H...)",
+    "text": "4.1.1 Monomials\n\nplot(monomials(0:100, 0 .. 1)...)\n\n\n\n\n\n\n\n\n\n\n4.1.2 Hermite like polynomials with middle node\nDefine linear forms\n\nimport MMJMesh.Mathematics.valueat\n\nstruct ValueAtLF &lt;: AbstractMapping{FunctionRToR,Real,All}\n    x::Real\nend\nvalueat(u::ValueAtLF, f::FunctionRToR) = f(u.x)\n\nstruct DerivativeAtLF &lt;: AbstractMapping{FunctionRToR,Real,All}\n    x::Real\nend\nvalueat(u::DerivativeAtLF, f::FunctionRToR) = f'(u.x)\n\nvalueat (generic function with 11 methods)\n\n\nCompute polynomials\n\nh = 2.0\nN = [ValueAtLF.(0:h/2:h); DerivativeAtLF.([0, h])] |&gt; vcat\nP = monomials(0:length(N)-1, 0 .. h)\nM = [n(p) for p in P, n in N]\nH = inv(M) * P\nplot(H...)",
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Mathematics</span>"
     ]
