@@ -10,6 +10,7 @@ using MMJMesh
     @testset "Mathematics" include("mathematics/00-runtests.jl")    
     @testset "Utilities" include("utilities/00-runtests.jl")    
     @testset "Plots" include("plots/00-runtests.jl")    
+    @testset "Gmsh" include("gmsh/00-runtests.jl")    
 end
 
 end
