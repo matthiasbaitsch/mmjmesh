@@ -124,7 +124,7 @@
     "href": "mathematics.html",
     "title": "4  Mathematics",
     "section": "",
-    "text": "4.1 Mappings\ns = Sin(0 .. 3π)\nc = Cos(0 .. 3π)\n\nf = 2s\ng = s + f'\np = 1 / 20 * Polynomial([2, -1], 1 .. 8) * Polynomial([3, -1]) * Polynomial([4.5, -1]) * Polynomial([8, -1])\n\nplot(c, s, g, p)\nf = Polynomial([0, 1], -1 .. 1)\nF = antiderivative(f)\nplot(f, F)\nintegrate(f, 0 .. 1)\n\n0.5\np = [0, 1, 2]\nf = plot(fromroots(p, -0.1 .. 2.1))\ncm.scatter!(p, 0 * p, color=:tomato)\nf\np = [0, 1.5, 2]\nf = plot(lagrangepolynomials(p, 0 .. 2)...)\ncm.scatter!(p, [0, 0, 0], color=:tomato)\ncm.scatter!(p, [1, 1, 1], color=:blue)\nf",
+    "text": "4.1 Mappings\ns = Sin(0 .. 3π)\nc = Cos(0 .. 3π)\n\nf = 2s\ng = s + f'\np = 1 / 20 * Polynomial([2, -1], 1 .. 8) * Polynomial([3, -1]) * Polynomial([4.5, -1]) * Polynomial([8, -1])\n\nfplot(c, s, g, p)\nf = Polynomial([0, 1], -1 .. 1)\nF = antiderivative(f)\nfplot(f, F)\nintegrate(f, 0 .. 1)\n\n0.5\np = [0, 1, 2]\nf = fplot(fromroots(p, -0.1 .. 2.1))\ncm.scatter!(p, 0 * p, color=:tomato)\nf\np = [0, 1.5, 2]\nf = fplot(lagrangepolynomials(p, 0 .. 2)...)\ncm.scatter!(p, [0, 0, 0], color=:tomato)\ncm.scatter!(p, [1, 1, 1], color=:blue)\nf",
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Mathematics</span>"
     ]
@@ -134,7 +134,7 @@
     "href": "mathematics.html#mappings",
     "title": "4  Mathematics",
     "section": "",
-    "text": "4.1.1 Monomials\n\nplot(monomials(0:100, 0 .. 1)...)\n\n\n\n\n\n\n\n\n\n\n4.1.2 Hermite like polynomials with middle node\nDefine linear forms\n\nimport MMJMesh.Mathematics.valueat\n\nstruct ValueAtLF &lt;: AbstractMapping{FunctionRToR,Real,All}\n    x::Real\nend\nvalueat(u::ValueAtLF, f::FunctionRToR) = f(u.x)\n\nstruct DerivativeAtLF &lt;: AbstractMapping{FunctionRToR,Real,All}\n    x::Real\nend\nvalueat(u::DerivativeAtLF, f::FunctionRToR) = f'(u.x)\n\nvalueat (generic function with 11 methods)\n\n\nCompute polynomials\n\nh = 2.0\nN = [ValueAtLF.(0:h/2:h); DerivativeAtLF.([0, h])] |&gt; vcat\nP = monomials(0:length(N)-1, 0 .. h)\nM = [n(p) for p in P, n in N]\nH = inv(M) * P\nplot(H...)",
+    "text": "4.1.1 Monomials\n\nfplot(monomials(0:100, 0 .. 1)...)\n\n\n\n\n\n\n\n\n\n\n4.1.2 Hermite like polynomials with middle node\nDefine linear forms\n\nimport MMJMesh.Mathematics.valueat\n\nstruct ValueAtLF &lt;: AbstractMapping{FunctionRToR,Real,All}\n    x::Real\nend\nvalueat(u::ValueAtLF, f::FunctionRToR) = f(u.x)\n\nstruct DerivativeAtLF &lt;: AbstractMapping{FunctionRToR,Real,All}\n    x::Real\nend\nvalueat(u::DerivativeAtLF, f::FunctionRToR) = f'(u.x)\n\nvalueat (generic function with 11 methods)\n\n\nCompute polynomials\n\nh = 2.0\nN = [ValueAtLF.(0:h/2:h); DerivativeAtLF.([0, h])] |&gt; vcat\nP = monomials(0:length(N)-1, 0 .. h)\nM = [n(p) for p in P, n in N]\nH = inv(M) * P\nfplot(H...)",
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Mathematics</span>"
     ]
