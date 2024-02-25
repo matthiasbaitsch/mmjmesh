@@ -2,7 +2,6 @@ using IntervalSets
 using StaticArrays
 
 import Polynomials
-import CairoMakie as cm
 
 
 """
@@ -84,8 +83,14 @@ Base.adjoint(m::AbstractMapping) = derivative(m)
 
 
 # Make similar array 
-Base.similar(a::AbstractArray, ::Type{T}, dims::Base.OneTo...) where {T<:AbstractMapping} =
-    similar(a, AbstractMapping, Base.to_shape(dims))
+# TODO: This is probably not the right way to do that
+function Base.similar(a::Vector, ::Type{T}, dims::Base.OneTo...) where {T<:AbstractMapping}
+    if !isempty(dims)
+        return similar(a, AbstractMapping, Base.to_shape(dims))
+    else
+        return Vector{AbstractMapping}(undef, length(a))
+    end
+end
 
 
 # Zero element w.r.t. addition
@@ -313,26 +318,6 @@ end
 # Rules for antiderivative
 antiderivative(f::ScaledMapping{Real,Real}) = f.a * antiderivative(f.m)
 antiderivative(f::Sum{Real,Real}) = antiderivative(f.m1) + antiderivative(f.m2)
-
-
-# TODO: Adaptive sampling
-function sample(f::FunctionRToR, n=100)
-    dom = domain(f)
-    a, b = width(dom) != Inf ? endpoints(dom) : (0, 5)
-    x = LinRange(a, b, n)
-    y = f.(x)
-    x, y
-end
-
-# TODO: Recipe
-function plot(f::FunctionRToR, fs::FunctionRToR...)
-    n = 100
-    f = cm.lines(sample(f, n)...)
-    for g ∈ fs
-        cm.lines!(sample(g, n)...)
-    end
-    f
-end
 
 
 # -------------------------------------------------------------------------------------------------

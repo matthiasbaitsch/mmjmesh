@@ -18,5 +18,6 @@ export mplot, mconf
 # Parts
 include("sampleadaptive.jl")
 include("mplot.jl")
+include("fplot.jl")
 
 end

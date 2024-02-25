@@ -20,13 +20,13 @@ f = 2s
 g = s + f'
 p = 1 / 20 * Polynomial([2, -1], 1 .. 8) * Polynomial([3, -1]) * Polynomial([4.5, -1]) * Polynomial([8, -1])
 
-plot(c, s, g, p)
+fplot(c, s, g, p)
 ```
 
 ```{julia}
 f = Polynomial([0, 1], -1 .. 1)
 F = antiderivative(f)
-plot(f, F)
+fplot(f, F)
 ```
 
 ```{julia}
@@ -35,14 +35,14 @@ integrate(f, 0 .. 1)
 
 ```{julia}
 p = [0, 1, 2]
-f = plot(fromroots(p, -0.1 .. 2.1))
+f = fplot(fromroots(p, -0.1 .. 2.1))
 cm.scatter!(p, 0 * p, color=:tomato)
 f
 ```
 
 ```{julia}
 p = [0, 1.5, 2]
-f = plot(lagrangepolynomials(p, 0 .. 2)...)
+f = fplot(lagrangepolynomials(p, 0 .. 2)...)
 cm.scatter!(p, [0, 0, 0], color=:tomato)
 cm.scatter!(p, [1, 1, 1], color=:blue)
 f
@@ -52,7 +52,7 @@ f
 ### Monomials
 
 ```{julia}
-plot(monomials(0:100, 0 .. 1)...)
+fplot(monomials(0:100, 0 .. 1)...)
 ```
 
 
@@ -82,5 +82,5 @@ N = [ValueAtLF.(0:h/2:h); DerivativeAtLF.([0, h])] |> vcat
 P = monomials(0:length(N)-1, 0 .. h)
 M = [n(p) for p in P, n in N]
 H = inv(M) * P
-plot(H...)
+fplot(H...)
 ```

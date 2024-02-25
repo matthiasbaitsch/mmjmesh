@@ -1,5 +1,5 @@
 Manifest.toml
-foo.jl
+src/dev.jl
 demo/*_files
 demo/site_libs
 demo/*.ipynb
