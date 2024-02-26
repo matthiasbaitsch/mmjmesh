@@ -233,6 +233,7 @@ Base.:*(a::Real, m::ScaledMapping) = (a * m.a) * m.m
 
 # /
 Base.:/(m1::AbstractMapping, m2::AbstractMapping) = QuotientMapping(m1, m2)
+Base.:/(a::Real, m2::AbstractMapping) = QuotientMapping(Polynomial(a), m2)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -357,6 +358,7 @@ end
 
 Polynomial(p::Polynomials.Polynomial, d=R) = Polynomial{d}(p)
 Polynomial(c::AbstractArray, d=R) = Polynomial{d}(Polynomials.Polynomial(c))
+Polynomial(c::T...; d=R) where {T<:Real} = Polynomial{d}(Polynomials.Polynomial(c))
 
 
 # Basic operations

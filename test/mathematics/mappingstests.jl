@@ -59,10 +59,12 @@ validate(c)
 validate(antiderivative(c))
 
 # Polynomial
-p = Polynomial([4, 6, 1, 9, 2, -1])
+p = Polynomial(4, 6, 1, 9, 2, -1)
 @test degree(p) == 5
 validate(p)
 validate(antiderivative(p))
+
+Polynomial([1, 2, 3]) == Polynomial(1, 2, 3)
 
 # Roots and domain
 @test roots(Polynomial([-1, 0, 1])) == [-1, 1]
@@ -137,3 +139,6 @@ p = m1 / m3
 @test p(0.2) ≈ tan(0.2)
 validate(p, rtol=1e-4)
 
+f = 2 / Polynomial(0, 1)
+@test f(0.2) ≈ 10
+@test pois(f) == [0]
