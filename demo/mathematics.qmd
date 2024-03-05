@@ -63,12 +63,12 @@ Define linear forms
 ```{julia}
 import MMJMesh.Mathematics.valueat
 
-struct ValueAtLF <: AbstractMapping{FunctionRToR,Real,All}
+struct ValueAtLF <: AbstractMapping{FunctionRToR,Real,Any}
     x::Real
 end
 valueat(u::ValueAtLF, f::FunctionRToR) = f(u.x)
 
-struct DerivativeAtLF <: AbstractMapping{FunctionRToR,Real,All}
+struct DerivativeAtLF <: AbstractMapping{FunctionRToR,Real,Any}
     x::Real
 end
 valueat(u::DerivativeAtLF, f::FunctionRToR) = f'(u.x)
