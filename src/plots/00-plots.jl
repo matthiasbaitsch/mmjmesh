@@ -7,6 +7,7 @@ using Random
 using IntervalSets
 using LinearAlgebra
 
+import Makie
 import MakieCore
 
 ## Own

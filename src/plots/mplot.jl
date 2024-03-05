@@ -138,7 +138,7 @@ function MakieCore.plot!(plot::MPlot)
         plotedges(plot, true)
     end
     if plot.nodesvisible[]
-        Makie.scatter!(
+        MakieCore.scatter!(
             plot,
             coordinates(mesh),
             color=plot.nodecolor,
@@ -250,11 +250,11 @@ function plotlineplot(plot::MPlot)
     if plot.lineplotfacesvisible[]
         x = [xf yf]'
         tf = mapreduce(permutedims, vcat, tf)
-        Makie.mesh!(plot, x, tf, color=c, colormap=plot.lineplotfacescolormap)
+        MakieCore.mesh!(plot, x, tf, color=c, colormap=plot.lineplotfacescolormap)
     end
 
     if plot.lineplotoutlinesvisible[]
-        Makie.lines!(plot, xe, ye, linewidth=plot.lineplotoutlineslinewidth, color=plot.lineplotoutlinescolor)
+        MakieCore.lines!(plot, xe, ye, linewidth=plot.lineplotoutlineslinewidth, color=plot.lineplotoutlinescolor)
     end
 end
 
@@ -322,7 +322,7 @@ function plotfaces(plot::MPlot)
     end
 
     # Plot
-    Makie.mesh!(plot, x, tf, color=c, colormap=plot.facecolormap)
+    MakieCore.mesh!(plot, x, tf, color=c, colormap=plot.facecolormap)
 end
 
 function plotedges(plot::MPlot, featureedges::Bool)
@@ -368,5 +368,5 @@ function plotedges(plot::MPlot, featureedges::Bool)
     end
 
     # Plot
-    Makie.lines!(plot, xx, yy, linewidth=lw, color=lc, colormap=:tab10)
+    MakieCore.lines!(plot, xx, yy, linewidth=lw, color=lc, colormap=:tab10)
 end
