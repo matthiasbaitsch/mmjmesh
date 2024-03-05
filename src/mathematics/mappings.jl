@@ -25,15 +25,6 @@ There are many things missing
 
 
 # -------------------------------------------------------------------------------------------------
-# Set of all objects
-# -------------------------------------------------------------------------------------------------
-
-struct All end
-Base.in(_, ::All) = true
-Base.in(_, ::typeof(All)) = true
-
-
-# -------------------------------------------------------------------------------------------------
 # General concept of mapping
 # -------------------------------------------------------------------------------------------------
 
@@ -42,7 +33,7 @@ Base.in(_, ::typeof(All)) = true
 
 Abstract type for mappings from a domain `X` to a codomain `Y`. In this implementation `X` is
 represented by the type `DT` and `Y` by the type `CT`. The third parameter `D` is a subset of
-`DT` and specifies the actual domain, use `All` if all elements of `DT` are in the domain.
+`DT` and specifies the actual domain, use `Any` if all elements of `DT` are in the domain.
 """
 abstract type AbstractMapping{DT,CT,D} <: Function end
 
@@ -84,7 +75,7 @@ Base.adjoint(m::AbstractMapping) = derivative(m)
 
 # Make similar array 
 # TODO: This is probably not the right way to do that
-function Base.similar(a::Vector, ::Type{T}, dims::Base.OneTo...) where {T<:AbstractMapping}
+function Base.similar(a::Vector, ::Type{T}, dims::Base.AbstractUnitRange...) where {T<:AbstractMapping}
     if !isempty(dims)
         return similar(a, AbstractMapping, Base.to_shape(dims))
     else
@@ -100,6 +91,9 @@ derivativeat(::Zero{DT,CT,D}, x::DT) where {DT,CT,D} = DT(0)
 derivative(z::Zero) = z
 Base.zero(::AbstractMapping{DT,CT,D}) where {DT,CT,D} = Zero{DT,CT,D}()
 Base.show(io::IO, ::Zero) = print(io, "0")
+
+
+# TODO: One
 
 
 # -------------------------------------------------------------------------------------------------
