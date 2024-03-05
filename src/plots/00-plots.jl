@@ -1,12 +1,16 @@
 module Plots
 
 # Modules needed by this module
+
 ## Others
-import Makie
-import MakieCore
-using LinearAlgebra
+using Random
 using IntervalSets
+using LinearAlgebra
+
+import MakieCore
+
 ## Own
+using MMJMesh
 using MMJMesh.Meshes
 using MMJMesh.MMJBase
 using MMJMesh.Topologies
@@ -17,6 +21,7 @@ export mplot, mconf
 
 # Parts
 include("sampleadaptive.jl")
+include("sampleadaptive2.jl")
 include("mplot.jl")
 include("fplot.jl")
 

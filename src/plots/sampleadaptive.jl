@@ -1,13 +1,12 @@
 """
     sampleadaptive(f, a::Real, b::Real, ir::Bool, atol::Real, rtol::Real, level::Int)
 
-Adaptive sampling of function `f` in the interval from `a` to `b`.
+Very basic adaptive sampling of function `f` in the interval from `a` to `b`.
 
 @see https://yacas.readthedocs.io/en/latest/book_of_algorithms/basic.html
 """
-function sampleadaptive(f::Function, a::Real, b::Real; ir::Bool=false, tol::Real=1e-2, level::Int=10)
-    r = valuerange(f, a, b, 20)
-    return dosampleadaptive(f, a, b, ir, r * tol, level)
+function sampleadaptive(f::Function, a::Real, b::Real; ir::Bool=false, tol::Real=1e-3, level::Int=10)
+    return dosampleadaptive(f, a, b, ir, tol * valuerange(f, a, b, 20), level)
 end
 
 const X1 = 0:1/4:1
@@ -117,5 +116,3 @@ function insertroot(xx, yy)
         return xx, yy
     end
 end
-
-
