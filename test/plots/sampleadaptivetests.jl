@@ -4,7 +4,7 @@ using Random
 using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Plots
-import MMJMesh.Plots: sampleadaptive2
+import MMJMesh.Plots: sampleadaptive
 
 
 # -------------------------------------------------------------------------------------------------
@@ -18,25 +18,25 @@ xref = [
 
 # Number of points
 for d ∈ 0:3, np ∈ 3:6
-    p = sampleadaptive2(f, 0, 1, npoints=np, maxrecursion=d, maxangle=0)
+    p = sampleadaptive(f, 0, 1, npoints=np, maxrecursion=d, maxangle=0)
     @test size(p, 2) == (np - 1)^(d + 1) + 1
 end
 
 # Compare to reference values
-p = sampleadaptive2(f, 0, 1, maxrecursion=1, maxangle=0)
+p = sampleadaptive(f, 0, 1, maxrecursion=1, maxangle=0)
 @test p[1, :] ≈ xref
 
 # Test scaling factor
-p1 = sampleadaptive2(f, 0, 1, maxrecursion=20)
-p2 = sampleadaptive2(41 * f, 0, 1, maxrecursion=20)
-p3 = sampleadaptive2(41 * f, 0, 1, maxrecursion=20, yscale=1.0 / 41.0)
+p1 = sampleadaptive(f, 0, 1, maxrecursion=20)
+p2 = sampleadaptive(41 * f, 0, 1, maxrecursion=20)
+p3 = sampleadaptive(41 * f, 0, 1, maxrecursion=20, yscale=1.0 / 41.0)
 
 @test size(p1, 2) < size(p2, 2)
 @test p1[1, :] == p3[1, :]
 
 # Insert root
-p1 = sampleadaptive2(f, -2, 2, maxrecursion=1)
-p2 = sampleadaptive2(f, -2, 2, maxrecursion=1, ir=true)
+p1 = sampleadaptive(f, -2, 2, maxrecursion=1)
+p2 = sampleadaptive(f, -2, 2, maxrecursion=1, ir=true)
 
 @test size(p2, 2) == size(p1, 2) + 2
 @test 0 ∈ p2[2, :]

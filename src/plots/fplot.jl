@@ -16,7 +16,7 @@ function MakieCore.plot!(plot::FPlot)
     for a ∈ plot.args
         f = a[]
         a, b = endpoints(domain(f))
-        xy = sampleadaptive2(f, a, b)
+        xy = sampleadaptive(f, a, b)
         MakieCore.lines!(plot, xy)
         # MakieCore.lines!(plot, x, y; plot.attributes)
         # MakieCore.plot!(MakieCore.Lines, plot.attributes, x, y)

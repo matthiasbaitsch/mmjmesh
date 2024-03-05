@@ -21,7 +21,7 @@ using MMJMesh.Mathematics
 export mplot, mconf
 
 # Parts
-include("sampleadaptive2.jl")
+include("sampleadaptive.jl")
 include("mplot.jl")
 include("fplot.jl")
 
