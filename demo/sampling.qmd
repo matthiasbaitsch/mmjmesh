@@ -20,6 +20,11 @@ end
 
 
 ```{julia}
+sampleadaptive2(x -> -0.2413 + x, -1, 2, ir=true) |> doplot
+```
+
+
+```{julia}
 sampleadaptive2(x -> x^100, 0, 1) |> doplot
 ```
 
