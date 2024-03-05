@@ -14,7 +14,7 @@ import MMJMesh.Plots: approximationerror, sampleadaptive
 ### On a straight line
 
 ```{julia}
-m = makemeshoninterval(0, 4, 20) 
+m = makemeshoninterval(0, 4, 20)
 mplot(m) |> mconf()
 ```
 
@@ -128,20 +128,6 @@ Colors for elements
 mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf()
 ```
 
-```{julia}
-cm.set_theme!(cm.theme_minimal())
-m = makemeshoninterval(π, 3π, 20, t -> t * [cos(t); sin(t)])
-# cm.with_theme(cm.theme_dark()) do
-# cm.update_theme!(xxx=:blue)
-# cm.update_theme!(markercolor=:tomato)
-cm.update_theme!(Axis=(leftspinevisible=false,))
-
-#println(cm.theme(:markercolor)[])
-
-mplot(m, edgecolor = :green)
-#cm.scatter(coordinates(m))
-#end
-```
 
 ## Plot options
 
@@ -168,119 +154,3 @@ mplot(m2, rand(nnodes(m2)),
 ) |> mconf(title="Test Plot")
 ```
 
-## Adaptive sampling
-
-```{julia}
-#| echo: false
-#| warning: false
-include("setup.jl")
-using IntervalSets
-using LinearAlgebra
-import CairoMakie as cm
-import MMJMesh.Plots: approximationerror, sampleadaptive
-```
-
-
-### Derivation of quadrature formulae
-
-```{julia}
-X1 = 0:1/4:1
-L1 = lagrangepolynomials(X1, 0 .. 1)
-W1 = [integrate(L, 0 .. 1) for L in L1]
-
-X2 = [0, 0.253124, 0.4986745, 0.75834, 1]
-L2 = lagrangepolynomials(X2, 0 .. 1)
-W2 = [integrate(L, 0 .. 1) for L in L2]
-
-function nint(f, a, b)
-    w = b - a
-    y1 = f.(a .+ w * X1)
-    y2 = f.(a .+ w * X2)
-    w * dot(W1, y1), w * dot(W2, y2)
-end
-
-println(nint(x -> x, 0, 2))
-println(nint(sin, 0, pi))
-println(nint(sin, pi, 2pi))
-```
-
-
-### Integral of squared distance between curve and straight line
-
-```{julia}
-#| code-fold: true
-
-function doplot(xy)
-    x, y = xy
-    f = cm.lines(x, y)
-    cm.scatter!(x, y, color=:darkred, markersize=5)
-    return f
-end
-
-function convergence(f, a, b, n)
-    h = 1
-    X = X2
-    W = W2
-    e = zeros(n)
-
-    for i in 1:n
-        w = b - a
-        x = a .+ w * X
-        y = f.(x)
-        e[i] = approximationerror(h, X, W, y)
-        b = (a + b) / 2
-        h /= 2
-    end
-
-    return e
-end
-```
-
-
-```{julia}
-n = 5
-(1:n, convergence(x -> 100x^3, -0.25, 1.5, n)) |> doplot
-```
-
-
-```{julia}
-(1:n, convergence(sin, 0, pi, n)) |> doplot
-```
-
-
-```{julia}
-(1:n, convergence(x -> 1 / x, -1, 1e-5, n)) |> doplot
-```
-
-
-```{julia}
-n = 20
-(1:n, convergence(x -> sin(1 / x), 1e-5, 1e-1, n)) |> doplot
-```
-
-
-### Test cases
-
-```{julia}
-sampleadaptive(x -> x^100, 0, 1) |> doplot
-```
-
-
-```{julia}
-sampleadaptive(x -> sin(1.0 / x), 0, 0.05, level=14) |> doplot
-```
-
-
-```{julia}
-sampleadaptive(x -> 1 / x, -1, 1) |> doplot
-```
-
-
-```{julia}
-sampleadaptive(x -> (-0.3 + x), -1, 1, ir=true) |> doplot
-```
-
-
-```{julia}
-sampleadaptive(x -> x^2, -1, 1) |> doplot
-```
