@@ -1,5 +1,6 @@
 using Test
 using Random
+using IntervalSets
 
 using MMJMesh
 using MMJMesh.Mathematics
@@ -50,6 +51,14 @@ p2 = sampleadaptive(f, -2, 2, maxrecursion=1, ir=true)
 
 f = 1 / Polynomial(0, 1)
 sampleadaptive(f, 0, 1)
+
+
+# -------------------------------------------------------------------------------------------------
+# Parametric curve
+# -------------------------------------------------------------------------------------------------
+
+u = ParametricCurve(Sin(), Cos())
+@test size(sampleadaptive(u, 0, 2π), 2) == 257
 
 
 # -------------------------------------------------------------------------------------------------

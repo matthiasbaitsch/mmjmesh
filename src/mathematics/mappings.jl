@@ -316,6 +316,30 @@ antiderivative(f::Sum{Real,Real}) = antiderivative(f.m1) + antiderivative(f.m2)
 
 
 # -------------------------------------------------------------------------------------------------
+# Mappings R → Rn
+# -------------------------------------------------------------------------------------------------
+
+struct ParametricCurve{N,D} <: AbstractMapping{Real,StaticVector{N,Float64},D}
+    components::Vector{FunctionRToR{D}}
+end
+
+function ParametricCurve(components::FunctionRToR{D}...) where {D}
+    n = length(components)
+    cc = Vector{FunctionRToR{D}}(undef, n)
+    for i ∈ eachindex(components)
+        cc[i] = components[i]
+    end
+    return ParametricCurve{n,D}(cc)
+end
+
+valueat(u::ParametricCurve{N,D}, x::Real) where {N,D} = SVector{N}([c(x) for c ∈ u.components])
+derivativeat(u::ParametricCurve{N,D}, x::Real, n::Int=1) where {N,D} = SVector{N}([derivativeat(c, x, n) for c ∈ u.components])
+_derivative(u::ParametricCurve{N,D}, n::Int=1) where {N,D} = ParametricCurve{N,D}([derivative(c, n) for c ∈ u.components])
+Base.show(io::IO, u::ParametricCurve) = print(io, "ParametricCurve[$(u.components)]")
+Base.:(==)(c1::ParametricCurve{N,D}, c2::ParametricCurve{N,D}) where {N,D} = (c1.components == c2.components)
+
+
+# -------------------------------------------------------------------------------------------------
 # Special functions
 # -------------------------------------------------------------------------------------------------
 

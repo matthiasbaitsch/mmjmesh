@@ -53,6 +53,11 @@ cm.scatter!(p, [1, 1, 1], color=:blue)
 f
 ```
 
+Lissajous curve
+
+```{julia}
+fplot(ParametricCurve(Cos(0 .. 2π), Sin() ∘ Polynomial(0, 2, d=0 .. 2pi)))
+```
 
 ### Monomials
 

@@ -38,11 +38,7 @@ function _validateantiderivative(f::FunctionRToR)
     end
 end
 
-function validate(m::MappingFromR)
-    _validatederivatives(m)
-end
-
-function validate(f::FunctionRToR; atol::Real=0.0, rtol::Real=1e-5)
+function validate(f::MappingFromR; atol::Real=0.0, rtol::Real=1e-5)
 
     # Derivatives should always work
     _validatederivatives(f, atol, rtol)
@@ -51,6 +47,5 @@ function validate(f::FunctionRToR; atol::Real=0.0, rtol::Real=1e-5)
     if hasmethod(antiderivative, Tuple{typeof(f)})
         _validateantiderivative(f)
     end
-
 end
 

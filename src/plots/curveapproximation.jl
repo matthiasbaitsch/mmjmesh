@@ -16,6 +16,7 @@ struct PP{D}
     x::Float64
     point::SVector{D,Float64}
     PP(x::Real, y::Real) = new{2}(x, SA[x, y])
+    PP(x::Real, y::SVector{D,Float64}) where {D} = new{D}(x, y)
 end
 
 

@@ -84,3 +84,10 @@ a = 0.01
 f = Polynomial(0, 1, d=-1 .. 1) + a^2 / Polynomial(a^2, 0.0, 1.0)
 sampleadaptive(f, -1, 1) |> doplot
 ```
+
+Circle
+
+```{julia}
+u = ParametricCurve(Cos(0 .. 2π), Sin(0 .. 2π))
+sampleadaptive(u, 0, 2pi) |> doplot
+```

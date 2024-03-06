@@ -99,7 +99,6 @@ m2 = Sin()
 m3 = Cos()
 m4 = Polynomial([0, 0, 1], 0 .. 4)
 
-
 # Multiply by scalar
 @test m1 * 2 == 2 * m1
 @test 2 * m1 == 2 * m1
@@ -108,7 +107,6 @@ m4 = Polynomial([0, 0, 1], 0 .. 4)
 @test (-1) * ((-1) * m1) == m1
 @test (-1) * (-m1) == m1
 validate(2 * m1, rtol=1e-4)
-
 
 # Add and subtract
 @test m1 + zero(m1) == m1
@@ -121,24 +119,34 @@ validate(2 * m1, rtol=1e-4)
 @test m3 - m1 == Cos() - Sin()
 validate(m1 + m3, rtol=1e-4)
 
-
 # Composition m5 = Sin(x^2)
 m5 = m1 ∘ m4
 @test m5' == (Cos() ∘ Polynomial([0, 0, 1], 0 .. 4)) * Polynomial([0, 2], 0 .. 4)
 @test isapprox(m5(√π), 0, atol=1e-15)
 validate(m5, rtol=1e-4)
 
-
 # Product
 p = m1 * m2
 validate(p)
-
 
 # Quotient
 p = m1 / m3
 @test p(0.2) ≈ tan(0.2)
 validate(p, rtol=1e-4)
-
 f = 2 / Polynomial(0, 1)
 @test f(0.2) ≈ 10
 @test pois(f) == [0]
+
+
+# -------------------------------------------------------------------------------------------------
+# Functions R → Rn
+# -------------------------------------------------------------------------------------------------
+
+c = ParametricCurve(Sin(), Cos())
+@test c(0.0) == [0, 1]
+@test derivativeat(c, 0) ≈ [1, 0]
+@test derivativeat(c, 0, 2) ≈ [0, -1]
+@test c'(0) ≈ [1, 0]
+@test c''(0) ≈ [0, -1]
+validate(c)
+
