@@ -6,61 +6,81 @@
 include("setup.jl")
 using IntervalSets
 using LinearAlgebra
-import MMJMesh.Plots: approximationerror, sampleadaptive, sampleadaptive
+import MMJMesh.Plots: sampleadaptive
 ```
 
+Plot function
 
 ```{julia}
 function doplot(xy)
     f = cm.lines(xy)
     cm.scatter!(xy, color=:darkred, markersize=5)
     return f
-end
+end;
 ```
 
+Linear function
 
 ```{julia}
-sampleadaptive(x -> -0.2413 + x, -1, 2, ir=true) |> doplot
+sampleadaptive(x -> x, -1, 1) |> doplot
 ```
 
-
-```{julia}
-sampleadaptive(x -> x^100, 0, 1) |> doplot
-```
-
-
-```{julia}
-sampleadaptive(x -> sin(1.0 / x), 0.0001, 0.05, npoints=7) |> doplot
-```
-
-
-```{julia}
-sampleadaptive(x -> sin(30 * sin(x)), 0, 2pi, npoints=7) |> doplot
-```
-
-
-```{julia}
-sampleadaptive(x -> 1 / x, -1, 1) |> doplot
-```
-
-
-```{julia}
-sampleadaptive(x -> (-0.3 + x), -1, 1, ir=true) |> doplot
-```
-
+Parabola
 
 ```{julia}
 sampleadaptive(x -> x^2, -1, 1) |> doplot
 ```
 
+Curved in one region
+
+```{julia}
+sampleadaptive(x -> x^100, 0, 1) |> doplot
+```
+
+Singular point
+
+```{julia}
+sampleadaptive(x -> sin(1.0 / x), 0.0, 0.05, maxangle=0.05, npoints=21) |> doplot
+```
+
+
+```{julia}
+sampleadaptive(x -> sin(1.0 / x), 0.0, 0.05, yscale=0.05, npoints=21) |> doplot
+```
+
+
+```{julia}
+@time size(sampleadaptive(x -> sin(1.0 / x), 0.0, 0.05, maxangle=0.1), 2)
+```
+
+Multiple curvatures
+
+```{julia}
+sampleadaptive(x -> sin(30 * sin(x)), 0, 2pi) |> doplot
+```
+
+Discontinuity
+
+```{julia}
+sampleadaptive(x -> 1 / x, 0, 1, yscale=1e-5) |> doplot
+```
+
+Insert root
+
+```{julia}
+sampleadaptive(x -> (-0.3 + x), -1, 1, ir=true) |> doplot
+```
+
+Non smooth function
+
+```{julia}
+sampleadaptive(x -> abs(x), -1, 1) |> doplot
+```
+
+Local peak
 
 ```{julia}
 a = 0.01
 f = Polynomial(0, 1, d=-1 .. 1) + a^2 / Polynomial(a^2, 0.0, 1.0)
 sampleadaptive(f, -1, 1) |> doplot
-```
-
-
-```{julia}
-cm.lines(0.001 .. 0.05, x -> sin(1 / x))
 ```

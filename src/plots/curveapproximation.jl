@@ -1,17 +1,15 @@
 # -------------------------------------------------------------------------------------------------
-# Angle between vectors
+# Angle between vectors in degrees
 # -------------------------------------------------------------------------------------------------
 
-""" Clamp x to interval [-1, 1] """
 clamp1(x::Real) = clamp(x, -1, 1)
 
-""" Angle between vectors in degrees """
 Base.angle(u::AbstractVector, v::AbstractVector) = u ⋅ v / (norm(u) * norm(v)) |>
                                                    clamp1 |> acos |> abs |> rad2deg
 
 
 # -------------------------------------------------------------------------------------------------
-# Parameter and corresponding point in 2D or 3D space
+# Mapping parameter and corresponding point in 2D or 3D space
 # -------------------------------------------------------------------------------------------------
 
 struct PP{D}
@@ -46,7 +44,7 @@ hasnext(s::Segment) = !isnothing(s.next)
 Base.angle(s1::Nothing, s2::Segment) = 0
 Base.angle(s1::Segment, s2::Segment) = angle(point2(s1) - point1(s1), point2(s2) - point1(s2))
 Base.angle(s1::Segment, s2::Nothing) = 0
-Base.isvalid(s::Segment) = isnan(s.pp1.point[end]) || isnan(s.pp2.point[end])
+Base.isvalid(s::Segment) = !isfinite(s.pp1.point[end]) || !isfinite(s.pp2.point[end])
 Base.show(io::IO, s::Segment) = Base.print(io, "Segment[$(s.level), $(s.refine), $(s.pp1.point), $(s.pp2.point)]")
 
 function connect!(s1::Segment, s2::Segment)
@@ -71,31 +69,45 @@ function refine!(s::Segment, pp::PP)
     return newsegment
 end
 
+hasroot(s::Segment{2}) = point1(s)[end] * point2(s)[end] < -1e-12
+
+function root(s::Segment{2})
+    x1, y1 = point1(s)
+    x2, y2 = point2(s)
+    return abs(y2 - y1) > 1e-14 ? (x2 * y1 - x1 * y2) / (y1 - y2) : 0.5 * (x1 + x2)
+end
+
+function e1(s::Segment)
+    u = point2(s) - point1(s)
+    return u / norm(u)
+end
+
 
 # -------------------------------------------------------------------------------------------------
 # Curve approximation
 # -------------------------------------------------------------------------------------------------
 
-struct CurveApproximation
+struct CurveApproximation{D}
     head::Segment
-    tail::Segment
+    f::MappingFromR
 end
 
-function CurveApproximation(params::AbstractArray{<:Real}, f)
+function CurveApproximation(params::AbstractArray{<:Real}, f::MappingFromR)
     xy = [PP(x, f(x)) for x ∈ params]
-    head = tail = Segment(xy[1], xy[2])
+    head = s = Segment(xy[1], xy[2])
     for i ∈ 2:length(params)-1
-        tail = connect!(tail, Segment(xy[i], xy[i+1]))
+        s = connect!(s, Segment(xy[i], xy[i+1]))
     end
-    return CurveApproximation(head, tail)
+    return CurveApproximation{length(point1(head))}(head, f)
 end
 
+head(p::CurveApproximation) = p.head
 Base.iterate(p::CurveApproximation) = (p.head, next(p.head))
 Base.iterate(_::CurveApproximation, state) = isnothing(state) ? nothing : (state, next(state))
 
 function Base.length(p::CurveApproximation)
     cnt = 0
-    for s ∈ p
+    for _ ∈ p
         cnt += 1
     end
     return cnt
@@ -110,6 +122,14 @@ function Base.show(io::IO, p::CurveApproximation)
     end
 end
 
+function tail(p::CurveApproximation)
+    s = p.head
+    while hasnext(s)
+        s = next(s)
+    end
+    return s
+end
+
 function mark!(p::CurveApproximation, maxangle::Real, maxrecursion::Integer)
     refine = false
     for s ∈ p
@@ -122,12 +142,53 @@ function mark!(p::CurveApproximation, maxangle::Real, maxrecursion::Integer)
     return refine
 end
 
-function refine!(p::CurveApproximation, f)
+function refine!(p::CurveApproximation)
     for s ∈ p
         if s.refine
             xmid = 0.5 * (param1(s) + param2(s))
-            refine!(s, PP(xmid, f(xmid)))
+            refine!(s, PP(xmid, p.f(xmid)))
         end
     end
+    return nothing
 end
 
+function handlenotfinite(x::SVector)
+    if !isfinite(x[end])
+        x = similar(x)
+        x .= NaN
+    end
+    return x
+end
+
+function points(p::CurveApproximation{D}, ir::Bool) where {D}
+
+    # Segments containing a root
+    segmentindex = 1
+    segmentswithroot = Int[]
+    for s ∈ p
+        ir && hasroot(s) && push!(segmentswithroot, segmentindex)
+        segmentindex += 1
+    end
+
+    # Initialize
+    rootindex = 1
+    pointindex = 1
+    segmentindex = 1
+    points = zeros(D, length(p) + length(segmentswithroot) + 1)
+    points[:, pointindex] = handlenotfinite(point1(head(p)))
+    pointindex += 1
+
+    # Collect
+    for s ∈ p
+        if rootindex <= length(segmentswithroot) && segmentindex == segmentswithroot[rootindex]
+            points[1, pointindex] = root(s)
+            rootindex += 1
+            pointindex += 1
+        end
+        points[:, pointindex] = handlenotfinite(point2(s))
+        pointindex += 1
+        segmentindex += 1
+    end
+
+    return points
+end

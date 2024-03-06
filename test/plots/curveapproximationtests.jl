@@ -4,16 +4,23 @@ using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Plots
 
-import MMJMesh.Plots: PP, Segment, CurveApproximation, refine!, connect!, prev, next, hasprev, hasnext, mark!
+import MMJMesh.Plots: PP, Segment, CurveApproximation, refine!,
+    connect!, prev, next, hasprev, hasnext, mark!, point1, point2, tail, points
 
 
+# -------------------------------------------------------------------------------------------------
 # PP tests
+# -------------------------------------------------------------------------------------------------
+
 p1 = PP(1, 2)
 @test p1.x == 1.0
 @test p1.point == [1, 2]
 
 
+# -------------------------------------------------------------------------------------------------
 # Segment tests
+# -------------------------------------------------------------------------------------------------
+
 p1 = PP(0, 0)
 p2 = PP(1, 0)
 p3 = PP(2, 0)
@@ -43,16 +50,26 @@ s11 = refine!(s1, PP(0.5, 0.5))
 @test next(s11) === s2
 @test prev(s2) === s11
 
-# CurveApproximation tests
-f = x -> x^2
-p = CurveApproximation(range(-1, 1, 4), f)
 
+# -------------------------------------------------------------------------------------------------
+# CurveApproximation tests
+# -------------------------------------------------------------------------------------------------
+
+# Refine
+f = Polynomial(0, 0, 1)
+p = CurveApproximation(range(-1, 1, 4), f)
 @test length(p) == 3
 @test mark!(p, 10, 2)
-refine!(p, f)
+refine!(p)
 @test length(p) == 6
 @test mark!(p, 20, 2)
-refine!(p, f)
+refine!(p)
 @test length(p) == 10
 @test !mark!(p, 20, 2)
+@test point2(tail(p)) == [1, 1]
 
+# Points
+f = Polynomial(-0.5, 0.0, 1.0)
+p = CurveApproximation(range(-2, 2, step=1), f)
+@test points(p, false) == [-2.0 -1.0 0.0 1.0 2.0; 3.5 0.5 -0.5 0.5 3.5]
+@test points(p, true) == [-2.0 -1.0 -0.5 0.0 0.5 1.0 2.0; 3.5 0.5 0.0 -0.5 0.0 0.5 3.5]

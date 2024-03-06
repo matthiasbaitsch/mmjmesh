@@ -13,6 +13,11 @@ import CairoMakie as cm
 ## Mappings
 
 ```{julia}
+f = Sin() ∘ (1 / Polynomial(0, 1, d=0.0 .. 0.05))
+fplot(f, yscale=0.05, npoints=11)
+```
+
+```{julia}
 s = Sin(0 .. 3π)
 c = Cos(0 .. 3π)
 
