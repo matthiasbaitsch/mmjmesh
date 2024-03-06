@@ -130,13 +130,24 @@ Base.show(io::IO, s::ScaledMapping) = print(io, s.a, " * ", s.m)
 Base.:(==)(m1::ScaledMapping{DT,CT,D}, m2::ScaledMapping{DT,CT,D}) where {DT,CT,D} =
     (m1.a == m2.a && m1.m == m2.m)
 
+function ct(t1, t2)
+    if t1 <: Real && t2 <: Real
+        return t1
+    elseif t1 <: Real && t2 <: StaticVector
+        return t2
+    elseif t1 <: StaticVector && t2 <: Real
+        return t1
+    end
+    error()
+end
+
 # Mapping times mapping, only useful if `*` is defined for type `CT`
 struct ProductMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
-    m1::AbstractMapping{DT,CT}
-    m2::AbstractMapping{DT,CT}
+    m1::AbstractMapping
+    m2::AbstractMapping
     ProductMapping(
-        m1::AbstractMapping{DT,CT,D1}, m2::AbstractMapping{DT,CT,D2}
-    ) where {DT,CT,D1,D2} = new{DT,CT,D1 ∩ D2}(m1, m2)
+        m1::AbstractMapping{DT,CT1,D1}, m2::AbstractMapping{DT,CT2,D2}
+    ) where {DT,CT1,CT2,D1,D2} = new{DT,ct(CT1, CT2),D1 ∩ D2}(m1, m2)
 end
 
 valueat(p::ProductMapping, x) = valueat(p.m1, x) * valueat(p.m2, x)
@@ -319,6 +330,8 @@ antiderivative(f::Sum{Real,Real}) = antiderivative(f.m1) + antiderivative(f.m2)
 # Mappings R → Rn
 # -------------------------------------------------------------------------------------------------
 
+
+# Parametric curve from components
 struct ParametricCurve{N,D} <: AbstractMapping{Real,StaticVector{N,Float64},D}
     components::Vector{FunctionRToR{D}}
 end
@@ -332,11 +345,28 @@ function ParametricCurve(components::FunctionRToR{D}...) where {D}
     return ParametricCurve{n,D}(cc)
 end
 
-valueat(u::ParametricCurve{N,D}, x::Real) where {N,D} = SVector{N}([c(x) for c ∈ u.components])
-derivativeat(u::ParametricCurve{N,D}, x::Real, n::Int=1) where {N,D} = SVector{N}([derivativeat(c, x, n) for c ∈ u.components])
-_derivative(u::ParametricCurve{N,D}, n::Int=1) where {N,D} = ParametricCurve{N,D}([derivative(c, n) for c ∈ u.components])
-Base.show(io::IO, u::ParametricCurve) = print(io, "ParametricCurve[$(u.components)]")
-Base.:(==)(c1::ParametricCurve{N,D}, c2::ParametricCurve{N,D}) where {N,D} = (c1.components == c2.components)
+valueat(u::ParametricCurve{N,D}, x::Real) where {N,D} =
+    SVector{N}([c(x) for c ∈ u.components])
+derivativeat(u::ParametricCurve{N,D}, x::Real, n::Int=1) where {N,D} =
+    SVector{N}([derivativeat(c, x, n) for c ∈ u.components])
+_derivative(u::ParametricCurve{N,D}, n::Int=1) where {N,D} =
+    ParametricCurve{N,D}([derivative(c, n) for c ∈ u.components])
+Base.show(io::IO, u::ParametricCurve) =
+    print(io, "ParametricCurve[$(u.components)]")
+Base.:(==)(c1::ParametricCurve{N,D}, c2::ParametricCurve{N,D}) where {N,D} =
+    (c1.components == c2.components)
+
+
+# Unit normal
+struct UnitNormal{D} <: AbstractMapping{Real,StaticVector{2,Float64},D}
+    u::ParametricCurve{2,D}
+end
+
+function valueat(u::UnitNormal, x)
+    t = derivativeat(u.u, x)
+    n = SA[-t[2], t[1]]
+    return n / norm(n)
+end
 
 
 # -------------------------------------------------------------------------------------------------

@@ -2,6 +2,7 @@ using Test
 using StaticArrays
 using IntervalSets
 using FiniteDifferences
+using LinearAlgebra
 
 using MMJMesh
 using MMJMesh.Mathematics
@@ -149,4 +150,12 @@ c = ParametricCurve(Sin(), Cos())
 @test c'(0) ≈ [1, 0]
 @test c''(0) ≈ [0, -1]
 validate(c)
+
+n = UnitNormal(c)
+@test norm(n(0)) ≈ 1
+@test abs(n(0) ⋅ c'(0)) < 1e-16
+
+f1 = Polynomial(1, 2, 3) * c
+f2 = c * Polynomial(1, 2, 3)
+@test f1(π) == f2(π)
 
