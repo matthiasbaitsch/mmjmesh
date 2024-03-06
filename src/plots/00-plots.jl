@@ -3,7 +3,9 @@ module Plots
 # Modules needed by this module
 
 ## Others
+using Printf
 using Random
+using StaticArrays
 using IntervalSets
 using LinearAlgebra
 
@@ -21,6 +23,7 @@ using MMJMesh.Mathematics
 export mplot, mconf
 
 # Parts
+include("curveapproximation.jl")
 include("sampleadaptive.jl")
 include("mplot.jl")
 include("fplot.jl")
