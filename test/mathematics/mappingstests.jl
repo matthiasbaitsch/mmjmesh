@@ -1,7 +1,6 @@
 using Test
 using StaticArrays
 using IntervalSets
-using FiniteDifferences
 using LinearAlgebra
 
 using MMJMesh

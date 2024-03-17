@@ -1,3 +1,6 @@
+using IntervalSets
+using FiniteDifferences
+
 function _sample(I::Interval)
     xi = [
         0.077555809, 0.095330104, 0.488611758, 0.490830944, 0.541245779,
@@ -20,6 +23,12 @@ function _validatederivatives(m::MappingFromR, atol::Real, rtol::Real)
             d2 = ed1(x)
             d3 = ed2(x)
             d4 = fd(m, x)
+
+            if ed1 != ed2
+                println(ed1)
+                println(ed2)
+            end
+
             @test ed1 == ed2
             @test d1 ≈ d2
             @test d1 ≈ d3

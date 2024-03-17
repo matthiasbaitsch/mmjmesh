@@ -15,8 +15,9 @@ Base.angle(u::AbstractVector, v::AbstractVector) = u ⋅ v / (norm(u) * norm(v))
 struct PP{D}
     x::Float64
     point::SVector{D,Float64}
-    PP(x::Real, y::Real) = new{2}(x, SA[x, y])
-    PP(x::Real, y::SVector{D,Float64}) where {D} = new{D}(x, y)
+    PP(x, y) = new{2}(x, SA[x, y])
+    PP(x, y::SVector{D,Float64}) where {D} = new{D}(x, y)
+    PP(x, y::AbstractArray) = new{length(y)}(x, SVector{length(y),Float64}(y))
 end
 
 

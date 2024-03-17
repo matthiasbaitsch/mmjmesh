@@ -1,4 +1,5 @@
 using Test
+using StaticArrays
 
 using MMJMesh
 using MMJMesh.Mathematics
@@ -15,6 +16,14 @@ import MMJMesh.Plots: PP, Segment, CurveApproximation, refine!,
 p1 = PP(1, 2)
 @test p1.x == 1.0
 @test p1.point == [1, 2]
+
+p2 = PP(2, SA[2.0, 3, 4])
+@test p2.x == 2.0
+@test p2.point == [2, 3, 4]
+
+p3 = PP(2, [2, 3, 4])
+@test p3.x == 2.0
+@test p3.point == [2, 3, 4]
 
 
 # -------------------------------------------------------------------------------------------------

@@ -58,14 +58,17 @@ f
 Lissajous curve
 
 ```{julia}
-fplot(ParametricCurve(Cos(0 .. 2π), Sin() ∘ Polynomial(0, 2, d=0 .. 2pi)))
+u = ParametricCurve(Cos(0 .. 2π), Sin() ∘ Polynomial(0, 2, d=0 .. 2pi))
+fig, ax = fplot(u)
+fplot!(ax, u + 0.05 * Sin() ∘ Polynomial(0, 100) * UnitNormal(u))
+fig
 ```
 
 ```{julia}
-u = ParametricCurve(Cos(0 .. 2π), Sin() ∘ Polynomial(0, 2, d=0 .. 2pi))
-s = Sin() ∘ Polynomial(0, 100)
-n = UnitNormal(u)
-fplot(u + 0.025 * s * n)
+pts = tomatrix([[0.0, 0], [1.5, 1], [2, 0], [1.5, -1], [0, 0]])
+fig, ax = fplot(Interpolation(pts, 1))
+cm.scatter!(ax, pts, color=:tomato)
+fig
 ```
 
 

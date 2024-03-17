@@ -3,6 +3,7 @@ import CairoMakie as cm
 using MMJMesh
 using MMJMesh.Plots
 using MMJMesh.Meshes
+using MMJMesh.MMJBase
 using MMJMesh.Utilities
 using MMJMesh.Topologies
 using MMJMesh.Mathematics

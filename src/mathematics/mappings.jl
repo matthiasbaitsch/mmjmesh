@@ -95,6 +95,10 @@ Base.show(io::IO, ::Zero) = print(io, "0")
 
 # TODO: One
 
+# TODO: Add value
+
+# TODO: Transform a f(b(x + c)) + d ???
+
 
 # -------------------------------------------------------------------------------------------------
 # Construction of mappings from mappings
@@ -331,6 +335,7 @@ antiderivative(f::Sum{Real,Real}) = antiderivative(f.m1) + antiderivative(f.m2)
 # -------------------------------------------------------------------------------------------------
 
 
+# TODO Generalize to mapping from components
 # Parametric curve from components
 struct ParametricCurve{N,D} <: AbstractMapping{Real,StaticVector{N,Float64},D}
     components::Vector{FunctionRToR{D}}
