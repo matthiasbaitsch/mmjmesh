@@ -1,3 +1,6 @@
+function pdim end
+function gdim end
+
 atol(Float64) = 1e-10
 
 @enum FromType ROWS COLS

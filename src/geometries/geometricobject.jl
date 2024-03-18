@@ -28,11 +28,17 @@ parametrization(::GeometricObjectP) = @notimplemented
 
 
 """
-    GeometricObjectI{NP,DT,DG}
+    GeometricObjectI{DT,DG,NP}
 
 A `DT,DG` dimensional geometric object with a parametrization which interpolates `NP` points. An
 important class of such objects are the geometries of typical isoparametric finite elements.
 """
 struct GeometricObjectI{DT,DG,NP} <: GeometricObjectP{DT,DG}
+    points::SMatrix{DG,NP,Float64}
 
+    GeometricObjectI{DT}(points::AbstractMatrix) where {DT} =
+        new{DT,size(points, 1),size(points, 2)}(points)
 end
+
+parametrization(o::GeometricObjectI{DT}) where {DT} = Interpolation(o.points, DT)
+

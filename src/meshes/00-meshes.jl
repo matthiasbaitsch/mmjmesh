@@ -8,14 +8,16 @@ using MMJMesh.MMJBase
 using MMJMesh.Topologies
 using MMJMesh.Geometries
 
+import MMJMesh.MMJBase: gdim, pdim
+
 # Exports
 ## groups.jl
 export Group, GroupCollection, addrecipe!, clearcache!, names
 ## mesh.jl
 export Mesh
-export pdim, gdim, nelements, element, elements, entity, entities
+export nelements, element, elements, entity, entities
 ## meshentities.jl
-export MeshEntity, Node, Edge, Face, Solid, index
+export MeshEntity, Node, Edge, Face, Solid, index, geometry
 ## common.jl
 export coordinate, coordinates
 export nnodes, nedges, nfaces, nsolids

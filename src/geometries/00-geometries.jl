@@ -3,12 +3,16 @@ module Geometries
 # Modules needed by this module
 using StaticArrays
 using LinearAlgebra
+
 using MMJMesh
 using MMJMesh.MMJBase
+using MMJMesh.Mathematics
 
 # Functions extended by this module
 import Base.in
 import Base.isequal
+
+import MMJMesh.MMJBase: gdim, pdim
 
 # Parts
 include("detail.jl")
@@ -19,7 +23,9 @@ include("geometry.jl")
 
 # Exports
 ## geometricobject.jl
-export GeometricObject, pdim, gdim, center, measure, boundingbox
+export GeometricObject, GeometricObjectP, GeometricObjectI,
+       parametrization,
+       center, measure, boundingbox
 ## geometry.jl
 export Geometry
 ## point.jl
@@ -30,3 +36,4 @@ export Box, diagonal, sides
 # export coordinates
 
 end
+

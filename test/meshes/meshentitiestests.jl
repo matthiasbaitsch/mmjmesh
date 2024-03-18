@@ -1,6 +1,7 @@
 using Test
 
 using MMJMesh.Meshes
+using MMJMesh.Geometries
 
 
 # Set up
@@ -27,6 +28,10 @@ n5 = node(m, 5)
 e2 = edge(m, 2)
 @test length(e2) == hypot(0.1, 0.9)
 
+g = geometry(e2)
+p = parametrization(g)
+@test p(-1) == coordinates(e2, 1)
+@test p(1) == coordinates(e2, 2)
 
 # -------------------------------------------------------------------------------------------------
 # Face

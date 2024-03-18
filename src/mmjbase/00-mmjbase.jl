@@ -4,7 +4,7 @@ module MMJBase
 ## seqintset.jl
 export SeqIntSet
 ## functions.jl
-export atol, tomatrix, FromType, ROWS, COLS
+export atol, tomatrix, FromType, ROWS, COLS, pdim, gdim
 ## macros.jl
 export @abstractmethod
 export @notimplemented
