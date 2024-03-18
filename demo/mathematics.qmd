@@ -59,9 +59,9 @@ Lissajous curve
 
 ```{julia}
 u = ParametricCurve(Cos(0 .. 2π), Sin() ∘ Polynomial(0, 2, d=0 .. 2pi))
-fig, ax = fplot(u)
-fplot!(ax, u + 0.05 * Sin() ∘ Polynomial(0, 100) * UnitNormal(u))
-fig
+v = 0.075 * Sin() ∘ Polynomial(0, 100) * UnitNormal(u)
+w = 0.025 * ParametricCurve(Sin(), Cos()) ∘ Polynomial(0, 200)
+fplot(u, u + v, u + w)
 ```
 
 ```{julia}

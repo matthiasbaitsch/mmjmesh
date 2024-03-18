@@ -1,10 +1,10 @@
 """
-    sampleadaptive(f, a, b, maxrecursion, maxangle, npoints, yscale, ir) -> Matrix{Real}
+    sampleadaptive(f, a, b, maxrecursion, maxangle, npoints, rp, yscale, ir) -> Matrix{Real}
 
 Simple adaptive sampling of mapping `f` on the interval from `a` to `b`. The interval is initially
 sampled at `npoints` g and then refined recursively until either the angles are smaller than 
 `maxangle` (in degrees) or the recursion depth reaches `maxrecursion`. The function returns the
-sampled points in a matrix.
+sampled points in a matrix. If `rp=true`, the function returns parameters and corresponding points.
 
 Parameters for functions R → R only: Angles are evaluated using the scaling factor `yscale`. Use `ir=true` to insert roots.
 
@@ -13,7 +13,8 @@ Parameters for functions R → R only: Angles are evaluated using the scaling fa
 """
 function sampleadaptive(
     f::MappingFromR{CT}, a::Real, b::Real;
-    maxrecursion::Integer=15, maxangle::Real=2.5, npoints::Integer=5, yscale::Real=1.0, ir::Bool=false
+    maxrecursion::Integer=15, maxangle::Real=2.5, npoints::Integer=5, 
+    yscale::Real=1.0, ir::Bool=false, rp::Bool=false
 ) where {CT}
 
     # Scaling factor
@@ -33,11 +34,15 @@ function sampleadaptive(
     end
 
     # Collect points with optional roots and scale
-    pts = points(ca, ir)
-    pts[2, :] /= yscale
+    params, points = collectpoints(ca, ir)
+    points[2, :] /= yscale
 
     # Return
-    return pts
+    if rp
+        return params, points
+    else 
+        return points
+    end
 end
 
 sampleadaptive(

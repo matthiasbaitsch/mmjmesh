@@ -162,12 +162,12 @@ function handlenotfinite(x::SVector)
     return x
 end
 
-function points(p::CurveApproximation{D}, ir::Bool) where {D}
+function collectpoints(ca::CurveApproximation{D}, ir::Bool) where {D}
 
     # Segments containing a root
     segmentindex = 1
     segmentswithroot = Int[]
-    for s ∈ p
+    for s ∈ ca
         ir && hasroot(s) && push!(segmentswithroot, segmentindex)
         segmentindex += 1
     end
@@ -176,21 +176,29 @@ function points(p::CurveApproximation{D}, ir::Bool) where {D}
     rootindex = 1
     pointindex = 1
     segmentindex = 1
-    points = zeros(D, length(p) + length(segmentswithroot) + 1)
-    points[:, pointindex] = handlenotfinite(point1(head(p)))
+    segment = head(ca)
+    np = length(ca) + length(segmentswithroot) + 1
+
+    params = zeros(np)
+    points = zeros(D, np)
+    params[pointindex] = param1(segment)
+    points[:, pointindex] = handlenotfinite(point1(segment))
     pointindex += 1
 
     # Collect
-    for s ∈ p
+    for segment ∈ ca
         if rootindex <= length(segmentswithroot) && segmentindex == segmentswithroot[rootindex]
-            points[1, pointindex] = root(s)
+            p = root(segment)
+            params[pointindex] = p
+            points[1, pointindex] = p
             rootindex += 1
             pointindex += 1
         end
-        points[:, pointindex] = handlenotfinite(point2(s))
+        params[pointindex] = param2(segment)
+        points[:, pointindex] = handlenotfinite(point2(segment))
         pointindex += 1
         segmentindex += 1
     end
 
-    return points
+    return params, points
 end

@@ -24,8 +24,10 @@ for d ∈ 0:3, np ∈ 3:6
 end
 
 # Compare to reference values
-p = sampleadaptive(f, 0, 1, maxrecursion=1, maxangle=0)
+x,p = sampleadaptive(f, 0, 1, maxrecursion=1, maxangle=0,rp=true)
 @test p[1, :] ≈ xref
+@test f.(x) ≈ p[2, :]
+
 
 # Test scaling factor
 p1 = sampleadaptive(f, 0, 1, maxrecursion=20)
@@ -38,11 +40,13 @@ p3 = sampleadaptive(41 * f, 0, 1, maxrecursion=20, yscale=1.0 / 41.0)
 # Insert root
 p1 = sampleadaptive(f, -2, 2, maxrecursion=1)
 p2 = sampleadaptive(f, -2, 2, maxrecursion=1, ir=true)
+x3, p3 = sampleadaptive(f, -2, 2, maxrecursion=1, ir=true, rp=true)
 
 @test size(p2, 2) == size(p1, 2) + 2
 @test 0 ∈ p2[2, :]
 @test p1[:, 1] == p2[:, 1]
 @test p1[:, end] == p2[:, end]
+@test p2 == p3
 
 
 # -------------------------------------------------------------------------------------------------
@@ -58,7 +62,9 @@ sampleadaptive(f, 0, 1)
 # -------------------------------------------------------------------------------------------------
 
 u = ParametricCurve(Sin(), Cos())
-@test size(sampleadaptive(u, 0, 2π), 2) == 257
+x, pts = sampleadaptive(u, 0, 2π, rp=true)
+@test length(x) == 257
+@test size(pts, 2) == 257
 
 
 # -------------------------------------------------------------------------------------------------
