@@ -6,7 +6,13 @@ Here, a geometric object is understood as a connected set of points.
 """
 abstract type GeometricObject{DT,DG} end
 
-# TODO x::Point forward declaration?
+pdim(o::GeometricObject) = pdim(typeof(o))
+gdim(o::GeometricObject) = gdim(typeof(o))
+gdim(::Type{<:GeometricObject}) = @notimplemented
+pdim(::Type{<:GeometricObject}) = @notimplemented
+center(::GeometricObject) = @notimplemented
+measure(::GeometricObject) = @notimplemented
+boundingbox(::GeometricObject) = @notimplemented
 Base.in(::GeometricObject, x; eps::Float64=0.0) = @notimplemented
 
 

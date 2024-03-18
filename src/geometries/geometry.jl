@@ -26,6 +26,9 @@ Geometry(coordinates::Matrix) =
 # General methods
 # -------------------------------------------------------------------------------------------------
 
+gdim(g::Geometry) = gdim(typeof(g))
+gdim(::Type{Geometry{D}}) where {D} = D
+
 dimension(::Geometry{D}) where {D} = D
 
 """
@@ -71,8 +74,13 @@ end
 # Points
 # -------------------------------------------------------------------------------------------------
 
+_byrow(op, g::Geometry) = [op(coordinates(g)[i, :]) for i ∈ 1:gdim(g)]
+
 coordinates(g::Geometry) = g.points.coordinates[:, 1:g.points.n]
 coordinates(g::Geometry, idx) = g.points.coordinates[:, idx]
+Base.minimum(g::Geometry) = Point(_byrow(minimum, g)...)
+Base.maximum(g::Geometry) = Point(_byrow(maximum, g)...)
+boundingbox(g::Geometry) = Box(minimum(g), maximum(g))
 
 function Base.setindex!(g::Geometry{D}, p::AbstractVecOrMat{<:Number}, d::Int, idx::Int) where {D}
     @assert d == 0
@@ -109,11 +117,11 @@ end
 # IO
 # -------------------------------------------------------------------------------------------------
 
-function Base.show(io::IO, g::Geometry{D}) where D
+function Base.show(io::IO, g::Geometry{D}) where {D}
     println(io, "Geometry{$D} with $(length(g, 0)) Points")
     for i ∈ 1:D
         println(io, "x$i: $(g.points.coordinates[i, 1:g.points.n])")
-    end    
+    end
 end
 
 

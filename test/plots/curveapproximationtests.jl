@@ -6,7 +6,7 @@ using MMJMesh.Mathematics
 using MMJMesh.Plots
 
 import MMJMesh.Plots: PP, Segment, CurveApproximation, refine!,
-    connect!, prev, next, hasprev, hasnext, mark!, point1, point2, tail, points
+    connect!, prev, next, hasprev, hasnext, mark!, point1, point2, tail, collectpoints
 
 
 # -------------------------------------------------------------------------------------------------
@@ -80,5 +80,7 @@ refine!(p)
 # Points
 f = Polynomial(-0.5, 0.0, 1.0)
 p = CurveApproximation(range(-2, 2, step=1), f)
-@test points(p, false) == [-2.0 -1.0 0.0 1.0 2.0; 3.5 0.5 -0.5 0.5 3.5]
-@test points(p, true) == [-2.0 -1.0 -0.5 0.0 0.5 1.0 2.0; 3.5 0.5 0.0 -0.5 0.0 0.5 3.5]
+_, pts1 = collectpoints(p, false)
+_, pts2 = collectpoints(p, true)
+@test pts1 == [-2.0 -1.0 0.0 1.0 2.0; 3.5 0.5 -0.5 0.5 3.5]
+@test pts2 == [-2.0 -1.0 -0.5 0.0 0.5 1.0 2.0; 3.5 0.5 0.0 -0.5 0.0 0.5 3.5]

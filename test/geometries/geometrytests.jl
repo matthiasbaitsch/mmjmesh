@@ -36,6 +36,10 @@ end
     @test g[0, 3] == Point(2, -2)
     @test g[0, 4] == Point(5, 6)
     @test g[0, 5] == Point(0, 0)
+
+    @test minimum(g) == Point(0, -6)
+    @test maximum(g) == Point(5, 6)
+    @test boundingbox(g) == Box(Point(0, -6), Point(5, 6))
 end
 
 end
