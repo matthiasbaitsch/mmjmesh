@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -177,74 +211,159 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<pre class="{julia}"><code>#| echo: false
-#| warning: false
-include("setup.jl")
-using IntervalSets
-using LinearAlgebra
-import CairoMakie as cm</code></pre>
 <section id="mappings" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="mappings"><span class="header-section-number">4.1</span> Mappings</h2>
-<pre class="{julia}"><code>f = Sin() ∘ (1 / Polynomial(0, 1, d=0.0 .. 0.05))
-fplot(f, yscale=0.05, npoints=11)</code></pre>
-<pre class="{julia}"><code>s = Sin(0 .. 3π)
-c = Cos(0 .. 3π)
-
-f = 2s
-g = s + f'
-p = 1 / 20 * Polynomial([2, -1], 1 .. 8) * Polynomial([3, -1]) * Polynomial([4.5, -1]) * Polynomial([8, -1])
-
-fplot(c, s, g, p)</code></pre>
-<pre class="{julia}"><code>f = Polynomial([0, 1], -1 .. 1)
-F = antiderivative(f)
-fplot(f, F)</code></pre>
-<pre class="{julia}"><code>integrate(f, 0 .. 1)</code></pre>
-<pre class="{julia}"><code>p = [0, 1, 2]
-f = fplot(fromroots(p, -0.1 .. 2.1))
-cm.scatter!(p, 0 * p, color=:tomato)
-f</code></pre>
-<pre class="{julia}"><code>p = [0, 1.5, 2]
-f = fplot(lagrangepolynomials(p, 0 .. 2)...)
-cm.scatter!(p, [0, 0, 0], color=:tomato)
-cm.scatter!(p, [1, 1, 1], color=:blue)
-f</code></pre>
+<div id="2f841f2f" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">Sin</span>() <span class="op">∘</span> (<span class="fl">1</span> <span class="op">/</span> <span class="fu">Polynomial</span>(<span class="fl">0</span>, <span class="fl">1</span>, d<span class="op">=</span><span class="fl">0.0</span> <span class="op">..</span> <span class="fl">0.05</span>))</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fplot</span>(f, yscale<span class="op">=</span><span class="fl">0.05</span>, npoints<span class="op">=</span><span class="fl">11</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div>
+<figure class="figure">
+<p><img src="mathematics_files/figure-html/cell-3-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="706fda87" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> <span class="fu">Sin</span>(<span class="fl">0</span> <span class="op">..</span> <span class="fl">3</span>π)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> <span class="fu">Cos</span>(<span class="fl">0</span> <span class="op">..</span> <span class="fl">3</span>π)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fl">2</span>s</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> s <span class="op">+</span> f<span class="op">'</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">20</span> <span class="op">*</span> <span class="fu">Polynomial</span>([<span class="fl">2</span>, <span class="op">-</span><span class="fl">1</span>], <span class="fl">1</span> <span class="op">..</span> <span class="fl">8</span>) <span class="op">*</span> <span class="fu">Polynomial</span>([<span class="fl">3</span>, <span class="op">-</span><span class="fl">1</span>]) <span class="op">*</span> <span class="fu">Polynomial</span>([<span class="fl">4.5</span>, <span class="op">-</span><span class="fl">1</span>]) <span class="op">*</span> <span class="fu">Polynomial</span>([<span class="fl">8</span>, <span class="op">-</span><span class="fl">1</span>])</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">fplot</span>(c, s, g, p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div>
+<figure class="figure">
+<p><img src="mathematics_files/figure-html/cell-4-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="9967477c" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">Polynomial</span>([<span class="fl">0</span>, <span class="fl">1</span>], <span class="op">-</span><span class="fl">1</span> <span class="op">..</span> <span class="fl">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">antiderivative</span>(f)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fplot</span>(f, F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div>
+<figure class="figure">
+<p><img src="mathematics_files/figure-html/cell-5-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="630f9aa3" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(f, <span class="fl">0</span> <span class="op">..</span> <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>0.5</code></pre>
+</div>
+</div>
+<div id="48fd691f" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> [<span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">fplot</span>(<span class="fu">fromroots</span>(p, <span class="op">-</span><span class="fl">0.1</span> <span class="op">..</span> <span class="fl">2.1</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>cm.<span class="fu">scatter!</span>(p, <span class="fl">0</span> <span class="op">*</span> p, color<span class="op">=:</span>tomato)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>f</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+<figure class="figure">
+<p><img src="mathematics_files/figure-html/cell-7-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="230e74f4" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> [<span class="fl">0</span>, <span class="fl">1.5</span>, <span class="fl">2</span>]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">fplot</span>(<span class="fu">lagrangepolynomials</span>(p, <span class="fl">0</span> <span class="op">..</span> <span class="fl">2</span>)<span class="op">...</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>cm.<span class="fu">scatter!</span>(p, [<span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>], color<span class="op">=:</span>tomato)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>cm.<span class="fu">scatter!</span>(p, [<span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>], color<span class="op">=:</span>blue)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>f</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div>
+<figure class="figure">
+<p><img src="mathematics_files/figure-html/cell-8-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 <section id="parametric-curves" class="level3" data-number="4.1.1">
 <h3 data-number="4.1.1" class="anchored" data-anchor-id="parametric-curves"><span class="header-section-number">4.1.1</span> Parametric curves</h3>
 <p>Lissajous curve</p>
-<pre class="{julia}"><code>u = ParametricCurve(Cos(0 .. 2π), Sin() ∘ Polynomial(0, 2, d=0 .. 2pi))
-fig, ax = fplot(u)
-fplot!(ax, u + 0.05 * Sin() ∘ Polynomial(0, 100) * UnitNormal(u))
-fig</code></pre>
-<pre class="{julia}"><code>pts = tomatrix([[0.0, 0], [1.5, 1], [2, 0], [1.5, -1], [0, 0]])
-fig, ax = fplot(Interpolation(pts, 1))
-cm.scatter!(ax, pts, color=:tomato)
-fig</code></pre>
+<div id="eb9c2087" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">ParametricCurve</span>(<span class="fu">Cos</span>(<span class="fl">0</span> <span class="op">..</span> <span class="fl">2</span>π), <span class="fu">Sin</span>() <span class="op">∘</span> <span class="fu">Polynomial</span>(<span class="fl">0</span>, <span class="fl">2</span>, d<span class="op">=</span><span class="fl">0</span> <span class="op">..</span> <span class="fl">2</span>pi))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> <span class="fl">0.075</span> <span class="op">*</span> <span class="fu">Sin</span>() <span class="op">∘</span> <span class="fu">Polynomial</span>(<span class="fl">0</span>, <span class="fl">100</span>) <span class="op">*</span> <span class="fu">UnitNormal</span>(u)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> <span class="fl">0.025</span> <span class="op">*</span> <span class="fu">ParametricCurve</span>(<span class="fu">Sin</span>(), <span class="fu">Cos</span>()) <span class="op">∘</span> <span class="fu">Polynomial</span>(<span class="fl">0</span>, <span class="fl">200</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fplot</span>(u, u <span class="op">+</span> v, u <span class="op">+</span> w)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div>
+<figure class="figure">
+<p><img src="mathematics_files/figure-html/cell-9-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="d7506eb4" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pts <span class="op">=</span> <span class="fu">tomatrix</span>([[<span class="fl">0.0</span>, <span class="fl">0</span>], [<span class="fl">1.5</span>, <span class="fl">1</span>], [<span class="fl">2</span>, <span class="fl">0</span>], [<span class="fl">1.5</span>, <span class="op">-</span><span class="fl">1</span>], [<span class="fl">0</span>, <span class="fl">0</span>]])</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> <span class="fu">fplot</span>(<span class="fu">Interpolation</span>(pts, <span class="fl">1</span>))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>cm.<span class="fu">scatter!</span>(ax, pts, color<span class="op">=:</span>tomato)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>fig</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<div>
+<figure class="figure">
+<p><img src="mathematics_files/figure-html/cell-10-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="monomials" class="level3" data-number="4.1.2">
 <h3 data-number="4.1.2" class="anchored" data-anchor-id="monomials"><span class="header-section-number">4.1.2</span> Monomials</h3>
-<pre class="{julia}"><code>fplot(monomials(0:100, 0 .. 1)...)</code></pre>
+<div id="4786486d" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fplot</span>(<span class="fu">monomials</span>(<span class="fl">0</span><span class="op">:</span><span class="fl">100</span>, <span class="fl">0</span> <span class="op">..</span> <span class="fl">1</span>)<span class="op">...</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<div>
+<figure class="figure">
+<p><img src="mathematics_files/figure-html/cell-11-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="hermite-like-polynomials-with-middle-node" class="level3" data-number="4.1.3">
 <h3 data-number="4.1.3" class="anchored" data-anchor-id="hermite-like-polynomials-with-middle-node"><span class="header-section-number">4.1.3</span> Hermite like polynomials with middle node</h3>
 <p>Define linear forms</p>
-<pre class="{julia}"><code>import MMJMesh.Mathematics.valueat
-
-struct ValueAtLF &lt;: AbstractMapping{FunctionRToR,Real,Any}
-    x::Real
-end
-valueat(u::ValueAtLF, f::FunctionRToR) = f(u.x)
-
-struct DerivativeAtLF &lt;: AbstractMapping{FunctionRToR,Real,Any}
-    x::Real
-end
-valueat(u::DerivativeAtLF, f::FunctionRToR) = f'(u.x)</code></pre>
+<div id="dd42488d" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">MMJMesh.Mathematics.valueat</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> ValueAtLF <span class="op">&lt;:</span><span class="dt"> AbstractMapping{FunctionRToR,Real,Any}</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    x<span class="op">::</span><span class="dt">Real</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">valueat</span>(u<span class="op">::</span><span class="dt">ValueAtLF</span>, f<span class="op">::</span><span class="dt">FunctionRToR</span>) <span class="op">=</span> <span class="fu">f</span>(u.x)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> DerivativeAtLF <span class="op">&lt;:</span><span class="dt"> AbstractMapping{FunctionRToR,Real,Any}</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    x<span class="op">::</span><span class="dt">Real</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="fu">valueat</span>(u<span class="op">::</span><span class="dt">DerivativeAtLF</span>, f<span class="op">::</span><span class="dt">FunctionRToR</span>) <span class="op">=</span> f<span class="op">'</span>(u.x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>valueat (generic function with 16 methods)</code></pre>
+</div>
+</div>
 <p>Compute polynomials</p>
-<pre class="{julia}"><code>h = 2.0
-N = [ValueAtLF.(0:h/2:h); DerivativeAtLF.([0, h])] |&gt; vcat
-P = monomials(0:length(N)-1, 0 .. h)
-M = [n(p) for p in P, n in N]
-H = inv(M) * P
-fplot(H...)</code></pre>
+<div id="ba65f2c2" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> [<span class="fu">ValueAtLF</span>.(<span class="fl">0</span><span class="op">:</span>h<span class="op">/</span><span class="fl">2</span><span class="op">:</span>h); <span class="fu">DerivativeAtLF</span>.([<span class="fl">0</span>, h])] <span class="op">|&gt;</span> vcat</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> <span class="fu">monomials</span>(<span class="fl">0</span><span class="op">:</span><span class="fu">length</span>(N)<span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span> <span class="op">..</span> h)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> [<span class="fu">n</span>(p) for p <span class="kw">in</span> P, n <span class="kw">in</span> N]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> <span class="fu">inv</span>(M) <span class="op">*</span> P</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">fplot</span>(H<span class="op">...</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div>
+<figure class="figure">
+<p><img src="mathematics_files/figure-html/cell-13-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 
 
 </section>
