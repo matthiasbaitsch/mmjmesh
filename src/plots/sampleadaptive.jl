@@ -1,5 +1,5 @@
 """
-    sampleadaptive(f, a, b, maxrecursion, maxangle, npoints, rp, yscale, ir) -> Matrix{Real}
+    sampleadaptive(f, a, b, rp, maxrecursion, maxangle, npoints, yscale, ir) -> Matrix{Real}
 
 Simple adaptive sampling of mapping `f` on the interval from `a` to `b`. The interval is initially
 sampled at `npoints` g and then refined recursively until either the angles are smaller than 
@@ -12,10 +12,14 @@ Parameters for functions R → R only: Angles are evaluated using the scaling fa
 @see T. Bayer: Efficient plotting the functions with discontinuities
 """
 function sampleadaptive(
-    f::MappingFromR{CT}, a::Real, b::Real;
-    maxrecursion::Integer=15, maxangle::Real=2.5, npoints::Integer=5, 
-    yscale::Real=1.0, ir::Bool=false, rp::Bool=false
-) where {CT}
+    f::MappingFromR, a::Real, b::Real;
+    rp::Bool=false,
+    maxrecursion::Integer=15, maxangle::Real=2.5, npoints::Integer=5, yscale::Real=1.0,
+    ir::Bool=false
+)
+
+    # Check input
+    @assert !ir || codomaintype(f) <: Real
 
     # Scaling factor
     f = yscale * SafeEval(f)
@@ -40,7 +44,7 @@ function sampleadaptive(
     # Return
     if rp
         return params, points
-    else 
+    else
         return points
     end
 end

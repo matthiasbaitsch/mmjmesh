@@ -16,6 +16,7 @@ import MakieCore
 using MMJMesh
 using MMJMesh.Meshes
 using MMJMesh.MMJBase
+using MMJMesh.Geometries
 using MMJMesh.Topologies
 using MMJMesh.Mathematics
 

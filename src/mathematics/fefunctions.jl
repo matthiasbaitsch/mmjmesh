@@ -38,11 +38,11 @@ with interpolation functions ``h_i : R^n -> R``, coefficients
 """
 struct Interpolation{DT,CT,D} <: AbstractMapping{DT,CT,D}
     functions::AbstractMapping{DT,<:AbstractVector,D}
-    coefficients::AbstractVecOrMat
+    coefficients::SArray
     Interpolation(h::AbstractMapping{DT,<:AbstractVector,D}, C::AbstractVector) where {DT,D} =
-        new{DT,Float64,D}(h, C)
+        new{DT,Float64,D}(h, SVector{length(C)}(C))
     Interpolation(h::AbstractMapping{DT,<:AbstractVector,D}, C::AbstractMatrix) where {DT,D} =
-        new{DT,AbstractVector,D}(h, C)
+        new{DT,SVector{size(C, 1),Float64},D}(h, SMatrix{size(C, 1),size(C, 2)}(C))
 end
 
 function Interpolation(C::AbstractVecOrMat, d::Integer)

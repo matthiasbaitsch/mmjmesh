@@ -24,7 +24,7 @@ for d ∈ 0:3, np ∈ 3:6
 end
 
 # Compare to reference values
-x,p = sampleadaptive(f, 0, 1, maxrecursion=1, maxangle=0,rp=true)
+x, p = sampleadaptive(f, 0, 1, maxrecursion=1, maxangle=0, rp=true)
 @test p[1, :] ≈ xref
 @test f.(x) ≈ p[2, :]
 
@@ -47,6 +47,11 @@ x3, p3 = sampleadaptive(f, -2, 2, maxrecursion=1, ir=true, rp=true)
 @test p1[:, 1] == p2[:, 1]
 @test p1[:, end] == p2[:, end]
 @test p2 == p3
+
+
+# XXXX
+
+x, p = sampleadaptive(Polynomial(1, -2), -1, 1, ir=true, rp=true)
 
 
 # -------------------------------------------------------------------------------------------------

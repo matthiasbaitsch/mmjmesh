@@ -9,9 +9,11 @@ First, we need to load the required modules. Note that `CairoMakie` included by 
 ```{julia}
 #| warning: false
 import CairoMakie
+using IntervalSets
 using MMJMesh.Plots
 using MMJMesh.Meshes
 using MMJMesh.Utilities
+using MMJMesh.Mathematics
 ```
 
 ```{julia}
@@ -70,10 +72,16 @@ constant on elements
 mplot(m, -1 .+ 2 * rand(nelements(m))) |> mconf()
 ```
 
-or linear on elements
+linear on elements
 
 ```{julia}
 mplot(m, -1 .+ 2 * rand(2, nelements(m))) |> mconf()
+```
+
+functions on elements
+
+```{julia}
+mplot(m, [Polynomial(rand(-1 .. 1, 4), IHat) for _ ∈ 1:nelements(m)]) |> mconf()
 ```
 
 Furthermore, 1D meshes can be created with a parametric function

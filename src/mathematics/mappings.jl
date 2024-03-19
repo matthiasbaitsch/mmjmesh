@@ -214,38 +214,6 @@ end
 
 
 # -------------------------------------------------------------------------------------------------
-# Operators and simplification rules
-# -------------------------------------------------------------------------------------------------
-
-# +
-Base.:+(m1::AbstractMapping, m2::AbstractMapping) = Sum(m1, m2)
-Base.:+(z::Zero, ::Zero) = z
-Base.:+(::Zero, m::AbstractMapping) = m
-Base.:+(::Zero, m::ScaledMapping) = m
-Base.:+(m::AbstractMapping, ::Zero) = m
-Base.:+(m1::ScaledMapping, m2::AbstractMapping) = m2 + m1
-Base.:+(m1::AbstractMapping, m2::ScaledMapping) =
-    m1 == m2.m ? (1 + m2.a) * m2.m : Sum(m1, m2)
-Base.:+(m1::ScaledMapping, m2::ScaledMapping) =
-    m1.m === m2.m ? (m1.a + m2.a) * m1.m : Sum(m1, m2)
-Base.:+(m1::T, m2::T) where {T<:AbstractMapping} = m1 == m2 ? 2.0 * m1 : Sum(m1, m2)
-
-# -
-Base.:-(m::AbstractMapping) = -1.0 * m
-Base.:-(m1::AbstractMapping, m2::AbstractMapping) = m1 + (-m2)
-
-# *
-Base.:*(m1::AbstractMapping, m2::AbstractMapping) = ProductMapping(m1, m2)
-Base.:*(a::Real, m::AbstractMapping) = a == 1 ? m : a == 0 ? zero(m) : ScaledMapping(a, m)
-Base.:*(m::AbstractMapping, a::Real) = a * m
-Base.:*(a::Real, m::ScaledMapping) = (a * m.a) * m.m
-
-# /
-Base.:/(m1::AbstractMapping, m2::AbstractMapping) = QuotientMapping(m1, m2)
-Base.:/(a::Real, m2::AbstractMapping) = QuotientMapping(Polynomial(a), m2)
-
-
-# -------------------------------------------------------------------------------------------------
 # Interval domains
 # -------------------------------------------------------------------------------------------------
 
@@ -337,7 +305,7 @@ antiderivative(f::Sum{Real,Real}) = antiderivative(f.m1) + antiderivative(f.m2)
 
 # TODO Generalize to mapping from components
 # Parametric curve from components
-struct ParametricCurve{N,D} <: AbstractMapping{Real,StaticVector{N,Float64},D}
+struct ParametricCurve{N,D} <: AbstractMapping{Real,SVector{N,Float64},D}
     components::Vector{FunctionRToR{D}}
 end
 
@@ -363,8 +331,8 @@ Base.:(==)(c1::ParametricCurve{N,D}, c2::ParametricCurve{N,D}) where {N,D} =
 
 
 # Unit normal
-struct UnitNormal{D} <: AbstractMapping{Real,StaticVector{2,Float64},D}
-    u::ParametricCurve{2,D}
+struct UnitNormal{D} <: AbstractMapping{Real,SVector{2,Float64},D}
+    u::AbstractMapping{Real,SVector{2,Float64},D}
 end
 
 function valueat(u::UnitNormal, x)
@@ -445,3 +413,38 @@ function monomials(p::AbstractArray{Int}, d=R)
     coeffs(pp) = [i == pp + 1 ? 1 : 0 for i in 1:pp+1]
     return [Polynomial(coeffs(n), d) for n in p]
 end
+
+
+
+# -------------------------------------------------------------------------------------------------
+# Operators and simplification rules
+# -------------------------------------------------------------------------------------------------
+
+# +
+Base.:+(m1::AbstractMapping, m2::AbstractMapping) = Sum(m1, m2)
+Base.:+(z::Zero, ::Zero) = z
+Base.:+(::Zero, m::AbstractMapping) = m
+Base.:+(::Zero, m::ScaledMapping) = m
+Base.:+(m::AbstractMapping, ::Zero) = m
+Base.:+(m1::ScaledMapping, m2::AbstractMapping) = m2 + m1
+Base.:+(m1::AbstractMapping, m2::ScaledMapping) =
+    m1 == m2.m ? (1 + m2.a) * m2.m : Sum(m1, m2)
+Base.:+(m1::ScaledMapping, m2::ScaledMapping) =
+    m1.m === m2.m ? (m1.a + m2.a) * m1.m : Sum(m1, m2)
+Base.:+(m1::T, m2::T) where {T<:AbstractMapping} = m1 == m2 ? 2.0 * m1 : Sum(m1, m2)
+
+# -
+Base.:-(m::AbstractMapping) = -1.0 * m
+Base.:-(m1::AbstractMapping, m2::AbstractMapping) = m1 + (-m2)
+
+# *
+Base.:*(m1::AbstractMapping{DT,CT1}, m2::AbstractMapping{DT,CT2}) where {DT,CT1,CT2} = ProductMapping(m1, m2)
+Base.:*(m1::AbstractMapping{DT,CT1}, m2::AbstractMapping{DT,CT2}) where {DT,CT1,CT2<:Real} = ProductMapping(m2, m1)
+
+Base.:*(a::Real, m::AbstractMapping) = a == 1 ? m : a == 0 ? zero(m) : ScaledMapping(a, m)
+Base.:*(m::AbstractMapping, a::Real) = a * m
+Base.:*(a::Real, m::ScaledMapping) = (a * m.a) * m.m
+
+# /
+Base.:/(m1::AbstractMapping, m2::AbstractMapping) = QuotientMapping(m1, m2)
+Base.:/(a::Real, m2::AbstractMapping) = QuotientMapping(Polynomial(a), m2)

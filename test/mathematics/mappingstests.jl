@@ -156,5 +156,8 @@ n = UnitNormal(c)
 
 f1 = Polynomial(1, 2, 3) * c
 f2 = c * Polynomial(1, 2, 3)
+@test f1 == f2
 @test f1(π) == f2(π)
+@test codomaintype(f1) <: SVector
+@test codomaintype(f2) <: SVector
 

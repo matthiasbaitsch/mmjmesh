@@ -44,6 +44,7 @@ MakieCore.@recipe(MPlot, mesh, scalars) do scene
     return attr
 end
 
+
 # -------------------------------------------------------------------------------------------------
 # Configure
 # -------------------------------------------------------------------------------------------------
@@ -71,6 +72,7 @@ function mconf(; colorbar=true, dataaspect=true, blank=true, title="")
         return scene
     end
 end
+
 
 # -------------------------------------------------------------------------------------------------
 # Main plot function
@@ -150,113 +152,75 @@ function MakieCore.plot!(plot::MPlot)
     return plot
 end
 
+
 # -------------------------------------------------------------------------------------------------
-# Details
+# Plot parts
 # -------------------------------------------------------------------------------------------------
 
-function plotlineplot(plot::MPlot)
-    mesh = plot.mesh[]
+plotlineplot(plot::MPlot) =
+    plotlineplot(plot, plot.mesh[], plot.scalars[])
 
-    # TODO complete rewrite using functions
-    Nn = nentities(mesh.topology, 0)
-    Ne = nentities(mesh.topology, 1)
-    values = plot.scalars[]
-    edges = links(mesh.topology, 1, 0)
-    coords = coordinates(mesh)
+# Version for numbers
+plotlineplot(plot::MPlot, mesh::Mesh, values::AbstractVecOrMat{<:Real}) =
+    plotlineplot(plot, mesh, _tofunctions(mesh, values))
 
-    # Get values right
-    dv = size(values)
-    if length(dv) == 1
-        if dv[1] == Nn
-            values = mapreduce(permutedims, vcat, [values[l] for l in links(mesh.topology, 1, 0)])'
-        elseif dv[1] == Ne
-            values = [values values]'
-        else
-            @notimplemented
-        end
-        dv = size(values)
-    end
+# Version for functions
+function plotlineplot(plot::MPlot, mesh::Mesh, functions::AbstractVector{<:FunctionRToR{IHat}})
 
-    # Check preconditions
-    @assert length(dv) == 2
-    @assert dv[1] == 2
-    @assert dv[2] == Ne
+    # Check input
+    @assert nedges(mesh) == length(functions)
 
-    # sz = size(boundingbox(m.geometry))
-    minx = minimum(coordinates(mesh)[1, :])
-    maxx = maximum(coordinates(mesh)[1, :])
-    miny = minimum(coordinates(mesh)[2, :])
-    maxy = maximum(coordinates(mesh)[2, :])
-    lx = maxx - minx
-    ly = maxy - miny
-    sz = sqrt(lx * ly)
-    if sz == 0
-        sz = max(lx, ly)
-    end
-
-    vmx = maximum(abs, values)
+    # Scaling factor
+    fmax(f) = maximum(abs.(f.(-1:1:1)))
+    vmx = maximum(fmax.(functions))
+    sz = diagonal(boundingbox(mesh.geometry))
     a = -plot.lineplotscale[] * sz / vmx
 
-    c = Vector{Float64}()
-    xf = Vector{Float64}()
-    yf = Vector{Float64}()
-    tf = Vector{Vector{Int}}()
+    # Storage
+    xe = Float32[]
+    ye = Float32[]
+    cf = Float32[]
+    xf = Float32[]
+    yf = Float32[]
+    triangles = Int[]
 
-    xe = Vector{Float64}()
-    ye = Vector{Float64}()
+    # Loop over edges
+    for i ∈ eachindex(functions)
 
-    for e ∈ 1:Ne
-        n1 = edges[e, 1]
-        n2 = edges[e, 2]
-        x1 = coords[:, n1]
-        x2 = coords[:, n2]
-        d = (x2 - x1) / norm(x2 - x1)
-        n = [-d[2], d[1]]
-        v1 = values[1, e]
-        v2 = values[2, e]
-        p1 = x1 + a * v1 * n
-        p2 = x2 + a * v2 * n
-        bi = length(xf) + 1
+        # Mappings for edge, function and line plot
+        f = functions[i]
+        ce = parametrization(geometry(edge(mesh, i)))
+        cl = ce + a * f * UnitNormal(ce)
 
-        # Face
-        push!(c, v1, v1, v2, v2)
-        push!(xf, x1[1], p1[1], x2[1], p2[1])
-        push!(yf, x1[2], p1[2], x2[2], p2[2])
+        # Sample, refactor for curved edges
+        params, values = sampleadaptive(f, -1.0, 1.0, ir=true, rp=true, yscale=abs(a))
+        pe = tomatrix(ce.(params))
+        pl = tomatrix(cl.(params))
 
-        # Edge
-        push!(xe, x1[1], p1[1], p2[1], x2[1], NaN)
-        push!(ye, x1[2], p1[2], p2[2], x2[2], NaN)
-
-        # Sign change
-        if v1 * v2 < 1e-10
-            # v1 + (v2 - v1) * s = 0
-            s = v1 / (v1 - v2)
-            x3 = x1 + s * (x2 - x1)
-            push!(xf, x3[1])
-            push!(yf, x3[2])
-            push!(c, 0.0)
-            push!(tf, [bi, bi + 1, bi + 4])
-            push!(tf, [bi + 4, bi + 2, bi + 3])
-        else
-            push!(tf, [bi, bi + 1, bi + 3])
-            push!(tf, [bi, bi + 2, bi + 3])
-        end
+        # Append
+        _appendedges!(xe, ye, pe, pl)
+        _appendfaces!(xf, yf, cf, triangles, pe, pl, values[2, :])
     end
 
+    # Color for faces if specified
     if plot.lineplotfacescolor[] != MakieCore.automatic
-        c = plot.lineplotfacescolor[]
+        cf = plot.lineplotfacescolor[]
     end
 
+    # Plot faces
     if plot.lineplotfacesvisible[]
-        x = [xf yf]'
-        tf = mapreduce(permutedims, vcat, tf)
-        MakieCore.mesh!(plot, x, tf, color=c, colormap=plot.lineplotfacescolormap)
+        MakieCore.mesh!(plot, [xf yf]', reshape(triangles, 3, :)',
+            color=cf, colormap=plot.lineplotfacescolormap)
     end
 
+    # Plot outlines
     if plot.lineplotoutlinesvisible[]
-        MakieCore.lines!(plot, xe, ye, linewidth=plot.lineplotoutlineslinewidth, color=plot.lineplotoutlinescolor)
+        MakieCore.lines!(plot, xe, ye, linewidth=plot.lineplotoutlineslinewidth,
+            color=plot.lineplotoutlinescolor)
     end
 end
+
+
 
 function plotfaces(plot::MPlot)
     mesh = plot.mesh[]
@@ -370,3 +334,60 @@ function plotedges(plot::MPlot, featureedges::Bool)
     # Plot
     MakieCore.lines!(plot, xx, yy, linewidth=lw, color=lc, colormap=:tab10)
 end
+
+
+# -------------------------------------------------------------------------------------------------
+# Helper functions
+# -------------------------------------------------------------------------------------------------
+
+function _appendedges!(xe, ye, edgepoints, lineplotpoints)
+    push!(xe, edgepoints[1, 1])
+    append!(xe, lineplotpoints[1, :])
+    append!(xe, [edgepoints[1, end], NaN])
+    push!(ye, edgepoints[2, 1])
+    append!(ye, lineplotpoints[2, :])
+    append!(ye, [edgepoints[2, end], NaN])
+end
+
+function _appendfaces!(xf, yf, cf, triangles, edgepoints, lineplotpoints, values)
+    bi = length(xf) + 1
+    np = length(values)
+    append!(xf, edgepoints[1, :])
+    append!(xf, lineplotpoints[1, :])
+    append!(yf, edgepoints[2, :])
+    append!(yf, lineplotpoints[2, :])
+    append!(cf, values)
+    append!(cf, values)
+    for j ∈ 1:np-1
+        append!(triangles, [bi + j - 1, bi + j, bi + np + j - 1])
+        append!(triangles, [bi + j, bi + np + j - 1, bi + np + j])
+    end
+end
+
+function _collectvalues(mesh::Mesh, values)
+    dv = size(values)
+    Nn = nentities(mesh.topology, 0)
+    Ne = nentities(mesh.topology, 1)
+
+    # Check input
+    @assert (length(dv) == 1 && (dv[1] == Nn || dv[1] == Ne)) ||
+            (length(dv) == 2 && dv[1] == 2 && dv[2] == Ne)
+
+    # Values from nodes to edges
+    if length(dv) == 1 && dv[1] == nnodes(mesh)
+        values = tomatrix([values[l] for l in links(mesh.topology, 1, 0)])
+    end
+    return values
+end
+
+_coeffs(v1, v2) = [(v1 + v2) / 2, (v2 - v1) / 2]
+
+function _tofunctions(mesh, values)
+    values = _collectvalues(mesh, values)
+    if length(size(values)) == 1
+        return [Polynomial([values[i]], IHat) for i in eachindex(values)]
+    else
+        return [Polynomial(_coeffs(values[:, i]...), IHat) for i in axes(values, 2)]
+    end
+end
+
