@@ -17,7 +17,7 @@ There are many things missing
 
 - Inverse functions
 
-- Printing
+- Printing is very basic
 
 - ...
 
@@ -74,8 +74,7 @@ Base.adjoint(m::AbstractMapping) = derivative(m)
 
 
 # Make similar array 
-# TODO: This is probably not the right way to do that
-function Base.similar(a::Vector, ::Type{T}, dims::Base.AbstractUnitRange...) where {T<:AbstractMapping}
+function Base.similar(a::Vector, ::Type{T}, dims::AbstractUnitRange...) where {T<:AbstractMapping}
     if !isempty(dims)
         return similar(a, AbstractMapping, Base.to_shape(dims))
     else
@@ -84,7 +83,7 @@ function Base.similar(a::Vector, ::Type{T}, dims::Base.AbstractUnitRange...) whe
 end
 
 
-# Zero element w.r.t. addition
+# Neutral element w.r.t. addition
 struct Zero{DT,CT,D} <: AbstractMapping{DT,CT,D} end
 valueat(::Zero{DT,CT,D}, x::DT) where {DT,CT,D} = zero(DT)
 derivativeat(::Zero{DT,CT,D}, x::DT) where {DT,CT,D} = DT(0)
@@ -232,7 +231,7 @@ Base.intersect(s::AbstractInterval, a::AbstractVector{T}) where {T} = T[x for x 
 # -------------------------------------------------------------------------------------------------
 
 # Base type for functions from R
-const MappingFromR{Real,CT,D} = AbstractMapping{Real,CT,D}
+const MappingFromR{CT,D} = AbstractMapping{Real,CT,D}
 
 """
     pois(m::MappingFromR) -> Real[]
@@ -262,7 +261,7 @@ pois(q::QuotientMapping) = pois(q.m1) ∪ pois(q.m2) ∪ roots(q.m2)
 # Functions into R
 # -------------------------------------------------------------------------------------------------
 
-const FunctionToR{DT,Real,D} = AbstractMapping{DT,Real,D}
+const FunctionToR{DT,D} = AbstractMapping{DT,Real,D}
 
 
 # -------------------------------------------------------------------------------------------------
@@ -302,6 +301,7 @@ antiderivative(f::Sum{Real,Real}) = antiderivative(f.m1) + antiderivative(f.m2)
 # Mappings R → Rn
 # -------------------------------------------------------------------------------------------------
 
+const FunctionRToRn{N,D} = AbstractMapping{Real,SVector{N,Float64},D}
 
 # TODO Generalize to mapping from components
 # Parametric curve from components
@@ -346,7 +346,6 @@ end
 # Special functions
 # -------------------------------------------------------------------------------------------------
 
-
 # Sine function
 struct Sin{D} <: FunctionRToR{D}
     Sin(d=R) = new{d}()
@@ -357,7 +356,6 @@ derivativeat(::Sin, x, n::Int=1) = sin(x + n * π / 2)
 derivative(::Sin{D}, n::Int=1) where {D} = (-1.0)^(n ÷ 2) * (mod(n, 2) == 0 ? Sin(D) : Cos(D))
 antiderivative(::Sin{D}) where {D} = -Cos(D)
 Base.show(io::IO, ::Sin) = print(io, "sin(x)")
-
 
 # Cosine function
 struct Cos{D} <: FunctionRToR{D}
@@ -381,8 +379,6 @@ Polynomial(p::Polynomials.Polynomial, d=R) = Polynomial{d}(p)
 Polynomial(c::AbstractArray, d=R) = Polynomial{d}(Polynomials.Polynomial(c))
 Polynomial(c::T...; d=R) where {T<:Real} = Polynomial{d}(Polynomials.Polynomial(c))
 
-
-# Basic operations
 _roots(p::Polynomial{D}) where {D} = Polynomials.roots(p.p)
 degree(p::Polynomial{D}) where {D} = Polynomials.degree(p.p)
 fromroots(r::AbstractArray{<:Real}, d=R) = Polynomial(Polynomials.fromroots(r), d)
@@ -393,8 +389,6 @@ antiderivative(p::Polynomial{D}, n::Int=1) where {D} = Polynomial(Polynomials.in
 Base.show(io::IO, p::Polynomial) = print(io, p.p)
 Base.:(==)(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = (D1 == D2 && p1.p == p2.p)
 
-
-# Rules
 Base.:+(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = Polynomial(p1.p + p2.p, D1 ∩ D2)
 Base.:*(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = Polynomial(p1.p * p2.p, D1 ∩ D2)
 Base.:*(a::Real, p::Polynomial{D}) where {D} = Polynomial(a * p.p, D)

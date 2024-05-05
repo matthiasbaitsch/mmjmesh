@@ -87,66 +87,46 @@ function MakieCore.plot!(plot::MPlot)
 
     # Flag if we have data
     color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
-    plot[:havedata] = color isa Vector
+    plot.havedata = color isa Vector
 
     # Configure
-    plot[:colorbygroups] = false
+    plot.colorbygroups = false
+    plot.lineplotvisible = false
     setifautomatic(:nodesvisible, nnodes(mesh) <= 50)
-    if pdim(mesh) == 1                              # 1D mesh
+
+    if pdim(mesh) == 1
         plot.edgesvisible = true
         plot.edgecolor = MakieCore.theme(plot, :linecolor)
         plot.featureedgesvisible = false
         plot.facesvisible = false
-        if length(plot) > 1
-            plot.lineplotvisible = true
-        else
-            plot.lineplotvisible = false
-        end
+        plot.lineplotvisible = length(plot) > 1
         setifautomatic(:edgelinewidth, 3)
-    elseif pdim(mesh) == 2                          # 2D mesh
-
-        # Coloring by groups
-        if !plot[:havedata][] && isautomatic(:facecolor) && hasgroups(mesh.groups, d=2)
-            setifautomatic(:facecolormap, :Pastel1_9)
-            plot[:colorbygroups] = true
-        else
-            setifautomatic(:facecolor, :seashell2)
-            setifautomatic(:facecolormap, MakieCore.theme(plot, :colormap))
-        end
-
-        # Others
-        plot.lineplotvisible = false
+    elseif pdim(mesh) == 2
+        plot.colorbygroups = !plot.havedata[] && isautomatic(:facecolor) && hasgroups(mesh.groups, d=2)
         setifautomatic(:featureedgesvisible, true)
         setifautomatic(:edgesvisible, nfaces(mesh) <= 100)
         setifautomatic(:edgecolor, MakieCore.theme(plot, :linecolor))
         setifautomatic(:edgelinewidth, 0.75)
         setifautomatic(:featureedgelinewidth, 3 * plot.edgelinewidth[])
         setifautomatic(:facesvisible, true)
+        if plot.colorbygroups[]
+            setifautomatic(:facecolormap, :Pastel1_9)
+        else
+            setifautomatic(:facecolor, :seashell2)
+            setifautomatic(:facecolormap, MakieCore.theme(plot, :colormap))
+        end
     else
         @notimplemented
     end
 
     # Plot
-    if plot.lineplotvisible[]
-        plotlineplot(plot)
-    end
-    if plot.facesvisible[]
-        plotfaces(plot)
-    end
-    if plot.edgesvisible[]
-        plotedges(plot, false)
-    end
-    if plot.featureedgesvisible[]
-        plotedges(plot, true)
-    end
-    if plot.nodesvisible[]
-        MakieCore.scatter!(
-            plot,
-            coordinates(mesh),
-            color=plot.nodecolor,
-            markersize=plot.nodesize
-        )
-    end
+    plot.lineplotvisible[] && plotlineplot(plot)
+    plot.facesvisible[] && plotfaces(plot)
+    plot.edgesvisible[] && plotedges(plot, false)
+    plot.featureedgesvisible[] && plotedges(plot, true)
+    plot.nodesvisible[] && MakieCore.scatter!(
+        plot, coordinates(mesh), color=plot.nodecolor, markersize=plot.nodesize
+    )
 
     # Return
     return plot
@@ -221,7 +201,6 @@ function plotlineplot(plot::MPlot, mesh::Mesh, functions::AbstractVector{<:Funct
 end
 
 
-
 function plotfaces(plot::MPlot)
     mesh = plot.mesh[]
     color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
@@ -288,6 +267,7 @@ function plotfaces(plot::MPlot)
     # Plot
     MakieCore.mesh!(plot, x, tf, color=c, colormap=plot.facecolormap)
 end
+
 
 function plotedges(plot::MPlot, featureedges::Bool)
     mesh = plot.mesh[]
@@ -377,6 +357,7 @@ function _collectvalues(mesh::Mesh, values)
     if length(dv) == 1 && dv[1] == nnodes(mesh)
         values = tomatrix([values[l] for l in links(mesh.topology, 1, 0)])
     end
+
     return values
 end
 

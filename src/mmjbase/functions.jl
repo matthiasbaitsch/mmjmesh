@@ -1,5 +1,5 @@
-function pdim end
-function gdim end
+function pdim(o) end
+function gdim(o) end
 
 atol(Float64) = 1e-10
 
