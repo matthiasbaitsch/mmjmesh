@@ -14,7 +14,7 @@ include("fefunctions.jl")
 
 
 # Exports
-export AbstractMapping, MappingFromR, FunctionToR, FunctionRToR
+export AbstractMapping, MappingFromR, MappingFromRn, FunctionToR, FunctionRToR, FunctionRnToR
 export domaintype, codomaintype, domain, valueat, derivativeat, derivative
 export R, RPlus, R0Plus, IHat
 export antiderivative, integrate, sample, plot, pois, roots

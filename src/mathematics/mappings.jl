@@ -1,7 +1,8 @@
+import Polynomials
+
 using IntervalSets
 using StaticArrays
-
-import Polynomials
+using DomainSets: ×
 
 
 """
@@ -221,6 +222,7 @@ const R = -Inf .. Inf
 const RPlus = Interval{:open,:open}(0, Inf)
 const R0Plus = Interval{:closed,:open}(0, Inf)
 const IHat = -1.0 .. 1.0
+const ReferenceInterval = IHat
 
 # Select elements in interval
 Base.intersect(s::AbstractInterval, a::AbstractVector{T}) where {T} = T[x for x in a if x ∈ s]
@@ -255,6 +257,23 @@ pois(p::Sum) = pois(p.m1) ∪ pois(p.m2)
 pois(s::ScaledMapping) = pois(s.m)
 pois(p::ProductMapping) = pois(p.m1) ∪ pois(p.m2)
 pois(q::QuotientMapping) = pois(q.m1) ∪ pois(q.m2) ∪ roots(q.m2)
+
+
+# -------------------------------------------------------------------------------------------------
+# Domains in Rn
+# -------------------------------------------------------------------------------------------------
+
+const ReferenceQuadrilateral = ReferenceInterval × ReferenceInterval
+
+
+# -------------------------------------------------------------------------------------------------
+# Mappings from Rn
+# -------------------------------------------------------------------------------------------------
+
+const MappingFromRn{N,CT,D} = AbstractMapping{SVector{N,Float64},CT,D}
+
+valueat(m::MappingFromRn{N}, x::T...) where {N,T<:Real} = valueat(m, SVector{N,Float64}(x))
+(m::MappingFromRn{N})(x::T...) where {N,T<:Real} = valueat(m, SVector{N,Float64}(x))
 
 
 # -------------------------------------------------------------------------------------------------
@@ -340,6 +359,14 @@ function valueat(u::UnitNormal, x)
     n = SA[-t[2], t[1]]
     return n / norm(n)
 end
+
+
+# -------------------------------------------------------------------------------------------------
+# Functions Rn → R
+# -------------------------------------------------------------------------------------------------
+
+const FunctionRnToR{N,D} = AbstractMapping{SVector{N,Float64},Real,D}
+(f::FunctionRnToR{N})(x::AbstractVector) where {N} = valueat(f, SVector{N}(x))
 
 
 # -------------------------------------------------------------------------------------------------
