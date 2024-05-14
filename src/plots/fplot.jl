@@ -24,7 +24,7 @@ function MakieCore.plot!(plot::FPlot)
     for a ∈ plot.args
         f = a[]
         a, b = endpoints(domain(f))
-        xy = sampleadaptive(f, a, b,
+        xy = sample1d(f, a, b,
             maxrecursion=att.maxrecursion[],
             maxangle=att.maxangle[],
             npoints=att.npoints[],

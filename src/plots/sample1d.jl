@@ -1,5 +1,5 @@
 """
-    sampleadaptive(f, a, b, rp, maxrecursion, maxangle, npoints, yscale, ir) -> Matrix{Real}
+    sample1d(f, a, b, rp, maxrecursion, maxangle, npoints, yscale, ir) -> Matrix{Real}
 
 Simple adaptive sampling of mapping `f` on the interval from `a` to `b`. The interval is initially
 sampled at `npoints` g and then refined recursively until either the angles are smaller than 
@@ -11,7 +11,7 @@ Parameters for functions R → R only: Angles are evaluated using the scaling fa
 @see adapted_grid.jl in PlotUtils.jl
 @see T. Bayer: Efficient plotting the functions with discontinuities
 """
-function sampleadaptive(
+function sample1d(
     f::MappingFromR, a::Real, b::Real;
     rp::Bool=false,
     maxrecursion::Integer=15, maxangle::Real=2.5, npoints::Integer=5, yscale::Real=1.0,
@@ -49,10 +49,10 @@ function sampleadaptive(
     end
 end
 
-sampleadaptive(
+sample1d(
     f::Function, a::Real, b::Real;
     maxrecursion::Integer=15, maxangle::Real=2.5, npoints::Integer=5, yscale::Real=1.0, ir::Bool=false
-) = sampleadaptive(
+) = sample1d(
     MF(f), a, b,
     maxrecursion=maxrecursion, maxangle=maxangle, npoints=npoints, yscale=yscale, ir=ir
 )

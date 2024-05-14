@@ -5,7 +5,7 @@ using IntervalSets
 using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Plots
-import MMJMesh.Plots: sampleadaptive, SafeEval
+import MMJMesh.Plots: sample1d, SafeEval
 
 
 # -------------------------------------------------------------------------------------------------
@@ -19,28 +19,28 @@ xref = [
 
 # Number of points
 for d ∈ 0:3, np ∈ 3:6
-    p = sampleadaptive(f, 0, 1, npoints=np, maxrecursion=d, maxangle=0)
+    p = sample1d(f, 0, 1, npoints=np, maxrecursion=d, maxangle=0)
     @test size(p, 2) == (np - 1) * 2^d + 1
 end
 
 # Compare to reference values
-x, p = sampleadaptive(f, 0, 1, maxrecursion=1, maxangle=0, rp=true)
+x, p = sample1d(f, 0, 1, maxrecursion=1, maxangle=0, rp=true)
 @test p[1, :] ≈ xref
 @test f.(x) ≈ p[2, :]
 
 
 # Test scaling factor
-p1 = sampleadaptive(f, 0, 1, maxrecursion=20)
-p2 = sampleadaptive(41 * f, 0, 1, maxrecursion=20)
-p3 = sampleadaptive(41 * f, 0, 1, maxrecursion=20, yscale=1.0 / 41.0)
+p1 = sample1d(f, 0, 1, maxrecursion=20)
+p2 = sample1d(41 * f, 0, 1, maxrecursion=20)
+p3 = sample1d(41 * f, 0, 1, maxrecursion=20, yscale=1.0 / 41.0)
 
 @test size(p1, 2) < size(p2, 2)
 @test p1[1, :] == p3[1, :]
 
 # Insert root
-p1 = sampleadaptive(f, -2, 2, maxrecursion=1)
-p2 = sampleadaptive(f, -2, 2, maxrecursion=1, ir=true)
-x3, p3 = sampleadaptive(f, -2, 2, maxrecursion=1, ir=true, rp=true)
+p1 = sample1d(f, -2, 2, maxrecursion=1)
+p2 = sample1d(f, -2, 2, maxrecursion=1, ir=true)
+x3, p3 = sample1d(f, -2, 2, maxrecursion=1, ir=true, rp=true)
 
 @test size(p2, 2) == size(p1, 2) + 2
 @test 0 ∈ p2[2, :]
@@ -51,7 +51,7 @@ x3, p3 = sampleadaptive(f, -2, 2, maxrecursion=1, ir=true, rp=true)
 
 # XXXX
 
-x, p = sampleadaptive(Polynomial(1, -2), -1, 1, ir=true, rp=true)
+x, p = sample1d(Polynomial(1, -2), -1, 1, ir=true, rp=true)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ x, p = sampleadaptive(Polynomial(1, -2), -1, 1, ir=true, rp=true)
 # -------------------------------------------------------------------------------------------------
 
 f = 1 / Polynomial(0, 1)
-sampleadaptive(f, 0, 1)
+sample1d(f, 0, 1)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ sampleadaptive(f, 0, 1)
 # -------------------------------------------------------------------------------------------------
 
 u = ParametricCurve(Sin(), Cos())
-x, pts = sampleadaptive(u, 0, 2π, rp=true)
+x, pts = sample1d(u, 0, 2π, rp=true)
 @test length(x) == 257
 @test size(pts, 2) == 257
 

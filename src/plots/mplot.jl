@@ -173,7 +173,7 @@ function plotlineplot(plot::MPlot, mesh::Mesh, functions::AbstractVector{<:Funct
         cl = ce + a * f * UnitNormal(ce)
 
         # Sample, refactor for curved edges
-        params, values = sampleadaptive(f, -1.0, 1.0, ir=true, rp=true, yscale=abs(a))
+        params, values = sample1d(f, -1.0, 1.0, ir=true, rp=true, yscale=abs(a))
         pe = tomatrix(ce.(params))
         pl = tomatrix(cl.(params))
 

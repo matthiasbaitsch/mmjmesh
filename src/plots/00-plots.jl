@@ -25,7 +25,8 @@ export mplot, mconf
 
 # Parts
 include("curveapproximation.jl")
-include("sampleadaptive.jl")
+include("sample1d.jl")
+include("sample2d.jl")
 include("mplot.jl")
 include("fplot.jl")
 
