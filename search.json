@@ -114,7 +114,7 @@
     "href": "mathematics.html",
     "title": "4  Mathematics",
     "section": "",
-    "text": "4.1 Mappings\nf = Sin() ∘ (1 / Polynomial(0, 1, d=0.0 .. 0.05))\nfplot(f, yscale=0.05, npoints=11)\ns = Sin(0 .. 3π)\nc = Cos(0 .. 3π)\n\nf = 2s\ng = s + f'\np = 1 / 20 * Polynomial([2, -1], 1 .. 8) * Polynomial([3, -1]) * Polynomial([4.5, -1]) * Polynomial([8, -1])\n\nfplot(c, s, g, p)\nf = Polynomial([0, 1], -1 .. 1)\nF = antiderivative(f)\nfplot(f, F)\nintegrate(f, 0 .. 1)\n\n0.5\np = [0, 1, 2]\nf = fplot(fromroots(p, -0.1 .. 2.1))\ncm.scatter!(p, 0 * p, color=:tomato)\nf\np = [0, 1.5, 2]\nf = fplot(lagrangepolynomials(p, 0 .. 2)...)\ncm.scatter!(p, [0, 0, 0], color=:tomato)\ncm.scatter!(p, [1, 1, 1], color=:blue)\nf",
+    "text": "4.1 Mappings",
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Mathematics</span>"
     ]
@@ -124,7 +124,17 @@
     "href": "mathematics.html#mappings",
     "title": "4  Mathematics",
     "section": "",
-    "text": "4.1.1 Parametric curves\nLissajous curve\n\nu = ParametricCurve(Cos(0 .. 2π), Sin() ∘ Polynomial(0, 2, d=0 .. 2pi))\nv = 0.075 * Sin() ∘ Polynomial(0, 100) * UnitNormal(u)\nw = 0.025 * ParametricCurve(Sin(), Cos()) ∘ Polynomial(0, 200)\nfplot(u, u + v, u + w)\n\n\n\n\n\n\n\n\n\npts = tomatrix([[0.0, 0], [1.5, 1], [2, 0], [1.5, -1], [0, 0]])\nfig, ax = fplot(Interpolation(pts, 1))\ncm.scatter!(ax, pts, color=:tomato)\nfig\n\n\n\n\n\n\n\n\n\n\n4.1.2 Monomials\n\nfplot(monomials(0:100, 0 .. 1)...)\n\n\n\n\n\n\n\n\n\n\n4.1.3 Hermite like polynomials with middle node\nDefine linear forms\n\nimport MMJMesh.Mathematics.valueat\n\nstruct ValueAtLF &lt;: AbstractMapping{FunctionRToR,Real,Any}\n    x::Real\nend\nvalueat(u::ValueAtLF, f::FunctionRToR) = f(u.x)\n\nstruct DerivativeAtLF &lt;: AbstractMapping{FunctionRToR,Real,Any}\n    x::Real\nend\nvalueat(u::DerivativeAtLF, f::FunctionRToR) = f'(u.x)\n\nvalueat (generic function with 16 methods)\n\n\nCompute polynomials\n\nh = 2.0\nN = [ValueAtLF.(0:h/2:h); DerivativeAtLF.([0, h])] |&gt; vcat\nP = monomials(0:length(N)-1, 0 .. h)\nM = [n(p) for p in P, n in N]\nH = inv(M) * P\nfplot(H...)",
+    "text": "f = Sin() ∘ (1 / Polynomial(0, 1, d=0.0 .. 0.05))\nfplot(f, yscale=0.05, npoints=11)\ns = Sin(0 .. 3π)\nc = Cos(0 .. 3π)\n\nf = 2s\ng = s + f'\np = 1 / 20 * Polynomial([2, -1], 1 .. 8) * Polynomial([3, -1]) * Polynomial([4.5, -1]) * Polynomial([8, -1])\n\nfplot(c, s, g, p)\nf = Polynomial([0, 1], -1 .. 1)\nF = antiderivative(f)\nfplot(f, F)\nintegrate(f, 0 .. 1)\np = [0, 1, 2]\nf = fplot(fromroots(p, -0.1 .. 2.1))\ncm.scatter!(p, 0 * p, color=:tomato)\nf\np = [0, 1.5, 2]\nf = fplot(lagrangepolynomials(p, 0 .. 2)...)\ncm.scatter!(p, [0, 0, 0], color=:tomato)\ncm.scatter!(p, [1, 1, 1], color=:blue)\nf\n\n4.1.1 Parametric curves\nLissajous curve\nu = ParametricCurve(Cos(0 .. 2π), Sin() ∘ Polynomial(0, 2, d=0 .. 2pi))\nv = 0.075 * Sin() ∘ Polynomial(0, 100) * UnitNormal(u)\nw = 0.025 * ParametricCurve(Sin(), Cos()) ∘ Polynomial(0, 200)\nfplot(u, u + v, u + w)\npts = tomatrix([[0.0, 0], [1.5, 1], [2, 0], [1.5, -1], [0, 0]])\nfig, ax = fplot(Interpolation(pts, 1))\ncm.scatter!(ax, pts, color=:tomato)\nfig\n\n\n4.1.2 Monomials\nfplot(monomials(0:100, 0 .. 1)...)\n\n\n4.1.3 Hermite like polynomials with middle node\nCompute polynomials\nh = 2.0\nN = [ValueAtLF.(0:h/2:h); DerivativeAtLF.([0, h])] |&gt; vcat\nP = monomials(0:length(N)-1, 0 .. h)\nM = [n(p) for p in P, n in N]\nH = inv(M) * P\nfplot(H...)",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Mathematics</span>"
+    ]
+  },
+  {
+    "objectID": "mathematics.html#functions-of-two-variables",
+    "href": "mathematics.html#functions-of-two-variables",
+    "title": "4  Mathematics",
+    "section": "4.2 Functions of two variables",
+    "text": "4.2 Functions of two variables\nThis part is in a very early stage of development.\nCreate the function \\(f : [0, 5\\pi]^2 \\to \\mathbb{R}, \\quad f(\\mathbf{x}) = \\sin x_1 \\sin x_2\\)\nf = makefunction(x -&gt; sin(x[1]) * sin(x[2]), 0 .. 5π, 0 .. 5π)\nBy default the plot is a view down from positive \\(z\\) direction\nfplot3d(f, mesh=9)\nCreate a 3D plot using Axis3 and switch of the mesh since CairoMakie does not handle hidden lines.\nfig = Figure()\nax3d = Axis3(fig[1, 1])\nfplot3d!(ax3d, f, npoints=250, mesh=nothing)\nfig\nA (sometimes?) interactive 3D plot is obtained using WebGL:\nWGLMakie.activate!()\nfig = Figure()\nax3d = Axis3(fig[1, 1])\nfplot3d!(ax3d, f, mesh=19, npoints=250)\nfig",
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Mathematics</span>"
     ]
