@@ -81,22 +81,6 @@ fplot(monomials(0:100, 0 .. 1)...)
 
 ### Hermite like polynomials with middle node
 
-Define linear forms
-
-```{julia}
-import MMJMesh.Mathematics.valueat
-
-struct ValueAtLF <: AbstractMapping{FunctionRToR,Real,Any}
-    x::Real
-end
-valueat(u::ValueAtLF, f::FunctionRToR) = f(u.x)
-
-struct DerivativeAtLF <: AbstractMapping{FunctionRToR,Real,Any}
-    x::Real
-end
-valueat(u::DerivativeAtLF, f::FunctionRToR) = f'(u.x)
-```
-
 Compute polynomials
 
 ```{julia}

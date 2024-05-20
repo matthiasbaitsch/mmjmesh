@@ -10,6 +10,7 @@ using LinearAlgebra
 
 # Parts
 include("mappings.jl")
+include("forms.jl")
 include("fefunctions.jl")
 
 
@@ -21,6 +22,7 @@ export antiderivative, integrate, sample, plot, pois, roots
 export Sin, Cos, Polynomial, fromroots, lagrangepolynomials, monomials, degree
 export lagrangebasis1d, Interpolation
 export ParametricCurve, UnitNormal
+export ValueAtLF, DerivativeAtLF
 
 
 end
