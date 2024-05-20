@@ -6,7 +6,9 @@
 include("setup.jl")
 using IntervalSets
 using LinearAlgebra
-import CairoMakie as cm
+using WGLMakie
+using CairoMakie
+CairoMakie.activate!()
 ```
 
 
@@ -90,4 +92,39 @@ P = monomials(0:length(N)-1, 0 .. h)
 M = [n(p) for p in P, n in N]
 H = inv(M) * P
 fplot(H...)
+```
+
+## Functions of two variables
+
+This part is in a very early stage of development.
+
+Create the function $f : [0, 5\pi]^2 \to \mathbb{R}, \quad f(\mathbf{x}) = \sin x_1 \sin x_2$
+
+```{julia}
+f = makefunction(x -> sin(x[1]) * sin(x[2]), 0 .. 5π, 0 .. 5π)
+```
+
+By default the plot is a view down from positive $z$ direction
+
+```{julia}
+fplot3d(f, mesh=9)
+```
+
+Create a 3D plot using `Axis3` and switch of the mesh since `CairoMakie` does not handle hidden lines.
+
+```{julia}
+fig = Figure()
+ax3d = Axis3(fig[1, 1])
+fplot3d!(ax3d, f, npoints=250, mesh=nothing)
+fig
+```
+
+A (sometimes?) interactive 3D plot is obtained using WebGL:
+
+```{julia}
+WGLMakie.activate!()
+fig = Figure()
+ax3d = Axis3(fig[1, 1])
+fplot3d!(ax3d, f, mesh=19, npoints=250)
+fig
 ```

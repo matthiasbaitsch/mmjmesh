@@ -21,7 +21,7 @@ using MMJMesh.Topologies
 using MMJMesh.Mathematics
 
 # Exports
-export mplot, mconf
+export mplot, fplot, fplot3d, mconf
 
 # Parts
 include("curveapproximation.jl")
@@ -29,5 +29,6 @@ include("sample1d.jl")
 include("sample2d.jl")
 include("mplot.jl")
 include("fplot.jl")
+include("fplot3d.jl")
 
 end

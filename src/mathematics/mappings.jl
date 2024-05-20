@@ -71,7 +71,7 @@ domain(::AbstractMapping{DT,CT,D}) where {DT,CT,D} = D
 
 # Shorthand notations for derivative and evaluation
 Base.adjoint(m::AbstractMapping) = derivative(m)
-(m::AbstractMapping{DT})(x::DT) where {DT} = valueat(m, x)
+(m::AbstractMapping{DT})(x::T) where {DT,T<:DT} = valueat(m, x)
 
 
 # Make similar array 
@@ -436,6 +436,17 @@ function monomials(p::AbstractArray{Int}, d=R)
 end
 
 
+# -------------------------------------------------------------------------------------------------
+# Operators and simplification rules
+# -------------------------------------------------------------------------------------------------
+
+struct AdHocMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
+    m::Function
+end
+AdHocMapping(m::Function, dt=Real, ct=Real, d=Any) = AdHocMapping{dt,ct,d}(m)
+
+valueat(m::AdHocMapping{DT}, x::T) where {DT,T<:DT} = m.m(x)
+
 
 # -------------------------------------------------------------------------------------------------
 # Operators and simplification rules
@@ -469,3 +480,11 @@ Base.:*(a::Real, m::ScaledMapping) = (a * m.a) * m.m
 # /
 Base.:/(m1::AbstractMapping, m2::AbstractMapping) = QuotientMapping(m1, m2)
 Base.:/(a::Real, m2::AbstractMapping) = QuotientMapping(Polynomial(a), m2)
+
+
+# -------------------------------------------------------------------------------------------------
+# Convenience functions
+# -------------------------------------------------------------------------------------------------
+
+makefunction(f::Function, d::Rectangle) = AdHocMapping(f, SVector{2,Float64}, Real, d)
+makefunction(f::Function, xrange::Interval, yrange::Interval) = makefunction(f, xrange × yrange)

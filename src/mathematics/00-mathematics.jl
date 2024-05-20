@@ -2,10 +2,10 @@ module Mathematics
 
 
 # Required modules
+using DomainSets
 using IntervalSets
-using IntervalSets
-import Polynomials
 using LinearAlgebra
+import Polynomials
 
 
 # Parts
@@ -20,6 +20,8 @@ export domaintype, codomaintype, domain, valueat, derivativeat, derivative
 export R, RPlus, R0Plus, IHat
 export antiderivative, integrate, sample, plot, pois, roots
 export Sin, Cos, Polynomial, fromroots, lagrangepolynomials, monomials, degree
+export AdHocMapping
+export makefunction
 export lagrangebasis1d, Interpolation
 export ParametricCurve, UnitNormal
 export ValueAtLF, DerivativeAtLF
