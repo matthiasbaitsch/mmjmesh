@@ -101,7 +101,7 @@ This part is in a very early stage of development.
 Create the function $f : [0, 5\pi]^2 \to \mathbb{R}, \quad f(\mathbf{x}) = \sin x_1 \sin x_2$
 
 ```{julia}
-f = makefunction(x -> sin(x[1]) * sin(x[2]), 0 .. 5π, 0 .. 5π)
+f = makefunction(x -> sin(x[1]) * sin(x[2]), 0 .. 5π, 0 .. 5π);
 ```
 
 By default the plot is a view down from positive $z$ direction
@@ -110,7 +110,7 @@ By default the plot is a view down from positive $z$ direction
 fplot3d(f, mesh=9)
 ```
 
-Create a 3D plot using `Axis3` and switch of the mesh since `CairoMakie` does not handle hidden lines.
+Create a 3D plot using `Axis3` and switch of the mesh off since `CairoMakie` does not handle hidden lines.
 
 ```{julia}
 fig = Figure()
