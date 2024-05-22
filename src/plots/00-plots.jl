@@ -31,4 +31,7 @@ include("mplot.jl")
 include("fplot.jl")
 include("fplot3d.jl")
 
+# TODO
+# plottype(::T) where {T<:AbstractMapping{SVector{2,Float64},Real}} = FPlot3D
+
 end
