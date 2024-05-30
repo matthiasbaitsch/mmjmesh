@@ -128,3 +128,46 @@ ax3d = Axis3(fig[1, 1])
 fplot3d!(ax3d, f, mesh=19, npoints=250)
 fig
 ```
+
+Multivariate polynomial
+
+```{julia}
+g = MPolynomial([2 1; 0 1], [1.0, -1.0], ReferenceQuadrilateral)
+fig = Figure()
+Axis3(fig[1, 1])
+fplot3d!(g)
+fig
+```
+
+Multivariate monomials
+
+```{julia}
+fplot3d(mmonomials(2, 3, ReferenceQuadrilateral))
+```
+
+Bilinear functions
+
+```{julia}
+V = [-1 1 1 -1; -1 -1 1 1]
+N = [ValueAtLF(p) for p in eachcol(V)]
+P = mmonomials(2, 1, ReferenceQuadrilateral)
+M = [n(p) for p in P, n in N]
+H = inv(M) * P
+
+fplot3d(H)
+```
+
+Serendipity shape functions
+```{julia}
+V = [-1 0 1 1 1 0 -1 -1; -1 -1 -1 0 1 1 1 0]
+P = mmonomials(
+    2, 2,
+    ReferenceQuadrilateral,
+    predicate=(p1, p2) -> p1 + p2 < 4
+)
+N = [ValueAtLF(p) for p in eachcol(V)]
+M = [n(p) for p in P, n in N]
+H = inv(M) * P
+
+fplot3d(H)
+```

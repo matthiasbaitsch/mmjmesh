@@ -40,3 +40,20 @@ function MakieCore.plot!(plot::FPlot3D)
     end
     return plot
 end
+
+
+function fplot3d(fs::AbstractArray{<:AbstractMapping})
+    n = length(fs)
+    fig = Makie.Figure()
+    cnt = 1
+    ncol = Int(ceil(sqrt(n)))
+    nrow = Int(ceil(n / ncol))
+    for i = 1:ncol, j = 1:nrow
+        if cnt <= n
+            Makie.hidedecorations!(Makie.Axis3(fig[i, j], protrusions=0))
+            fplot3d!(fs[cnt])
+            cnt += 1
+        end
+    end
+    return fig
+end

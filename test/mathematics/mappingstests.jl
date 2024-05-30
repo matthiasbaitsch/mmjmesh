@@ -139,7 +139,7 @@ f = 2 / Polynomial(0, 1)
 
 
 # -------------------------------------------------------------------------------------------------
-# Functions R → Rn
+# Mappings R → Rn
 # -------------------------------------------------------------------------------------------------
 
 c = ParametricCurve(Sin(), Cos())
@@ -161,3 +161,50 @@ f2 = c * Polynomial(1, 2, 3)
 @test codomaintype(f1) <: SVector
 @test codomaintype(f2) <: SVector
 
+
+# -------------------------------------------------------------------------------------------------
+# Mappings Rn → R
+# -------------------------------------------------------------------------------------------------
+
+# Multivariate polynomial
+x = [1, 2, 3]
+f = MPolynomial([3 1; 1 1; 0 2], [-2.0, 3.0])
+g = MPolynomial([3 1 1; 1 1 2; 2 2 3], [1.0, 2.0, 4.0])
+
+@test f == f
+@test f(x) == 50
+@test (3.1 * f)(x) == 3.1 * 50
+@test (f + g)(x) == f(x) + g(x)
+@test domaintype(f) == SVector{3,Float64}
+
+# Product function, two parameters
+f = ProductFunction(Sin(0 .. 1), Cos(0.5 .. 5))
+x = SVector(1.0, 2.0)
+@test valueat(f, x) == sin(1) * cos(2)
+@test gradientat(f, x) == [cos(1) * cos(2), -sin(1) * sin(2)]
+# TODO @test ∇(f)(x) == gradientat(f, x)
+@test hessianat(f, x) ≈ [
+    -sin(1)*cos(2) -cos(1)*sin(2)
+    -cos(1)*sin(2) -sin(1)*cos(2)
+]
+# TODO @test H(f)(x) == hessian(f, x)
+@test gradientat(f, x) isa SVector{2,Float64}
+@test hessianat(f, x) isa MMatrix{2,2,Float64}
+@test domain(f) == (0 .. 1) × (0.5 .. 5)
+# TODO Generic test
+
+# Product function three variables
+f = ProductFunction(Sin(1 .. 2), Cos(3 .. 4), Polynomial([2, 3], 6 .. 7))
+x = SVector(1.0, 2.0, 3.0)
+@test valueat(f, x) == sin(1) * cos(2) * 11
+@test gradientat(f, x) ≈ [cos(1) * cos(2) * 11, -sin(1) * sin(2) * 11, sin(1) * cos(2) * 3]
+@test hessianat(f, x) ≈ [
+    -sin(1)*cos(2)*11 -cos(1)*sin(2)*11 cos(1)*cos(2)*3
+    -cos(1)*sin(2)*11 -sin(1)*cos(2)*11 -sin(1)*sin(2)*3
+    cos(1)*cos(2)*3 -sin(1)*sin(2)*3 0
+]
+# TODO @test H(f)(x) == hessian(f, x)
+@test gradientat(f, x) isa SVector{3,Float64}
+@test hessianat(f, x) isa MMatrix{3,3,Float64}
+@test domain(f) == (1 .. 2) × (3 .. 4) × (6 .. 7)
+# TODO Generic test
