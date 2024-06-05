@@ -1,24 +1,35 @@
+"""
+    ValueAtLF(x)
+
+Evaluates the function at `x`.
+"""
 struct ValueAtLF <: AbstractMapping{AbstractMapping,Real,Any}
     x
     ValueAtLF(x::Real) = new(x)
     ValueAtLF(x::AbstractArray{<:Real}) = new(Vector(x))
 end
-valueat(u::ValueAtLF, f::FunctionToR) = f(u.x)
+valueat(u::ValueAtLF, f::FunctionToR) = valueat(f, u.x)
 
+"""
+    DerivativeAtLF(x)
+
+Evaluates the derivative at `x`.
+"""
 struct DerivativeAtLF <: AbstractMapping{AbstractMapping,Real,Any}
     x
     DerivativeAtLF(x::Real) = new(x)
     DerivativeAtLF(x::AbstractArray{<:Real}) = new(Vector(x))
 end
-valueat(u::DerivativeAtLF, f::FunctionRToR) = f'(u.x)
+valueat(u::DerivativeAtLF, f::FunctionRToR) = derivativeat(f, u.x)
 
-struct DDerivativeAtLF <: AbstractMapping{AbstractMapping,Real,Any}
-    x
-    d
-    DDerivativeAtLF(x::AbstractArray{<:Real}, d::AbstractArray{<:Real}) = new(Vector(x), Vector(d))
-end
-valueat(u::DDerivativeAtLF, f::FunctionToR) = gradientat(f, u.x) ⋅ u.d
+"""
+    PDerivativeAtLF(x, n)
 
+Evaluates the partial derivative at `x` in directions `n` of a function 
+``f : \mathbb{R}^n \to \mathbb{R}``. The i-th entry of `n` specifies the
+order of the partial derivative in direction `i`. For instance, `[1, 2]`
+refers to the partial derivative ``f_{xyy}(\mathbf{x})``.
+"""
 struct PDerivativeAtLF <: AbstractMapping{AbstractMapping,Real,Any}
     x
     n

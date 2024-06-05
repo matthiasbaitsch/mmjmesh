@@ -40,6 +40,7 @@ fplot3d(H)
 Serendipity shape functions
 
 ```{julia}
+WGLMakie.activate!()
 V = [-1 0 1 1 1 0 -1 -1; -1 -1 -1 0 1 1 1 0]
 P = mmonomials(
     2, 2,
