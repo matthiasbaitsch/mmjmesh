@@ -1,5 +1,5 @@
 import Polynomials as P
-import FixedPolynomials as FP
+import MMJMesh.Mathematics.FixedPolynomials as FP
 
 using IntervalSets
 using StaticArrays

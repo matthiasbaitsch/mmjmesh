@@ -8,6 +8,7 @@ using LinearAlgebra
 
 
 # Parts
+include("poly.jl")
 include("mappings.jl")
 include("forms.jl")
 include("fefunctions.jl")
