@@ -11,6 +11,7 @@ book:
     - plot.qmd
     - mathematics.qmd
     - sampling.qmd
+    - finite-elements.qmd
 
 format:
   html: default

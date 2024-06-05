@@ -49,12 +49,18 @@ end
 
 function validate(f::MappingFromR; atol::Real=0.0, rtol::Real=1e-5)
 
-    # Derivatives should always work
+    # Derivatives
     _validatederivatives(f, atol, rtol)
 
-    # Antiderivative should work if it exists
-    if hasmethod(antiderivative, Tuple{typeof(f)})
-        _validateantiderivative(f)
+    # Antiderivative for function R to R
+    if f isa FunctionRToR
+        try
+            _validateantiderivative(f)
+        catch e
+            if !(e isa MMJMesh.MMJBase.NotImplementedError)
+                rethrow(e)
+            end
+        end
     end
 end
 

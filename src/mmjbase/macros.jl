@@ -1,5 +1,13 @@
 # Macros for error reporting, borrowed from Gridap.jl
 
+struct NotImplementedError <: Exception
+  val
+  msg::AbstractString
+  NotImplementedError(@nospecialize(val)) = (@noinline; new(val, ""))
+  NotImplementedError(@nospecialize(val), @nospecialize(msg)) = (@noinline; new(val, msg))
+end
+
+
 macro abstractmethod(message="This function is an abstract method")
   quote
     error($(esc(message)))
@@ -8,7 +16,7 @@ end
 
 macro notimplemented(message="This function is not yet implemented")
   quote
-    error($(esc(message)))
+    throw(NotImplementedError($(esc(message))))
   end
 end
 

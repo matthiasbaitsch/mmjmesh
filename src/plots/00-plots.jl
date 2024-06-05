@@ -21,7 +21,7 @@ using MMJMesh.Topologies
 using MMJMesh.Mathematics
 
 # Exports
-export mplot, fplot, fplot3d, mconf
+export mplot, mconf, fplot, fplot3d, vplot
 
 # Parts
 include("curveapproximation.jl")
@@ -30,6 +30,7 @@ include("sample2d.jl")
 include("mplot.jl")
 include("fplot.jl")
 include("fplot3d.jl")
+include("vplot.jl")
 
 # TODO
 # plottype(::T) where {T<:AbstractMapping{SVector{2,Float64},Real}} = FPlot3D

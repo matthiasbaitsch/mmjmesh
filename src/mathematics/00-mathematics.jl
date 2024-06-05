@@ -15,18 +15,30 @@ include("fefunctions.jl")
 
 
 # Exports
+export MappingFromComponents
 export AbstractMapping, MappingFromR, MappingFromRn, FunctionToR, FunctionRToR, FunctionRnToR
-export domaintype, codomaintype, domain, valueat, derivativeat, derivative
-export R, RPlus, R0Plus, IHat, ReferenceInterval, ReferenceQuadrilateral
+export domaintype, codomaintype, domain, valueat
+export derivativeat, derivative, pderivativeat, pderivative
+export R, R2, RPlus, R0Plus, IHat, ReferenceInterval, QHat, ReferenceQuadrilateral
 export antiderivative, integrate, sample, plot, pois, roots
 export Sin, Cos, Polynomial, fromroots, lagrangepolynomials, monomials, degree
-export gradientat, hessianat, ∇, H
+
 export AdHocMapping
 export makefunction
-export ProductFunction, MPolynomial, mmonomials
 export lagrangebasis1d, Interpolation
+
+# Functions Rn to R
+export gradient, gradientat, hessian, hessianat, laplacian, laplacianat, ∇, H, Δ
+export ProductFunction, MPolynomial, mmonomials
+
+# Vector fields
+export VectorField, div, divergence, divergenceat
+
+# Parametric curves
 export ParametricCurve, UnitNormal
-export ValueAtLF, DerivativeAtLF
+
+# Forms
+export ValueAtLF, DerivativeAtLF, DDerivativeAtLF, PDerivativeAtLF
 
 
 end

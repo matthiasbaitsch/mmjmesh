@@ -6,6 +6,7 @@ export SeqIntSet
 ## functions.jl
 export atol, tomatrix, FromType, ROWS, COLS, pdim, gdim
 ## macros.jl
+export NotImplementedError
 export @abstractmethod
 export @notimplemented
 export @unreachable
