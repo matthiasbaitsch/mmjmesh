@@ -207,7 +207,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>Plot function</p>
-<div id="3a60d4c0" class="cell" data-execution_count="2">
+<div id="c44bdb93" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">doplot</span>(xy)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    f <span class="op">=</span> cm.<span class="fu">lines</span>(xy)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    cm.<span class="fu">scatter!</span>(xy, color<span class="op">=:</span>darkred, markersize<span class="op">=</span><span class="fl">5</span>)</span>
@@ -215,8 +215,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Linear function</p>
-<div id="3aac6cb8" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sampleadaptive</span>(x <span class="op">-&gt;</span> x, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="2157b16f" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sample1d</span>(x <span class="op">-&gt;</span> x, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div>
 <figure class="figure">
@@ -226,8 +226,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Parabola</p>
-<div id="9fee5e53" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sampleadaptive</span>(x <span class="op">-&gt;</span> x<span class="op">^</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="40961375" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sample1d</span>(x <span class="op">-&gt;</span> x<span class="op">^</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div>
 <figure class="figure">
@@ -237,8 +237,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Curved in one region</p>
-<div id="cfef9391" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sampleadaptive</span>(x <span class="op">-&gt;</span> x<span class="op">^</span><span class="fl">100</span>, <span class="fl">0</span>, <span class="fl">1</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="21e1a19e" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sample1d</span>(x <span class="op">-&gt;</span> x<span class="op">^</span><span class="fl">100</span>, <span class="fl">0</span>, <span class="fl">1</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div>
 <figure class="figure">
@@ -248,8 +248,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Singular point</p>
-<div id="b3a01004" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sampleadaptive</span>(x <span class="op">-&gt;</span> <span class="fu">sin</span>(<span class="fl">1.0</span> <span class="op">/</span> x), <span class="fl">0.0</span>, <span class="fl">0.05</span>, maxangle<span class="op">=</span><span class="fl">0.05</span>, npoints<span class="op">=</span><span class="fl">21</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="20e57666" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sample1d</span>(x <span class="op">-&gt;</span> <span class="fu">sin</span>(<span class="fl">1.0</span> <span class="op">/</span> x), <span class="fl">0.0</span>, <span class="fl">0.05</span>, maxangle<span class="op">=</span><span class="fl">0.05</span>, npoints<span class="op">=</span><span class="fl">21</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div>
 <figure class="figure">
@@ -258,8 +258,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="ba1e3cce" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sampleadaptive</span>(x <span class="op">-&gt;</span> <span class="fu">sin</span>(<span class="fl">1.0</span> <span class="op">/</span> x), <span class="fl">0.0</span>, <span class="fl">0.05</span>, yscale<span class="op">=</span><span class="fl">0.05</span>, npoints<span class="op">=</span><span class="fl">21</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="2eb4acb8" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sample1d</span>(x <span class="op">-&gt;</span> <span class="fu">sin</span>(<span class="fl">1.0</span> <span class="op">/</span> x), <span class="fl">0.0</span>, <span class="fl">0.05</span>, yscale<span class="op">=</span><span class="fl">0.05</span>, npoints<span class="op">=</span><span class="fl">21</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div>
 <figure class="figure">
@@ -268,18 +268,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="b22e7c0d" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">size</span>(<span class="fu">sampleadaptive</span>(x <span class="op">-&gt;</span> <span class="fu">sin</span>(<span class="fl">1.0</span> <span class="op">/</span> x), <span class="fl">0.0</span>, <span class="fl">0.05</span>, maxangle<span class="op">=</span><span class="fl">0.1</span>), <span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="7e862bf0" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> <span class="fu">size</span>(<span class="fu">sample1d</span>(x <span class="op">-&gt;</span> <span class="fu">sin</span>(<span class="fl">1.0</span> <span class="op">/</span> x), <span class="fl">0.0</span>, <span class="fl">0.05</span>, maxangle<span class="op">=</span><span class="fl">0.1</span>), <span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  0.044733 seconds (336.79 k allocations: 7.267 MiB, 19.84% compilation time)</code></pre>
+<pre><code>  0.043987 seconds (353.86 k allocations: 7.730 MiB, 18.48% compilation time)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>8479</code></pre>
 </div>
 </div>
 <p>Multiple curvatures</p>
-<div id="4f0f6892" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sampleadaptive</span>(x <span class="op">-&gt;</span> <span class="fu">sin</span>(<span class="fl">30</span> <span class="op">*</span> <span class="fu">sin</span>(x)), <span class="fl">0</span>, <span class="fl">2</span>pi) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="0942f31d" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sample1d</span>(x <span class="op">-&gt;</span> <span class="fu">sin</span>(<span class="fl">30</span> <span class="op">*</span> <span class="fu">sin</span>(x)), <span class="fl">0</span>, <span class="fl">2</span>pi) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div>
 <figure class="figure">
@@ -289,8 +289,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Discontinuity</p>
-<div id="7d99adcb" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sampleadaptive</span>(x <span class="op">-&gt;</span> <span class="fl">1</span> <span class="op">/</span> x, <span class="fl">0</span>, <span class="fl">1</span>, yscale<span class="op">=</span><span class="fl">1e-5</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="a58cfb00" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sample1d</span>(x <span class="op">-&gt;</span> <span class="fl">1</span> <span class="op">/</span> x, <span class="fl">0</span>, <span class="fl">1</span>, yscale<span class="op">=</span><span class="fl">1e-5</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <div>
 <figure class="figure">
@@ -300,8 +300,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Insert root</p>
-<div id="a44f182b" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sampleadaptive</span>(x <span class="op">-&gt;</span> (<span class="op">-</span><span class="fl">0.3</span> <span class="op">+</span> x), <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, ir<span class="op">=</span><span class="cn">true</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="7e698ce1" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sample1d</span>(x <span class="op">-&gt;</span> (<span class="op">-</span><span class="fl">0.3</span> <span class="op">+</span> x), <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, ir<span class="op">=</span><span class="cn">true</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <div>
 <figure class="figure">
@@ -311,8 +311,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Non smooth function</p>
-<div id="887f8436" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sampleadaptive</span>(x <span class="op">-&gt;</span> <span class="fu">abs</span>(x), <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="d93839e0" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sample1d</span>(x <span class="op">-&gt;</span> <span class="fu">abs</span>(x), <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <div>
 <figure class="figure">
@@ -322,10 +322,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Local peak</p>
-<div id="8c547553" class="cell" data-execution_count="13">
+<div id="6af1b1d0" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="fl">0.01</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">Polynomial</span>(<span class="fl">0</span>, <span class="fl">1</span>, d<span class="op">=-</span><span class="fl">1</span> <span class="op">..</span> <span class="fl">1</span>) <span class="op">+</span> a<span class="op">^</span><span class="fl">2</span> <span class="op">/</span> <span class="fu">Polynomial</span>(a<span class="op">^</span><span class="fl">2</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sampleadaptive</span>(f, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sample1d</span>(f, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <div>
 <figure class="figure">
@@ -335,9 +335,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Circle</p>
-<div id="0374b21a" class="cell" data-execution_count="14">
+<div id="55357d0b" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">ParametricCurve</span>(<span class="fu">Cos</span>(<span class="fl">0</span> <span class="op">..</span> <span class="fl">2</span>π), <span class="fu">Sin</span>(<span class="fl">0</span> <span class="op">..</span> <span class="fl">2</span>π))</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sampleadaptive</span>(u, <span class="fl">0</span>, <span class="fl">2</span>pi) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sample1d</span>(u, <span class="fl">0</span>, <span class="fl">2</span>pi) <span class="op">|&gt;</span> doplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
 <div>
 <figure class="figure">

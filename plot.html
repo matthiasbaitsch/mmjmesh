@@ -229,7 +229,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="3.1" class="anchored" data-anchor-id="plot-a-1d-mesh"><span class="header-section-number">3.1</span> Plot a 1D mesh</h2>
 <section id="on-a-straight-line" class="level3" data-number="3.1.1">
 <h3 data-number="3.1.1" class="anchored" data-anchor-id="on-a-straight-line"><span class="header-section-number">3.1.1</span> On a straight line</h3>
-<div id="3762a150" class="cell" data-execution_count="2">
+<div id="d93ddb7b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshoninterval</span>(<span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">20</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
@@ -241,7 +241,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Nodes hidden if too many.</p>
-<div id="45af8bcb" class="cell" data-execution_count="3">
+<div id="ec3d4b1b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshoninterval</span>(<span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">60</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
@@ -253,7 +253,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>One value per node</p>
-<div id="e89b2542" class="cell" data-execution_count="4">
+<div id="edc3934a" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1.1</span> <span class="op">.+</span> <span class="fl">2.6</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fu">nnodes</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div>
@@ -264,7 +264,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>One value per element</p>
-<div id="ea355d8a" class="cell" data-execution_count="5">
+<div id="0a117dec" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1.1</span> <span class="op">.+</span> <span class="fl">2.2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fu">nedges</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div>
@@ -275,7 +275,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Two values per element</p>
-<div id="ef39274d" class="cell" data-execution_count="6">
+<div id="ca154e5c" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1.1</span> <span class="op">.+</span> <span class="fl">2.2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fl">2</span>, <span class="fu">nedges</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div>
@@ -288,7 +288,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="vertical" class="level3" data-number="3.1.2">
 <h3 data-number="3.1.2" class="anchored" data-anchor-id="vertical"><span class="header-section-number">3.1.2</span> Vertical</h3>
-<div id="0d447fcf" class="cell" data-execution_count="7">
+<div id="a2a7a481" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshoninterval</span>(<span class="cn">π</span>, <span class="fl">3</span>π, <span class="fl">20</span>, t <span class="op">-&gt;</span> [<span class="fl">0</span>; t])</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1.1</span> <span class="op">.+</span> <span class="fl">3.2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fu">nedges</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
@@ -302,7 +302,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="on-a-spiral" class="level3" data-number="3.1.3">
 <h3 data-number="3.1.3" class="anchored" data-anchor-id="on-a-spiral"><span class="header-section-number">3.1.3</span> On a spiral</h3>
-<div id="5383828f" class="cell" data-execution_count="8">
+<div id="219c0fa5" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshoninterval</span>(<span class="cn">π</span>, <span class="fl">3</span>π, <span class="fl">20</span>, t <span class="op">-&gt;</span> t <span class="op">*</span> [<span class="fu">cos</span>(t); <span class="fu">sin</span>(t)])</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1.1</span> <span class="op">.+</span> <span class="fl">3.2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fl">2</span>, <span class="fu">nedges</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
@@ -317,7 +317,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="customize-plot" class="level3" data-number="3.1.4">
 <h3 data-number="3.1.4" class="anchored" data-anchor-id="customize-plot"><span class="header-section-number">3.1.4</span> Customize plot</h3>
 <p>Plot customization works like this:</p>
-<div id="ffbe5ff3" class="cell" data-execution_count="9">
+<div id="26c2cbf2" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>f, ax <span class="op">=</span> <span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1.1</span> <span class="op">.+</span> <span class="fl">3.2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fl">2</span>, <span class="fu">nedges</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>ax.title <span class="op">=</span> <span class="st">"Spiral with reversed vertical axis"</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>ax.yreversed <span class="op">=</span> <span class="cn">true</span></span>
@@ -337,7 +337,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="3.2" class="anchored" data-anchor-id="plot-a-2d-mesh"><span class="header-section-number">3.2</span> Plot a 2D mesh</h2>
 <section id="quad-mesh" class="level3" data-number="3.2.1">
 <h3 data-number="3.2.1" class="anchored" data-anchor-id="quad-mesh"><span class="header-section-number">3.2.1</span> Quad mesh</h3>
-<div id="0d8e0a37" class="cell" data-execution_count="10">
+<div id="73f08707" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="fl">80</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshonrectangle</span>(<span class="fl">9.0</span>, <span class="fl">4.5</span>, <span class="fl">2</span>a, a)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Number of nodes is Nn = "</span>, (a <span class="op">+</span> <span class="fl">1</span>) <span class="op">*</span> (<span class="fl">2</span>a <span class="op">+</span> <span class="fl">1</span>))</span>
@@ -345,11 +345,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> l12 <span class="op">=</span> <span class="fu">links</span>(m.topology, <span class="fl">1</span>, <span class="fl">2</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Number of nodes is Nn = 13041
-Links...  0.237752 seconds (1.11 M allocations: 86.500 MiB, 74.10% gc time, 6.19% compilation time)</code></pre>
+Links...  0.091282 seconds (1.11 M allocations: 86.504 MiB, 32.34% gc time, 14.82% compilation time)</code></pre>
 </div>
 </div>
 <p>Default color</p>
-<div id="0c16e078" class="cell" data-execution_count="11">
+<div id="c89b5a1b" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, edgesvisible<span class="op">=</span><span class="cn">true</span>, edgecolor<span class="op">=:</span>hotpink) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <div>
@@ -360,7 +360,7 @@ Links...  0.237752 seconds (1.11 M allocations: 86.500 MiB, 74.10% gc time, 6.19
 </div>
 </div>
 <p>Colors for nodes</p>
-<div id="a3939ad3" class="cell" data-execution_count="12">
+<div id="aa286fcb" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="fl">4.1</span> <span class="op">*</span> (<span class="fu">rand</span>(<span class="fu">nnodes</span>(m)) <span class="op">.-</span> <span class="fl">0.25</span>)) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <div>
@@ -371,7 +371,7 @@ Links...  0.237752 seconds (1.11 M allocations: 86.500 MiB, 74.10% gc time, 6.19
 </div>
 </div>
 <p>Colors for elements</p>
-<div id="5fa15fbd" class="cell" data-execution_count="13">
+<div id="319aed7f" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="fl">4.1</span> <span class="op">*</span> (<span class="fu">rand</span>(<span class="fu">nfaces</span>(m)) <span class="op">.-</span> <span class="fl">0.25</span>)) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <div>
@@ -384,7 +384,7 @@ Links...  0.237752 seconds (1.11 M allocations: 86.500 MiB, 74.10% gc time, 6.19
 </section>
 <section id="triangle-mesh" class="level3" data-number="3.2.2">
 <h3 data-number="3.2.2" class="anchored" data-anchor-id="triangle-mesh"><span class="header-section-number">3.2.2</span> Triangle mesh</h3>
-<div id="454e89f2" class="cell" data-execution_count="14">
+<div id="46399d97" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="fl">20</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshonrectangle</span>(<span class="fl">9.0</span>, <span class="fl">4.5</span>, <span class="fl">2</span>a, a, TRIANGLE)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Nn = "</span>, (a <span class="op">+</span> <span class="fl">1</span>) <span class="op">*</span> (<span class="fl">2</span>a <span class="op">+</span> <span class="fl">1</span>))</span>
@@ -392,11 +392,11 @@ Links...  0.237752 seconds (1.11 M allocations: 86.500 MiB, 74.10% gc time, 6.19
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> l12 <span class="op">=</span> <span class="fu">links</span>(m.topology, <span class="fl">1</span>, <span class="fl">2</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Nn = 861
-Links (1, 2):  0.004417 seconds (101.71 k allocations: 8.227 MiB)</code></pre>
+Links (1, 2):  0.004371 seconds (101.71 k allocations: 8.229 MiB)</code></pre>
 </div>
 </div>
 <p>Default color</p>
-<div id="71a5f6d0" class="cell" data-execution_count="15">
+<div id="72d5da8a" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, edgesvisible<span class="op">=</span><span class="cn">true</span>) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="16">
 <div>
@@ -407,7 +407,7 @@ Links (1, 2):  0.004417 seconds (101.71 k allocations: 8.227 MiB)</code></pre>
 </div>
 </div>
 <p>Colors for nodes</p>
-<div id="f2a20cd5" class="cell" data-execution_count="16">
+<div id="1180b62e" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="fl">4.1</span> <span class="op">*</span> (<span class="fu">rand</span>(<span class="fu">nnodes</span>(m)) <span class="op">.-</span> <span class="fl">0.25</span>)) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
 <div>
@@ -418,7 +418,7 @@ Links (1, 2):  0.004417 seconds (101.71 k allocations: 8.227 MiB)</code></pre>
 </div>
 </div>
 <p>Colors for elements</p>
-<div id="30febcff" class="cell" data-execution_count="17">
+<div id="b44f8b2a" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="fl">4.1</span> <span class="op">*</span> (<span class="fu">rand</span>(<span class="fu">nfaces</span>(m)) <span class="op">.-</span> <span class="fl">0.25</span>)) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="18">
 <div>
@@ -432,7 +432,7 @@ Links (1, 2):  0.004417 seconds (101.71 k allocations: 8.227 MiB)</code></pre>
 </section>
 <section id="plot-options" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="plot-options"><span class="header-section-number">3.3</span> Plot options</h2>
-<div id="731445ec" class="cell" data-execution_count="18">
+<div id="968d2df8" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="fl">10</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>m1 <span class="op">=</span> <span class="fu">makemeshonrectangle</span>(<span class="fl">4</span>, <span class="fl">2</span>, <span class="fl">2</span>a, a)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m1, <span class="fl">3</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fu">nfaces</span>(m1)),</span>
@@ -449,7 +449,7 @@ Links (1, 2):  0.004417 seconds (101.71 k allocations: 8.227 MiB)</code></pre>
 </div>
 </div>
 </div>
-<div id="2afc3c43" class="cell" data-execution_count="19">
+<div id="21e8fbc4" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>m2 <span class="op">=</span> <span class="fu">makemeshoninterval</span>(<span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">20</span>)</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m2, <span class="fu">rand</span>(<span class="fu">nnodes</span>(m2)),</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    lineplotoutlinesvisible<span class="op">=</span><span class="cn">true</span>,</span>

@@ -216,7 +216,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>This chapter is incomplete and probably not worth reading.</p>
-<div id="38a3338e" class="cell" data-execution_count="1">
+<div id="c7b0f477" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>meshpath (generic function with 1 method)</code></pre>
 </div>
@@ -224,7 +224,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="basic-usage" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="basic-usage"><span class="header-section-number">2.1</span> Basic usage</h2>
 <p>Create mesh</p>
-<div id="8f3bcee8" class="cell" data-execution_count="2">
+<div id="0c8488fe" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>coords <span class="op">=</span> [<span class="fl">0.0</span> <span class="fl">1.0</span> <span class="fl">2.0</span> <span class="fl">0.1</span> <span class="fl">0.9</span> <span class="fl">1.9</span>; <span class="fl">0.0</span> <span class="fl">0.1</span> <span class="fl">0.0</span> <span class="fl">0.9</span> <span class="fl">1.0</span> <span class="fl">0.9</span>]</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>elts <span class="op">=</span> [[<span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">4</span>], [<span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">6</span>], [<span class="fl">2</span>, <span class="fl">6</span>, <span class="fl">5</span>]]</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">Mesh</span>(coords, elts, <span class="fl">2</span>)</span>
@@ -238,7 +238,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Coordinates of a node</p>
-<div id="dc25a85e" class="cell" data-execution_count="3">
+<div id="606b8bdf" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coordinates</span>(<span class="fu">node</span>(m, <span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>2-element Vector{Float64}:
@@ -247,7 +247,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Coordinates of a face</p>
-<div id="11bcfb89" class="cell" data-execution_count="4">
+<div id="216ab50a" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coordinates</span>(<span class="fu">face</span>(m, <span class="fl">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>2×3 Matrix{Float64}:
@@ -256,7 +256,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Process faces and print node and edge indices</p>
-<div id="f562e94a" class="cell" data-execution_count="5">
+<div id="057928bb" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="cn">e</span> <span class="op">∈</span> <span class="fu">elements</span>(m)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">println</span>(<span class="cn">e</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">println</span>(<span class="st">"- "</span>, <span class="fu">nodeindices</span>(<span class="cn">e</span>))</span>
@@ -281,7 +281,7 @@ Face{2, 3}[3]
 </section>
 <section id="read-mesh-from-gmsh-file" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="read-mesh-from-gmsh-file"><span class="header-section-number">2.2</span> Read mesh from Gmsh file</h2>
-<div id="350b9f34" class="cell" data-execution_count="6">
+<div id="11b732de" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">Mesh</span>(<span class="fu">meshpath</span>(<span class="st">"complex-g1.msh"</span>))</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, edgesvisible<span class="op">=</span><span class="cn">true</span>) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -296,7 +296,7 @@ Face{2, 3}[3]
 <section id="groups-and-predefined-groups" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="groups-and-predefined-groups"><span class="header-section-number">2.3</span> Groups and predefined groups</h2>
 <p>Mesh entities can be collected in groups some of which are predefined.</p>
-<div id="e7272fd0" class="cell" data-execution_count="7">
+<div id="afc82485" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">keys</span>(m.groups.recipes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>KeySet for a Dict{Symbol, Function} with 7 entries. Keys:
@@ -309,14 +309,14 @@ Face{2, 3}[3]
   :boundarynodes</code></pre>
 </div>
 </div>
-<div id="3fda1e18" class="cell" data-execution_count="8">
+<div id="ceb384cd" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(m.groups[<span class="op">:</span>boundarynodes])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>NodeGroup[1:19, 31:34, 46:106, 116:157]</code></pre>
 </div>
 </div>
 <p>Groups can be used to filter access</p>
-<div id="b09cb7d9" class="cell" data-execution_count="9">
+<div id="edf5b23f" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">Mesh</span>(<span class="fu">meshpath</span>(<span class="st">"complex-g1.msh"</span>))</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fu">mplot</span>(m)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>cm.<span class="fu">scatter!</span>(p.axis, <span class="fu">coordinates</span>(m, <span class="op">:</span>boundarynodes), color <span class="op">=</span> <span class="op">:</span>hotpink)</span>
@@ -330,7 +330,7 @@ Face{2, 3}[3]
 </div>
 </div>
 <p>Additional groups can be defined</p>
-<div id="79687e02" class="cell" data-execution_count="10">
+<div id="c1baf4e3" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>m.groups[<span class="op">:</span>f1] <span class="op">=</span> <span class="fu">FaceGroup</span>(<span class="fl">100</span><span class="op">:</span><span class="fl">300</span>)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>m.groups[<span class="op">:</span>f2] <span class="op">=</span> <span class="fu">FaceGroup</span>(<span class="fl">200</span><span class="op">:</span><span class="fl">600</span>)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>m.groups[<span class="op">:</span>e1] <span class="op">=</span> <span class="fu">EdgeGroup</span>(<span class="fl">600</span><span class="op">:</span><span class="fl">800</span>)</span>
@@ -348,7 +348,7 @@ Face{2, 3}[3]
 <section id="data" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="data"><span class="header-section-number">2.4</span> Data</h2>
 <p>Example how to attach data to mesh entities:</p>
-<div id="c97256da" class="cell" data-execution_count="11">
+<div id="9de29920" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">Mesh</span>(<span class="fu">meshpath</span>(<span class="st">"complex-g1.msh"</span>))</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>n1 <span class="op">=</span> <span class="fu">node</span>(m, <span class="fl">1</span>)</span>
@@ -367,7 +367,7 @@ e22.data[:d2] = 61</code></pre>
 </div>
 </div>
 <p>Example how to attach data to groups:</p>
-<div id="97aa1a93" class="cell" data-execution_count="12">
+<div id="51f06e1c" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">Mesh</span>(<span class="fu">meshpath</span>(<span class="st">"complex-g1.msh"</span>))</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"s1: "</span>, m.groups[<span class="op">:</span>s1].indices)</span>

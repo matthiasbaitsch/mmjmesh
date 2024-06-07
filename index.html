@@ -258,7 +258,7 @@ window.Quarto = {
 <section id="demo-for-1d-meshes" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="demo-for-1d-meshes"><span class="header-section-number">1.1</span> Demo for 1D meshes</h2>
 <p>First, we need to load the required modules. Note that <code>CairoMakie</code> included by <code>import</code> and not by <code>using</code> in order to avoid name collissions.</p>
-<div id="2ebd2b69" class="cell" data-execution_count="1">
+<div id="a1d03613" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">CairoMakie</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">IntervalSets</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MMJMesh.Plots</span></span>
@@ -267,7 +267,7 @@ window.Quarto = {
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MMJMesh.Mathematics</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>In the simplest case, a 1D mesh is defined by parameter bounds and the number of elements.</p>
-<div id="6675f6cb" class="cell" data-execution_count="3">
+<div id="70bd9fa3" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshoninterval</span>(<span class="fl">0.0</span>, <span class="fl">8.0</span>, <span class="fl">4</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
@@ -279,7 +279,7 @@ window.Quarto = {
 </div>
 </div>
 <p>Elements of the mesh can be easily processed in a loop:</p>
-<div id="2112a014" class="cell" data-execution_count="4">
+<div id="decd4d62" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="cn">e</span> <span class="op">∈</span> <span class="fu">elements</span>(m)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">println</span>(<span class="cn">e</span>, <span class="st">" with n = "</span>, <span class="fu">nodeindices</span>(<span class="cn">e</span>), <span class="st">" and l = "</span>, <span class="fu">length</span>(<span class="cn">e</span>))</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -292,7 +292,7 @@ Edge{2, 2}[4] with n = [4, 5] and l = 2.0</code></pre>
 </div>
 <p>Various functions like <code>nodeindices</code> and <code>length</code> exist to access properties. If you are used to an object-oriented language like Java it might be helpful to understand that <code>nodeindices(e)</code> in Julia is equivalent to <code>e.nodeindices()</code> in an OO language.</p>
 <p>Node coordinates are retrieved using the <code>coordinates</code> method:</p>
-<div id="f6a5c40c" class="cell" data-execution_count="5">
+<div id="264404b9" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coordinates</span>(m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>2×5 Matrix{Float64}:
@@ -301,12 +301,12 @@ Edge{2, 2}[4] with n = [4, 5] and l = 2.0</code></pre>
 </div>
 </div>
 <p>Properties are associated with the mesh using the <code>data</code> field of the mesh and a name for the property in the form <code>:name</code></p>
-<div id="9d2cc19c" class="cell" data-execution_count="6">
+<div id="e6fd713c" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m.data[<span class="op">:</span>foo] <span class="op">=</span> <span class="fl">99</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>m.data[<span class="op">:</span>bar] <span class="op">=</span> sqrt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>and then are ready to be used in a later stage</p>
-<div id="a23715ca" class="cell" data-execution_count="7">
+<div id="4801e956" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> m.data[<span class="op">:</span>bar]</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(<span class="fl">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
@@ -315,7 +315,7 @@ Edge{2, 2}[4] with n = [4, 5] and l = 2.0</code></pre>
 </div>
 <p>In Julia, <code>:name</code> is called a symbol. In many applications, this is equivalent to the use of strings like <code>"name"</code>, however, easier to type.</p>
 <p>It is easy to plot quantities for nodes</p>
-<div id="b6f1c530" class="cell" data-execution_count="8">
+<div id="978b8976" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1</span> <span class="op">.+</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fu">nnodes</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div>
@@ -326,7 +326,7 @@ Edge{2, 2}[4] with n = [4, 5] and l = 2.0</code></pre>
 </div>
 </div>
 <p>constant on elements</p>
-<div id="71e880b2" class="cell" data-execution_count="9">
+<div id="7c38555a" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1</span> <span class="op">.+</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fu">nelements</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div>
@@ -337,7 +337,7 @@ Edge{2, 2}[4] with n = [4, 5] and l = 2.0</code></pre>
 </div>
 </div>
 <p>linear on elements</p>
-<div id="246e0ff5" class="cell" data-execution_count="10">
+<div id="7bfd2cbd" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, <span class="op">-</span><span class="fl">1</span> <span class="op">.+</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu">rand</span>(<span class="fl">2</span>, <span class="fu">nelements</span>(m))) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <div>
@@ -348,7 +348,7 @@ Edge{2, 2}[4] with n = [4, 5] and l = 2.0</code></pre>
 </div>
 </div>
 <p>functions on elements</p>
-<div id="fc755a1a" class="cell" data-execution_count="11">
+<div id="97c93775" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m, [<span class="fu">Polynomial</span>(<span class="fu">rand</span>(<span class="op">-</span><span class="fl">1</span> <span class="op">..</span> <span class="fl">1</span>, <span class="fl">4</span>), IHat) for _ <span class="op">∈</span> <span class="fl">1</span><span class="op">:</span><span class="fu">nelements</span>(m)]) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <div>
@@ -359,7 +359,7 @@ Edge{2, 2}[4] with n = [4, 5] and l = 2.0</code></pre>
 </div>
 </div>
 <p>Furthermore, 1D meshes can be created with a parametric function</p>
-<div id="145e6ae4" class="cell" data-execution_count="12">
+<div id="f720f6fc" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshoninterval</span>(<span class="fl">0</span>, <span class="fl">5</span>, <span class="fl">60</span>, t <span class="op">-&gt;</span> [t; <span class="fl">0.3</span> <span class="op">*</span> <span class="fu">sin</span>(<span class="cn">π</span> <span class="op">*</span> t)])</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
@@ -385,7 +385,7 @@ Edge{2, 2}[4] with n = [4, 5] and l = 2.0</code></pre>
 <section id="demo-for-2d-meshes" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="demo-for-2d-meshes"><span class="header-section-number">1.2</span> Demo for 2D meshes</h2>
 <p>Create mesh on rectangular grid</p>
-<div id="8174710a" class="cell" data-execution_count="13">
+<div id="5412ac92" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="fl">80</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">makemeshonrectangle</span>(<span class="fl">9.0</span>, <span class="fl">4.5</span>, <span class="fl">2</span>a, a)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -398,7 +398,7 @@ Edge{2, 2}[4] with n = [4, 5] and l = 2.0</code></pre>
 </div>
 </div>
 <p>Read mesh from Gmsh</p>
-<div id="80bfd8e1" class="cell" data-execution_count="14">
+<div id="92a10ba4" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">Mesh</span>(<span class="st">"../data/gmsh/advanced.msh"</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mplot</span>(m) <span class="op">|&gt;</span> <span class="fu">mconf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
@@ -410,7 +410,7 @@ Edge{2, 2}[4] with n = [4, 5] and l = 2.0</code></pre>
 </div>
 </div>
 <p>Indices of nodes on boundary</p>
-<div id="40383245" class="cell" data-execution_count="15">
+<div id="b9ef3302" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>m.groups[<span class="op">:</span>boundarynodes]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="16">
 <pre><code>12-element NodeGroup:
