@@ -26,9 +26,9 @@ valueat(u::DerivativeAtLF, f::FunctionRToR) = derivativeat(f, u.x)
     PDerivativeAtLF(x, n)
 
 Evaluates the partial derivative at `x` in directions `n` of a function 
-``f : \mathbb{R}^n \to \mathbb{R}``. The i-th entry of `n` specifies the
+``f : \\mathbb{R}^n \\to \\mathbb{R}``. The i-th entry of `n` specifies the
 order of the partial derivative in direction `i`. For instance, `[1, 2]`
-refers to the partial derivative ``f_{xyy}(\mathbf{x})``.
+refers to the partial derivative ``f_{xyy}(\\mathbf{x})``.
 """
 struct PDerivativeAtLF <: AbstractMapping{AbstractMapping,Real,Any}
     x

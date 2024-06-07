@@ -1,4 +1,5 @@
 using Test
+using Symbolics
 using StaticArrays
 using IntervalSets
 using LinearAlgebra
@@ -202,6 +203,18 @@ f = MPolynomial([1 3; 1 2], [1, 3])
 @test integrate(f, 1 .. 2, 5 .. 9) == 2307
 
 
+# Symbolic variables
+@variables a, b
+f = MPolynomial([1 2; 2 1], [a, b]);
+g = MPolynomial([3 2; 2 3], [7, 2]);
+@test simplify(f(2, 3) == 18a + 12b) == true
+@test simplify((a * f)(2, 3) == 18a^2 + 12a * b) == true
+@test simplify((f * g)(2, 3) == (g * f)(2, 3)) == true
+@test simplify((f * f)(1, 2) == 16 * a^2 + 16 * a * b + 4 * b^2) == true
+@test simplify(g(a, b) == 7(a^3) * (b^2) + 2(a^2) * (b^3)) == true
+@test simplify(ValueAtLF([a, b])(f) == 2(a^2) * (b^2)) == true
+
+
 # -------------------------------------------------------------------------------------------------
 # Parametric curves R → Rn
 # -------------------------------------------------------------------------------------------------
@@ -306,7 +319,7 @@ g = MPolynomial([3 1 1; 1 1 2; 2 2 3], [1.0, 2.0, 4.0])
 @test f(x) == 50
 @test (3.1 * f)(x) == 3.1 * 50
 @test (f + g)(x) == f(x) + g(x)
-@test domaintype(f) == SVector{3,Float64}
+@test domaintype(f) == SVector{3,<:Real}
 @test domain(MPolynomial([1 2; 2 1], [1, 2])) == R2
 
 ps = mmonomials(2, 1)

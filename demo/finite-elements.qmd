@@ -4,15 +4,39 @@
 #| echo: false
 #| warning: false
 include("setup.jl")
+using Latexify
+using WGLMakie
+using Symbolics
+using DomainSets
+using CairoMakie
 using IntervalSets
 using LinearAlgebra
-using WGLMakie
-using CairoMakie
-using DomainSets
 CairoMakie.activate!()
 ```
 
 ## Shape functions
+
+Linear shape functions
+
+```{julia}
+N = [ValueAtLF(-1), ValueAtLF(1)]
+P = monomials(0:1, -1 .. 1)
+M = [n(p) for p ∈ P, n ∈ N]
+L11 = inv(M) * P
+
+fplot(L11...)
+```
+
+Hermite polynomials
+
+```{julia}
+h = 2.0
+N = [ValueAtLF(-1), DerivativeAtLF(-1), ValueAtLF(1), DerivativeAtLF(1)]
+P = monomials(0:length(N)-1, IHat)
+M = [n(p) for p in P, n in N]
+H1 = inv(M) * P
+fplot(H1...)
+```
 
 Hermite like polynomials with middle node
 
@@ -28,40 +52,31 @@ fplot(H...)
 Bilinear shape functions
 
 ```{julia}
+WGLMakie.activate!()
 V = [-1 1 1 -1; -1 -1 1 1]
 N = [ValueAtLF(p) for p in eachcol(V)]
 P = mmonomials(2, 1, QHat)
 M = [n(p) for p in P, n in N]
-H = inv(M) * P
-
-fplot3d(H)
+L21 = inv(M) * P
+fplot3d(L21)
 ```
 
 Serendipity shape functions
 
 ```{julia}
-WGLMakie.activate!()
 V = [-1 0 1 1 1 0 -1 -1; -1 -1 -1 0 1 1 1 0]
-P = mmonomials(
-    2, 2,
-    QHat,
-    predicate=(p1, p2) -> p1 + p2 < 4
-)
+P = mmonomials(2, 2, QHat, (p1, p2) -> p1 + p2 < 4)
 N = [ValueAtLF(p) for p in eachcol(V)]
 M = [n(p) for p in P, n in N]
-H = inv(M) * P
-
-fplot3d(H)
+Q8 = inv(M) * P
+fplot3d(Q8)
 ```
 
 Conforming rectangular plate element shape functions
 
 ```{julia}
-V = [-1.0 1 1 -1; -1 -1 1 1]
-P = mmonomials(
-    2, 3,
-    QHat
-)
+V = [-1 1 1 -1; -1 -1 1 1]
+P = mmonomials(2, 3, QHat)
 N = vcat(
     [
         [
@@ -74,8 +89,59 @@ N = vcat(
     ]...
 )
 M = [n(p) for p in P, n in N]
-H = inv(M) * P
+H4 = inv(M) * P
 
-fplot3d(H)
+fplot3d(H4)
 ```
 
+## Finite element stiffness matrices
+
+```{julia}
+@variables l, a, b, EA, EI, ν;
+```
+
+### Truss
+
+```{julia}
+D(u) = 2 / l * u'
+ae(u, δu) = EA * l / 2 * integrate(D(u) * D(δu), IHat)
+Ke = simplify.([ae(s1, s2) for s1 ∈ L11, s2 ∈ L11])
+```
+
+### Beam
+
+```{julia}
+H1l = [H1[1], l / 2 * H1[2], H1[3], l / 2 * H1[4]]
+D(w) = 4 / l^2 * w''
+ae(w, δw) = EI * l / 2 * integrate(D(w) * D(δw), IHat)
+Ke = simplify.(l^3 / EI * [ae(s1, s2) for s1 ∈ H1l, s2 ∈ H1l])
+```
+
+### 2D Poisson equation
+
+Integration on the reference quadrilateral
+
+```{julia}
+D(u) = [2 / a * ∂x(u), 2 / b * ∂y(u)]
+ae(u, v) = a * b / 4 * integrate(D(u) ⋅ D(v), QHat)
+Ke = simplify.(expand.(6 * a * b * [ae(n1, n2) for n1 ∈ L21, n2 ∈ L21]))
+```
+
+Alternative derivation in physical coordinates
+
+```{julia}
+V = [0 a a 0; 0 0 b b]
+N = [ValueAtLF(p) for p in eachcol(V)]
+P = mmonomials(2, 1, QHat)
+M = [n(p) for p in P, n in N]
+L21p = inv(M) * P
+
+ae(u, v) = integrate(∇(u) ⋅ ∇(v), (0 .. a) × (0 .. b))
+Ke = simplify.(expand.(6 * a * b * [ae(n1, n2) for n1 ∈ L21p, n2 ∈ L21p]))
+```
+
+Nicely formatted output. TODO: Handle LaTeX-String from `latexify`
+
+$$
+    \mathbf{K}^\mathrm{e} = \frac{1}{6ab} \cdot `{julia} latexify(Ke, env=:raw)`
+$$

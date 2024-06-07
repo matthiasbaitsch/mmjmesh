@@ -1,8 +1,8 @@
 push!(LOAD_PATH,"../src/")
 
+using MMJMesh
 using Documenter
 using DocumenterMermaid
-using MMJMesh
 
 makedocs(
     sitename = "MMJMesh",
@@ -15,7 +15,8 @@ makedocs(
         "Utilities" => "utilities.md",
         "Geometries" => "geometries.md",
         "Topologies" => "topologies.md",
-        "Gmsh" => "gmsh.md"
+        "Gmsh" => "gmsh.md",
+        "Mathematics" => "mathematics.md"
     ]
 )
 

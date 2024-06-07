@@ -6,6 +6,3 @@ The `Associations` module makes it possible to associate data with mesh entities
 
 In the simplest case, data can be associated with the mesh. It is then accessible from each mesh entity.
 
-```@example
-
-```

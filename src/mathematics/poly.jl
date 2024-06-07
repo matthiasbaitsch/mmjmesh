@@ -460,6 +460,7 @@ function print_poly(io::IO, p::Polynomial{T}, vars) where {T}
     first = true
     exps = exponents(p)
     cfs = coefficients(p)
+    iscomparable = (promote_type(T, Float64) == Float64)
 
     m, n = size(exps)
 
@@ -467,12 +468,12 @@ function print_poly(io::IO, p::Polynomial{T}, vars) where {T}
         exp = exps[:, i]
         coeff = cfs[i]
 
-        if (!first && show_plus(coeff))
+        if (!first && (!iscomparable || show_plus(coeff)))
             print(io, "+")
         end
         first = false
 
-        if (coeff != 1 && coeff != -1) || exp == zeros(Int, m)
+        if !iscomparable || (coeff != 1 && coeff != -1) || exp == zeros(Int, m)
             show_coeff(io, coeff)
         elseif coeff == -1
             print(io, "-")
