@@ -202,6 +202,9 @@ f = ProductFunction(Sin(), Cos())
 f = MPolynomial([1 3; 1 2], [1, 3])
 @test integrate(f, 1 .. 2, 5 .. 9) == 2307
 
+# Simplification
+f = MPolynomial([1 2; 2 1], [1.0, 0.0])
+@test length(f.p.coefficients) == 1
 
 # Symbolic variables
 @variables a, b

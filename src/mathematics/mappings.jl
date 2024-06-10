@@ -598,16 +598,24 @@ struct MPolynomial{N,D} <: FunctionRnToR{N,D}
     p::FP.Polynomial
 end
 
-function _simplify(e::Matrix, c::Vector{T}) where {T}
-    m = Dict{AbstractArray{Int},T}()
+function _simplify(e::Matrix{ET}, c::Vector{CT}) where {ET,CT}
+    m = Dict{AbstractArray{Int},CT}()
+    isnumeric = (promote_type(CT, Float64) == Float64)
+
     for (e, c) ∈ zip(eachcol(e), c)
-        if e ∈ keys(m)
-            m[e] += c
-        else
-            m[e] = c
+        if !isnumeric || c != 0
+            if e ∈ keys(m)
+                m[e] += c
+            else
+                m[e] = c
+            end
         end
     end
-    return stack(keys(m)), collect(values(m))
+    if !isempty(m)
+        return stack(keys(m)), collect(values(m))
+    else
+        return zeros(ET,size(e, 1), 1), zeros(CT, 1)
+    end
 end
 
 function MPolynomial(exponents::Matrix{Int}, coefficients::AbstractVector{T}, d=nothing) where {T}
