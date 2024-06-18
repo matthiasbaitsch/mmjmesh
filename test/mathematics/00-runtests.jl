@@ -2,7 +2,10 @@ module MathematicsTests
 
 using Test
 
-@testset "Mappings" include("mappingstests.jl")
+@testset "Mappings" begin
+    include("mappingstests.jl")
+    include("mpolynomialstests.jl")
+end
 
 end
 
