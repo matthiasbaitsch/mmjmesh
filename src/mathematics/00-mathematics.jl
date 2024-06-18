@@ -29,7 +29,7 @@ export ParametricCurve, UnitNormal
 
 # Special functions
 export Sin, Cos
-export MPolynomial, mmonomials
+export MPolynomial, mmonomials, simplifyx
 export AdHocMapping, makefunction
 export Polynomial, Interpolation, fromroots, lagrangepolynomials, monomials, degree, lagrangebasis1d
 

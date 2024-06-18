@@ -1,3 +1,7 @@
+using Symbolics
+using SymbolicUtils
+using SymbolicUtils: Postwalk, Chain
+
 import MMJMesh.Mathematics.FixedPolynomials as FP
 
 # Multivariate polynomials
@@ -30,7 +34,7 @@ function antiderivative(f::MPolynomial{N}, ns::AbstractArray{<:Integer}) where {
     c = Vector{promote_type(FP.eltype(f.p), Float64)}(FP.coefficients(f.p))
     for i = 1:N, _ = 1:ns[i], k = 1:FP.nterms(f.p)
         e[i, k] += 1
-        c[k] /= e[i, k]
+        c[k] = (1 // e[i, k]) * c[k]
     end
     return MPolynomial(e, c)
 end
@@ -58,7 +62,7 @@ end
 
 Base.:(*)(a::Real, p::MPolynomial{N,D}) where {N,D} =
     MPolynomial(FP.exponents(p.p), a * FP.coefficients(p.p), D)
-    
+
 Base.show(io::IO, p::MPolynomial) = print(io, p.p)
 Base.:(==)(p1::MPolynomial{N,D}, p2::MPolynomial{N,D}) where {N,D} = p1.p == p2.p
 
@@ -90,10 +94,9 @@ end
 
 function _simplify(e::Matrix{ET}, c::Vector{CT}) where {ET,CT}
     m = Dict{AbstractArray{Int},CT}()
-    isnumeric = (promote_type(CT, Float64) == Float64)
 
     for (e, c) ∈ zip(eachcol(e), c)
-        if !isnumeric || c != 0
+        if !isequal(c, 0)
             if e ∈ keys(m)
                 m[e] += c
             else
@@ -102,7 +105,7 @@ function _simplify(e::Matrix{ET}, c::Vector{CT}) where {ET,CT}
         end
     end
     if !isempty(m)
-        return stack(keys(m)), collect(values(m))
+        return stack(keys(m)), _integerize!(collect(values(m)))
     else
         return zeros(ET, size(e, 1), 1), zeros(CT, 1)
     end
@@ -118,3 +121,32 @@ function _extract(p1::MPolynomial, p2::MPolynomial)
     return n1, e1, c1, n2, e2, c2
 end
 
+_isintegervalue(x::T) where {T<:Integer} = true
+_isintegervalue(x::Rational) = denominator(x) == 1
+_isintegervalue(x::T) where {T<:AbstractFloat} = x == round(x, digits=0)
+_isintegervalue(x) = false
+
+function _integerize(expression::Num)
+    @variables xone, xnull
+    r = @rule ~x::_isintegervalue => xone * (Int(~x) + xnull)
+    expression = simplify(expression)
+    expression = simplify(expression, Postwalk(Chain([r])))
+    expression = simplify(substitute(expression, Dict(xone => 1, xnull => 0)))
+    return expression
+end
+
+function _integerize!(c::Vector{Num})
+    for i = eachindex(c)
+        c[i] = _integerize(c[i])
+    end
+    return c
+end
+
+_integerize!(c) = c
+
+"""
+    simplifyx(expression::Num) -> Num
+
+Simplify expression and convert numbers to integers if possible.
+"""
+simplifyx(expression::Num) = _integerize(expression)
