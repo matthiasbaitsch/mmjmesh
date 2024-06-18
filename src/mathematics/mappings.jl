@@ -1,12 +1,15 @@
-import Polynomials as P
-import MMJMesh.Mathematics.FixedPolynomials as FP
-
-using MMJMesh.MMJBase
-
 using IntervalSets
 using StaticArrays
 using LinearAlgebra
 using DomainSets: ×, Rectangle, ProductDomain
+
+import Polynomials as P
+
+
+using MMJMesh.MMJBase
+
+import MMJMesh.Mathematics.FixedPolynomials as FP
+
 
 """
 Implementation of the concept of mappings as elements of a vector space.
@@ -614,7 +617,7 @@ function _simplify(e::Matrix{ET}, c::Vector{CT}) where {ET,CT}
     if !isempty(m)
         return stack(keys(m)), collect(values(m))
     else
-        return zeros(ET,size(e, 1), 1), zeros(CT, 1)
+        return zeros(ET, size(e, 1), 1), zeros(CT, 1)
     end
 end
 
@@ -691,11 +694,11 @@ Base.:(==)(p1::MPolynomial{N,D}, p2::MPolynomial{N,D}) where {N,D} = p1.p == p2.
 Generate multivariate momonials of `n` components up to degree `p`. Optionally, a domain
 and a predicate can be specified
 """
-function mmonomials(n::Integer, p::Integer, dom=R^n, predicate=(ps...) -> true)
+function mmonomials(n::Integer, p::Integer, dom=R^n, predicate=(ps...) -> true; type=Float64)
     if n == 2
         return reshape(
             [
-                MPolynomial([p1; p2;;], [1.0], dom)
+                MPolynomial([p1; p2;;], type.([1]), dom)
                 for p1 in 0:p, p2 in 0:p
                 if predicate(p1, p2)
             ],

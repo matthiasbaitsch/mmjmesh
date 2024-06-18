@@ -1,35 +1,24 @@
 module Mathematics
 
 
-# Required modules
-using DomainSets
-using IntervalSets
-using LinearAlgebra
-
-
-# Parts
 include("poly.jl")
 include("mappings.jl")
 include("forms.jl")
 include("fefunctions.jl")
+include("mpolynomials.jl")
 
 
-# Exports
+# General concept of mapping
 export MappingFromComponents
 export AbstractMapping, MappingFromR, MappingFromRn, FunctionToR, FunctionRToR, FunctionRnToR
 export domaintype, codomaintype, domain, valueat
 export derivativeat, derivative, pderivativeat, pderivative
 export R, R2, RPlus, R0Plus, IHat, ReferenceInterval, QHat, ReferenceQuadrilateral
 export antiderivative, integrate, sample, plot, pois, roots
-export Sin, Cos, Polynomial, fromroots, lagrangepolynomials, monomials, degree
-
-export AdHocMapping
-export makefunction
-export lagrangebasis1d, Interpolation
 
 # Functions Rn to R
 export gradient, gradientat, hessian, hessianat, laplacian, laplacianat, ∇, H, Δ
-export ProductFunction, MPolynomial, mmonomials
+export ProductFunction
 export ∂x, ∂y, ∂xx, ∂yy, ∂xy
 
 # Vector fields
@@ -37,6 +26,12 @@ export VectorField, div, divergence, divergenceat
 
 # Parametric curves
 export ParametricCurve, UnitNormal
+
+# Special functions
+export Sin, Cos
+export MPolynomial, mmonomials
+export AdHocMapping, makefunction
+export Polynomial, Interpolation, fromroots, lagrangepolynomials, monomials, degree, lagrangebasis1d
 
 # Forms
 export ValueAtLF, DerivativeAtLF, DDerivativeAtLF, PDerivativeAtLF

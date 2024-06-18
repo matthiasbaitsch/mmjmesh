@@ -325,11 +325,15 @@ g = MPolynomial([3 1 1; 1 1 2; 2 2 3], [1.0, 2.0, 4.0])
 @test domaintype(f) == SVector{3,<:Real}
 @test domain(MPolynomial([1 2; 2 1], [1, 2])) == R2
 
-ps = mmonomials(2, 1)
+ps = mmonomials(2, 1, type=Int)
 @test ps[1] == MPolynomial([0; 0;;], [1])
 @test ps[2] == MPolynomial([1; 0;;], [1])
 @test ps[3] == MPolynomial([0; 1;;], [1])
 @test ps[4] == MPolynomial([1; 1;;], [1])
+@test ps[1](0, 0) isa Integer
+
+ps = mmonomials(2, 1, type=BigInt)
+@test ps[1].p.coefficients isa Vector{BigInt}
 
 # 2x₁²x₂⁵+3x₁³x₂²
 f = MPolynomial([2 3; 5 2], [2, 3])
