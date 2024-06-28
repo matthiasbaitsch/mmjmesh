@@ -7,35 +7,42 @@ MakieCore.@recipe(MPlot, mesh, scalars) do scene
     attr = MakieCore.Attributes(
 
         # Nodes
-        nodesvisible=MakieCore.automatic,
-        nodecolor=:tomato,
+        nodesvisible=MakieCore.theme(scene, :nodesvisible),
+        nodecolor=MakieCore.theme(scene, :nodecolor),
         nodesize=MakieCore.theme(scene, :markersize),
 
         # Edges
-        edgesvisible=MakieCore.automatic,
-        edgecolor=MakieCore.automatic,
-        edgelinewidth=MakieCore.automatic,
+        edgesvisible=MakieCore.theme(scene, :edgesvisible),
+        edgecolor=MakieCore.theme(scene, :edgecolor),
+        edgelinewidth=MakieCore.theme(scene, :edgelinewidth),
 
         # Featureedges
-        featureedgesvisible=MakieCore.automatic,
-        featureedgecolor=MakieCore.automatic,
-        featureedgelinewidth=MakieCore.automatic,
+        featureedgesvisible=MakieCore.theme(scene, :featureedgesvisible),
+        featureedgecolor=MakieCore.theme(scene, :featureedgecolor),
+        featureedgelinewidth=MakieCore.theme(scene, :featureedgelinewidth),
 
         # Faces
-        facesvisible=MakieCore.automatic,
-        facecolor=MakieCore.automatic,
-        facecolormap=MakieCore.automatic,
+        facesvisible=MakieCore.theme(scene, :facesvisible),
+        facecolor=MakieCore.theme(scene, :facecolor),
+        facecolormap=MakieCore.theme(scene, :facecolormap),
 
         # Lineplot
-        lineplotvisible=MakieCore.automatic,
-        lineplotvalues=MakieCore.automatic,
-        lineplotscale=0.1,
-        lineplotoutlinesvisible=true,
-        lineplotoutlinescolor=MakieCore.theme(scene, :linecolor),
-        lineplotoutlineslinewidth=MakieCore.theme(scene, :linewidth),
-        lineplotfacesvisible=true,
-        lineplotfacescolor=MakieCore.automatic,
-        lineplotfacescolormap=MakieCore.theme(scene, :colormap),
+        lineplotvisible=MakieCore.theme(scene, :lineplotvisible),
+        lineplotvalues=MakieCore.theme(scene, :lineplotvalues),
+        lineplotscale=MakieCore.theme(scene, :lineplotscale),
+        lineplotoutlinesvisible=MakieCore.theme(scene, :lineplotoutlinesvisible),
+        lineplotoutlinescolor=MakieCore.theme(scene, :lineplotoutlinescolor),
+        lineplotoutlineslinewidth=MakieCore.theme(scene, :lineplotoutlineslinewidth),
+        lineplotfacesvisible=MakieCore.theme(scene, :lineplotfacesvisible),
+        lineplotfacescolor=MakieCore.theme(scene, :lineplotfacescolor),
+        lineplotfacescolormap=MakieCore.theme(scene, :lineplotfacescolormap),
+
+        # Faceplot TODO refactor, rename
+        faceplotzscale=MakieCore.theme(scene, :faceplotzscale),
+        faceplotmesh=MakieCore.theme(scene, :faceplotmesh),
+        faceplotnpoints=MakieCore.theme(scene, :faceplotnpoints),
+        faceplotmeshcolor=MakieCore.theme(scene, :faceplotmeshcolor),
+        faceplotmeshlinewidth=MakieCore.theme(scene, :faceplotmeshlinewidth),
     )
 
     MakieCore.generic_plot_attributes!(attr)
@@ -82,8 +89,8 @@ function MakieCore.plot!(plot::MPlot)
     mesh = plot.mesh[]
 
     # Helper
-    isautomatic(key) = (plot.attributes[key][] == MakieCore.automatic)
-    setifautomatic(key, value) = isautomatic(key) && (plot.attributes[key] = value)
+    isundefined(key) = isnothing(plot.attributes[key][])
+    setifundefined(key, value) = isundefined(key) && (plot.attributes[key] = value)
 
     # Flag if we have data
     color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
@@ -92,41 +99,65 @@ function MakieCore.plot!(plot::MPlot)
     # Configure
     plot.colorbygroups = false
     plot.lineplotvisible = false
-    setifautomatic(:nodesvisible, nnodes(mesh) <= 50)
+
+    setifundefined(:nodecolor, :tomato)
+    setifundefined(:nodesvisible, nnodes(mesh) <= 50)
+
+    setifundefined(:edgecolor, MakieCore.theme(plot, :linecolor))
+
+    setifundefined(:lineplotscale, 0.1)
+    setifundefined(:lineplotoutlinesvisible, true)
+    setifundefined(:lineplotfacesvisible, true)
+
+    setifundefined(:lineplotoutlinescolor, MakieCore.theme(plot, :linecolor))
+    setifundefined(:lineplotoutlineslinewidth, MakieCore.theme(plot, :linewidth))
+    setifundefined(:lineplotfacescolormap, MakieCore.theme(plot, :colormap))
+
+    setifundefined(:faceplotzscale, 0.0)
+    setifundefined(:faceplotnpoints, 30)
+    setifundefined(:faceplotmeshlinewidth, 1.25)
+    setifundefined(:faceplotmeshcolor, MakieCore.theme(plot, :linecolor))
 
     if pdim(mesh) == 1
         plot.edgesvisible = true
-        plot.edgecolor = MakieCore.theme(plot, :linecolor)
         plot.featureedgesvisible = false
         plot.facesvisible = false
         plot.lineplotvisible = length(plot) > 1
-        setifautomatic(:edgelinewidth, 3)
+        setifundefined(:edgelinewidth, 3)
     elseif pdim(mesh) == 2
-        plot.colorbygroups = !plot.havedata[] && isautomatic(:facecolor) && hasgroups(mesh.groups, d=2)
-        setifautomatic(:featureedgesvisible, true)
-        setifautomatic(:edgesvisible, nfaces(mesh) <= 100)
-        setifautomatic(:edgecolor, MakieCore.theme(plot, :linecolor))
-        setifautomatic(:edgelinewidth, 0.75)
-        setifautomatic(:featureedgelinewidth, 3 * plot.edgelinewidth[])
-        setifautomatic(:facesvisible, true)
+        plot.colorbygroups = !plot.havedata[] && isundefined(:facecolor) && hasgroups(mesh.groups, d=2)
+        setifundefined(:featureedgesvisible, true)
+        setifundefined(:edgesvisible, nfaces(mesh) <= 100)
+        setifundefined(:edgecolor, MakieCore.theme(plot, :linecolor))
+        setifundefined(:edgelinewidth, 0.75)
+        setifundefined(:featureedgelinewidth, 3 * plot.edgelinewidth[])
+        setifundefined(:facesvisible, true)
         if plot.colorbygroups[]
-            setifautomatic(:facecolormap, :Pastel1_9)
+            setifundefined(:facecolormap, :Pastel1_9)
         else
-            setifautomatic(:facecolor, :seashell2)
-            setifautomatic(:facecolormap, MakieCore.theme(plot, :colormap))
+            if color isa Function || color isa Symbol
+                setifundefined(:facecolor, 3)
+            else
+                setifundefined(:facecolor, :seashell2)
+            end
+            setifundefined(:facecolormap, MakieCore.theme(plot, :colormap))
         end
     else
         @notimplemented
     end
 
-    # Plot
-    plot.lineplotvisible[] && plotlineplot(plot)
-    plot.facesvisible[] && plotfaces(plot)
-    plot.edgesvisible[] && plotedges(plot, false)
-    plot.featureedgesvisible[] && plotedges(plot, true)
-    plot.nodesvisible[] && MakieCore.scatter!(
-        plot, coordinates(mesh), color=plot.nodecolor, markersize=plot.nodesize
-    )
+    # Plot functions on faces goes extra at the moment - TODO this is a hack, refactor
+    if pdim(mesh) == 2 && (color isa Function || color isa Symbol)
+        plotfacefunctions(plot)
+    else # Plot
+        plot.lineplotvisible[] && plotlineplot(plot)
+        plot.facesvisible[] && plotfaces(plot)
+        plot.edgesvisible[] && plotedges(plot, false)
+        plot.featureedgesvisible[] && plotedges(plot, true)
+        plot.nodesvisible[] && MakieCore.scatter!(
+            plot, coordinates(mesh), color=plot.nodecolor, markersize=plot.nodesize
+        )
+    end
 
     # Return
     return plot
@@ -183,7 +214,7 @@ function plotlineplot(plot::MPlot, mesh::Mesh, functions::AbstractVector{<:Funct
     end
 
     # Color for faces if specified
-    if plot.lineplotfacescolor[] != MakieCore.automatic
+    if !isnothing(plot.lineplotfacescolor[])
         cf = plot.lineplotfacescolor[]
     end
 
@@ -202,12 +233,15 @@ end
 
 
 function plotfaces(plot::MPlot)
+
+    # Mesh and color
     mesh = plot.mesh[]
     color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
 
     # Test if we have data and overall color
     haveData = color isa Vector
-    haveColor = plot.facecolor[] != MakieCore.automatic
+    haveColor = !isnothing(plot.facecolor[])
+    zscale = plot.faceplotzscale[]
 
     # Helpers
     coords = coordinates(mesh)
@@ -234,6 +268,11 @@ function plotfaces(plot::MPlot)
         x = coords
         tf = mapreduce(permutedims, vcat, tf)
         c = color
+
+        # TODO refactor the whole thing
+        if haveData && zscale != 0
+            x = [x[1, :]'; x[2, :]'; zscale * color']
+        end
     elseif length(color) == Nf                                    # Element color
         cnt = 1
         tf = Vector{Vector{Int}}()
@@ -265,12 +304,19 @@ function plotfaces(plot::MPlot)
     end
 
     # Plot
-    MakieCore.mesh!(plot, x, tf, color=c, colormap=plot.facecolormap)
+    MakieCore.mesh!(plot, x, tf, color=c, colormap=plot.facecolormap, colorrange=plot.colorrange)
 end
 
 
 function plotedges(plot::MPlot, featureedges::Bool)
+
+    # Mesh and color
     mesh = plot.mesh[]
+    color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
+
+    # Test if we have data and overall color
+    havedata = color isa Vector
+    zscale = plot.faceplotzscale[]
 
     # Collect indices of edges to plot
     if featureedges
@@ -284,21 +330,28 @@ function plotedges(plot::MPlot, featureedges::Bool)
 
     # Collect coordinates
     # TODO 3D: Generalize
-    xx = Real[]
-    yy = Real[]
+    xx = Float32[]
+    yy = Float32[]
+    zz = Float32[]
+
     for i ∈ indices
         e = edge(mesh, i)
-        x1 = coordinates(e, 1)
-        x2 = coordinates(e, 2)
+        n1, n2 = nodeindices(e)
+        x1 = coordinates(mesh, n1)
+        x2 = coordinates(mesh, n2)
         push!(xx, x1[1], x2[1], NaN)
         push!(yy, x1[2], x2[2], NaN)
+
+        if havedata && zscale != 0
+            push!(zz, zscale * color[n1], zscale * color[n2], NaN)
+        end
     end
 
     # Plot attributes
     if featureedges
         lc = plot.featureedgecolor[]
         lw = plot.featureedgelinewidth[]
-        if lc == MakieCore.automatic
+        if isnothing(lc)
             if ngroups(mesh.groups, d=1) > 0
                 ids = groupids(mesh, d=1, predefined=true)
                 lc = reshape(repeat(ids[indices], 1, 3)', :)
@@ -312,13 +365,93 @@ function plotedges(plot::MPlot, featureedges::Bool)
     end
 
     # Plot
-    MakieCore.lines!(plot, xx, yy, linewidth=lw, color=lc, colormap=:tab10)
+    if havedata && zscale != 0
+        MakieCore.lines!(plot, xx, yy, zz, linewidth=lw, color=lc, colormap=:tab10)
+    else
+        MakieCore.lines!(plot, xx, yy, linewidth=lw, color=lc, colormap=:tab10)
+    end
+end
+
+function plotfacefunctions(plot::MPlot)
+    attributes = plot.attributes
+
+    # Edge attributes
+    edgesvisible = attributes.edgesvisible[]
+    edgecolor = attributes.edgecolor[]
+    edgelinewidth = attributes.edgelinewidth[]
+
+    # Face attributes
+    facecolor = attributes.facecolor[]
+
+    # Faceplot
+    zscale = attributes.faceplotzscale[]
+    npoints = attributes.faceplotnpoints[]
+    fmesh = attributes.faceplotmesh[]
+    fmeshcolor = attributes.faceplotmeshcolor[]
+    fmeshlinewidth = attributes.faceplotmeshlinewidth[]
+
+    # General
+    colorrange = attributes.colorrange[]
+    colormap = attributes.colormap[]
+
+    # Parameters
+    mesh = plot.args[1][]
+    cc = plot.args[2][]
+
+    # Function to plot
+    if cc isa Symbol
+        facefunction(face) = face.data[:post](face, cc)
+    else
+        facefunction = cc
+    end
+
+    # Prepare
+    cf, cl1, cl2 = _sample(mesh, facefunction, npoints, 1, fmesh)
+
+    # Collect
+    xf, tf = _collectfaces(cf)
+    xl1, yl1, zl1 = _collectlines(cl1)
+    xl2, yl2, zl2 = _collectlines(cl2)
+    color = _getcolor(xf, facecolor, 1)
+
+    # Scale
+    xf[3, :] *= zscale
+    zl1 *= zscale
+    zl2 *= zscale
+
+    # Plot Mesh
+    mesh!(
+        plot, xf, tf, color=color,
+        colormap=colormap, colorrange=colorrange
+    )
+
+    # Plot mesh lines on elements
+    lines!(plot, xl2, yl2, zl2, color=fmeshcolor, linewidth=fmeshlinewidth)
+
+    # Plot element edges
+    if edgesvisible
+        lines!(plot, xl1, yl1, zl1, color=edgecolor, linewidth=edgelinewidth)
+    end
 end
 
 
 # -------------------------------------------------------------------------------------------------
 # Helper functions
 # -------------------------------------------------------------------------------------------------
+
+function _sample(m, mf, npoints, zscale, mesh)
+    cf = []
+    cl1 = []
+    cl2 = []
+    for face = faces(m)
+        f = mf(face)
+        gmap = _makegmap(face)
+        push!(cf, sample2d(f, domain=QHat, npoints=2 * npoints, gmap=gmap, zscale=zscale))
+        push!(cl1, sample2dlines(f, domain=QHat, npoints=npoints, mesh=0, gmap=gmap, zscale=zscale))
+        push!(cl2, sample2dlines(f, domain=QHat, npoints=npoints, mesh=mesh, gmap=gmap, zscale=zscale))
+    end
+    return cf, cl1, cl2
+end
 
 function _appendedges!(xe, ye, edgepoints, lineplotpoints)
     push!(xe, edgepoints[1, 1])
@@ -359,6 +492,49 @@ function _collectvalues(mesh::Mesh, values)
     end
 
     return values
+end
+
+function _fsize(face)
+    x = coordinates(face)
+    p = x[:, 1]
+    l1 = x[1, 2] - x[1, 1]
+    l2 = x[2, 3] - x[2, 2]
+    return p, l1, l2
+end
+
+function _makegmap(face) # TODO use geometry map for face
+    nn(x) = (1 + x) / 2
+    p, a, b = _fsize(face)
+    return x -> p + [nn(x[1]) * a, nn(x[2]) * b]
+end
+
+function _collectlines(cl)
+    l1 = Float32[]
+    l2 = Float32[]
+    l3 = Float32[]
+    for c in cl
+        append!(l1, c[1])
+        push!(l1, NaN)
+        append!(l2, c[2])
+        push!(l2, NaN)
+        append!(l3, c[3])
+        push!(l3, NaN)
+    end
+    return l1, l2, l3
+end
+
+function _collectfaces(cf)
+    xx = [Float32[], Float32[], Float32[]]
+    tt = [Int[], Int[], Int[]]
+    for c in cf
+        xf, tf = c
+        pos = length(xx[1])
+        for i = 1:3
+            append!(xx[i], xf[i, :])
+            append!(tt[i], pos .+ tf[:, i])
+        end
+    end
+    return stack(xx, dims=1), stack(tt)
 end
 
 _coeffs(v1, v2) = [(v1 + v2) / 2, (v2 - v1) / 2]
