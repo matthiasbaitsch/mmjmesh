@@ -150,3 +150,5 @@ _integerize!(c) = c
 Simplify expression and convert numbers to integers if possible.
 """
 simplifyx(expression::Num) = _integerize(expression)
+simplifyx(x::Float64) = x
+
