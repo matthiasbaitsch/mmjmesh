@@ -5,7 +5,6 @@ using DomainSets: ×, Rectangle, ProductDomain
 
 import Polynomials as P
 
-
 using MMJMesh.MMJBase
 
 
@@ -96,9 +95,10 @@ end
 
 # Neutral element w.r.t. addition
 struct Zero{DT,CT,D} <: AbstractMapping{DT,CT,D} end
-valueat(::Zero{DT,CT,D}, x::DT) where {DT,CT,D} = zero(DT)
-derivativeat(::Zero{DT,CT,D}, x::DT) where {DT,CT,D} = DT(0)
-derivative(z::Zero) = z
+valueat(::Zero{DT,CT,D}, x::DT) where {DT,CT,D} = zero(CT)
+derivative(z::Zero, _...) = z
+antiderivative(z::Zero, _...) = z
+derivativeat(::Zero{DT,CT,D}, x::DT, _...) where {DT,CT,D} = CT(0)
 Base.zero(::AbstractMapping{DT,CT,D}) where {DT,CT,D} = Zero{DT,CT,D}()
 Base.show(io::IO, ::Zero) = print(io, "0")
 
@@ -409,12 +409,20 @@ end
 const FunctionRnToR{N,D} = AbstractMapping{SVector{N,<:Real},Float64,D}
 
 
+# Operator
+struct Operator
+    op
+end
+(op::Operator)(x) = op.op(x)
+Base.:(*)(op::Operator, x) = op.op(x)
+
+
 # Partial derivatives of functions R2 -> R
-∂x(f::FunctionRnToR{2}) = derivative(f, [1, 0])
-∂y(f::FunctionRnToR{2}) = derivative(f, [0, 1])
-∂xx(f::FunctionRnToR{2}) = derivative(f, [2, 0])
-∂yy(f::FunctionRnToR{2}) = derivative(f, [0, 2])
-∂xy(f::FunctionRnToR{2}) = derivative(f, [1, 1])
+const ∂x = Operator(f -> derivative(f, [1, 0]))
+const ∂y = Operator(f -> derivative(f, [0, 1]))
+const ∂xx = Operator(f -> derivative(f, [2, 0]))
+const ∂yy = Operator(f -> derivative(f, [0, 2]))
+const ∂xy = Operator(f -> derivative(f, [1, 1]))
 
 
 # Helper function 
