@@ -100,31 +100,29 @@ function MakieCore.plot!(plot::MPlot)
     plot.colorbygroups = false
     plot.lineplotvisible = false
 
+    # Setting if not defined
     setifundefined(:nodecolor, :tomato)
     setifundefined(:nodesvisible, nnodes(mesh) <= 50)
-
     setifundefined(:edgecolor, MakieCore.theme(plot, :linecolor))
-
     setifundefined(:lineplotscale, 0.1)
     setifundefined(:lineplotoutlinesvisible, true)
     setifundefined(:lineplotfacesvisible, true)
-
     setifundefined(:lineplotoutlinescolor, MakieCore.theme(plot, :linecolor))
     setifundefined(:lineplotoutlineslinewidth, MakieCore.theme(plot, :linewidth))
     setifundefined(:lineplotfacescolormap, MakieCore.theme(plot, :colormap))
-
     setifundefined(:faceplotzscale, 0.0)
     setifundefined(:faceplotnpoints, 30)
     setifundefined(:faceplotmeshlinewidth, 1.25)
     setifundefined(:faceplotmeshcolor, MakieCore.theme(plot, :linecolor))
 
-    if pdim(mesh) == 1
+    
+    if pdim(mesh) == 1 # Mesh of 1D elements
         plot.edgesvisible = true
         plot.featureedgesvisible = false
         plot.facesvisible = false
         plot.lineplotvisible = length(plot) > 1
         setifundefined(:edgelinewidth, 3)
-    elseif pdim(mesh) == 2
+    elseif pdim(mesh) == 2 # Mesh of 2D elements
         plot.colorbygroups = !plot.havedata[] && isundefined(:facecolor) && hasgroups(mesh.groups, d=2)
         setifundefined(:featureedgesvisible, true)
         setifundefined(:edgesvisible, nfaces(mesh) <= 100)
@@ -230,7 +228,6 @@ function plotlineplot(plot::MPlot, mesh::Mesh, functions::AbstractVector{<:Funct
             color=plot.lineplotoutlinescolor)
     end
 end
-
 
 function plotfaces(plot::MPlot)
 

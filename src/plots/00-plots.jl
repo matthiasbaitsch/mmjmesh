@@ -23,6 +23,14 @@ using MMJMesh.Mathematics
 # Exports
 export mplot, mconf, fplot, fplot3d, vplot
 
+# TODO good place or better, get rid of
+function _getcolor(x::Matrix, color, zscale)
+    if typeof(color) == Int && 1 <= color <= 3
+        return x[color, :] / zscale
+    end
+    return color
+end
+
 # Parts
 include("curveapproximation.jl")
 include("sample1d.jl")
