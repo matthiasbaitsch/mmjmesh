@@ -21,12 +21,6 @@ function MeshEntity(mesh::Mesh{DT,DG}, pdim::Int, idx::Int) where {DT,DG}
     return me
 end
 
-# Short names
-const Node{DG} = MeshEntity{0,DG,0}
-const Edge{DG,NN} = MeshEntity{1,DG,NN}
-const Face{DG,NN} = MeshEntity{2,DG,NN}
-const Solid{DG,NN} = MeshEntity{3,DG,NN}
-
 # Basic
 nentities(me::MeshEntity{DT}, pdim::Int) where {DT} = nlinks(me.mesh.topology, DT, pdim, me.index)
 index(me::MeshEntity) = me.index
@@ -34,10 +28,19 @@ index(me::MeshEntity{DT}, pdim::Int, i::Int) where {DT} = links(me.mesh.topology
 indices(me::MeshEntity{DT}, pdim::Int) where {DT} = links(me.mesh.topology, DT, pdim)[me.index]
 pdim(::MeshEntity{DT}) where {DT} = DT
 gdim(::MeshEntity{DT,DG}) where {DT,DG} = DG
-Base.length(e::Edge{DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
 
 # Show
 Base.show(io::IO, e::T) where {T<:MeshEntity} = print(io, "$(T)[$(e.index)]")
+
+# Short names
+const Node{DG} = MeshEntity{0,DG,0}
+const Edge{DG,NN} = MeshEntity{1,DG,NN}
+const Face{DG,NN} = MeshEntity{2,DG,NN}
+const Solid{DG,NN} = MeshEntity{3,DG,NN}
+
+# Specialized functions
+Base.length(e::Edge{DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
+
 
 
 # -------------------------------------------------------------------------------------------------
@@ -65,7 +68,7 @@ Base.iterate(el::MeshEntityList, state=1) = state > length(el) ? nothing : (el[s
 entities(m::Mesh, pdim::Int) = MeshEntityList(m, pdim, 1:nentities(m, pdim))
 entities(me::MeshEntity, pdim::Int) = MeshEntityList(me.mesh, pdim, indices(me, pdim))
 
-# Coordinates XXX
+# Coordinates
 coordinate(n::Node, c::Int) = n.mesh.geometry.points.coordinates[c, n.index]
 coordinates(n::Node) = n.mesh.geometry.points.coordinates[:, n.index]
 coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, indices(me, 0)]
