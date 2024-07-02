@@ -48,6 +48,38 @@ m2 = Cos()
 
 
 # -------------------------------------------------------------------------------------------------
+# Derivative types
+# -------------------------------------------------------------------------------------------------
+
+@test derivativetype(Sin()) === Float64
+@test derivativetype(Sin(), 2) === Float64
+@test derivativetype(MappingFromComponents(Sin(), Cos())) === SVector{2,Float64}
+@test derivativetype(MappingFromComponents(Sin(), Cos()), 2) === SVector{2,Float64}
+@test derivativetype(ProductFunction(Sin(), Cos())) === SVector{2,Float64}
+@test derivativetype(ProductFunction(Sin(), Cos()), 2) === SMatrix{2,2,Float64}
+
+@test derivativetype(
+    MappingFromComponents(
+        ProductFunction(Sin(), Cos(), Sin()),
+        ProductFunction(Cos(), -Sin(), -Sin())
+    )
+) === SMatrix{2,3,Float64}
+
+
+# -------------------------------------------------------------------------------------------------
+# Zero function
+# -------------------------------------------------------------------------------------------------
+
+z = Zero{SVector{2,<:Real},Float64,QHat}()
+@test z(1, 1) == 0
+@test derivative(z) == Zero{SVector{2,<:Real},SVector{2,Float64},QHat}()
+@test derivative(z, 2) == Zero{SVector{2,<:Real},SMatrix{2,2,Float64},QHat}()
+@test derivativeat(z, SVector{2,Real}([1, 1])) == [0, 0]
+@test derivativeat(z, [1, 1]) == [0, 0]
+@test derivativeat(z, [1, 1], 2) == [0 0; 0 0]
+
+
+# -------------------------------------------------------------------------------------------------
 # Mapping from components
 # -------------------------------------------------------------------------------------------------
 

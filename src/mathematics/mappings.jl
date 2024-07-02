@@ -72,9 +72,23 @@ function derivativeat end
 function derivative end
 
 
-domaintype(::AbstractMapping{DT,CT,D}) where {DT,CT,D} = DT
-codomaintype(::AbstractMapping{DT,CT,D}) where {DT,CT,D} = CT
+# Information about domains
+domaintype(::AbstractMapping{DT}) where {DT} = DT
+codomaintype(::AbstractMapping{DT,CT}) where {DT,CT} = CT
 domain(::AbstractMapping{DT,CT,D}) where {DT,CT,D} = D
+
+
+# Type of derivatives
+derivativetype(::Type{<:Real}, t, _::Int) = t
+derivativetype(::Type{<:SVector{N}}, t::Type{SVector{M,T}}, n::Int) where {N,M,T} = SMatrix{M,N,T}
+derivativetype(::Type{<:AbstractMapping{DT,CT}}, n::Int) where {DT,CT} = derivativetype(DT, CT, n)
+derivativetype(f::T, n::Int=1) where {T<:AbstractMapping} = derivativetype(typeof(f), n)
+
+function derivativetype(::Type{<:SVector{N}}, t::Type{<:Real}, n::Int) where {N}
+    n == 1 && return SVector{N,t}
+    n == 2 && return SMatrix{N,N,t}
+    error("Not implemented yet")
+end
 
 
 # Shorthand notations for derivative and evaluation
@@ -95,12 +109,15 @@ end
 
 # Neutral element w.r.t. addition
 struct Zero{DT,CT,D} <: AbstractMapping{DT,CT,D} end
-valueat(::Zero{DT,CT,D}, x::DT) where {DT,CT,D} = zero(CT)
-derivative(z::Zero, _...) = z
-antiderivative(z::Zero, _...) = z
-derivativeat(::Zero{DT,CT,D}, x::DT, _...) where {DT,CT,D} = CT(0)
+
+valueat(::Zero{DT,CT}, x::DT) where {DT,CT} = zero(CT)
+derivative(::Zero{DT,CT,D}, n::Int=1) where {DT,CT,D} = Zero{DT,derivativetype(DT, CT, n),D}()
+derivativeat(::Zero{DT,CT}, x::SVector{N}, n::Int=1) where {N,DT<:SVector{N},CT} =
+    zero(derivativetype(DT, CT, n))
+
 Base.zero(::AbstractMapping{DT,CT,D}) where {DT,CT,D} = Zero{DT,CT,D}()
-Base.show(io::IO, ::Zero) = print(io, "0")
+Base.show(io::IO, ::Zero) = print(io, "0(x)")
+Base.isequal(::Zero{DT,CT,D}, ::Zero{DT,CT,D}) where {DT,CT,D} = true
 
 
 # TODO: One
