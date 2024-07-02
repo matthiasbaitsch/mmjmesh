@@ -1,7 +1,7 @@
 """
     Point(x1, ..., xD)
 
-    A point in `D`-dimensional space. Based on `point.jl` from Meshes.jl.
+    p1 point in `D`-dimensional space. Based on `point.jl` from Meshes.jl.
 """
 struct Point{D} <: GeometricObject{0,D}
     coordinates::SVector{D,Float64}
@@ -13,20 +13,21 @@ Point(a1::Number, a2::Number, a3::Number) = Point{3}(a1, a2, a3)
 
 MMJMesh.pdim(::Type{<:Point}) = 0
 MMJMesh.gdim(::Type{<:Point{D}}) where {D} = D
-center(A::Point) = A
+
+center(p::Point) = p
 measure(::Point) = 0.0
 boundingbox(::Point) = nothing
-coordinates(A::Point) = A.coordinates
+coordinates(p::Point) = p.coordinates
 
-Base.:(-)(A::Point, B::Point) = A.coordinates - B.coordinates
-Base.:(==)(A::Point, B::Point) = A.coordinates == B.coordinates
-Base.in(A::Point, B::Point) = A == B
-Base.isapprox(A::Point, B::Point; atol=atol(Float64), kwargs...) = isapprox(A.coordinates, B.coordinates; atol, kwargs...)
+Base.:(-)(p1::Point, p2::Point) = p1.coordinates - p2.coordinates
+Base.:(==)(p1::Point, p2::Point) = p1.coordinates == p2.coordinates
+Base.in(p1::Point, p2::Point) = p1 == p2
+Base.isapprox(p1::Point, p2::Point; atol=atol(Float64), kwargs...) = isapprox(p1.coordinates, p2.coordinates; atol, kwargs...)
 
-Base.:(≤)(A::Point{D}, B::Point{D}) where {D} = all(≥(zero(D)), B - A)
-Base.:(≥)(A::Point{D}, B::Point{D}) where {D} = all(≥(zero(D)), A - B)
-Base.:(<)(A::Point{D}, B::Point{D}) where {D} = all(>(zero(D)), B - A)
-Base.:(>)(A::Point{D}, B::Point{D}) where {D} = all(>(zero(D)), A - B)
+Base.:(≤)(p1::Point{D}, p2::Point{D}) where {D} = all(≥(zero(D)), p2 - p1)
+Base.:(≥)(p1::Point{D}, p2::Point{D}) where {D} = all(≥(zero(D)), p1 - p2)
+Base.:(<)(p1::Point{D}, p2::Point{D}) where {D} = all(>(zero(D)), p2 - p1)
+Base.:(>)(p1::Point{D}, p2::Point{D}) where {D} = all(>(zero(D)), p1 - p2)
 
 function Base.show(io::IO, point::Point)
     print(io, "Point$(Tuple(point.coordinates))")

@@ -10,6 +10,7 @@ MMJMesh.pdim(o::GeometricObject) = pdim(typeof(o))
 MMJMesh.gdim(o::GeometricObject) = gdim(typeof(o))
 MMJMesh.gdim(::Type{<:GeometricObject}) = @notimplemented
 MMJMesh.pdim(::Type{<:GeometricObject}) = @notimplemented
+
 center(::GeometricObject) = @notimplemented
 measure(::GeometricObject) = @notimplemented
 boundingbox(::GeometricObject) = @notimplemented
@@ -31,7 +32,7 @@ parametrization(::GeometricObjectP) = @notimplemented
     GeometricObjectI{DT,DG,NP}
 
 A `DT,DG` dimensional geometric object with a parametrization which interpolates `NP` points. An
-important class of such objects are the geometries of typical isoparametric finite elements.
+important class of such objects are the geometries of isoparametric finite elements.
 """
 struct GeometricObjectI{DT,DG,NP} <: GeometricObjectP{DT,DG}
     points::SMatrix{DG,NP,Float64}

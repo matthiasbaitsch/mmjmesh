@@ -1,14 +1,3 @@
-
-# -------------------------------------------------------------------------------------------------
-# Helper functions
-# -------------------------------------------------------------------------------------------------
-
-mul(C::AbstractVector, h::AbstractVector) = C ⋅ h
-mul(C::AbstractMatrix, h::AbstractVector) = C * h
-ncoefficients(C::AbstractVector) = length(C)
-ncoefficients(C::AbstractMatrix) = size(C, 2)
-
-
 # -------------------------------------------------------------------------------------------------
 # Lagrange shape functions
 # -------------------------------------------------------------------------------------------------
@@ -16,10 +5,10 @@ ncoefficients(C::AbstractMatrix) = size(C, 2)
 """
     lagrangebasis1d(p)
 
-Constructs a 1D Lagrange basis of degree `p` on the interval `IHat`.
+Constructs a 1D Lagrange basis of degree `p` on the reference interval `IHat`.
 """
 lagrangebasis1d(p::Integer) =
-    ParametricCurve(lagrangepolynomials(range(IHat, length=(p + 1)), IHat)...)
+    MappingFromComponents(lagrangepolynomials(range(IHat, length=(p + 1)), IHat)...)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -46,7 +35,7 @@ struct Interpolation{DT,CT,D} <: AbstractMapping{DT,CT,D}
 end
 
 function Interpolation(C::AbstractVecOrMat, d::Integer)
-    nc = ncoefficients(C)
+    nc = _ncoefficients(C)
     if d == 1
         return Interpolation(lagrangebasis1d(nc - 1), C)
     else
@@ -54,8 +43,8 @@ function Interpolation(C::AbstractVecOrMat, d::Integer)
     end
 end
 
-valueat(m::Interpolation, x) = mul(m.coefficients, m.functions(x))
-derivativeat(m::Interpolation, x, n::Int=1) = mul(m.coefficients, derivativeat(m.functions, x, n))
+valueat(m::Interpolation, x) = _mul(m.coefficients, m.functions(x))
+derivativeat(m::Interpolation, x, n::Int=1) = _mul(m.coefficients, derivativeat(m.functions, x, n))
 derivative(m::Interpolation, n::Int=1) =
     Interpolation(derivative(m.functions, n), m.coefficients)
 Base.show(io::IO, m::Interpolation) =
@@ -64,5 +53,13 @@ Base.:(==)(p1::Interpolation, p2::Interpolation) =
     (p1.functions == p2.functions) && (p1.coefficients == p2.coefficients)
 
 
+# -------------------------------------------------------------------------------------------------
+# Helper functions
+# -------------------------------------------------------------------------------------------------
+
+_mul(C::AbstractVector, h::AbstractVector) = C ⋅ h
+_mul(C::AbstractMatrix, h::AbstractVector) = C * h
+_ncoefficients(C::AbstractVector) = length(C)
+_ncoefficients(C::AbstractMatrix) = size(C, 2)
 
 

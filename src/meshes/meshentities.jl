@@ -74,5 +74,6 @@ coordinates(n::Node) = n.mesh.geometry.points.coordinates[:, n.index]
 coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, indices(me, 0)]
 coordinates(me::MeshEntity, i::Int) = me.mesh.geometry.points.coordinates[:, index(me, 0, i)]
 
+# Geometry
 geometry(me::MeshEntity) = GeometricObjectI{pdim(me)}(coordinates(me))
 
