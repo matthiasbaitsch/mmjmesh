@@ -1,6 +1,7 @@
 module MMJMesh
 
 # Basic stuff
+include("common.jl")
 include("mmjbase/00-mmjbase.jl")
 include("mathematics/00-mathematics.jl")
 

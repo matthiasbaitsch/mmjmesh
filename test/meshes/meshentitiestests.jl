@@ -3,8 +3,6 @@ using Test
 using MMJMesh.Meshes
 using MMJMesh.Geometries
 
-using MMJMesh.Meshes: pdim, gdim
-
 
 # Set up
 coords = [0.0 1.0 2.0 0.1 0.9 1.9; 0.0 0.1 0.0 0.9 1.0 0.9]

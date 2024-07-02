@@ -8,12 +8,6 @@ using MMJMesh
 using MMJMesh.MMJBase
 using MMJMesh.Mathematics
 
-# Functions extended by this module
-import Base.in
-import Base.isequal
-
-import MMJMesh.MMJBase: gdim, pdim
-
 # Parts
 include("detail.jl")
 include("geometricobject.jl")

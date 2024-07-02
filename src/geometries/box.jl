@@ -11,8 +11,8 @@ end
 Box(min::Point{D}, max::Point{D}) where {D} = Box{D}(min, max)
 Box(min::Tuple, max::Tuple) = Box(Point(min...), Point(max...))
 
-gdim(::Type{<:Box{D}}) where {D} = D
-pdim(::Type{<:Box{D}}) where {D} = D
+MMJMesh.gdim(::Type{<:Box{D}}) where {D} = D
+MMJMesh.pdim(::Type{<:Box{D}}) where {D} = D
 
 center(b::Box) = Point((coordinates(b.max) + coordinates(b.min)) / 2)
 diagonal(b::Box) = norm(b.max - b.min)

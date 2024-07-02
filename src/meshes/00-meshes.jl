@@ -8,8 +8,6 @@ using MMJMesh.MMJBase
 using MMJMesh.Topologies
 using MMJMesh.Geometries
 
-import MMJMesh.MMJBase: gdim, pdim
-
 # Exports
 ## groups.jl
 export Group, GroupCollection, addrecipe!, clearcache!, names

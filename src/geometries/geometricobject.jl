@@ -6,10 +6,10 @@ Here, a geometric object is understood as a connected set of points.
 """
 abstract type GeometricObject{DT,DG} end
 
-pdim(o::GeometricObject) = pdim(typeof(o))
-gdim(o::GeometricObject) = gdim(typeof(o))
-gdim(::Type{<:GeometricObject}) = @notimplemented
-pdim(::Type{<:GeometricObject}) = @notimplemented
+MMJMesh.pdim(o::GeometricObject) = pdim(typeof(o))
+MMJMesh.gdim(o::GeometricObject) = gdim(typeof(o))
+MMJMesh.gdim(::Type{<:GeometricObject}) = @notimplemented
+MMJMesh.pdim(::Type{<:GeometricObject}) = @notimplemented
 center(::GeometricObject) = @notimplemented
 measure(::GeometricObject) = @notimplemented
 boundingbox(::GeometricObject) = @notimplemented

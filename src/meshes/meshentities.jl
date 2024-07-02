@@ -26,8 +26,8 @@ nentities(me::MeshEntity{DT}, pdim::Int) where {DT} = nlinks(me.mesh.topology, D
 index(me::MeshEntity) = me.index
 index(me::MeshEntity{DT}, pdim::Int, i::Int) where {DT} = links(me.mesh.topology, DT, pdim)[me.index][i]
 indices(me::MeshEntity{DT}, pdim::Int) where {DT} = links(me.mesh.topology, DT, pdim)[me.index]
-pdim(::MeshEntity{DT}) where {DT} = DT
-gdim(::MeshEntity{DT,DG}) where {DT,DG} = DG
+MMJMesh.pdim(::MeshEntity{DT}) where {DT} = DT
+MMJMesh.gdim(::MeshEntity{DT,DG}) where {DT,DG} = DG
 
 # Show
 Base.show(io::IO, e::T) where {T<:MeshEntity} = print(io, "$(T)[$(e.index)]")

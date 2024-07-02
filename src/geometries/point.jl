@@ -11,8 +11,8 @@ Point{D}(coords...) where {D} = Point{D}(coords)
 Point(a1::Number, a2::Number) = Point{2}(a1, a2)
 Point(a1::Number, a2::Number, a3::Number) = Point{3}(a1, a2, a3)
 
-pdim(::Type{<:Point}) = 0
-gdim(::Type{<:Point{D}}) where {D} = D
+MMJMesh.pdim(::Type{<:Point}) = 0
+MMJMesh.gdim(::Type{<:Point{D}}) where {D} = D
 center(A::Point) = A
 measure(::Point) = 0.0
 boundingbox(::Point) = nothing

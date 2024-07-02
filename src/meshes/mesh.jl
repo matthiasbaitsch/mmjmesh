@@ -39,8 +39,8 @@ end
 nentities(m::Mesh, dim::Int) = Topologies.nentities(m.topology, dim, true)
 entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx)
 indices(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
-pdim(::Mesh{DT,DG}) where {DT,DG} = DT
-gdim(::Mesh{DT,DG}) where {DT,DG} = DG
+MMJMesh.pdim(::Mesh{DT}) where {DT} = DT
+MMJMesh.gdim(::Mesh{DT,DG}) where {DT,DG} = DG
 
 coordinates(m::Mesh) = m.geometry.points.coordinates[:, nodeindices(m)]
 coordinates(m::Mesh, group::Symbol) = m.geometry.points.coordinates[:, m.groups[group]]
