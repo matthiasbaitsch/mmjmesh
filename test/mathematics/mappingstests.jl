@@ -52,6 +52,14 @@ m2 = Cos()
 # Derivative types
 # -------------------------------------------------------------------------------------------------
 
+T2 = SVector{2,Float64}
+T3 = SVector{3,Float64}
+
+@test derivativetype(T2, T3, 1) === SMatrix{3,2,Float64}
+@test derivativetype(T2, T3, 2) === SArray{Tuple{3,2,2},Float64}
+@test derivativetype(T3, T2, 1) === SMatrix{2,3,Float64}
+@test derivativetype(T3, T2, 2) === SArray{Tuple{2,3,3},Float64}
+
 @test derivativetype(Sin()) === Float64
 @test derivativetype(Sin(), 2) === Float64
 @test derivativetype(MappingFromComponents(Sin(), Cos())) === SVector{2,Float64}
@@ -147,13 +155,14 @@ validate(c)
 validate(antiderivative(c))
 @test antiderivative(Sin(), 2) == -Sin()
 
-# Polynomial
+# Polynomials
 p = Polynomial(4, 6, 1, 9, 2, -1)
 @test degree(p) == 5
 validate(p)
 validate(antiderivative(p))
 
-Polynomial([1, 2, 3]) == Polynomial(1, 2, 3)
+# Constructor
+@test Polynomial([1, 2, 3]) == Polynomial(1, 2, 3)
 
 # Roots and domain
 @test roots(Polynomial([-1, 0, 1])) == [-1, 1]
@@ -178,6 +187,19 @@ p = fromroots(c)
 # Monomials
 @test Polynomial([1, 2, 3, 4, 5]) == [1, 2, 3, 4, 5]' * monomials(0:4)
 
+# Affine map
+f = AffineMap(2, 3)
+@test f(2) == 7
+@test derivativeat(f, 2) == 2
+@test derivativeat(f, 2, 2) == 0
+@test derivativeat(f, 2, 3) == 0
+@test f'(2) == 2
+
+u = AffineMap([-1 1; 2 3], [1, 2], QHat)
+@test u([1, 2]) == [2, 10]
+@test derivativeat(u, [1, 2]) == [-1 1; 2 3]
+@test derivativeat(u, [1, 2], 2) == zeros(2, 2, 2)
+# TODO Derivative when needed. Requires product of something with mapping to R
 
 # -------------------------------------------------------------------------------------------------
 # Functions Rn -> R

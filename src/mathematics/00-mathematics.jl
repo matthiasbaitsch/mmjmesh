@@ -32,6 +32,7 @@ export ParametricCurve, UnitNormal
 export Sin, Cos
 export MPolynomial, mmonomials, simplifyx
 export AdHocMapping, makefunction
+export AffineMap
 export Polynomial, Interpolation, fromroots, lagrangepolynomials, monomials, degree, lagrangebasis1d
 
 # Forms

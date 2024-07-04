@@ -1,7 +1,7 @@
 using IntervalSets
 using StaticArrays
 using LinearAlgebra
-using DomainSets: ×, Rectangle, ProductDomain
+using DomainSets: ×, Rectangle, ProductDomain, dimension
 
 import Polynomials as P
 
@@ -77,16 +77,26 @@ domaintype(::AbstractMapping{DT}) where {DT} = DT
 codomaintype(::AbstractMapping{DT,CT}) where {DT,CT} = CT
 domain(::AbstractMapping{DT,CT,D}) where {DT,CT,D} = D
 
+"""
+    derivativetype(m, n)
+    derivativetype(DT, CT, n)
 
-# Type of derivatives
-derivativetype(::Type{<:Real}, t, _::Int) = t
-derivativetype(::Type{<:SVector{N}}, t::Type{SVector{M,T}}, n::Int) where {N,M,T} = SMatrix{M,N,T}
-derivativetype(::Type{<:AbstractMapping{DT,CT}}, n::Int) where {DT,CT} = derivativetype(DT, CT, n)
+Returns the type of an `n`-th order derivative for the mapping m or domain type `DT` and codomain
+type `CT`. For instance, the second derivative of a function R2 to R is a 2x2 matrix.
+"""
 derivativetype(f::T, n::Int=1) where {T<:AbstractMapping} = derivativetype(typeof(f), n)
+derivativetype(::Type{<:Real}, t, ::Int) = t
+derivativetype(::Type{<:AbstractMapping{DT,CT}}, n::Int) where {DT,CT} = derivativetype(DT, CT, n)
 
 function derivativetype(::Type{<:SVector{N}}, t::Type{<:Real}, n::Int) where {N}
     n == 1 && return SVector{N,t}
     n == 2 && return SMatrix{N,N,t}
+    error("Not implemented yet")
+end
+
+function derivativetype(::Type{<:SVector{N}}, t::Type{SVector{M,T}}, n::Int) where {N,M,T}
+    n == 1 && return SMatrix{M,N,T}
+    n == 2 && return SArray{Tuple{M,N,N},T}
     error("Not implemented yet")
 end
 
@@ -642,6 +652,49 @@ function monomials(p::AbstractArray{<:Integer}, d=R)
     coeffs(pp) = [i == pp + 1 ? 1 : 0 for i in 1:pp+1]
     return [Polynomial(coeffs(n), d) for n in p]
 end
+
+
+"""
+    AffineMap(A, b)
+
+Creates the affine map `A*x + b`.
+"""
+struct AffineMap{DT,CT,D} <: AbstractMapping{DT,CT,D}
+
+    A
+    b::CT
+
+    function AffineMap(a::Real, b::Real, d=R)
+        @assert dimension(d) == 1
+        return new{Real,Float64,d}(a, b)
+    end
+
+    function AffineMap(a::AbstractMatrix, b::AbstractVector, d=nothing)
+        n = size(a, 2)
+        m = size(a, 1)
+        dd = !isnothing(d) ? d : R^n
+        @assert length(b) == m
+        @assert dimension(dd) == m
+        return new{SVector{n,<:Real},SVector{m,Float64},dd}(a, b)
+    end
+
+    # function AffineMap(XXX)
+    #     return new{Real,Float64,IHat}(1, 2)
+    # end
+end
+
+valueat(m::AffineMap{DT}, x::DT) where {DT} = m.A * x + m.b
+
+function derivativeat(m::AffineMap{DT}, ::DT, n::Integer=1) where {DT}
+    n == 1 && return m.A
+    return zero(derivativetype(m, n))
+end
+
+function derivative(m::AffineMap, n::Integer=1)
+    n == 1 && return m.A * one(m)
+    error("Not implemented yet")
+end
+
 
 
 # -------------------------------------------------------------------------------------------------
