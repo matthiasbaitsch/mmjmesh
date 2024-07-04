@@ -5,6 +5,7 @@ using DomainSets: ×, Rectangle, ProductDomain
 
 using MMJMesh
 using MMJMesh.Mathematics
+using MMJMesh.Mathematics: derivativetype
 
 
 include("validatemappings.jl")
@@ -77,6 +78,26 @@ z = Zero{SVector{2,<:Real},Float64,QHat}()
 @test derivativeat(z, SVector{2,Real}([1, 1])) == [0, 0]
 @test derivativeat(z, [1, 1]) == [0, 0]
 @test derivativeat(z, [1, 1], 2) == [0 0; 0 0]
+
+
+# -------------------------------------------------------------------------------------------------
+# One function
+# -------------------------------------------------------------------------------------------------
+
+o1 = One{Real,R}()
+@test o1(1) == 1
+@test derivativeat(o1, 1) == 0
+validate(o1, atol=1e-8)
+
+o3 = One{SVector{3,<:Real},R^3}()
+@test valueat(o3, [1, 2, 3]) == 1
+@test valueat(o3, SVector{3,Real}([1, 2, 3])) == 1
+@test valueat(o3, SVector{3,Float64}([1, 2, 3])) == 1
+@test o3(1, 2, 3) == 1
+@test derivativeat(o3, [1, 2, 3]) == [0, 0, 0]
+@test o3'(1, 2, 3) == [0, 0, 0]
+@test o3''(1, 2, 3) == zeros(3, 3)
+@test (3 * o3)(1, 2, 3) == 3
 
 
 # -------------------------------------------------------------------------------------------------
@@ -162,6 +183,14 @@ p = fromroots(c)
 # Functions Rn -> R
 # -------------------------------------------------------------------------------------------------
 
+## _nn function
+using MMJMesh.Mathematics: _nn
+
+@test _nn(2, 1, 1) == [2, 0]
+@test _nn(2, 1, 2, 1, 2) == [2, 2]
+
+##  XXX
+
 # Product function, two parameters
 f = ProductFunction(Sin(0 .. 1), Cos(0.5 .. 5))
 x = SVector(1.0, 2.0)
@@ -180,8 +209,17 @@ x = SVector(1.0, 2.0)
 @test derivative(f, 2)(x) ≈ derivativeat(f, x, 2)
 @test derivativeat(f, x, 1) isa SVector{2,Float64}
 @test derivativeat(f, x, 2) isa SMatrix{2,2,Float64}
-
 @test derivativeat(f, Vector(x)) == derivativeat(f, x)
+
+gradf = derivative(f, 1)
+@test gradf[1] == derivative(f, [1, 0])
+@test gradf[2] == derivative(f, [0, 1])
+
+hf = derivative(f, 2)
+@test hf[1][1] == derivative(f, [2, 0])
+@test hf[1][2] == derivative(f, [1, 1])
+@test hf[2][1] == derivative(f, [1, 1])
+@test hf[2][2] == derivative(f, [0, 2])
 
 @test gradientat(f, x) == derivativeat(f, x, 1)
 @test gradientat(f, Vector(x)) == derivativeat(f, x, 1)
@@ -258,7 +296,7 @@ f2 = c * Polynomial(1, 2, 3)
 
 
 # -------------------------------------------------------------------------------------------------
-# Operations
+# Operations and simplification rules
 # -------------------------------------------------------------------------------------------------
 
 m1 = Sin()
@@ -304,6 +342,19 @@ f = 2 / Polynomial(0, 1)
 @test f(0.2) ≈ 10
 @test pois(f) == [0]
 
+# Multiply by one function
+f1 = Sin()
+u1 = MappingFromComponents(Sin(), Cos(), Sin())
+f3 = MPolynomial([4 3 2; 3 2 1; 2 1 0], [1, 2, 3])
+@test o1 * f1 === f1
+@test f1 * o1 === f1
+@test one(f1) === o1
+@test one(Sin{R}) === o1
+@test o1 * u1 === u1
+@test u1 * o1 === u1
+@test o3 * f3 === f3
+@test f3 * o3 === f3
+
 
 # -------------------------------------------------------------------------------------------------
 # Mappings to Rn
@@ -315,77 +366,14 @@ f2 = ProductFunction(Sin(), Cos())
 u1 = MappingFromComponents(f1, f2)
 u2 = MappingFromComponents(f2, f1)
 
-
 u = u1 ⋅ u2
 @test u(2, 3) == 2 * f1(2, 3) * f2(2, 3)
 
 u = ∇(f1) ⋅ ∇(f2)
-@test u(2, 3) ≈ derivative(f1, [1, 0])(2, 3) * cos(2) * cos(3) - derivative(f1, [0, 1])(2, 3) * sin(2) * sin(3)
+@test u(2, 3) ≈ derivative(f1, [1, 0])(2, 3) * cos(2) * cos(3) -
+                derivative(f1, [0, 1])(2, 3) * sin(2) * sin(3)
 
 @test isequal(∂x * f1, ∂x(f1))
-
-
-# -------------------------------------------------------------------------------------------------
-# Mappings Rn → R
-# -------------------------------------------------------------------------------------------------
-
-# Multivariate polynomial
-x = [1, 2, 3]
-f = MPolynomial([3 1; 1 1; 0 2], [-2.0, 3.0])
-g = MPolynomial([3 1 1; 1 1 2; 2 2 3], [1.0, 2.0, 4.0])
-
-@test f == f
-@test f(x) == 50
-@test (3.1 * f)(x) == 3.1 * 50
-@test (f + g)(x) == f(x) + g(x)
-@test domaintype(f) == SVector{3,<:Real}
-@test domain(MPolynomial([1 2; 2 1], [1, 2])) == R2
-
-ps = mmonomials(2, 1, type=Int)
-@test ps[1] == MPolynomial([0; 0;;], [1])
-@test ps[2] == MPolynomial([1; 0;;], [1])
-@test ps[3] == MPolynomial([0; 1;;], [1])
-@test ps[4] == MPolynomial([1; 1;;], [1])
-@test ps[1](0, 0) isa Integer
-
-ps = mmonomials(2, 1, type=BigInt)
-@test ps[1].p.coefficients isa Vector{BigInt}
-
-# 2x₁²x₂⁵+3x₁³x₂²
-f = MPolynomial([2 3; 5 2], [2, 3])
-x = SVector(1.0, 2.0)
-@test derivative(f, [1, 0]) == MPolynomial([1 2; 5 2], [4, 9])
-@test derivative(f, [2, 0]) == MPolynomial([0 1; 5 2], [4, 18])
-@test derivative(f, [1, 1]) == MPolynomial([1 2; 4 1], [20, 18])
-@test derivativeat(f, x, [1, 1]) == derivative(f, [1, 1])(x)
-
-# Operations
-x = SVector(1.0, 2.0)
-f = MPolynomial([2 2; 3 4], [4, 1])
-g = MPolynomial([1 4 1; 6 3 4], [6, 5, 4])
-
-h = f * g
-@test h(x) == f(x) * g(x)
-@test typeof(h) == typeof(g)
-
-h = f + g
-@test h(x) == f(x) + g(x)
-@test typeof(h) == typeof(g)
-
-# Check simplify
-f = MPolynomial([1 2; 1 2], [4, 1])
-g = MPolynomial([1 1; 1 1], [6, 5])
-
-@test f * g == MPolynomial([3 2; 3 2], [11, 44])
-@test f + g == MPolynomial([2 1; 2 1], [1, 15])
-
-# Antiderivative
-ns = [1, 2, 3]
-f = MPolynomial([1 2 3; 6 5 4; 1 2 3], [5, 4, 3])
-ff = derivative(antiderivative(f, ns), ns)
-
-@test f.p.exponents == ff.p.exponents
-@test f.p.coefficients ≈ ff.p.coefficients
 
 
 # -------------------------------------------------------------------------------------------------

@@ -8,6 +8,87 @@ using MMJMesh.Mathematics: _simplify, _isintegervalue, _integerize, _integerize!
 include("validatemappings.jl")
 
 
+# -------------------------------------------------------------------------------------------------
+# Real coefficients
+# -------------------------------------------------------------------------------------------------
+
+x = [1, 2, 3]
+f = MPolynomial([3 1; 1 1; 0 2], [-2.0, 3.0])
+g = MPolynomial([3 1 1; 1 1 2; 2 2 3], [1.0, 2.0, 4.0])
+
+@test f == f
+@test f(x) == 50
+@test (3.1 * f)(x) == 3.1 * 50
+@test (f + g)(x) == f(x) + g(x)
+@test domaintype(f) == SVector{3,<:Real}
+@test domain(MPolynomial([1 2; 2 1], [1, 2])) == R2
+
+# 2x₁²x₂⁵+3x₁³x₂²
+f = MPolynomial([2 3; 5 2], [2, 3])
+x = SVector(1.0, 2.0)
+@test derivative(f, [1, 0]) == MPolynomial([1 2; 5 2], [4, 9])
+@test derivative(f, [2, 0]) == MPolynomial([0 1; 5 2], [4, 18])
+@test derivative(f, [1, 1]) == MPolynomial([1 2; 4 1], [20, 18])
+@test derivativeat(f, x, [1, 1]) == derivative(f, [1, 1])(x)
+
+gradf = derivative(f, 1)
+@test gradf[1] == derivative(f, [1, 0])
+@test gradf[2] == derivative(f, [0, 1])
+
+hf = derivative(f, 2)
+@test hf[1][1] == derivative(f, [2, 0])
+@test hf[1][2] == derivative(f, [1, 1])
+@test hf[2][1] == derivative(f, [1, 1])
+@test hf[2][2] == derivative(f, [0, 2])
+
+# Operations
+x = SVector(1.0, 2.0)
+f = MPolynomial([2 2; 3 4], [4, 1])
+g = MPolynomial([1 4 1; 6 3 4], [6, 5, 4])
+
+h = f * g
+@test h(x) == f(x) * g(x)
+@test typeof(h) == typeof(g)
+
+h = f + g
+@test h(x) == f(x) + g(x)
+@test typeof(h) == typeof(g)
+
+# Check simplify
+f = MPolynomial([1 2; 1 2], [4, 1])
+g = MPolynomial([1 1; 1 1], [6, 5])
+
+@test f * g == MPolynomial([3 2; 3 2], [11, 44])
+@test f + g == MPolynomial([2 1; 2 1], [1, 15])
+
+# Antiderivative
+ns = [1, 2, 3]
+f = MPolynomial([1 2 3; 6 5 4; 1 2 3], [5, 4, 3])
+ff = derivative(antiderivative(f, ns), ns)
+
+@test f.p.exponents == ff.p.exponents
+@test f.p.coefficients ≈ ff.p.coefficients
+
+
+# -------------------------------------------------------------------------------------------------
+# Multivariate monomials
+# -------------------------------------------------------------------------------------------------
+
+ps = mmonomials(2, 1, type=Int)
+@test ps[1] == MPolynomial([0; 0;;], [1])
+@test ps[2] == MPolynomial([1; 0;;], [1])
+@test ps[3] == MPolynomial([0; 1;;], [1])
+@test ps[4] == MPolynomial([1; 1;;], [1])
+@test ps[1](0, 0) isa Integer
+
+ps = mmonomials(2, 1, type=BigInt)
+@test ps[1].p.coefficients isa Vector{BigInt}
+
+
+# -------------------------------------------------------------------------------------------------
+# Symbolic coefficients
+# -------------------------------------------------------------------------------------------------
+
 # Declarations
 @variables a, b
 

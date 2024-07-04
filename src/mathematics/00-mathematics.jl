@@ -15,7 +15,7 @@ export domaintype, codomaintype, domain, valueat
 export derivativeat, derivative, pderivativeat, pderivative
 export R, R2, RPlus, R0Plus, IHat, ReferenceInterval, QHat, ReferenceQuadrilateral
 export antiderivative, integrate, sample, plot, pois, roots
-export Zero
+export Zero, One
 
 # Functions Rn to R
 export gradient, gradientat, hessian, hessianat, laplacian, laplacianat, ∇, H, Δ

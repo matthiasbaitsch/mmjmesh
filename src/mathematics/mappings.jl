@@ -92,7 +92,7 @@ end
 
 
 # Shorthand notations for derivative and evaluation
-Base.adjoint(m::AbstractMapping) = derivative(m)
+Base.adjoint(m::AbstractMapping) = derivative(m, 1)
 (m::AbstractMapping{DT})(x::T) where {DT,T<:DT} = valueat(m, x)
 
 
@@ -115,12 +115,25 @@ derivative(::Zero{DT,CT,D}, n::Int=1) where {DT,CT,D} = Zero{DT,derivativetype(D
 derivativeat(::Zero{DT,CT}, x::SVector{N}, n::Int=1) where {N,DT<:SVector{N},CT} =
     zero(derivativetype(DT, CT, n))
 
+# TODO: zero for type
 Base.zero(::AbstractMapping{DT,CT,D}) where {DT,CT,D} = Zero{DT,CT,D}()
 Base.show(io::IO, ::Zero) = print(io, "0(x)")
 Base.isequal(::Zero{DT,CT,D}, ::Zero{DT,CT,D}) where {DT,CT,D} = true
 
 
-# TODO: One
+# Neutral element w.r.t. multiplication, currently only for mappings into R
+struct One{DT,D} <: AbstractMapping{DT,Float64,D} end
+
+valueat(::One{DT}, x::DT) where {DT} = 1.0
+derivative(::One{DT,D}, n::Integer=1) where {DT,D} = Zero{DT,derivativetype(DT, Real, n),D}()
+derivativeat(::One{DT}, x::DT, n::Integer=1) where {DT} = zero(derivativetype(DT, Real, n))
+
+Base.one(::Type{<:AbstractMapping{DT,Float64,D}}) where {DT,D} = One{DT,D}()
+Base.one(m::AbstractMapping{DT,Float64,D}) where {DT,D} = one(typeof(m))
+Base.show(io::IO, ::One) = print(io, "1(x)")
+Base.isequal(::One{DT,D}, ::One{DT,D}) where {DT,D} = true
+
+
 
 # TODO: Add value
 
@@ -426,13 +439,56 @@ end
 const FunctionRnToR{N,D} = AbstractMapping{SVector{N,<:Real},Float64,D}
 
 
-# Operator
+# Helper functions
+
+"""
+    _nn(n, indices...)
+
+Converts sequence of variable indices to vector of length `n` indicating orders
+of partial derivatives. For instance, calling `_nn(2, 1, 2, 1, 1)` returns `[3, 1]` 
+which corresponds to ``w_{xyxx}``.
+"""
+function _nn(n::Integer, indices::Integer...)
+    n = zeros(Int, n)
+    for i ∈ indices
+        n[i] += 1
+    end
+    return n
+end
+
+function _derivative(f::FunctionRnToR{N}, n::Integer) where {N}
+    if n == 1
+        return MappingFromComponents([derivative(f, _nn(N, i)) for i = 1:N]...)
+    elseif n == 2
+        return MappingFromComponents([derivative(derivative(f, _nn(N, i))) for i = 1:N]...)
+    else
+        throw(DomainError("Derivatives of order > 1 not implemented yet"))
+    end
+end
+
+function _derivativeat(f::FunctionRnToR{N}, x::SVector{N,<:Real}, n::Integer) where {N}
+    if n == 1
+        return SVector{N}([derivativeat(f, x, _nn(N, i)) for i = 1:N])
+    elseif n == 2
+        return SMatrix{N,N}([derivativeat(f, x, _nn(N, i, j)) for i = 1:N, j = 1:N])
+    else
+        throw(DomainError("Derivatives of order > 1 not implemented yet"))
+    end
+end
+
+_derivativeat(
+    f::FunctionRnToR{N,D}, x::SVector{N,<:Real}, ns::AbstractArray{<:Integer}
+) where {N,D} = valueat(derivative(f, ns), x)
+
+
+# Differential operators
+
+# Operator struct for operator matrices
 struct Operator
     op
 end
 (op::Operator)(x) = op.op(x)
 Base.:(*)(op::Operator, x) = op.op(x)
-
 
 # Partial derivatives of functions R2 -> R
 const ∂x = Operator(f -> derivative(f, [1, 0]))
@@ -441,47 +497,10 @@ const ∂xx = Operator(f -> derivative(f, [2, 0]))
 const ∂yy = Operator(f -> derivative(f, [0, 2]))
 const ∂xy = Operator(f -> derivative(f, [1, 1]))
 
-
-# Helper function 
-function _nn(::MappingFromRn{N}, is::Integer...) where {N}
-    n = MVector{N,Int}(zeros(N))
-    for i ∈ is
-        n[i] += 1
-    end
-    return n
-end
-
-
-# Derivatives
-function derivative(f::FunctionRnToR{N}, n::Integer=1) where {N}
-    if n == 1
-        return MappingFromComponents([derivative(f, _nn(f, i)) for i = 1:N]...)
-    elseif n == 2
-        return MappingFromComponents([derivative(derivative(f, _nn(f, i))) for i = 1:N]...)
-    else
-        throw(DomainError("Derivatives of order > 1 not implemented yet"))
-    end
-end
-
-function derivativeat(f::FunctionRnToR{N}, x::SVector{N}, n::Integer=1) where {N}
-    if n == 1
-        return SVector{N}([derivativeat(f, x, _nn(f, i)) for i = 1:N])
-    elseif n == 2
-        return SMatrix{N,N}([derivativeat(f, x, _nn(f, i, j)) for i = 1:N, j = 1:N])
-    else
-        throw(DomainError("Derivatives of order > 1 not implemented yet"))
-    end
-end
-
-derivativeat(
-    f::FunctionRnToR{N,D}, x::SVector{N}, ns::AbstractArray{<:Integer}
-) where {N,D} = valueat(derivative(f, ns), x)
-
-
-# Differential operators
+# Gradient, Hessian, Laplacian
 const gradient(f::FunctionRnToR) = derivative(f, 1)
 const hessian(f::FunctionRnToR) = derivative(f, 2)
-const laplacian(f::FunctionRnToR{N}) where {N} = sum([derivative(f, _nn(f, i, i)) for i = 1:N])
+const laplacian(f::FunctionRnToR{N}) where {N} = sum([derivative(f, _nn(N, i, i)) for i = 1:N])
 const ∇(f::FunctionRnToR) = gradient(f)
 const H(f::FunctionRnToR) = hessian(f)
 const Δ(f::FunctionRnToR) = laplacian(f)
@@ -489,7 +508,7 @@ const Δ(f::FunctionRnToR) = laplacian(f)
 gradientat(f::FunctionRnToR, x::SVector{N}) where {N} = derivativeat(f, x, 1)
 hessianat(f::FunctionRnToR, x::SVector{N}) where {N} = derivativeat(f, x, 2)
 laplacianat(f::FunctionRnToR{N}, x::SVector{N}) where {N} =
-    sum([derivativeat(f, x, _nn(f, i, i)) for i = 1:N])
+    sum([derivativeat(f, x, _nn(N, i, i)) for i = 1:N])
 
 gradientat(f::FunctionRnToR{N}, x::Vector{<:Real}) where {N} = gradientat(f, SVector{N,Float64}(x))
 gradientat(m::FunctionRnToR{N}, x::Real...) where {N} = gradientat(m, SVector{N,Float64}(x))
@@ -499,7 +518,7 @@ laplacianat(f::FunctionRnToR{N}, x::Vector{<:Real}) where {N} = laplacianat(f, S
 laplacianat(m::FunctionRnToR{N}, x::Real...) where {N} = laplacianat(m, SVector{N,Float64}(x))
 
 
-# Integration
+# Integrate functions R2 -> R over rectangle
 function integrate(f::FunctionRnToR{2}, I1::Interval, I2::Interval)
     a = leftendpoint(I1)
     b = rightendpoint(I1)
@@ -508,7 +527,6 @@ function integrate(f::FunctionRnToR{2}, I1::Interval, I2::Interval)
     F = antiderivative(f, [1, 1])
     return F(a, c) + F(b, d) - F(a, d) - F(b, c)
 end
-
 integrate(f::FunctionRnToR{2}, d::Rectangle) = integrate(f, component(d, 1), component(d, 2))
 
 
@@ -524,14 +542,21 @@ struct ProductFunction{N,D} <: FunctionRnToR{N,D}
         new{length(fs),ProductDomain(domain.(fs)...)}(collect(fs))
 end
 
-valueat(f::ProductFunction{N}, x::SVector{N}) where {N} =
+valueat(f::ProductFunction{N}, x::SVector{N,<:Real}) where {N} =
     prod([f.factors[i](x[i]) for i ∈ 1:N])
-derivativeat(f::ProductFunction{N}, x::SVector{N}, n::AbstractArray{<:Integer}) where {N} =
+
+derivativeat(f::ProductFunction{N}, x::SVector{N,<:Real}, n::AbstractArray{<:Integer}) where {N} =
     prod([derivativeat(f.factors[i], x[i], n[i]) for i in 1:N])
+derivativeat(f::ProductFunction{N}, x::SVector{N,<:Real}, n::Integer=1) where {N} =
+    _derivativeat(f, x, n)
+
 derivative(f::ProductFunction{N}, n::AbstractArray{<:Integer}) where {N} =
     ProductFunction([derivative(f.factors[i], n[i]) for i in 1:N]...)
+derivative(f::ProductFunction{N}, n::Integer=1) where {N} = _derivative(f, n)
+
 antiderivative(f::ProductFunction{N}, ns::AbstractArray{<:Integer}) where {N} =
     ProductFunction([antiderivative(f.factors[i], ns[i]) for i = 1:N]...)
+
 Base.show(io::IO, f::ProductFunction) = print(io, "ProductFunction with factors $(f.factors)")
 Base.:(==)(f1::ProductFunction, f2::ProductFunction) = f1.factors == f2.factors
 
@@ -542,9 +567,9 @@ Base.:(==)(f1::ProductFunction, f2::ProductFunction) = f1.factors == f2.factors
 
 const VectorField{N,D} = AbstractMapping{SVector{N,<:Real},SVector{N,Float64},D}
 
-divergence(v::VectorField{N}) where {N} = sum([derivative(v[i], _nn(v, i)) for i = 1:N])
+divergence(v::VectorField{N}) where {N} = sum([derivative(v[i], _nn(N, i)) for i = 1:N])
 divergenceat(v::VectorField{N}, x::SVector{N,<:Real}) where {N} =
-    sum([derivativeat(v[i], x, _nn(v, i)) for i = 1:N])
+    sum([derivativeat(v[i], x, _nn(N, i)) for i = 1:N])
 divergenceat(v::VectorField{N}, x::Real...) where {N} = divergenceat(v, SVector{N}(x))
 divergenceat(v::VectorField{N}, x::Vector{<:Real}) where {N} = divergenceat(v, SVector{N}(x))
 
@@ -663,6 +688,11 @@ Base.:(*)(m1::AbstractMapping{DT,CT1}, m2::AbstractMapping{DT,CT2}) where {DT,CT
     ProductMapping(m1, m2)
 Base.:(*)(m1::AbstractMapping{DT,CT1}, m2::AbstractMapping{DT,CT2}) where {DT,CT1,CT2<:Real} =
     ProductMapping(m2, m1)
+
+Base.:(*)(::One{DT}, m::AbstractMapping{DT}) where {DT} = m
+Base.:(*)(m::AbstractMapping{DT}, ::One{DT}) where {DT} = m
+Base.:(*)(::One{DT}, m::AbstractMapping{DT,<:Real}) where {DT} = m
+Base.:(*)(m::AbstractMapping{DT,<:Real}, ::One{DT}) where {DT} = m
 
 Base.:(*)(a::Real, m::AbstractMapping) = a == 1 ? m : a == 0 ? zero(m) : ScaledMapping(a, m)
 Base.:(*)(m::AbstractMapping, a::Real) = a * m

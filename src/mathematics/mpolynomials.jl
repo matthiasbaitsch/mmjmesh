@@ -29,6 +29,12 @@ function derivative(f::MPolynomial{N,D}, ns::AbstractArray{<:Integer}) where {N,
     return MPolynomial{N,D}(p)
 end
 
+derivative(f::MPolynomial, n::Integer=1) = _derivative(f, n)
+
+derivativeat(
+    f::MPolynomial{N,D}, x::SVector{N,<:Real}, ns::AbstractArray{<:Integer}
+) where {N,D} = _derivativeat(f, x, ns)
+
 function antiderivative(f::MPolynomial{N}, ns::AbstractArray{<:Integer}) where {N}
     e = copy(FP.exponents(f.p))
     c = Vector{promote_type(FP.eltype(f.p), Float64)}(FP.coefficients(f.p))
