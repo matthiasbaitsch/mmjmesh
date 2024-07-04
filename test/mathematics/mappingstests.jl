@@ -188,14 +188,14 @@ p = fromroots(c)
 @test Polynomial([1, 2, 3, 4, 5]) == [1, 2, 3, 4, 5]' * monomials(0:4)
 
 # Affine map
-f = AffineMap(2, 3)
+f = AffineMapping(2, 3)
 @test f(2) == 7
 @test derivativeat(f, 2) == 2
 @test derivativeat(f, 2, 2) == 0
 @test derivativeat(f, 2, 3) == 0
 @test f'(2) == 2
 
-u = AffineMap([-1 1; 2 3], [1, 2], QHat)
+u = AffineMapping([-1 1; 2 3], [1, 2], QHat)
 @test u([1, 2]) == [2, 10]
 @test derivativeat(u, [1, 2]) == [-1 1; 2 3]
 @test derivativeat(u, [1, 2], 2) == zeros(2, 2, 2)

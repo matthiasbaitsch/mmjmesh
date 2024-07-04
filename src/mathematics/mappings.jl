@@ -655,21 +655,21 @@ end
 
 
 """
-    AffineMap(A, b)
+    AffineMapping(A, b)
 
 Creates the affine map `A*x + b`.
 """
-struct AffineMap{DT,CT,D} <: AbstractMapping{DT,CT,D}
+struct AffineMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
 
     A
     b::CT
 
-    function AffineMap(a::Real, b::Real, d=R)
+    function AffineMapping(a::Real, b::Real, d=R)
         @assert dimension(d) == 1
         return new{Real,Float64,d}(a, b)
     end
 
-    function AffineMap(a::AbstractMatrix, b::AbstractVector, d=nothing)
+    function AffineMapping(a::AbstractMatrix, b::AbstractVector, d=nothing)
         n = size(a, 2)
         m = size(a, 1)
         dd = !isnothing(d) ? d : R^n
@@ -678,19 +678,19 @@ struct AffineMap{DT,CT,D} <: AbstractMapping{DT,CT,D}
         return new{SVector{n,<:Real},SVector{m,Float64},dd}(a, b)
     end
 
-    # function AffineMap(XXX)
+    # function AffineMapping(XXX)
     #     return new{Real,Float64,IHat}(1, 2)
     # end
 end
 
-valueat(m::AffineMap{DT}, x::DT) where {DT} = m.A * x + m.b
+valueat(m::AffineMapping{DT}, x::DT) where {DT} = m.A * x + m.b
 
-function derivativeat(m::AffineMap{DT}, ::DT, n::Integer=1) where {DT}
+function derivativeat(m::AffineMapping{DT}, ::DT, n::Integer=1) where {DT}
     n == 1 && return m.A
     return zero(derivativetype(m, n))
 end
 
-function derivative(m::AffineMap, n::Integer=1)
+function derivative(m::AffineMapping, n::Integer=1)
     n == 1 && return m.A * one(m)
     error("Not implemented yet")
 end
