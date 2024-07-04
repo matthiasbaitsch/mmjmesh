@@ -29,8 +29,6 @@ Geometry(coordinates::Matrix) =
 gdim(g::Geometry) = gdim(typeof(g))
 gdim(::Type{Geometry{D}}) where {D} = D
 
-dimension(::Geometry{D}) where {D} = D
-
 """
     length(g::Geometry, d::int)
 
