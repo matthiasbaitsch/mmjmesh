@@ -185,8 +185,6 @@ function Base.show(io::IO, ec::ElementBlockCollection)
 end
 
 Base.length(ebc::ElementBlockCollection) = ebc.nblocks
-# XXX Base.getindex(ebc::ElementBlockCollection, i) = ebc.blocks[i]
-# XXX blocksByDimension(bc::BlockCollection, dim::Int) = filter(b -> b.entitydim == dim, bc.blocks)
 
 function nodetags(ebc::ElementBlockCollection, dim::Int)
     nts = Vector{Vector{Int}}()
