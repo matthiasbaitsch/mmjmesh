@@ -177,3 +177,8 @@ f = gm.Figure()
 gm.Axis3(f[1, 1], aspect=:data)
 fplot3d!(ff, zscale=0.5)
 @test_reference ref("plot-01.png") f
+
+f = gm.Figure()
+gm.Axis3(f[1, 1], aspect=:data)
+fplot3d!(ff, zscale=0.5, mesh=nothing)
+@test_reference ref("plot-02.png") f

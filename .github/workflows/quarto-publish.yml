@@ -29,9 +29,12 @@ jobs:
       - name: Test
         continue-on-error: true
         run: DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --color=yes --project -e 'using Pkg; Pkg.test(coverage=true)'
-      - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v4
+      - name: Process code coverage information
+        uses: julia-actions/julia-processcoverage@v1
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}      
           file: lcov.info
       - name: Render
         uses: quarto-dev/quarto-actions/publish@v2

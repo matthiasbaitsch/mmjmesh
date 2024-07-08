@@ -181,7 +181,7 @@ mplot!(m, w, faceplotzscale=0.2, faceplotmesh=2)
 f
 ```
 
-Method 1: Specify postprocessing function with the items `w` and `sigma`:
+Method 2: Specify postprocessing function, here with the items `w` and `sigma`:
 
 ```{julia}
 function results(face, name)
@@ -211,7 +211,8 @@ f = Figure()
 Axis3(f[1, 1], aspect=:data)
 mplot!(
     m, :sigma,
-    faceplotzscale=0.5, faceplotmesh=15, edgelinewidth=2, edgecolor=:red, colormap=:redblue
+    faceplotzscale=0.5, faceplotmesh=15, 
+    edgelinewidth=2, edgecolor=:red, colormap=:redblue
 )
 f
 ```

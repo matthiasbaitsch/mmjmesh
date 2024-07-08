@@ -466,6 +466,7 @@ function _makegmap(face) # TODO use geometry map for face
 end
 
 function _collectlines(points)
+    isempty(points) && return Float32[], Float32[]
     n = length(points[1][1])
     x1 = Float32[]
     x2 = Float32[]
