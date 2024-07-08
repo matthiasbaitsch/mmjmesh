@@ -1,13 +1,17 @@
 using Random
 using ReferenceTests
 import CairoMakie as cm
+import GLMakie as gm
 
 using MMJMesh
 using MMJMesh.Gmsh
 using MMJMesh.Plots
 using MMJMesh.Meshes
 using MMJMesh.Utilities
+using MMJMesh.Mathematics
 
+# Make sure to use CairoMakie
+cm.activate!()
 
 # -------------------------------------------------------------------------------------------------
 # Set up
@@ -98,3 +102,59 @@ p = mplot(m, edgesvisible=true) |> mconf()
 cm.scatter!(p.axis, coordinates(m)[:, m.groups[:ΓD0]])
 @test_reference ref("m2d-015.png") p |> mconf()
 @test_reference ref("m2d-016.png") mplot(m, rand(nnodes(m))) |> mconf()
+
+# Here are 3D plots
+gm.activate!()
+
+# Warp in z-direction
+a = 4
+m = makemeshonrectangle(4, 2, 2a, a)
+function warp(node)
+    x = coordinates(node)
+    x3 = 0.1 * sin(0.25 * pi * (x[1] - 2)) * sin(0.5 * pi * (x[2] - 1))
+    return [x..., x3]
+end
+
+f = gm.Figure() # Warp by function
+gm.Axis3(f[1, 1], aspect=:data)
+mplot!(m, rand(nfaces(m)), nodewarp=warp)
+@test_reference ref("m2d-017.png") f
+
+f = gm.Figure() # Warp by nodal values
+gm.Axis3(f[1, 1], aspect=:data)
+mplot!(m, rand(nfaces(m)), nodewarp=0.5 * rand(nnodes(m)))
+@test_reference ref("m2d-018.png") f
+
+# Plot function on face
+m = makemeshonrectangle(8, 4, 4, 2)
+w(face) = x -> index(face) * (1 - x[1]^2) * (1 - x[2]^2)
+
+f = gm.Figure() # Warp by one function on face
+gm.Axis3(f[1, 1], aspect=:data)
+mplot!(m, w, faceplotzscale=0.2, faceplotmesh=2)
+@test_reference ref("m2d-019.png") f
+
+function results(face, name) # Warp using postprocessing function
+    if name == :w
+        return x -> index(face) * (1 - x[1]^2) * (1 - x[2]^2)
+    elseif name == :sigma
+        s = Polynomial([0, π])
+        return ProductFunction(Sin() ∘ s, Cos() ∘ s)
+    end
+end
+m.data[:post] = results
+
+f = gm.Figure()
+gm.Axis3(f[1, 1], aspect=:data)
+mplot!(m, :w, faceplotzscale=0.2, faceplotmesh=2)
+@test_reference ref("m2d-020.png") f
+
+f = gm.Figure()
+gm.Axis3(f[1, 1], aspect=:data)
+mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2)
+@test_reference ref("m2d-21.png") f
+
+f = gm.Figure()
+gm.Axis3(f[1, 1], aspect=:data)
+mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2, facecolor=:tomato)
+@test_reference ref("m2d-22.png") f

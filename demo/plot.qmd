@@ -128,8 +128,101 @@ Colors for elements
 mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf()
 ```
 
+## Plot functions on meshes
+
+```{julia}
+#| echo: false
+GLMakie.activate!()
+```
+
+### Warp by nodal values
+
+Nodes can be transformed. Either, specify a function which returns the 
+warped coordinates of the node.
+
+```{julia}
+m = makemeshonrectangle(4, 2, 20, 10)
+function warpfunction(node)
+    x = coordinates(node)
+    return [x..., 0.25 * sin(pi * (x[1] - 2)) * cos(pi * (x[2] - 1))]
+end
+
+f = Figure()
+Axis3(f[1, 1], aspect=:data)
+mplot!(m, rand(nfaces(m)), nodewarp=warpfunction)
+f
+```
+
+Alternatively, use an array to perform a scalar warp.
+
+```{julia}
+m = makemeshonrectangle(4, 2, 10, 5)
+
+f = Figure()
+Axis3(f[1, 1], aspect=:data)
+mplot!(m, rand(nfaces(m)), nodewarp=0.25 * rand(nnodes(m)))
+f
+```
+
+### Plot functions on faces
+
+For each face, a function from the face geometry reference domain into the real numbers can be provided. Function values are visualized by colors and/or by warping the face. 
+
+The function is specified by the first parameter to the mplot function, settings are the `faceplotXXX` named parameters.
+
+Method 1: Specify one function:
+
+```{julia}
+m = makemeshonrectangle(8, 4, 4, 2)
+w(face) = x -> index(face) * (1 - x[1]^2) * (1 - x[2]^2)
+f = Figure()
+Axis3(f[1, 1], aspect=:data)
+mplot!(m, w, faceplotzscale=0.2, faceplotmesh=2)
+f
+```
+
+Method 1: Specify postprocessing function with the items `w` and `sigma`:
+
+```{julia}
+function results(face, name)
+    if name == :w
+        return x -> index(face) * (1 - x[1]^2) * (1 - x[2]^2)
+    elseif name == :sigma
+        s = Polynomial([0, π])
+        return ProductFunction(Sin() ∘ s, Cos() ∘ s)
+    end
+end
+m.data[:post] = results;
+```
+
+Plot result `w`:
+
+```{julia}
+f = Figure()
+Axis3(f[1, 1], aspect=:data)
+mplot!(m, :w, faceplotzscale=0.2, faceplotmesh=2)
+f
+```
+
+Plot result `sigma`:
+
+```{julia}
+f = Figure()
+Axis3(f[1, 1], aspect=:data)
+mplot!(
+    m, :sigma,
+    faceplotzscale=0.5, faceplotmesh=15, edgelinewidth=2, edgecolor=:red, colormap=:redblue
+)
+f
+```
+
 
 ## Plot options
+
+```{julia}
+#| echo: false
+CairoMakie.activate!()
+```
 
 ```{julia}
 a = 10
@@ -153,4 +246,3 @@ mplot(m2, rand(nnodes(m2)),
     lineplotfacescolormap=:bluesreds
 ) |> mconf(title="Test Plot")
 ```
-

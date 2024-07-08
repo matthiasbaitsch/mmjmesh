@@ -34,7 +34,7 @@ end
 
 
 # TODO: Remove zscale
-function sample2d(f::FunctionRnToR{2}; domain, npoints::Integer, gmap=x -> x, zscale=1)
+function sample2d(f; domain, npoints::Integer, gmap=x -> x, zscale=1)
     m = makeinitialmesh(domain, npoints)
     x = tomatrix([[x[1], x[2], zscale * f(x)] for x in m.geometry.points])
     t = tomatrix([l for l in links(m.topology, 2, 0)], ROWS)
@@ -46,8 +46,8 @@ function sample2d(f::FunctionRnToR{2}; domain, npoints::Integer, gmap=x -> x, zs
     return x, t
 end
 
-
-function sample2dlines(f::FunctionRnToR{2}; domain::Rectangle, npoints::Integer, mesh=0, gmap=identity, zscale=1)
+# TODO refactor return type / return list of coordinates
+function sample2dlines(f; domain::Rectangle, npoints::Integer, mesh=0, gmap=identity, zscale=1)
     l1s = Float64[]
     l2s = Float64[]
     l3s = Float64[]

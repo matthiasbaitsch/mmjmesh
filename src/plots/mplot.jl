@@ -4,6 +4,7 @@
 
 MakieCore.@recipe(MPlot, mesh, scalars) do scene
 
+    # Collect attributes from theme
     attr = MakieCore.Attributes(
 
         # Nodes
@@ -37,7 +38,7 @@ MakieCore.@recipe(MPlot, mesh, scalars) do scene
         lineplotfacescolor=MakieCore.theme(scene, :lineplotfacescolor),
         lineplotfacescolormap=MakieCore.theme(scene, :lineplotfacescolormap),
 
-        # Faceplot TODO refactor, rename
+        # Faceplot
         faceplotzscale=MakieCore.theme(scene, :faceplotzscale),
         faceplotmesh=MakieCore.theme(scene, :faceplotmesh),
         faceplotnpoints=MakieCore.theme(scene, :faceplotnpoints),
@@ -53,56 +54,24 @@ end
 
 
 # -------------------------------------------------------------------------------------------------
-# Configure
-# -------------------------------------------------------------------------------------------------
-
-function mconf(; colorbar=true, dataaspect=true, blank=true, title="")
-    return scene -> begin
-        ax = scene.axis
-        if dataaspect
-            ax.aspect = Makie.DataAspect()
-        end
-        if blank
-            Makie.hidedecorations!(ax)
-            Makie.hidespines!(ax)
-        end
-        if colorbar && !scene.plot[:colorbygroups][]
-            # Hack using the fact that the mesh is always plotted first
-            p = scene.plot.plots[1]
-            if !isnothing(Makie.extract_colormap_recursive(p))
-                Makie.Colorbar(scene.figure[1, 2], p)
-            end
-        end
-        if title != ""
-            ax.title = title
-        end
-        return scene
-    end
-end
-
-
-# -------------------------------------------------------------------------------------------------
 # Main plot function
 # -------------------------------------------------------------------------------------------------
 
 function MakieCore.plot!(plot::MPlot)
     mesh = plot.mesh[]
 
-    # Helper
-    isundefined(key) = isnothing(plot.attributes[key][])
+    # Helpers
+    isundefined(key) = key ∉ keys(plot.attributes) || isnothing(plot.attributes[key][])
     setifundefined(key, value) = isundefined(key) && (plot.attributes[key] = value)
 
-    # Flag if we have data
-    color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
-    plot.havedata = color isa Vector
-
     # Configure
-    plot.colorbygroups = false
-    plot.lineplotvisible = false
+    color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
+    colorbygroups = false
+    lineplotvisible = false
 
-    # Setting if not defined
-    setifundefined(:nodecolor, :tomato)
+    # Settings if not defined
     setifundefined(:nodesvisible, nnodes(mesh) <= 50)
+    setifundefined(:nodecolor, :tomato)
     setifundefined(:edgecolor, MakieCore.theme(plot, :linecolor))
     setifundefined(:lineplotscale, 0.1)
     setifundefined(:lineplotoutlinesvisible, true)
@@ -115,22 +84,38 @@ function MakieCore.plot!(plot::MPlot)
     setifundefined(:faceplotmeshlinewidth, 1.25)
     setifundefined(:faceplotmeshcolor, MakieCore.theme(plot, :linecolor))
 
-    
-    if pdim(mesh) == 1 # Mesh of 1D elements
+    # Access node coordinates or warp
+    if isundefined(:nodewarp)
+        plot.nodecoordinates = node -> coordinates(node)
+    else
+        nodewarp = plot.nodewarp[]
+        if nodewarp isa Function
+            plot.nodecoordinates = plot.nodewarp[]
+        elseif nodewarp isa AbstractArray
+            plot.nodecoordinates = (node -> [coordinates(node)..., nodewarp[index(node)]])
+        end
+    end
+
+    # Settings for mesh of 1D elements
+    if pdim(mesh) == 1
         plot.edgesvisible = true
         plot.featureedgesvisible = false
         plot.facesvisible = false
-        plot.lineplotvisible = length(plot) > 1
+        lineplotvisible = length(plot) > 1
         setifundefined(:edgelinewidth, 3)
-    elseif pdim(mesh) == 2 # Mesh of 2D elements
-        plot.colorbygroups = !plot.havedata[] && isundefined(:facecolor) && hasgroups(mesh.groups, d=2)
+    end
+
+    # Settings for mesh of 2D elements
+    if pdim(mesh) == 2
+        havedata = color isa Vector
+        colorbygroups = !havedata && isundefined(:facecolor) && hasgroups(mesh.groups, d=2)
         setifundefined(:featureedgesvisible, true)
         setifundefined(:edgesvisible, nfaces(mesh) <= 100)
         setifundefined(:edgecolor, MakieCore.theme(plot, :linecolor))
         setifundefined(:edgelinewidth, 0.75)
         setifundefined(:featureedgelinewidth, 3 * plot.edgelinewidth[])
         setifundefined(:facesvisible, true)
-        if plot.colorbygroups[]
+        if colorbygroups
             setifundefined(:facecolormap, :Pastel1_9)
         else
             if color isa Function || color isa Symbol
@@ -140,21 +125,25 @@ function MakieCore.plot!(plot::MPlot)
             end
             setifundefined(:facecolormap, MakieCore.theme(plot, :colormap))
         end
-    else
+    end
+
+    # Higher dimensions not implemented yet
+    if pdim(mesh) >= 3
         @notimplemented
     end
+
+    # Used by mconf
+    plot.colorbygroups = colorbygroups
 
     # Plot functions on faces goes extra at the moment - TODO this is a hack, refactor
     if pdim(mesh) == 2 && (color isa Function || color isa Symbol)
         plotfacefunctions(plot)
     else # Plot
-        plot.lineplotvisible[] && plotlineplot(plot)
+        lineplotvisible && plotlineplot(plot)
         plot.facesvisible[] && plotfaces(plot)
         plot.edgesvisible[] && plotedges(plot, false)
         plot.featureedgesvisible[] && plotedges(plot, true)
-        plot.nodesvisible[] && MakieCore.scatter!(
-            plot, coordinates(mesh), color=plot.nodecolor, markersize=plot.nodesize
-        )
+        plot.nodesvisible[] && plotnodes(plot)
     end
 
     # Return
@@ -233,15 +222,15 @@ function plotfaces(plot::MPlot)
 
     # Mesh and color
     mesh = plot.mesh[]
+    nodecoordinates = plot.nodecoordinates[]
     color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
 
     # Test if we have data and overall color
     haveData = color isa Vector
     haveColor = !isnothing(plot.facecolor[])
-    zscale = plot.faceplotzscale[]
 
     # Helpers
-    coords = coordinates(mesh)
+    coords = nodecoordinates.(nodes(mesh))
     Nn = nnodes(mesh)
     Nf = nfaces(mesh)
 
@@ -262,31 +251,20 @@ function plotfaces(plot::MPlot)
                 push!(tf, [l[1], l[3], l[4]])
             end
         end
-        x = coords
-        tf = mapreduce(permutedims, vcat, tf)
-        c = color
-
-        # TODO refactor the whole thing
-        if haveData && zscale != 0
-            x = [x[1, :]'; x[2, :]'; zscale * color']
-        end
     elseif length(color) == Nf                                    # Element color
         cnt = 1
-        tf = Vector{Vector{Int}}()
-        c = Vector{Float64}()
-        xx = Vector{Float64}()
-        yy = Vector{Float64}()
+        tf = []
+        coordstmp = []
+        colortmp = Float32[]
         for (i, l) ∈ enumerate(links(mesh.topology, 2, 0))
             if length(l) == 3
-                append!(c, color[i] * ones(3))
-                append!(xx, coords[1, l[[1, 2, 3]]])
-                append!(yy, coords[2, l[[1, 2, 3]]])
+                append!(colortmp, color[i] * ones(3))
+                append!(coordstmp, coords[l[[1, 2, 3]]])
                 push!(tf, cnt:cnt+2)
                 cnt += 3
             elseif length(l) == 4
-                append!(c, color[i] * ones(6))
-                append!(xx, coords[1, l[[1, 2, 3, 1, 3, 4]]])
-                append!(yy, coords[2, l[[1, 2, 3, 1, 3, 4]]])
+                append!(colortmp, color[i] * ones(6))
+                append!(coordstmp, coords[l[[1, 2, 3, 1, 3, 4]]])
                 push!(tf, cnt:cnt+2)
                 push!(tf, cnt+3:cnt+5)
                 cnt += 6
@@ -294,26 +272,24 @@ function plotfaces(plot::MPlot)
                 @notimplemented
             end
         end
-        x = [xx yy]'
-        tf = mapreduce(permutedims, vcat, tf)
+        color = colortmp
+        coords = coordstmp
     else
         @notimplemented
     end
 
     # Plot
-    MakieCore.mesh!(plot, x, tf, color=c, colormap=plot.facecolormap, colorrange=plot.colorrange)
+    MakieCore.mesh!(
+        plot,
+        tomatrix(coords), tomatrix(tf, ROWS),
+        color=color, colormap=plot.facecolormap, colorrange=plot.colorrange
+    )
 end
 
 
 function plotedges(plot::MPlot, featureedges::Bool)
-
-    # Mesh and color
     mesh = plot.mesh[]
-    color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
-
-    # Test if we have data and overall color
-    havedata = color isa Vector
-    zscale = plot.faceplotzscale[]
+    nodecoordinates = plot.nodecoordinates[]
 
     # Collect indices of edges to plot
     if featureedges
@@ -325,24 +301,8 @@ function plotedges(plot::MPlot, featureedges::Bool)
         indices = 1:nedges(mesh)
     end
 
-    # Collect coordinates
-    # TODO 3D: Generalize
-    xx = Float32[]
-    yy = Float32[]
-    zz = Float32[]
-
-    for i ∈ indices
-        e = edge(mesh, i)
-        n1, n2 = nodeindices(e)
-        x1 = coordinates(mesh, n1)
-        x2 = coordinates(mesh, n2)
-        push!(xx, x1[1], x2[1], NaN)
-        push!(yy, x1[2], x2[2], NaN)
-
-        if havedata && zscale != 0
-            push!(zz, zscale * color[n1], zscale * color[n2], NaN)
-        end
-    end
+    # Coordinates
+    points = [nodecoordinates.(nodes(edge(mesh, i))) for i = indices]
 
     # Plot attributes
     if featureedges
@@ -361,12 +321,17 @@ function plotedges(plot::MPlot, featureedges::Bool)
         lc = plot.edgecolor[]
     end
 
-    # Plot
-    if havedata && zscale != 0
-        MakieCore.lines!(plot, xx, yy, zz, linewidth=lw, color=lc, colormap=:tab10)
-    else
-        MakieCore.lines!(plot, xx, yy, linewidth=lw, color=lc, colormap=:tab10)
-    end
+    MakieCore.lines!(plot, _xcollectlines(points)..., linewidth=lw, color=lc, colormap=:tab10)
+end
+
+function plotnodes(plot::MPlot)
+    mesh = plot.args[1][]
+    nodecoordinates = plot.nodecoordinates[]
+    x = nodecoordinates.(nodes(mesh)) |> tomatrix
+
+    MakieCore.scatter!(
+        plot, x, color=plot.nodecolor, markersize=plot.nodesize
+    )
 end
 
 function plotfacefunctions(plot::MPlot)
@@ -520,6 +485,25 @@ function _collectlines(cl)
     return l1, l2, l3
 end
 
+function _xcollectlines(points)
+    n = length(points[1][1])
+    x1 = Float32[]
+    x2 = Float32[]
+    x3 = Float32[]
+    for lp = points
+        for p = lp
+            push!(x1, p[1])
+            push!(x2, p[2])
+            n == 3 && push!(x3, p[3])
+        end
+        push!(x1, NaN)
+        push!(x2, NaN)
+        n == 3 && push!(x3, NaN)
+    end
+    n == 2 && return x1, x2
+    n == 3 && return x1, x2, x3
+end
+
 function _collectfaces(cf)
     xx = [Float32[], Float32[], Float32[]]
     tt = [Int[], Int[], Int[]]
@@ -544,4 +528,34 @@ function _tofunctions(mesh, values)
         return [Polynomial(_coeffs(values[:, i]...), IHat) for i in axes(values, 2)]
     end
 end
+
+
+# -------------------------------------------------------------------------------------------------
+# Configure
+# -------------------------------------------------------------------------------------------------
+
+function mconf(; colorbar=true, dataaspect=true, blank=true, title="")
+    return scene -> begin
+        ax = scene.axis
+        if dataaspect
+            ax.aspect = Makie.DataAspect()
+        end
+        if blank
+            Makie.hidedecorations!(ax)
+            Makie.hidespines!(ax)
+        end
+        if colorbar && !scene.plot[:colorbygroups][]
+            # Hack using the fact that the mesh is always plotted first
+            p = scene.plot.plots[1]
+            if !isnothing(Makie.extract_colormap_recursive(p))
+                Makie.Colorbar(scene.figure[1, 2], p)
+            end
+        end
+        if title != ""
+            ax.title = title
+        end
+        return scene
+    end
+end
+
 
