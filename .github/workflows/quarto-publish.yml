@@ -27,7 +27,7 @@ jobs:
       - name: Build
         uses: julia-actions/julia-buildpkg@v1
       - name: Test
-        run: DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --color=yes --project -e 'using Pkg; Pkg.test(coverage=true)'
+        run: DISPLAY=:0 xvfb-run -s '-screen 0 2048x1536x24' julia --color=yes --project -e 'using Pkg; Pkg.test(coverage=true)'
       - name: Render
         uses: quarto-dev/quarto-actions/publish@v2
         with:
