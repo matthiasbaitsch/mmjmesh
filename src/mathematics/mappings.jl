@@ -683,7 +683,9 @@ struct AffineMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
     # end
 end
 
-valueat(m::AffineMapping{DT}, x::DT) where {DT} = m.A * x + m.b
+valueat(m::AffineMapping{DT,<:Real}, x::DT) where {DT} = m.A * x + m.b
+valueat(m::AffineMapping{DT,<:SVector{N,Float64}}, x::DT) where {DT,N} =
+    SVector{N,Float64}(m.A * x + m.b)
 
 function derivativeat(m::AffineMapping{DT}, ::DT, n::Integer=1) where {DT}
     n == 1 && return m.A

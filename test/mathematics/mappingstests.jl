@@ -196,10 +196,17 @@ f = AffineMapping(2, 3)
 @test f'(2) == 2
 
 u = AffineMapping([-1 1; 2 3], [1, 2], QHat)
-@test u([1, 2]) == [2, 10]
+@test u(1, 2) == [2, 10]
+@test u(1, 2) isa SVector{2,Float64}
 @test derivativeat(u, [1, 2]) == [-1 1; 2 3]
 @test derivativeat(u, [1, 2], 2) == zeros(2, 2, 2)
 # TODO Derivative when needed. Requires product of something with mapping to R
+
+f = ProductFunction(Sin(), Sin())
+g = AffineMapping(Diagonal([π, π]), zeros(2))
+h = f ∘ g
+@test isapprox(h([1, 1]), 0.0, atol=1e-14)
+
 
 # -------------------------------------------------------------------------------------------------
 # Functions Rn -> R
@@ -207,11 +214,8 @@ u = AffineMapping([-1 1; 2 3], [1, 2], QHat)
 
 ## _nn function
 using MMJMesh.Mathematics: _nn
-
 @test _nn(2, 1, 1) == [2, 0]
 @test _nn(2, 1, 2, 1, 2) == [2, 2]
-
-##  XXX
 
 # Product function, two parameters
 f = ProductFunction(Sin(0 .. 1), Cos(0.5 .. 5))
