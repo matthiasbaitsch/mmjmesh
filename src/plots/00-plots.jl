@@ -37,10 +37,7 @@ include("sample1d.jl")
 include("sample2d.jl")
 include("mplot.jl")
 include("fplot.jl")
-include("fplot3d.jl")
 include("vplot.jl")
-
-# TODO
-# plottype(::T) where {T<:AbstractMapping{SVector{2,Float64},Real}} = FPlot3D
+include("fplot3d.jl")
 
 end

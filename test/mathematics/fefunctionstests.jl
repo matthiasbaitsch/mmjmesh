@@ -6,16 +6,9 @@ using MMJMesh
 using MMJMesh.Plots
 using MMJMesh.Mathematics
 
-include("validatemappings.jl")
-
 # Coefficients
 C1 = [1, 2]
 C2 = [1.0 2.0; 3.0 4.0]
-
-# Helpers
-hx = [3.0, 2.0]
-@test MMJMesh.Mathematics.mul(C1, hx) == C1 ⋅ hx
-@test MMJMesh.Mathematics.mul(C2, hx) == C2 * hx
 
 # Interpolate numbers
 m1 = Interpolation(C1, 1)

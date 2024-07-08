@@ -115,12 +115,12 @@ function warp(node)
     return [x..., x3]
 end
 
-f = gm.Figure() # Warp by function
+f = gm.Figure(size=(900, 1200)) # Warp by function
 gm.Axis3(f[1, 1], aspect=:data)
 mplot!(m, rand(nfaces(m)), nodewarp=warp)
 @test_reference ref("m2d-017.png") f
 
-f = gm.Figure() # Warp by nodal values
+f = gm.Figure(size=(900, 1200)) # Warp by nodal values
 gm.Axis3(f[1, 1], aspect=:data)
 mplot!(m, rand(nfaces(m)), nodewarp=0.5 * rand(nnodes(m)))
 @test_reference ref("m2d-018.png") f
@@ -129,7 +129,7 @@ mplot!(m, rand(nfaces(m)), nodewarp=0.5 * rand(nnodes(m)))
 m = makemeshonrectangle(8, 4, 4, 2)
 w(face) = x -> index(face) * (1 - x[1]^2) * (1 - x[2]^2)
 
-f = gm.Figure() # Warp by one function on face
+f = gm.Figure(size=(900, 1200)) # Warp by one function on face
 gm.Axis3(f[1, 1], aspect=:data)
 mplot!(m, w, faceplotzscale=0.2, faceplotmesh=2)
 @test_reference ref("m2d-019.png") f
@@ -144,17 +144,29 @@ function results(face, name) # Warp using postprocessing function
 end
 m.data[:post] = results
 
-f = gm.Figure()
+f = gm.Figure(size=(900, 1200))
 gm.Axis3(f[1, 1], aspect=:data)
 mplot!(m, :w, faceplotzscale=0.2, faceplotmesh=2)
 @test_reference ref("m2d-020.png") f
 
-f = gm.Figure()
+f = gm.Figure(size=(900, 1200))
 gm.Axis3(f[1, 1], aspect=:data)
 mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2)
 @test_reference ref("m2d-21.png") f
 
-f = gm.Figure()
+f = gm.Figure(size=(900, 1200))
 gm.Axis3(f[1, 1], aspect=:data)
 mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2, facecolor=:tomato)
 @test_reference ref("m2d-22.png") f
+
+
+# -------------------------------------------------------------------------------------------------
+# Other
+# -------------------------------------------------------------------------------------------------
+## XXX
+# Plot function R2 -> R
+ff = MPolynomial([0 2 0; 0 0 2], [1, -1, -1], QHat)
+f = gm.Figure(size=(900, 1200))
+gm.Axis3(f[1, 1], aspect=:data)
+fplot3d!(ff, zscale=0.5)
+@test_reference ref("plot-01.png") f

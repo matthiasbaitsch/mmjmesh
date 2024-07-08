@@ -5,9 +5,6 @@ using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Mathematics: _simplify, _isintegervalue, _integerize, _integerize!
 
-include("validatemappings.jl")
-
-
 # -------------------------------------------------------------------------------------------------
 # Real coefficients
 # -------------------------------------------------------------------------------------------------

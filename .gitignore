@@ -4,3 +4,4 @@ demo/*_files
 demo/site_libs
 demo/*.ipynb
 demo/*.html
+*.cov

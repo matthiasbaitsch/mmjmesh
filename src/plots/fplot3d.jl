@@ -32,16 +32,23 @@ function MakieCore.plot!(plot::FPlot3D)
     for arg ∈ plot.args
         f = arg[]
         d = domain(f)
-        x, t = sample2d(f, domain=d, npoints=npoints, gmap=gmap, zscale=zscale)
-        l1, l2, l3 = sample2dlines(f, domain=d, npoints=npoints, mesh=mesh, gmap=gmap, zscale=zscale)
-        mesh!(plot, x, t, color=_getcolor(x, color, zscale), colorrange=colorrange, colormap=colormap)
-        lines!(plot, l1, l2, l3, color=meshcolor)
+        !isfinite(d) && error("Domain is infinite: $d")
+        fx, ft = sample2d(f, domain=d, npoints=npoints, gmap=gmap)
+        fx[3, :] *= zscale
+        lx = sample2dlines(f, domain=d, npoints=npoints, nmeshlines=mesh, gmap=gmap, zscale=zscale)
+        mesh!(
+            plot, fx, ft,
+            color=_getcolor(fx, color, zscale), colorrange=colorrange, colormap=colormap
+        )
+        lines!(plot, _collectlines(lx)..., color=meshcolor)
     end
     return plot
 end
 
 
-function fplot3d(fs::AbstractArray{<:AbstractMapping}; colormap=MakieCore.theme(:colormap),fig=Makie.Figure())
+function fplot3d(
+    fs::AbstractArray{<:AbstractMapping}; colormap=MakieCore.theme(:colormap), fig=Makie.Figure()
+)
     n = length(fs)
     cnt = 1
     ncol = Int(ceil(sqrt(n)))

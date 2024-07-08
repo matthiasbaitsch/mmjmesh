@@ -300,6 +300,7 @@ const QHat = IHat × IHat
 const ReferenceQuadrilateral = QHat
 
 # Select elements in interval
+Base.isfinite(r::Rectangle) = all(isfinite.(r.a)) && all(isfinite.(r.b))
 Base.intersect(s::AbstractInterval, a::AbstractVector{T}) where {T} = T[x for x in a if x ∈ s]
 
 

@@ -136,7 +136,7 @@ function _integerize(expression::Num)
     @variables xone, xnull
     r = @rule ~x::_isintegervalue => xone * (Int(~x) + xnull)
     expression = simplify(expression)
-    expression = simplify(expression, Postwalk(Chain([r])))
+    expression = simplify(expression, rewriter=Postwalk(Chain([r])))
     expression = simplify(substitute(expression, Dict(xone => 1, xnull => 0)))
     return expression
 end

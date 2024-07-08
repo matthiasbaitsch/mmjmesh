@@ -321,7 +321,7 @@ function plotedges(plot::MPlot, featureedges::Bool)
         lc = plot.edgecolor[]
     end
 
-    MakieCore.lines!(plot, _xcollectlines(points)..., linewidth=lw, color=lc, colormap=:tab10)
+    MakieCore.lines!(plot, _collectlines(points)..., linewidth=lw, color=lc, colormap=:tab10)
 end
 
 function plotnodes(plot::MPlot)
@@ -346,8 +346,8 @@ function plotfacefunctions(plot::MPlot)
     facecolor = attributes.facecolor[]
 
     # Faceplot
-    zscale = attributes.faceplotzscale[]
-    npoints = attributes.faceplotnpoints[]
+    fzscale = attributes.faceplotzscale[]
+    fnpoints = attributes.faceplotnpoints[]
     fmesh = attributes.faceplotmesh[]
     fmeshcolor = attributes.faceplotmeshcolor[]
     fmeshlinewidth = attributes.faceplotmeshlinewidth[]
@@ -358,28 +358,20 @@ function plotfacefunctions(plot::MPlot)
 
     # Parameters
     mesh = plot.args[1][]
-    cc = plot.args[2][]
+    colors = plot.args[2][]
 
     # Function to plot
-    if cc isa Symbol
-        facefunction(face) = face.data[:post](face, cc)
+    if colors isa Symbol
+        facefunction(face) = face.data[:post](face, colors)
     else
-        facefunction = cc
+        facefunction = colors
     end
 
-    # Prepare
-    cf, cl1, cl2 = _sample(mesh, facefunction, npoints, 1, fmesh)
-
     # Collect
+    cf, clEdges, clMesh = _samplefaces(mesh, facefunction, fnpoints, fzscale, fmesh)
     xf, tf = _collectfaces(cf)
-    xl1, yl1, zl1 = _collectlines(cl1)
-    xl2, yl2, zl2 = _collectlines(cl2)
     color = _getcolor(xf, facecolor, 1)
-
-    # Scale
-    xf[3, :] *= zscale
-    zl1 *= zscale
-    zl2 *= zscale
+    xf[3, :] *= fzscale
 
     # Plot Mesh
     mesh!(
@@ -388,11 +380,11 @@ function plotfacefunctions(plot::MPlot)
     )
 
     # Plot mesh lines on elements
-    lines!(plot, xl2, yl2, zl2, color=fmeshcolor, linewidth=fmeshlinewidth)
+    lines!(plot, _collectlines(clMesh)..., color=fmeshcolor, linewidth=fmeshlinewidth)
 
     # Plot element edges
     if edgesvisible
-        lines!(plot, xl1, yl1, zl1, color=edgecolor, linewidth=edgelinewidth)
+        lines!(plot, _collectlines(clEdges)..., color=edgecolor, linewidth=edgelinewidth)
     end
 end
 
@@ -401,20 +393,23 @@ end
 # Helper functions
 # -------------------------------------------------------------------------------------------------
 
-function _sample(m, mf, npoints, zscale, mesh)
+# TODO move to helper functions file
+
+function _samplefaces(m, mf, npoints, zscale, nmeshlines)
     cf = []
     cl1 = []
     cl2 = []
     for face = faces(m)
         f = mf(face)
         gmap = _makegmap(face)
-        push!(cf, sample2d(f, domain=QHat, npoints=2 * npoints, gmap=gmap, zscale=zscale))
-        push!(cl1, sample2dlines(f, domain=QHat, npoints=npoints, mesh=0, gmap=gmap, zscale=zscale))
-        push!(cl2, sample2dlines(f, domain=QHat, npoints=npoints, mesh=mesh, gmap=gmap, zscale=zscale))
+        push!(cf, sample2d(f, domain=QHat, npoints=2 * npoints, gmap=gmap))
+        append!(cl1, sample2dlines(f, domain=QHat, npoints=npoints, nmeshlines=0, gmap=gmap, zscale=zscale))
+        append!(cl2, sample2dlines(f, domain=QHat, npoints=npoints, nmeshlines=nmeshlines, gmap=gmap, zscale=zscale))
     end
     return cf, cl1, cl2
 end
 
+# TODO refactor to get rid of this
 function _appendedges!(xe, ye, edgepoints, lineplotpoints)
     push!(xe, edgepoints[1, 1])
     append!(xe, lineplotpoints[1, :])
@@ -470,22 +465,7 @@ function _makegmap(face) # TODO use geometry map for face
     return x -> p + [nn(x[1]) * a, nn(x[2]) * b]
 end
 
-function _collectlines(cl)
-    l1 = Float32[]
-    l2 = Float32[]
-    l3 = Float32[]
-    for c in cl
-        append!(l1, c[1])
-        push!(l1, NaN)
-        append!(l2, c[2])
-        push!(l2, NaN)
-        append!(l3, c[3])
-        push!(l3, NaN)
-    end
-    return l1, l2, l3
-end
-
-function _xcollectlines(points)
+function _collectlines(points)
     n = length(points[1][1])
     x1 = Float32[]
     x2 = Float32[]
