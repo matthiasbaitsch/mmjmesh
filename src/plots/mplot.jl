@@ -374,139 +374,17 @@ function plotfacefunctions(plot::MPlot)
     xf[3, :] *= fzscale
 
     # Plot Mesh
-    mesh!(
+    MakieCore.mesh!(
         plot, xf, tf, color=color,
         colormap=colormap, colorrange=colorrange
     )
 
     # Plot mesh lines on elements
-    lines!(plot, _collectlines(clMesh)..., color=fmeshcolor, linewidth=fmeshlinewidth)
+    MakieCore.lines!(plot, _collectlines(clMesh)..., color=fmeshcolor, linewidth=fmeshlinewidth)
 
     # Plot element edges
     if edgesvisible
-        lines!(plot, _collectlines(clEdges)..., color=edgecolor, linewidth=edgelinewidth)
-    end
-end
-
-
-# -------------------------------------------------------------------------------------------------
-# Helper functions
-# -------------------------------------------------------------------------------------------------
-
-# TODO move to helper functions file
-
-function _samplefaces(m, mf, npoints, zscale, nmeshlines)
-    cf = []
-    cl1 = []
-    cl2 = []
-    for face = faces(m)
-        f = mf(face)
-        gmap = _makegmap(face)
-        push!(cf, sample2d(f, domain=QHat, npoints=2 * npoints, gmap=gmap))
-        append!(cl1, sample2dlines(f, domain=QHat, npoints=npoints, nmeshlines=0, gmap=gmap, zscale=zscale))
-        append!(cl2, sample2dlines(f, domain=QHat, npoints=npoints, nmeshlines=nmeshlines, gmap=gmap, zscale=zscale))
-    end
-    return cf, cl1, cl2
-end
-
-# TODO refactor to get rid of this
-function _appendedges!(xe, ye, edgepoints, lineplotpoints)
-    push!(xe, edgepoints[1, 1])
-    append!(xe, lineplotpoints[1, :])
-    append!(xe, [edgepoints[1, end], NaN])
-    push!(ye, edgepoints[2, 1])
-    append!(ye, lineplotpoints[2, :])
-    append!(ye, [edgepoints[2, end], NaN])
-end
-
-function _appendfaces!(xf, yf, cf, triangles, edgepoints, lineplotpoints, values)
-    bi = length(xf) + 1
-    np = length(values)
-    append!(xf, edgepoints[1, :])
-    append!(xf, lineplotpoints[1, :])
-    append!(yf, edgepoints[2, :])
-    append!(yf, lineplotpoints[2, :])
-    append!(cf, values)
-    append!(cf, values)
-    for j ∈ 1:np-1
-        append!(triangles, [bi + j - 1, bi + j, bi + np + j - 1])
-        append!(triangles, [bi + j, bi + np + j - 1, bi + np + j])
-    end
-end
-
-function _collectvalues(mesh::Mesh, values)
-    dv = size(values)
-    Nn = nentities(mesh.topology, 0)
-    Ne = nentities(mesh.topology, 1)
-
-    # Check input
-    @assert (length(dv) == 1 && (dv[1] == Nn || dv[1] == Ne)) ||
-            (length(dv) == 2 && dv[1] == 2 && dv[2] == Ne)
-
-    # Values from nodes to edges
-    if length(dv) == 1 && dv[1] == nnodes(mesh)
-        values = tomatrix([values[l] for l in links(mesh.topology, 1, 0)])
-    end
-
-    return values
-end
-
-function _fsize(face)
-    x = coordinates(face)
-    p = x[:, 1]
-    l1 = x[1, 2] - x[1, 1]
-    l2 = x[2, 3] - x[2, 2]
-    return p, l1, l2
-end
-
-function _makegmap(face) # TODO use geometry map for face
-    nn(x) = (1 + x) / 2
-    p, a, b = _fsize(face)
-    return x -> p + [nn(x[1]) * a, nn(x[2]) * b]
-end
-
-function _collectlines(points)
-    isempty(points) && return Float32[], Float32[]
-    n = length(points[1][1])
-    x1 = Float32[]
-    x2 = Float32[]
-    x3 = Float32[]
-    for lp = points
-        for p = lp
-            push!(x1, p[1])
-            push!(x2, p[2])
-            n == 3 && push!(x3, p[3])
-        end
-        push!(x1, NaN)
-        push!(x2, NaN)
-        n == 3 && push!(x3, NaN)
-    end
-    n == 2 && return x1, x2
-    n == 3 && return x1, x2, x3
-end
-
-function _collectfaces(cf)
-    xx = [Float32[], Float32[], Float32[]]
-    tt = [Int[], Int[], Int[]]
-    for c in cf
-        xf, tf = c
-        pos = length(xx[1])
-        for i = 1:3
-            append!(xx[i], xf[i, :])
-            append!(tt[i], pos .+ tf[:, i])
-        end
-    end
-    return stack(xx, dims=1), stack(tt)
-end
-
-_coeffs(v1, v2) = [(v1 + v2) / 2, (v2 - v1) / 2]
-
-function _tofunctions(mesh, values)
-    values = _collectvalues(mesh, values)
-    if length(size(values)) == 1
-        return [Polynomial([values[i]], IHat) for i in eachindex(values)]
-    else
-        return [Polynomial(_coeffs(values[:, i]...), IHat) for i in axes(values, 2)]
+        MakieCore.lines!(plot, _collectlines(clEdges)..., color=edgecolor, linewidth=edgelinewidth)
     end
 end
 

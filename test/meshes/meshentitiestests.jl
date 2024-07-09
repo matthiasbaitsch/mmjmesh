@@ -1,7 +1,11 @@
 using Test
 
+using MMJMesh
 using MMJMesh.Meshes
+using MMJMesh.Utilities
 using MMJMesh.Geometries
+
+using MMJMesh.Meshes: geometrytype
 
 
 # Set up
@@ -37,6 +41,7 @@ p = parametrization(g)
 @test p(-1) == coordinates(e2, 1)
 @test p(1) == coordinates(e2, 2)
 
+
 # -------------------------------------------------------------------------------------------------
 # Face
 # -------------------------------------------------------------------------------------------------
@@ -60,3 +65,22 @@ f3 = face(m, 3)
 @test coordinates(f3, 1) == [1.0, 0.1]
 @test coordinates(f3, 2) == [1.9, 0.9]
 @test coordinates(f3, 3) == [0.9, 1.0]
+
+
+# -------------------------------------------------------------------------------------------------
+# Geometry
+# -------------------------------------------------------------------------------------------------
+
+m = makemeshonrectangle(4, 2, 4, 2)
+n = node(m, 1)
+f = face(m, 3)
+phi = parametrization(geometry(f))
+
+@test geometry(n) isa Point
+@test geometrytype(f) == Box
+@test geometry(f) isa Box
+
+@test phi(-1, -1) == coordinates(f, 1)
+@test phi(1, -1) == coordinates(f, 2)
+@test phi(1, 1) == coordinates(f, 3)
+@test phi(-1, 1) == coordinates(f, 4)

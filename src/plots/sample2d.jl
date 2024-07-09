@@ -1,16 +1,3 @@
-using DomainSets: Rectangle
-using MMJMesh.Utilities: makemeshonrectangle, TRIANGLE
-
-function _getnpoints(r::Rectangle, npoints::Integer)
-    d1 = r.b[1] - r.a[1]
-    d2 = r.b[2] - r.a[2]
-    fn = npoints / max(d1, d2)
-    n1 = Int(ceil(fn * d1))
-    n2 = Int(ceil(fn * d2))
-    return n1, n2
-end
-
-
 function makeinitialmesh(r::Rectangle, npoints::Integer)
     d1 = r.b[1] - r.a[1]
     d2 = r.b[2] - r.a[2]

@@ -8,6 +8,7 @@ using Random
 using StaticArrays
 using IntervalSets
 using LinearAlgebra
+using DomainSets: Rectangle
 
 import Makie
 import MakieCore
@@ -16,6 +17,7 @@ import MakieCore
 using MMJMesh
 using MMJMesh.Meshes
 using MMJMesh.MMJBase
+using MMJMesh.Utilities
 using MMJMesh.Geometries
 using MMJMesh.Topologies
 using MMJMesh.Mathematics
@@ -32,6 +34,7 @@ function _getcolor(x::Matrix, color, zscale)
 end
 
 # Parts
+include("helperfunctions.jl")
 include("curveapproximation.jl")
 include("sample1d.jl")
 include("sample2d.jl")

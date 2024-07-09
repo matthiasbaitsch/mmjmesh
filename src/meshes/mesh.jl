@@ -1,44 +1,59 @@
-# -------------------------------------------------------------------------------------------------
-# MeshEntity struct
-# -------------------------------------------------------------------------------------------------
-
 """
-    Mesh(dt, dg [, nn=0])
-    Mesh(coordinates, dt)
-    Mesh(coordinates, elements, dt)
+    Mesh(dt, dg [, nn=0, g1=GeometricObjectI, g2=GeometricObjectI])
+    Mesh(coordinates, dt [, g1=GeometricObjectI, g2=GeometricObjectI])
+    Mesh(coordinates, elements, dt [, g1=GeometricObjectI, g2=GeometricObjectI])
 
-Mesh of parametric dimension ``d_t`` embedded in ``d_g`` dimensional space.
+Mesh of parametric dimension ``DT`` embedded in ``DG`` dimensional space. Types ``G1`` and ``G2`` 
+are default types for geometric objects of parametric dimension 1 and 2.
 """
-struct Mesh{DT,DG}
+struct Mesh{DT,DG,G1,G2}
     topology::Topology{DT}
     geometry::Geometry{DG}
     groups::GroupCollection
-    data::MeshData{Mesh{DT,DG}}
+    data::MeshData{Mesh{DT,DG,G1,G2}}
 end
 
-function Mesh(dt::Int, dg::Int, nn::Int=0)
-    T = Mesh{dt,dg}
+function Mesh(
+    dt::Int, dg::Int, nn::Int=0;
+    g1=GeometricObjectI, g2=GeometricObjectI
+)
+    T = Mesh{dt,dg,g1,g2}
     mesh = T(Topology(dt, nn), Geometry(dg, nn), GroupCollection(), MeshData{T}())
     mesh.data.mesh = mesh
     return mesh
 end
 
-function Mesh(coordinates::Matrix, dt::Int)
-    m = Mesh(dt, size(coordinates, 1), size(coordinates, 2))
+function Mesh(
+    coordinates::Matrix, dt::Int;
+    g1=GeometricObjectI, g2=GeometricObjectI
+)
+    m = Mesh(dt, size(coordinates, 1), size(coordinates, 2), g1=g1, g2=g2)
     m.geometry.points.coordinates[:, :] = coordinates[:, :] # TODO think again
     return m
 end
 
-function Mesh(coordinates::Matrix, elements::Vector{Vector{Int}}, dt::Int)
-    m = Mesh(coordinates, dt)
+function Mesh(
+    coordinates::Matrix,
+    elements::Vector{Vector{Int}}, dt::Int;
+    g1=GeometricObjectI, g2=GeometricObjectI
+)
+    m = Mesh(coordinates, dt, g1=g1, g2=g2)
     addlinks!(m.topology, dt, 0, elements)
     populatepredfinedgroups!(m)
     return m
 end
 
 nentities(m::Mesh, dim::Int) = Topologies.nentities(m.topology, dim, true)
-entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx)
+entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx, geometrytype(m, pdim))
 indices(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
+
+function geometrytype(::Mesh{DT,DG,G1,G2}, pdim::Integer) where {DT,DG,G1,G2}
+    pdim == 0 && return Point
+    pdim == 1 && return G1
+    pdim == 2 && return G2
+    error()
+end
+
 MMJMesh.pdim(::Mesh{DT}) where {DT} = DT
 MMJMesh.gdim(::Mesh{DT,DG}) where {DT,DG} = DG
 

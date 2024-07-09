@@ -14,10 +14,10 @@ Point(a1::Number, a2::Number, a3::Number) = Point{3}(a1, a2, a3)
 MMJMesh.pdim(::Type{<:Point}) = 0
 MMJMesh.gdim(::Type{<:Point{D}}) where {D} = D
 
+coordinates(p::Point) = p.coordinates
 center(p::Point) = p
 measure(::Point) = 0.0
 boundingbox(::Point) = nothing
-coordinates(p::Point) = p.coordinates
 
 Base.:(-)(p1::Point, p2::Point) = p1.coordinates - p2.coordinates
 Base.:(==)(p1::Point, p2::Point) = p1.coordinates == p2.coordinates

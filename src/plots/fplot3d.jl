@@ -1,9 +1,5 @@
-import MMJMesh.Mathematics: domain
-import MakieCore: mesh!, lines!, Attributes
-
-
 MakieCore.@recipe(FPlot3D, functions) do scene
-    attr = Attributes(
+    attr = MakieCore.Attributes(
         npoints=30,
         color=3,
         meshcolor=:black,
@@ -36,11 +32,11 @@ function MakieCore.plot!(plot::FPlot3D)
         fx, ft = sample2d(f, domain=d, npoints=npoints, gmap=gmap)
         fx[3, :] *= zscale
         lx = sample2dlines(f, domain=d, npoints=npoints, nmeshlines=mesh, gmap=gmap, zscale=zscale)
-        mesh!(
+        MakieCore.mesh!(
             plot, fx, ft,
             color=_getcolor(fx, color, zscale), colorrange=colorrange, colormap=colormap
         )
-        lines!(plot, _collectlines(lx)..., color=meshcolor)
+        MakieCore.lines!(plot, _collectlines(lx)..., color=meshcolor)
     end
     return plot
 end

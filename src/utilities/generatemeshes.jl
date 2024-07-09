@@ -1,5 +1,5 @@
 
-function makemeshoninterval(a::Number, b::Number, n::Int, g = t -> [t; 0.0])
+function makemeshoninterval(a::Number, b::Number, n::Int, g=t -> [t; 0.0])
     # Coordinates
     c = reduce(hcat, g.(range(a, stop=b, length=n + 1)))
 
@@ -50,8 +50,11 @@ function makemeshonrectangle(w::Number, h::Number, nx::Int, ny::Int, mt::Meshtyp
     c[1, :] = repeat(range(0, stop=w, length=nx + 1), outer=(ny + 1, 1))
     c[2, :] = repeat(range(0, stop=h, length=ny + 1), inner=(nx + 1, 1))
 
+    # Geometry type
+    g2 = mt == QUADRANGLE ? Box : GeometricObjectI
+
     # Mesh
-    m = Mesh(c, 2)
+    m = Mesh(c, 2, g2=g2)
 
     # Connectivity
     cl = ConnectivityList()

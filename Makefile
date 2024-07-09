@@ -12,3 +12,7 @@ apidoc:
 .PHONY: test
 test:
 	julia --project test/runtests.jl
+
+clean:
+	find . -name \*.cov | xargs rm
+

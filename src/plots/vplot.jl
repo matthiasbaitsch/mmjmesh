@@ -1,9 +1,3 @@
-import MMJMesh.Mathematics: domain
-import MakieCore: mesh!, lines!, arrows!
-import DomainSets: component
-import Makie: Point2f, Vec2f
-
-
 MakieCore.@recipe(VPlot, functions) do scene
     attr = Attributes(
         npoints=10,
