@@ -8,6 +8,8 @@ using MMJMesh.MMJBase
 using MMJMesh.Topologies
 using MMJMesh.Geometries
 
+import MMJMesh: coordinate, coordinates
+
 # Exports
 ## groups.jl
 export Group, GroupCollection, addrecipe!, clearcache!, names
@@ -17,7 +19,6 @@ export nelements, element, elements, entity, entities
 ## meshentities.jl
 export MeshEntity, Node, Edge, Face, Solid, index, geometry
 ## common.jl
-export coordinate, coordinates
 export nnodes, nedges, nfaces, nsolids
 export node, edge, face, solid
 export nodes, edges, faces, solids

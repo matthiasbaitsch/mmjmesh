@@ -41,14 +41,15 @@ const Edge{DG,NN} = MeshEntity{1,DG,NN}
 const Face{DG,NN} = MeshEntity{2,DG,NN}
 const Solid{DG,NN} = MeshEntity{3,DG,NN}
 
-# Specialized functions
-Base.length(e::Edge{DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
-
 # Coordinates
 coordinate(n::Node, c::Integer) = n.mesh.geometry.points.coordinates[c, n.index]
 coordinates(n::Node) = n.mesh.geometry.points.coordinates[:, n.index]
 coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, indices(me, 0)]
-coordinates(me::MeshEntity, i::Integer) = me.mesh.geometry.points.coordinates[:, index(me, 0, i)]
+coordinates(me::MeshEntity, i::Integer) = 
+    me.mesh.geometry.points.coordinates[:, index(me, 0, i)]
+
+# Specialized functions
+Base.length(e::Edge{DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
 
 # Geometry
 geometry(node::Node{DG}) where {DG} = Point{DG}(coordinates(node))
@@ -72,10 +73,12 @@ end
 # AbstractArray interface
 Base.length(el::MeshEntityList) = length(el.indices)
 Base.size(el::MeshEntityList) = (length(el),)
-Base.getindex(el::MeshEntityList{DT}, i::Integer) where {DT} = entity(el.mesh, DT, el.indices[i])
-Base.iterate(el::MeshEntityList, state=1) = state > length(el) ? nothing : (el[state], state + 1)
+Base.getindex(el::MeshEntityList{DT}, i::Integer) where {DT} = 
+    entity(el.mesh, DT, el.indices[i])
+Base.iterate(el::MeshEntityList, state=1) = 
+    state > length(el) ? nothing : (el[state], state + 1)
 
 # Get entities
-entities(m::Mesh, pdim::Integer) = MeshEntityList(m, pdim, 1:nentities(m, pdim)) # XXX
+entities(m::Mesh, pdim::Integer) = MeshEntityList(m, pdim, 1:nentities(m, pdim))
 entities(me::MeshEntity, pdim::Integer) = MeshEntityList(me.mesh, pdim, indices(me, pdim))
 
