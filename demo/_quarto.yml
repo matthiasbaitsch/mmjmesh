@@ -16,5 +16,7 @@ book:
 format:
   html: default
 
+fig-format: png
+
 execute:
   freeze: auto
