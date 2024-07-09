@@ -1,9 +1,3 @@
-using Symbolics
-using SymbolicUtils
-using SymbolicUtils: Postwalk, Chain
-
-import MMJMesh.Mathematics.FixedPolynomials as FP
-
 # Multivariate polynomials
 struct MPolynomial{N,D} <: FunctionRnToR{N,D}
     p::FP.Polynomial

@@ -1,7 +1,19 @@
 module Mathematics
 
+using Symbolics
+using SymbolicUtils
+using IntervalSets
+using StaticArrays
+using LinearAlgebra
+using DomainSets: ×, Rectangle, ProductDomain, dimension, component
+using SymbolicUtils: Postwalk, Chain
+include("poly.jl") # My own version of this code - forgot why I did this
 
-include("poly.jl")
+import Polynomials as P
+import MMJMesh.Mathematics.FixedPolynomials as FP
+
+using MMJMesh.MMJBase
+
 include("mappings.jl")
 include("forms.jl")
 include("fefunctions.jl")

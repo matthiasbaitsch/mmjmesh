@@ -1,13 +1,3 @@
-using IntervalSets
-using StaticArrays
-using LinearAlgebra
-using DomainSets: ×, Rectangle, ProductDomain, dimension
-
-import Polynomials as P
-
-using MMJMesh.MMJBase
-
-
 """
 Implementation of the concept of mappings as elements of a vector space.
 

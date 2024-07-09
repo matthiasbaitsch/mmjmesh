@@ -1,5 +1,5 @@
 MakieCore.@recipe(VPlot, functions) do scene
-    attr = Attributes(
+    attr = MakieCore.Attributes(
         npoints=10,
         color=:black,
         arrowsize=7.5,
@@ -31,8 +31,8 @@ function MakieCore.plot!(plot::VPlot)
         if color == :norm
             color = norm.(u)
         end
-        arrows!(
-            plot, Point2f.(p), Vec2f.(u), linecolor=color,
+        MakieCore.arrows!(
+            plot, MakieCore.Point2f.(p), MakieCore.Vec2f.(u), linecolor=color,
             arrowcolor=color, arrowsize=as, lengthscale=ls, colormap=cm
         )
     end

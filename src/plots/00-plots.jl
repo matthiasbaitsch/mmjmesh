@@ -12,7 +12,7 @@ using LinearAlgebra
 import Makie
 import MakieCore
 
-using DomainSets: Rectangle, components
+using DomainSets: Rectangle, component, components
 
 ## Own
 using MMJMesh
