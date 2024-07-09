@@ -348,7 +348,7 @@ function plotfacefunctions(plot::MPlot)
     # Faceplot
     fzscale = attributes.faceplotzscale[]
     fnpoints = attributes.faceplotnpoints[]
-    fmesh = attributes.faceplotmesh[]
+    fnmeshlines = attributes.faceplotmesh[]
     fmeshcolor = attributes.faceplotmeshcolor[]
     fmeshlinewidth = attributes.faceplotmeshlinewidth[]
 
@@ -368,8 +368,8 @@ function plotfacefunctions(plot::MPlot)
     end
 
     # Collect
-    cf, clEdges, clMesh = _samplefaces(mesh, facefunction, fnpoints, fzscale, fmesh)
-    xf, tf = _collectfaces(cf)
+    meshes, lpedges, lpmesh = _samplefaces(mesh, facefunction, fnpoints, fnmeshlines, fzscale)
+    xf, tf = _mergemeshes(meshes)
     color = _getcolor(xf, facecolor, 1)
     xf[3, :] *= fzscale
 
@@ -380,11 +380,11 @@ function plotfacefunctions(plot::MPlot)
     )
 
     # Plot mesh lines on elements
-    MakieCore.lines!(plot, _collectlines(clMesh)..., color=fmeshcolor, linewidth=fmeshlinewidth)
+    MakieCore.lines!(plot, _collectlines(lpmesh)..., color=fmeshcolor, linewidth=fmeshlinewidth)
 
     # Plot element edges
     if edgesvisible
-        MakieCore.lines!(plot, _collectlines(clEdges)..., color=edgecolor, linewidth=edgelinewidth)
+        MakieCore.lines!(plot, _collectlines(lpedges)..., color=edgecolor, linewidth=edgelinewidth)
     end
 end
 

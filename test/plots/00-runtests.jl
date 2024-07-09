@@ -28,6 +28,7 @@ using MMJMesh.Utilities
 
 end
 
+@testset "Helperfunctions" include("helperfunctionstests.jl")
 @testset "Sample1D" include("sample1dtests.jl")
 @testset "CurveApproximation" include("curveapproximationtests.jl")
 @testset "Reference" include("referencetests.jl")

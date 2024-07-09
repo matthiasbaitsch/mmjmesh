@@ -1,39 +1,106 @@
-function _getnpoints(r::Rectangle, npoints::Integer)
-    d1 = r.b[1] - r.a[1]
-    d2 = r.b[2] - r.a[2]
-    fn = npoints / max(d1, d2)
-    n1 = Int(ceil(fn * d1))
-    n2 = Int(ceil(fn * d2))
+"""
+Returns the number of intervals for each coordinate direction such that
+the rectangle `r` is divided into approximate squares. The longer side
+of `r` is divided into `nintervals` intervals.
+"""
+function _getnintervals(r::Rectangle, nintervals::Integer)
+    @assert nintervals >= 1
+    l1, l2 = width.(components(r))
+    h = max(l1, l2) / nintervals
+    n1 = Int(ceil(l1 / h))
+    n2 = Int(ceil(l2 / h))
     return n1, n2
 end
 
+"""
+    _collectlines(points) -> (x1, x2 [, x3])
 
-function _samplefaces(m, mf, npoints, zscale, nmeshlines)
+Collect point arrays
+
+``
+    points = [[[p111, p112], [p121, p122], ...], [[p211, p212], [p221, p222], ...], ...]
+``
+"""
+function _collectlines(points)
+    isempty(points) && return Float32[], Float32[]
+    n = length(points[1][1])
+    x1 = Float32[]
+    x2 = Float32[]
+    x3 = Float32[]
+    for lp = points
+        for p = lp
+            push!(x1, p[1])
+            push!(x2, p[2])
+            n == 3 && push!(x3, p[3])
+        end
+        push!(x1, NaN)
+        push!(x2, NaN)
+        n == 3 && push!(x3, NaN)
+    end
+    n == 2 && return x1, x2
+    n == 3 && return x1, x2, x3
+end
+
+"""
+Merges the meshes
+
+``
+    [(coords, triangles), (coords, triangles), ...]
+``
+
+into a single mesh
+
+``
+    (coords, triangles)
+``
+"""
+function _mergemeshes(meshes)
+    xx = [Float32[], Float32[], Float32[]]
+    tt = [Int[], Int[], Int[]]
+    for c in meshes
+        xf, tf = c
+        pos = length(xx[1])
+        for i = 1:3
+            append!(xx[i], xf[i, :])
+            append!(tt[i], pos .+ tf[:, i])
+        end
+    end
+    return stack(xx, dims=1), stack(tt)
+end
+
+function _getcolor(x::Matrix, color, zscale)
+    if typeof(color) == Int && 1 <= color <= 3
+        return x[color, :] / zscale
+    end
+    return color
+end
+
+function _samplefaces(mesh, makef, nintervals, nmeshlines, zscale)
     cf = []
     cl1 = []
     cl2 = []
 
-    for face = faces(m)
-        f = mf(face)
+    for face = faces(mesh)
+        f = makef(face)
         gmap = parametrization(geometry(face))
         d = domain(gmap)
 
         # Faces
         push!(
             cf,
-            sample2d(f, domain=d, npoints=2 * npoints, gmap=gmap)
+            sample2d(f, domain=d, npoints=2 * nintervals, gmap=gmap)
         )
 
         # Edges
         append!(
             cl1,
-            sample2dlines(f, domain=d, npoints=npoints, nmeshlines=0, gmap=gmap, zscale=zscale)
+            sample2dlines(f, domain=d, npoints=nintervals, nmeshlines=0, gmap=gmap, zscale=zscale)
         )
 
         # Meshlines
         append!(
             cl2,
-            sample2dlines(f, domain=d, npoints=npoints, nmeshlines=nmeshlines, gmap=gmap, zscale=zscale)
+            sample2dlines(f, domain=d, npoints=nintervals, nmeshlines=nmeshlines, gmap=gmap, zscale=zscale)
         )
     end
 
@@ -83,39 +150,6 @@ function _collectvalues(mesh::Mesh, values)
     return values
 end
 
-function _collectlines(points)
-    isempty(points) && return Float32[], Float32[]
-    n = length(points[1][1])
-    x1 = Float32[]
-    x2 = Float32[]
-    x3 = Float32[]
-    for lp = points
-        for p = lp
-            push!(x1, p[1])
-            push!(x2, p[2])
-            n == 3 && push!(x3, p[3])
-        end
-        push!(x1, NaN)
-        push!(x2, NaN)
-        n == 3 && push!(x3, NaN)
-    end
-    n == 2 && return x1, x2
-    n == 3 && return x1, x2, x3
-end
-
-function _collectfaces(cf)
-    xx = [Float32[], Float32[], Float32[]]
-    tt = [Int[], Int[], Int[]]
-    for c in cf
-        xf, tf = c
-        pos = length(xx[1])
-        for i = 1:3
-            append!(xx[i], xf[i, :])
-            append!(tt[i], pos .+ tf[:, i])
-        end
-    end
-    return stack(xx, dims=1), stack(tt)
-end
 
 _coeffs(v1, v2) = [(v1 + v2) / 2, (v2 - v1) / 2]
 

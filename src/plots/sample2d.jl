@@ -1,20 +1,10 @@
-function makeinitialmesh(r::Rectangle, npoints::Integer)
-    d1 = r.b[1] - r.a[1]
-    d2 = r.b[2] - r.a[2]
-    n1, n2 = _getnpoints(r, npoints)
-    m = makemeshonrectangle(d1, d2, n1, n2, TRIANGLE)
-    m.geometry.points.coordinates .+= r.a
-    return m
-end
-
-
 function sample2d(f; domain::Rectangle, npoints::Integer, gmap=identity)
-    m = makeinitialmesh(domain, npoints)
+    n1, n2 = _getnintervals(domain, npoints)
+    m = makemeshonrectangle(domain, n1, n2, TRIANGLE)
     x = tomatrix([[gmap(x)..., f(x)] for x in m.geometry.points])
     t = tomatrix([l for l in links(m.topology, 2, 0)], ROWS)
     return x, t
 end
-
 
 function sample2dlines(
     f; domain::Rectangle, npoints::Integer, nmeshlines=0, gmap=identity, zscale=1
@@ -25,7 +15,7 @@ function sample2dlines(
     isnothing(nmeshlines) && return points
 
     # Helpers
-    ng1, ng2 = 2 .* _getnpoints(domain, npoints)
+    ng1, ng2 = 2 .* _getnintervals(domain, npoints)
     nm1, nm2 = (nmeshlines isa Integer ? [nmeshlines, nmeshlines] : nmeshlines) .+ 2
     makepoints(ξ1, ξ2) = [
         [gmap([ξ1[i], ξ2[i]])..., zscale * f([ξ1[i], ξ2[i]])] for i = eachindex(ξ1)
