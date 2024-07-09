@@ -13,8 +13,8 @@ Plot function
 
 ```{julia}
 function doplot(xy)
-    f = cm.lines(xy)
-    cm.scatter!(xy, color=:darkred, markersize=5)
+    f = lines(xy)
+    scatter!(xy, color=:darkred, markersize=5)
     return f
 end;
 ```

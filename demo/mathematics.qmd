@@ -9,7 +9,6 @@ using LinearAlgebra
 using WGLMakie
 using CairoMakie
 using DomainSets
-CairoMakie.activate!()
 ```
 
 
@@ -46,15 +45,15 @@ integrate(f, 0 .. 1)
 ```{julia}
 p = [0, 1, 2]
 f = fplot(fromroots(p, -0.1 .. 2.1))
-cm.scatter!(p, 0 * p, color=:tomato)
+scatter!(p, 0 * p, color=:tomato)
 f
 ```
 
 ```{julia}
 p = [0, 1.5, 2]
 f = fplot(lagrangepolynomials(p, 0 .. 2)...)
-cm.scatter!(p, [0, 0, 0], color=:tomato)
-cm.scatter!(p, [1, 1, 1], color=:blue)
+scatter!(p, [0, 0, 0], color=:tomato)
+scatter!(p, [1, 1, 1], color=:blue)
 f
 ```
 
@@ -73,7 +72,7 @@ fplot(u, u + v, u + w)
 ```{julia}
 pts = tomatrix([[0.0, 0], [1.5, 1], [2, 0], [1.5, -1], [0, 0]])
 fig, ax = fplot(Interpolation(pts, 1))
-cm.scatter!(ax, pts, color=:tomato)
+scatter!(ax, pts, color=:tomato)
 fig
 ```
 
@@ -111,7 +110,7 @@ fig
 A (sometimes?) interactive 3D plot is obtained using WebGL:
 
 ```{julia}
-WGLMakie.activate!()
+GLMakie.activate!()
 fig = Figure()
 Axis3(fig[1, 1])
 fplot3d!(f, mesh=19, npoints=250)

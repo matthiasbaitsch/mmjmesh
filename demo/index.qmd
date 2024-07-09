@@ -8,17 +8,7 @@ First, we need to load the required modules. Note that `CairoMakie` included by 
 
 ```{julia}
 #| warning: false
-import CairoMakie
-using IntervalSets
-using MMJMesh.Plots
-using MMJMesh.Meshes
-using MMJMesh.Utilities
-using MMJMesh.Mathematics
-```
-
-```{julia}
-#| echo: false
-CairoMakie.set_theme!(CairoMakie.theme_minimal())
+include("setup.jl")
 ```
 
 In the simplest case, a 1D mesh is defined by parameter bounds and the number of elements. 

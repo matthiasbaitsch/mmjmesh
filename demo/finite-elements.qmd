@@ -11,7 +11,6 @@ using DomainSets
 using CairoMakie
 using IntervalSets
 using LinearAlgebra
-CairoMakie.activate!()
 ```
 
 ## Shape functions
@@ -52,7 +51,7 @@ fplot(H...)
 Bilinear shape functions
 
 ```{julia}
-WGLMakie.activate!()
+GLMakie.activate!()
 V = [-1 1 1 -1; -1 -1 1 1]
 N = [ValueAtLF(p) for p in eachcol(V)]
 P = mmonomials(2, 1, QHat)
