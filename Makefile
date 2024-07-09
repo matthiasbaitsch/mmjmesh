@@ -15,4 +15,5 @@ test:
 
 clean:
 	find . -name \*.cov | xargs rm
+	rm -rf demo/_book demo/.quarto demo/_freeze
 
