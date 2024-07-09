@@ -114,6 +114,14 @@ m = makemeshonrectangle(9.0, 4.5, 2a, a)
 mplot(m) |> mconf()
 ```
 
+Mesh with coordinate transformation
+
+```{julia}
+cartesianfrompolar(x) = x[1] * [cos(x[2]), sin(x[2])]
+m = makemeshonrectangle((1 .. 2) × (0 .. (3 / 2)π), 10, 70, gmap=cartesianfrompolar)
+mplot(m, edgesvisible=true) |> mconf()
+```
+
 Read mesh from Gmsh
 
 ```{julia}

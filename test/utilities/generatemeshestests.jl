@@ -6,7 +6,6 @@ using MMJMesh
 using MMJMesh.Meshes
 using MMJMesh.Utilities
 
-
 m = makemeshoninterval(0.0, 1.2, 10)
 @test nedges(m) == 10
 
@@ -27,3 +26,10 @@ m = makemeshonrectangle((1 .. 3) × (4 .. 5), 2, 2)
 @test nfaces(m) == 4
 @test coordinates(m, 1) == [1, 4]
 @test coordinates(m, 9) == [3, 5]
+
+cartesianfrompolar(x) = x[1] * [cos(x[2]), sin(x[2])]
+m = makemeshonrectangle((1 .. 2) × (0 .. (3 / 2)π), 10, 70, gmap=cartesianfrompolar)
+@test coordinates(m, 11 * 71) ≈ [0, -2]
+@test geometrytype(face(m, 1)) == GeometricObjectI
+
+

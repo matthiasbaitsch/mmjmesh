@@ -41,11 +41,11 @@ Generate a quad mesh on the specified with `nex` elements in the
 ``x`` direction and `ney` elements in the ``y`` direction.
 """
 makemeshonrectangle(
-    w::Real, h::Real, nex::Integer, ney::Integer=-1, meshtype::Meshtype=QUADRANGLE
-) = makemeshonrectangle((0 .. w) × (0 .. h), nex, ney, meshtype)
+    w::Real, h::Real, nex::Integer, ney::Integer=-1, meshtype::Meshtype=QUADRANGLE; gmap=identity
+) = makemeshonrectangle((0 .. w) × (0 .. h), nex, ney, meshtype, gmap=gmap)
 
 function makemeshonrectangle(
-    Ω::Rectangle, nex::Integer, ney::Integer=-1, meshtype::Meshtype=QUADRANGLE
+    Ω::Rectangle, nex::Integer, ney::Integer=-1, meshtype::Meshtype=QUADRANGLE; gmap=identity
 )
     # Bounds
     i1, i2 = components(Ω)
@@ -65,11 +65,21 @@ function makemeshonrectangle(
     coordinates[1, :] = repeat(range(i1, length=nnx), outer=(ney + 1, 1))
     coordinates[2, :] = repeat(range(i2, length=nny), inner=(nex + 1, 1))
 
-    # Geometry type for faces
-    g2 = (meshtype == QUADRANGLE ? Box : GeometricObjectI)
+    # Apply geometric map
+    if gmap !== identity
+        for i = 1:nn
+            coordinates[:, i] = gmap(coordinates[:, i])
+        end
+    end
+
+    # Geometry types
+    g1 = g2 = GeometricObjectI
+    if meshtype == QUADRANGLE && gmap === identity
+        g2 = Box
+    end
 
     # Mesh
-    m = Mesh(coordinates, 2, g2=g2)
+    m = Mesh(coordinates, 2, g1=g1, g2=g2)
 
     # Connectivity
     cl = ConnectivityList()
