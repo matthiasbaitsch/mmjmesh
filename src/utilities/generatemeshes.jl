@@ -66,7 +66,7 @@ function makemeshonrectangle(
     coordinates[2, :] = repeat(range(i2, length=nny), inner=(nex + 1, 1))
 
     # Apply geometric map
-    if gmap !== identity
+    if gmap != identity
         for i = 1:nn
             coordinates[:, i] = gmap(coordinates[:, i])
         end
@@ -74,7 +74,7 @@ function makemeshonrectangle(
 
     # Geometry types
     g1 = g2 = GeometricObjectI
-    if meshtype == QUADRANGLE && gmap === identity
+    if meshtype == QUADRANGLE && _isscaling(gmap)
         g2 = Box
     end
 
@@ -101,3 +101,5 @@ function makemeshonrectangle(
     return m
 end
 
+_isscaling(gmap) = (gmap == identity)
+_isscaling(m::AffineMapping) = m.A[1, 2] == 0 && m.A[2, 1] == 0

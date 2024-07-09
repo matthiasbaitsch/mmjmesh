@@ -10,6 +10,7 @@ using DomainSets: ×
 using MMJMesh.Meshes
 using MMJMesh.Topologies
 using MMJMesh.Geometries
+using MMJMesh.Mathematics
 
 # Exports
 ## generatemeshes.jl

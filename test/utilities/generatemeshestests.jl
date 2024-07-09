@@ -1,10 +1,13 @@
 using Test
 using DomainSets
 using DomainSets: ×
+using LinearAlgebra
 
 using MMJMesh
 using MMJMesh.Meshes
 using MMJMesh.Utilities
+using MMJMesh.Geometries
+using MMJMesh.Mathematics
 
 m = makemeshoninterval(0.0, 1.2, 10)
 @test nedges(m) == 10
@@ -32,4 +35,6 @@ m = makemeshonrectangle((1 .. 2) × (0 .. (3 / 2)π), 10, 70, gmap=cartesianfrom
 @test coordinates(m, 11 * 71) ≈ [0, -2]
 @test geometrytype(face(m, 1)) == GeometricObjectI
 
-
+m = makemeshonrectangle(QHat, 2, 3, gmap=AffineMapping(Diagonal([2, 3]), [2, 1]));
+@test coordinates(m, 12) == [4, 4]
+@test geometrytype(face(m, 1)) == Box
