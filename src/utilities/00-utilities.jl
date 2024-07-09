@@ -1,5 +1,11 @@
 module Utilities
 
+# Packages needed
+using DomainSets
+using IntervalSets
+
+using DomainSets: ×
+
 # Modules needed by this module
 using MMJMesh.Meshes
 using MMJMesh.Topologies
