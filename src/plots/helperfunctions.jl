@@ -1,6 +1,8 @@
 """
+    _getnintervals(r, inintervals) -> (n1, n2)
+
 Returns the number of intervals for each coordinate direction such that
-the rectangle `r` is divided into approximate squares. The longer side
+the `Rectangle` parameter `r` is divided into approximate squares. The longer side
 of `r` is divided into `nintervals` intervals.
 """
 function _getnintervals(r::Rectangle, nintervals::Integer)
@@ -12,14 +14,24 @@ function _getnintervals(r::Rectangle, nintervals::Integer)
     return n1, n2
 end
 
+
 """
     _collectlines(points) -> (x1, x2 [, x3])
 
 Collect point arrays
 
-``
-    points = [[[p111, p112], [p121, p122], ...], [[p211, p212], [p221, p222], ...], ...]
-``
+```{julia}
+points = [[[p111, p112], [p121, p122], ...], [[p211, p212], [p221, p222], ...], ...]
+```
+
+into arrays 
+
+```{julia}
+x1 = [p111, p121, ..., NaN, p211, p221, ..., NaN, ...]
+x2 = [p112, p122, ..., NaN, p212, p222, ..., NaN, ...]
+```
+
+which can be passed to `Makie`'s `lines` function.
 """
 function _collectlines(points)
     isempty(points) && return Float32[], Float32[]
@@ -41,18 +53,21 @@ function _collectlines(points)
     n == 3 && return x1, x2, x3
 end
 
+
 """
+    _mergemeshes(meshes) -> mesh
+
 Merges the meshes
 
-``
-    [(coords, triangles), (coords, triangles), ...]
-``
+```{julia}
+[(coords, triangles), (coords, triangles), ...]
+```
 
 into a single mesh
 
-``
-    (coords, triangles)
-``
+```{julia}
+(coords, triangles)
+```
 """
 function _mergemeshes(meshes)
     xx = [Float32[], Float32[], Float32[]]
@@ -68,12 +83,14 @@ function _mergemeshes(meshes)
     return stack(xx, dims=1), stack(tt)
 end
 
+
 function _getcolor(x::Matrix, color, zscale)
     if typeof(color) == Int && 1 <= color <= 3
         return x[color, :] / zscale
     end
     return color
 end
+
 
 function _samplefaces(mesh, makef, nintervals, nmeshlines, zscale)
     cf = []
@@ -149,7 +166,6 @@ function _collectvalues(mesh::Mesh, values)
 
     return values
 end
-
 
 _coeffs(v1, v2) = [(v1 + v2) / 2, (v2 - v1) / 2]
 

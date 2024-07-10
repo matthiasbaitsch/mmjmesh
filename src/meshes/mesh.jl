@@ -3,7 +3,7 @@
     Mesh(coordinates, dt [, g1=GeometricObjectI, g2=GeometricObjectI])
     Mesh(coordinates, elements, dt [, g1=GeometricObjectI, g2=GeometricObjectI])
 
-Mesh of parametric dimension ``DT`` embedded in ``DG`` dimensional space. Types ``G1`` and ``G2`` 
+Mesh of parametric dimension `dt` embedded in `dg` dimensional space. Types `g1` and `g2` 
 are default types for geometric objects of parametric dimension 1 and 2.
 """
 struct Mesh{DT,DG,G1,G2}

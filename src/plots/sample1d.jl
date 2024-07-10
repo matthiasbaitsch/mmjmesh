@@ -1,12 +1,13 @@
 """
-    sample1d(f, a, b, rp, maxrecursion, maxangle, npoints, yscale, ir) -> Matrix{Real}
+    sample1d(f, a, b; rp=false, maxrecursion=15, maxangle=2.5, npoints=5, yscale=1, ir=false) -> [params, ] points
 
 Simple adaptive sampling of mapping `f` on the interval from `a` to `b`. The interval is initially
-sampled at `npoints` g and then refined recursively until either the angles are smaller than 
+sampled at `npoints` and then refined recursively until either the angles are smaller than 
 `maxangle` (in degrees) or the recursion depth reaches `maxrecursion`. The function returns the
 sampled points in a matrix. If `rp=true`, the function returns parameters and corresponding points.
 
-Parameters for functions R → R only: Angles are evaluated using the scaling factor `yscale`. Use `ir=true` to insert roots.
+Parameters for real valued functions only: Angles are evaluated using the scaling factor `yscale`. 
+Use `ir=true` to insert roots.
 
 @see adapted_grid.jl in PlotUtils.jl
 @see T. Bayer: Efficient plotting the functions with discontinuities
