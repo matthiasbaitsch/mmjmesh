@@ -1,13 +1,13 @@
 all: test book apidoc
 
-book:
-	cd demo && quarto render --to html
+guide:
+	cd doc/guide && quarto render --to html
 
-book-publish:
-	cd demo && quarto publish gh-pages --no-prompt
+guide-publish:
+	cd doc/guide && quarto publish gh-pages --no-prompt
 
 apidoc:
-	cd docs && julia --project make.jl
+	cd doc/apidoc && julia --project make.jl
 
 .PHONY: test
 test:

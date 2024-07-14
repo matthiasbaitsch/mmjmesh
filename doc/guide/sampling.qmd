@@ -1,0 +1,93 @@
+# Adaptive sampling
+
+```{julia}
+#| echo: false
+#| warning: false
+include("setup.jl")
+using IntervalSets
+using LinearAlgebra
+import MMJMesh.Plots: sample1d
+```
+
+Plot function
+
+```{julia}
+function doplot(xy)
+    f = lines(xy)
+    scatter!(xy, color=:darkred, markersize=5)
+    return f
+end;
+```
+
+Linear function
+
+```{julia}
+sample1d(x -> x, -1, 1) |> doplot
+```
+
+Parabola
+
+```{julia}
+sample1d(x -> x^2, -1, 1) |> doplot
+```
+
+Curved in one region
+
+```{julia}
+sample1d(x -> x^100, 0, 1) |> doplot
+```
+
+Singular point
+
+```{julia}
+sample1d(x -> sin(1.0 / x), 0.0, 0.05, maxangle=0.05, npoints=21) |> doplot
+```
+
+
+```{julia}
+sample1d(x -> sin(1.0 / x), 0.0, 0.05, yscale=0.05, npoints=21) |> doplot
+```
+
+
+```{julia}
+@time size(sample1d(x -> sin(1.0 / x), 0.0, 0.05, maxangle=0.1), 2)
+```
+
+Multiple curvatures
+
+```{julia}
+sample1d(x -> sin(30 * sin(x)), 0, 2pi) |> doplot
+```
+
+Discontinuity
+
+```{julia}
+sample1d(x -> 1 / x, 0, 1, yscale=1e-5) |> doplot
+```
+
+Insert root
+
+```{julia}
+sample1d(x -> (-0.3 + x), -1, 1, ir=true) |> doplot
+```
+
+Non smooth function
+
+```{julia}
+sample1d(x -> abs(x), -1, 1) |> doplot
+```
+
+Local peak
+
+```{julia}
+a = 0.01
+f = Polynomial(0, 1, d=-1 .. 1) + a^2 / Polynomial(a^2, 0.0, 1.0)
+sample1d(f, -1, 1) |> doplot
+```
+
+Circle
+
+```{julia}
+u = ParametricCurve(Cos(0 .. 2π), Sin(0 .. 2π))
+sample1d(u, 0, 2pi) |> doplot
+```

@@ -1,0 +1,51 @@
+---
+title: "Entities Demo"
+---
+
+```{julia}
+using Pkg
+Pkg.activate(".")
+using Revise
+using BenchmarkTools
+using MMJMesh.Topologies
+```
+
+# What is the fastest way to get an entity topology?
+
+## Dict version
+
+```{julia}
+TD = Dict(
+    (1, 2) => Topologies.L2,
+    (1, 3) => Topologies.L3,
+    (2, 3) => Topologies.TRI3,
+    (2, 4) => Topologies.Q4
+)
+entitytopology1(d::Int, nn::Int) = TD[(d, nn)]
+
+@benchmark a = entitytopology1(2, 4)
+```
+
+## Branching version
+
+```{julia}
+function entitytopology2(d::Int, nn::Int)
+    if d == 1
+        if nn == 2
+            return Topologies.L2
+        elseif nn == 3
+            return Topologies.L3
+        end
+    elseif d == 2
+        if nn == 3
+            return Topologies.TRI3
+        elseif nn == 4
+            return Topologies.Q4
+        end
+    end
+end
+
+@benchmark a = entitytopology2(2, 4)
+```
+
+Not much of a difference, use the shorter one.

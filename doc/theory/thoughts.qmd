@@ -1,0 +1,42 @@
+---
+title: Thoughts -- Other's and mine
+format: 
+    typst: default
+bibliography: references.bib
+---
+
+# Notation
+
+## Polynomial spaces
+
+::: {layout-ncol=2}
+![Breaess @braess_finite_2007 p.60](00-pics/polynomial-space-braess-1.png)
+
+![Breaess @braess_finite_2007 p.68](00-pics/polynomial-space-braess-2.png)
+
+![Brenner and Scott @brenner_mathematical_2008 p.71](00-pics/polynomial-space-bs-1.png)
+
+![Brenner and Scott @brenner_mathematical_2008 p85](00-pics/polynomial-space-bs-2.png)
+:::
+
+## Definition of a finite element
+
+::: {layout-ncol=2}
+![Johnson @johnson_numerical_1987 p.79](00-pics/finite-element-johnson.png)
+
+![Brenner and Scott @brenner_mathematical_2008 p.69](00-pics/finite-element-brenner-scott.png)
+
+![Boffi, Brezzi and Martin @boffi_mixed_2013 p.67](00-pics/finite-element-boffi-brezzi-martin.png)
+
+![Braess @braess_finite_2007 p.70](00-pics/finite-element-braess.png)
+:::
+
+## Misc
+
+::: {layout-ncol=2}
+![Reference Triangle,  Breass @braess_finite_2007 p.73](00-pics/reference-triangle-braess.png)
+
+![Affine equivalence,  Brenner and Scott @brenner_mathematical_2008 p.82](00-pics/affine-equivalence-brenner-scott.png)
+:::
+
+

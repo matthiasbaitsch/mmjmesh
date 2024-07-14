@@ -1,0 +1,249 @@
+# Plotting
+
+This chapter is utterly incomplete and probably not worth reading.
+
+```{julia}
+#| echo: false
+#| warning: false
+include("setup.jl")
+import MMJMesh.Plots: approximationerror, sampleadaptive
+```
+
+## Plot a 1D mesh
+
+### On a straight line
+
+```{julia}
+m = makemeshoninterval(0, 4, 20)
+mplot(m) |> mconf()
+```
+
+Nodes hidden if too many.
+
+```{julia}
+m = makemeshoninterval(0, 4, 60)
+mplot(m) |> mconf()
+```
+
+One value per node
+
+```{julia}
+mplot(m, -1.1 .+ 2.6 * rand(nnodes(m))) |> mconf()
+```
+
+One value per element
+
+```{julia}
+mplot(m, -1.1 .+ 2.2 * rand(nedges(m))) |> mconf()
+```
+
+Two values per element
+
+```{julia}
+mplot(m, -1.1 .+ 2.2 * rand(2, nedges(m))) |> mconf()
+```
+
+### Vertical
+
+```{julia}
+m = makemeshoninterval(π, 3π, 20, t -> [0; t])
+mplot(m, -1.1 .+ 3.2 * rand(nedges(m))) |> mconf()
+```
+
+### On a spiral
+
+```{julia}
+m = makemeshoninterval(π, 3π, 20, t -> t * [cos(t); sin(t)])
+mplot(m, -1.1 .+ 3.2 * rand(2, nedges(m))) |> mconf()
+```
+
+### Customize plot
+
+Plot customization works like this:
+
+```{julia}
+f, ax = mplot(m, -1.1 .+ 3.2 * rand(2, nedges(m))) |> mconf()
+ax.title = "Spiral with reversed vertical axis"
+ax.yreversed = true
+f
+```
+
+Documentation on plot axis can be found on the [Makie documentation](https://docs.makie.org/stable/reference/blocks/axis) which unfortunately is quite hard to read.
+
+## Plot a 2D mesh
+
+### Quad mesh
+
+```{julia}
+a = 80
+m = makemeshonrectangle(9.0, 4.5, 2a, a)
+println("Number of nodes is Nn = ", (a + 1) * (2a + 1))
+print("Links...")
+@time l12 = links(m.topology, 1, 2);
+```
+
+Default color
+
+```{julia}
+mplot(m, edgesvisible=true, edgecolor=:hotpink) |> mconf()
+```
+
+Colors for nodes
+
+```{julia}
+mplot(m, 4.1 * (rand(nnodes(m)) .- 0.25)) |> mconf()
+```
+
+Colors for elements
+
+```{julia}
+mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf()
+```
+
+### Triangle mesh
+
+```{julia}
+a = 20
+m = makemeshonrectangle(9.0, 4.5, 2a, a, TRIANGLE)
+println("Nn = ", (a + 1) * (2a + 1))
+print("Links (1, 2):")
+@time l12 = links(m.topology, 1, 2);
+```
+
+Default color
+
+```{julia}
+mplot(m, edgesvisible=true) |> mconf()
+```
+
+Colors for nodes
+
+```{julia}
+mplot(m, 4.1 * (rand(nnodes(m)) .- 0.25)) |> mconf()
+```
+
+Colors for elements
+
+```{julia}
+mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf()
+```
+
+## Plot functions on meshes
+
+```{julia}
+#| echo: false
+GLMakie.activate!()
+```
+
+### Warp by nodal values
+
+Nodes can be transformed. Either, specify a function which returns the 
+warped coordinates of the node.
+
+```{julia}
+m = makemeshonrectangle(4, 2, 20, 10)
+function warpfunction(node)
+    x = coordinates(node)
+    return [x..., 0.25 * sin(pi * (x[1] - 2)) * cos(pi * (x[2] - 1))]
+end
+
+f = Figure()
+Axis3(f[1, 1], aspect=:data)
+mplot!(m, rand(nfaces(m)), nodewarp=warpfunction)
+f
+```
+
+Alternatively, use an array to perform a scalar warp.
+
+```{julia}
+m = makemeshonrectangle(4, 2, 10, 5)
+
+f = Figure()
+Axis3(f[1, 1], aspect=:data)
+mplot!(m, rand(nfaces(m)), nodewarp=0.25 * rand(nnodes(m)))
+f
+```
+
+### Plot functions on faces
+
+For each face, a function from the face geometry reference domain into the real numbers can be provided. Function values are visualized by colors and/or by warping the face. 
+
+The function is specified by the first parameter to the mplot function, settings are the `faceplotXXX` named parameters.
+
+Method 1: Specify one function:
+
+```{julia}
+m = makemeshonrectangle(8, 4, 4, 2)
+w(face) = x -> index(face) * (1 - x[1]^2) * (1 - x[2]^2)
+f = Figure()
+Axis3(f[1, 1], aspect=:data)
+mplot!(m, w, faceplotzscale=0.2, faceplotmesh=2)
+f
+```
+
+Method 2: Specify postprocessing function, here with the items `w` and `sigma`:
+
+```{julia}
+function results(face, name)
+    if name == :w
+        return x -> index(face) * (1 - x[1]^2) * (1 - x[2]^2)
+    elseif name == :sigma
+        s = Polynomial([0, π])
+        return ProductFunction(Sin() ∘ s, Cos() ∘ s)
+    end
+end
+m.data[:post] = results;
+```
+
+Plot result `w`:
+
+```{julia}
+f = Figure()
+Axis3(f[1, 1], aspect=:data)
+mplot!(m, :w, faceplotzscale=0.2, faceplotmesh=2)
+f
+```
+
+Plot result `sigma`:
+
+```{julia}
+f = Figure()
+Axis3(f[1, 1], aspect=:data)
+mplot!(
+    m, :sigma,
+    faceplotzscale=0.5, faceplotmesh=15, 
+    edgelinewidth=2, edgecolor=:red, colormap=:redblue
+)
+f
+```
+
+
+## Plot options
+
+```{julia}
+#| echo: false
+CairoMakie.activate!()
+```
+
+```{julia}
+a = 10
+m1 = makemeshonrectangle(4, 2, 2a, a)
+mplot(m1, 3 * rand(nfaces(m1)),
+    nodesvisible=true, nodecolor=:hotpink, nodesize=12,
+    edgesvisible=true, edgecolor=:lightblue, edgelinewidth=3,
+    featureedgecolor=:red, featureedgelinewidth=6,
+    facecolormap=:bluesreds
+) |> mconf()
+```
+
+```{julia}
+m2 = makemeshoninterval(0, 4, 20)
+mplot(m2, rand(nnodes(m2)),
+    lineplotoutlinesvisible=true,
+    edgecolor=:blue, edgelinewidth=10,
+    lineplotscale=0.3,
+    lineplotoutlinescolor=:hotpink,
+    lineplotoutlineslinewidth=2.0,
+    lineplotfacescolormap=:bluesreds
+) |> mconf(title="Test Plot")
+```

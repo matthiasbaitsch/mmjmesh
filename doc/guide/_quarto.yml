@@ -1,0 +1,22 @@
+project:
+  type: book
+
+book:
+  title: "The MMJMesh Library"
+  subtitle: "Minh's and Matthias' Julia Mesh Library"
+  author: "Matthias Baitsch"
+  chapters: 
+    - index.qmd
+    - mesh.qmd
+    - plot.qmd
+    - mathematics.qmd
+    - sampling.qmd
+    - finite-elements.qmd
+
+format:
+  html: default
+
+fig-format: png
+
+execute:
+  freeze: auto
