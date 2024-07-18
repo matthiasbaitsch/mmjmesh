@@ -23,6 +23,7 @@ include("mappings.jl")
 include("forms.jl")
 include("fefunctions.jl")
 include("mpolynomials.jl")
+include("parametertypes.jl")
 
 # Domains
 export R, RPlus, R⁺, R0Plus, R⁺₀, IHat, ReferenceInterval

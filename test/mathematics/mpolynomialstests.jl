@@ -28,7 +28,9 @@ x = SVector(1.0, 2.0)
 @test derivative(f, [1, 0]) == MPolynomial([1 2; 5 2], [4, 9])
 @test derivative(f, [2, 0]) == MPolynomial([0 1; 5 2], [4, 18])
 @test derivative(f, [1, 1]) == MPolynomial([1 2; 4 1], [20, 18])
+
 @test derivativeat(f, x, [1, 1]) == derivative(f, [1, 1])(x)
+@test derivativeat(f, [1, 2], [1, 1]) == derivative(f, [1, 1])(x)
 
 gradf = derivative(f, 1)
 @test gradf[1] == derivative(f, [1, 0])

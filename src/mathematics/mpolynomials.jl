@@ -15,6 +15,14 @@ end
 
 valueat(p::MPolynomial{N}, x::InRⁿ{N}) where {N} = p.p(x)
 
+derivativeat(
+    f::MPolynomial{N}, x::InRⁿ{N}, ns::AbstractArray{<:Integer}
+) where {N} = _derivativeat(f, x, ns)
+
+derivativeat(
+    f::MPolynomial{N}, x::InRⁿ{N}, n::Integer=1
+) where {N} = _derivativeat(f, x, n)
+
 function derivative(f::MPolynomial{N,D}, ns::AbstractArray{<:Integer}) where {N,D}
     p = f.p
     for (idx, n) ∈ enumerate(ns)
@@ -26,10 +34,6 @@ function derivative(f::MPolynomial{N,D}, ns::AbstractArray{<:Integer}) where {N,
 end
 
 derivative(f::MPolynomial, n::Integer=1) = _derivative(f, n)
-
-derivativeat(
-    f::MPolynomial{N,D}, x::InRⁿ{N}, ns::AbstractArray{<:Integer},
-) where {N,D} = _derivativeat(f, x, ns)
 
 function antiderivative(f::MPolynomial{N}, ns::AbstractArray{<:Integer}) where {N}
     e = copy(FP.exponents(f.p))

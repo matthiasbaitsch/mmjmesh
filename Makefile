@@ -1,4 +1,4 @@
-all: test book apidoc
+all: test guide apidoc
 
 guide:
 	cd doc/guide && quarto render --to html
@@ -15,5 +15,5 @@ test:
 
 clean:
 	find . -name \*.cov | xargs rm
-	rm -rf demo/_book demo/.quarto demo/_freeze
+	rm -rf doc/guide/_book doc/guide/.quarto doc/guide/_freeze
 

@@ -115,7 +115,7 @@ mplot(m, edgesvisible=true) |> mconf()
 Read mesh from Gmsh
 
 ```{julia}
-m = Mesh("../data/gmsh/advanced.msh")
+m = Mesh(meshpath("advanced.msh"))
 mplot(m) |> mconf()
 ```
 

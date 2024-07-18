@@ -469,6 +469,16 @@ function _nn(n::Integer, indices::Integer...)
     return n
 end
 
+"""
+    _derivative(f::FunctionRnToR{N}, n::Integer)
+
+Default implementation of `n`-th order derivative of multivariate function `f`.  Currently
+implemented for 
+
+- `n = 1`: Returns the gradient function
+
+- `n = 2`: Returns the Hessian function
+"""
 function _derivative(f::FunctionRnToR{N}, n::Integer) where {N}
     if n == 1
         return MappingFromComponents([derivative(f, _nn(N, i)) for i = 1:N]...)
@@ -479,6 +489,16 @@ function _derivative(f::FunctionRnToR{N}, n::Integer) where {N}
     end
 end
 
+"""
+    _derivativeat(f::FunctionRnToR{N}, x::InRⁿ{N}, n::Integer)
+
+Default implementation for the evaluation `n`-th order derivative of multivariate function `f`
+at position `x`. Currently implemented for
+
+- `n = 1`: Returns the gradient of `f` at `x`
+
+- `n = 2`: Returns the Hessian of `f` at `x`
+"""
 function _derivativeat(f::FunctionRnToR{N}, x::InRⁿ{N}, n::Integer) where {N}
     if n == 1
         return SVector{N}([derivativeat(f, x, _nn(N, i)) for i = 1:N])
@@ -489,6 +509,12 @@ function _derivativeat(f::FunctionRnToR{N}, x::InRⁿ{N}, n::Integer) where {N}
     end
 end
 
+"""
+    _derivativeat(f::FunctionRnToR{N,D}, x::InRⁿ{N}, ns::AbstractArray{<:Integer})
+
+Default implementation for the evaluation of the `ns` partial derivative of `f` at `x`. Note
+that this is an inefficient implementation which computes the derivative function first.
+"""
 _derivativeat(
     f::FunctionRnToR{N,D}, x::InRⁿ{N}, ns::AbstractArray{<:Integer}
 ) where {N,D} = valueat(derivative(f, ns), x)
@@ -532,7 +558,8 @@ function integrate(f::FunctionRnToR{2}, I1::Interval, I2::Interval)
     F = antiderivative(f, [1, 1])
     return F(a, c) + F(b, d) - F(a, d) - F(b, c)
 end
-integrate(f::FunctionRnToR{2}, d::DomainSets.Rectangle) = integrate(f, component(d, 1), component(d, 2))
+integrate(f::FunctionRnToR{2}, d::DomainSets.Rectangle) = 
+    integrate(f, DomainSets.component(d, 1), DomainSets.component(d, 2))
 
 
 """
@@ -749,47 +776,3 @@ Base.:(*)(a::Real, m::ScaledMapping) = (a * m.a) * m.m
 # /
 Base.:(/)(m1::AbstractMapping, m2::AbstractMapping) = QuotientMapping(m1, m2)
 Base.:(/)(a::Real, m2::AbstractMapping) = QuotientMapping(Polynomial(a), m2)
-
-
-
-# -------------------------------------------------------------------------------------------------
-# Take care of parameter types
-# -------------------------------------------------------------------------------------------------
-
-_TYPES = (Real,)
-
-for type in _TYPES
-    @eval begin
-        valueat(m::MappingFromRn{N}, x::Vector{<:$type}) where {N} = valueat(m, InRⁿ{N}(x))
-        (m::MappingFromRn{N})(x::Vector{<:$type}) where {N} = valueat(m, x)
-        (m::MappingFromRn{N})(x::$type...) where {N} = valueat(m, InRⁿ{N}(x))
-        derivativeat(m::MappingFromRn{N}, x::Vector{<:$type}, n::Integer=1) where {N} =
-            derivativeat(m, InRⁿ{N}(x), n)
-    end
-end
-
-# for type in _TYPES
-#     if type != Float64
-#         @eval begin
-#             # valueat(m::MappingFromR, x::$type) = valueat(m, Float64(x))
-#             # derivativeat(m::MappingFromR, x::$type, n::Integer=1) = derivativeat(m, Float64(x), n)
-#             # (m::MappingFromR)(x::$type) = valueat(m, Float64(x))
-#         end
-#     end
-# end
-
-for func in (:gradientat, :hessianat, :laplacianat), type in _TYPES
-    @eval begin
-        $func(f::FunctionRnToR{N}, x::Vector{<:$type}) where {N} = $func(f, InRⁿ{N}(x))
-        $func(f::FunctionRnToR{N}, x::$type...) where {N} = $func(f, InRⁿ{N}(x))
-    end
-end
-
-for type in _TYPES
-    @eval begin
-        divergenceat(v::VectorField{N}, x::Vector{<:$type}) where {N} =
-            divergenceat(v, InRⁿ{N}(x))
-        divergenceat(v::VectorField{N}, x::$type...) where {N} =
-            divergenceat(v, InRⁿ{N}(x))
-    end
-end
