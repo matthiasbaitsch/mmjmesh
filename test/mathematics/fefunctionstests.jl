@@ -6,6 +6,8 @@ using MMJMesh
 using MMJMesh.Plots
 using MMJMesh.Mathematics
 
+include("validatemappings.jl")
+
 # Coefficients
 C1 = [1, 2]
 C2 = [1.0 2.0; 3.0 4.0]

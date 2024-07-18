@@ -5,27 +5,36 @@ using SymbolicUtils
 using IntervalSets
 using StaticArrays
 using LinearAlgebra
-using DomainSets: ×, Rectangle, ProductDomain, dimension, component
 using SymbolicUtils: Postwalk, Chain
-include("poly.jl") # My own version of this code - forgot why I did this
+using DomainSets: ×, ProductDomain, Rectangle
 
-import Polynomials as P
+# Multivariate polynomials, my own version of 
+## FixedPolynomials - forgot why I did this
+include("poly.jl")
+
+import DomainSets
+import Polynomials
 import MMJMesh.Mathematics.FixedPolynomials as FP
 
 using MMJMesh.MMJBase
 
+include("domains.jl")
 include("mappings.jl")
 include("forms.jl")
 include("fefunctions.jl")
 include("mpolynomials.jl")
 
+# Domains
+export R, RPlus, R⁺, R0Plus, R⁺₀, IHat, ReferenceInterval
+export R2, R², R3, R³, QHat, ReferenceQuadrilateral
+export InR, InRⁿ, InR2, InR², InR3, InR³, InRⁿˣᵐ
+export dimension
 
 # General concept of mapping
 export MappingFromComponents
 export AbstractMapping, MappingFromR, MappingFromRn, FunctionToR, FunctionRToR, FunctionRnToR
 export domaintype, codomaintype, domain, valueat
 export derivativeat, derivative, pderivativeat, pderivative
-export R, R2, RPlus, R0Plus, IHat, ReferenceInterval, QHat, ReferenceQuadrilateral
 export antiderivative, integrate, sample, plot, pois, roots
 export Zero, One
 
@@ -45,7 +54,9 @@ export Sin, Cos
 export MPolynomial, mmonomials, simplifyx
 export AdHocMapping, makefunction
 export AffineMapping
-export Polynomial, Interpolation, fromroots, lagrangepolynomials, monomials, degree, lagrangebasis1d
+export Polynomial, Interpolation, fromroots, lagrangepolynomials, monomials, lagrangebasis1d
+
+export degree, degrees
 
 # Forms
 export ValueAtLF, DerivativeAtLF, DDerivativeAtLF, PDerivativeAtLF

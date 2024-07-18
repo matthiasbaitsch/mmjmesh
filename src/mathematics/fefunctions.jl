@@ -29,12 +29,12 @@ struct Interpolation{DT,CT,D} <: AbstractMapping{DT,CT,D}
     functions::AbstractMapping{DT,<:AbstractVector,D}
     coefficients::SArray
     Interpolation(h::AbstractMapping{DT,<:AbstractVector,D}, C::AbstractVector) where {DT,D} =
-        new{DT,Float64,D}(h, SVector{length(C)}(C))
+        new{DT,InR,D}(h, SVector{length(C)}(C))
     Interpolation(h::AbstractMapping{DT,<:AbstractVector,D}, C::AbstractMatrix) where {DT,D} =
-        new{DT,SVector{size(C, 1),Float64},D}(h, SMatrix{size(C, 1),size(C, 2)}(C))
+        new{DT,InRⁿ{size(C, 1)},D}(h, SMatrix{size(C, 1),size(C, 2)}(C))
 end
 
-function Interpolation(C::AbstractVecOrMat, d::Integer)
+function Interpolation(C::AbstractVecOrMat{<:Real}, d::Integer)
     nc = _ncoefficients(C)
     if d == 1
         return Interpolation(lagrangebasis1d(nc - 1), C)
@@ -43,8 +43,9 @@ function Interpolation(C::AbstractVecOrMat, d::Integer)
     end
 end
 
-valueat(m::Interpolation, x) = _mul(m.coefficients, m.functions(x))
-derivativeat(m::Interpolation, x, n::Int=1) = _mul(m.coefficients, derivativeat(m.functions, x, n))
+valueat(m::Interpolation{DT}, x::DT) where {DT} = _mul(m.coefficients, m.functions(x))
+derivativeat(m::Interpolation{DT}, x::DT, n::Int=1) where {DT} =
+    _mul(m.coefficients, derivativeat(m.functions, x, n))
 derivative(m::Interpolation, n::Int=1) =
     Interpolation(derivative(m.functions, n), m.coefficients)
 Base.show(io::IO, m::Interpolation) =

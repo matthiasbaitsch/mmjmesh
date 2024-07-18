@@ -3,7 +3,9 @@ struct MPolynomial{N,D} <: FunctionRnToR{N,D}
     p::FP.Polynomial
 end
 
-function MPolynomial(exponents::Matrix{Int}, coefficients::AbstractVector{T}, d=nothing) where {T}
+function MPolynomial(
+    exponents::Matrix{<:Integer}, coefficients::AbstractVector{T}, d=nothing
+) where {T}
     n = size(exponents, 1)
     if isnothing(d)
         d = R^n
@@ -11,12 +13,12 @@ function MPolynomial(exponents::Matrix{Int}, coefficients::AbstractVector{T}, d=
     return MPolynomial{n,d}(FP.Polynomial(_simplify(exponents, coefficients)...))
 end
 
-valueat(p::MPolynomial{N}, x::SVector{N}) where {N} = p.p(x)
+valueat(p::MPolynomial{N}, x::InRⁿ{N}) where {N} = p.p(x)
 
 function derivative(f::MPolynomial{N,D}, ns::AbstractArray{<:Integer}) where {N,D}
     p = f.p
     for (idx, n) ∈ enumerate(ns)
-        for _ = 1:n
+        for _ ∈ 1:n
             p = FP.differentiate(p, idx)
         end
     end
@@ -26,18 +28,22 @@ end
 derivative(f::MPolynomial, n::Integer=1) = _derivative(f, n)
 
 derivativeat(
-    f::MPolynomial{N,D}, x::SVector{N,<:Real}, ns::AbstractArray{<:Integer}
+    f::MPolynomial{N,D}, x::InRⁿ{N}, ns::AbstractArray{<:Integer},
 ) where {N,D} = _derivativeat(f, x, ns)
 
 function antiderivative(f::MPolynomial{N}, ns::AbstractArray{<:Integer}) where {N}
     e = copy(FP.exponents(f.p))
     c = Vector{promote_type(FP.eltype(f.p), Float64)}(FP.coefficients(f.p))
-    for i = 1:N, _ = 1:ns[i], k = 1:FP.nterms(f.p)
+    for i ∈ 1:N, _ ∈ 1:ns[i], k ∈ 1:FP.nterms(f.p)
         e[i, k] += 1
         c[k] = (1 // e[i, k]) * c[k]
     end
     return MPolynomial(e, c)
 end
+
+degree(f::MPolynomial) = FP.degree(f.p)
+degree(f::MPolynomial, i::Integer) = maximum(f.p.exponents[i, :])
+degrees(f::MPolynomial) = maximum(f.p.exponents, dims=2) |> vec
 
 function Base.:(+)(p1::MPolynomial, p2::MPolynomial)
     _, e1, c1, _, e2, c2 = _extract(p1, p2)
@@ -50,8 +56,8 @@ function Base.:(*)(p1::MPolynomial{N}, p2::MPolynomial{N}) where {N}
     e = zeros(Int, N, n)
     c = ones(promote_type(FP.eltype(p1.p), FP.eltype(p2.p)), n)
     cnt = 1
-    for i = 1:n1
-        for j = 1:n2
+    for i ∈ 1:n1
+        for j ∈ 1:n2
             e[:, cnt] = e1[:, i] + e2[:, j]
             c[cnt] = c1[i] * c2[j]
             cnt += 1
@@ -62,12 +68,12 @@ end
 
 Base.:(*)(a::Real, p::MPolynomial{N,D}) where {N,D} =
     MPolynomial(FP.exponents(p.p), a * FP.coefficients(p.p), D)
-
 Base.show(io::IO, p::MPolynomial) = print(io, p.p)
-Base.:(==)(p1::MPolynomial{N,D}, p2::MPolynomial{N,D}) where {N,D} = p1.p == p2.p
+Base.:(==)(p1::MPolynomial{N,D}, p2::MPolynomial{N,D}) where {N,D} = (p1.p == p2.p)
+
 
 """
-    mmonomials(n::Integer, p::Integer, dom=R^n, predicate=(...) -> true)
+	mmonomials(n::Integer, p::Integer, dom=R^n, predicate=(...) -> true)
 
 Generate multivariate momonials of `n` components up to degree `p`. Optionally, a domain
 and a predicate can be specified
@@ -80,7 +86,7 @@ function mmonomials(n::Integer, p::Integer, dom=R^n, predicate=(ps...) -> true; 
                 for p1 in 0:p, p2 in 0:p
                 if predicate(p1, p2)
             ],
-            :
+            :,
         )
     else
         error("Not implemented yet")
@@ -136,7 +142,7 @@ function _integerize(expression::Num)
 end
 
 function _integerize!(c::Vector{Num})
-    for i = eachindex(c)
+    for i ∈ eachindex(c)
         c[i] = _integerize(c[i])
     end
     return c
@@ -145,7 +151,7 @@ end
 _integerize!(c) = c
 
 """
-    simplifyx(expression::Num) -> Num
+	simplifyx(expression::Num) -> Num
 
 Simplify expression and convert numbers to integers if possible.
 """

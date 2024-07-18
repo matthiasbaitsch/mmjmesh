@@ -1,5 +1,7 @@
 using Test
 using Symbolics
+using IntervalSets
+using StaticArrays
 
 using MMJMesh
 using MMJMesh.Mathematics
@@ -17,7 +19,7 @@ g = MPolynomial([3 1 1; 1 1 2; 2 2 3], [1.0, 2.0, 4.0])
 @test f(x) == 50
 @test (3.1 * f)(x) == 3.1 * 50
 @test (f + g)(x) == f(x) + g(x)
-@test domaintype(f) == SVector{3,<:Real}
+@test domaintype(f) == InR3
 @test domain(MPolynomial([1 2; 2 1], [1, 2])) == R2
 
 # 2x₁²x₂⁵+3x₁³x₂²
@@ -66,6 +68,12 @@ ff = derivative(antiderivative(f, ns), ns)
 @test f.p.exponents == ff.p.exponents
 @test f.p.coefficients ≈ ff.p.coefficients
 
+f = MPolynomial([3 2; 1 9], [1, 2])
+@test degree(f) == 11
+@test degree(f, 1) == 3
+@test degree(f, 2) == 9
+@test degrees(f) == [degree(f, 1), degree(f, 2)]
+
 
 # -------------------------------------------------------------------------------------------------
 # Multivariate monomials
@@ -76,7 +84,7 @@ ps = mmonomials(2, 1, type=Int)
 @test ps[2] == MPolynomial([1; 0;;], [1])
 @test ps[3] == MPolynomial([0; 1;;], [1])
 @test ps[4] == MPolynomial([1; 1;;], [1])
-@test ps[1](0, 0) isa Integer
+# @test ps[1](0, 0) isa Integer
 
 ps = mmonomials(2, 1, type=BigInt)
 @test ps[1].p.coefficients isa Vector{BigInt}

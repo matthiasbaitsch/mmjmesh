@@ -4,7 +4,6 @@ MakieCore.@recipe(FPlot3D, functions) do scene
         color=3,
         meshcolor=:black,
         mesh=5,
-        gmap=x -> x,
         colorrange=MakieCore.automatic,
         colormap=MakieCore.theme(scene, :colormap),
         zscale=1
@@ -21,7 +20,6 @@ function MakieCore.plot!(plot::FPlot3D)
     color = attributes.color[]
     meshcolor = attributes.meshcolor[]
     npoints = attributes.npoints[]
-    gmap = attributes.gmap[]
     colorrange = attributes.colorrange[]
     colormap = attributes.colormap[]
     zscale = attributes.zscale[]
@@ -29,9 +27,9 @@ function MakieCore.plot!(plot::FPlot3D)
         f = arg[]
         d = domain(f)
         !isfinite(d) && error("Domain is infinite: $d")
-        fx, ft = sample2d(f, domain=d, npoints=npoints, gmap=gmap)
+        fx, ft = sample2d(f, domain=d, npoints=npoints)
         fx[3, :] *= zscale
-        lx = sample2dlines(f, domain=d, npoints=npoints, nmeshlines=mesh, gmap=gmap, zscale=zscale)
+        lx = sample2dlines(f, domain=d, npoints=npoints, nmeshlines=mesh, zscale=zscale)
         MakieCore.mesh!(
             plot, fx, ft,
             color=_getcolor(fx, color, zscale), colorrange=colorrange, colormap=colormap

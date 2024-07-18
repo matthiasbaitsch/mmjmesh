@@ -5,7 +5,9 @@ using DomainSets: ×, Rectangle, ProductDomain
 
 using MMJMesh
 using MMJMesh.Mathematics
-using MMJMesh.Mathematics: derivativetype
+using MMJMesh.Mathematics: derivativetype, dimension
+
+include("validatemappings.jl")
 
 
 # -------------------------------------------------------------------------------------------------
@@ -49,38 +51,39 @@ m2 = Cos()
 # Derivative types
 # -------------------------------------------------------------------------------------------------
 
-T2 = SVector{2,Float64}
-T3 = SVector{3,Float64}
+T1 = InR
+T2 = InR2
+T3 = InR3
 
-@test derivativetype(T2, T3, 1) === SMatrix{3,2,Float64}
-@test derivativetype(T2, T3, 2) === SArray{Tuple{3,2,2},Float64}
-@test derivativetype(T3, T2, 1) === SMatrix{2,3,Float64}
-@test derivativetype(T3, T2, 2) === SArray{Tuple{2,3,3},Float64}
+@test derivativetype(T1, T2) === InR2
+@test derivativetype(T2, T3, 1) == InRⁿˣᵐ{3,2}
+@test derivativetype(T2, T3, 2) == SArray{Tuple{3,2,2},<:Real}
+@test derivativetype(T3, T2, 1) == InRⁿˣᵐ{2,3}
+@test derivativetype(T3, T2, 2) == SArray{Tuple{2,3,3},<:Real}
 
-@test derivativetype(Sin()) === Float64
-@test derivativetype(Sin(), 2) === Float64
-@test derivativetype(MappingFromComponents(Sin(), Cos())) === SVector{2,Float64}
-@test derivativetype(MappingFromComponents(Sin(), Cos()), 2) === SVector{2,Float64}
-@test derivativetype(ProductFunction(Sin(), Cos())) === SVector{2,Float64}
-@test derivativetype(ProductFunction(Sin(), Cos()), 2) === SMatrix{2,2,Float64}
-
+@test derivativetype(Sin()) == InR
+@test derivativetype(Sin(), 2) == InR
+@test derivativetype(MappingFromComponents(Sin(), Cos())) == InR2
+@test derivativetype(MappingFromComponents(Sin(), Cos()), 2) == InR2
+@test derivativetype(ProductFunction(Sin(), Cos())) == InR2
+@test derivativetype(ProductFunction(Sin(), Cos()), 2) == InRⁿˣᵐ{2,2}
 @test derivativetype(
     MappingFromComponents(
         ProductFunction(Sin(), Cos(), Sin()),
         ProductFunction(Cos(), -Sin(), -Sin())
     )
-) === SMatrix{2,3,Float64}
+) == SMatrix{2,3,<:Real}
 
 
 # -------------------------------------------------------------------------------------------------
 # Zero function
 # -------------------------------------------------------------------------------------------------
 
-z = Zero{SVector{2,<:Real},Float64,QHat}()
+z = Zero{InR2,InR,QHat}()
 @test z(1, 1) == 0
-@test derivative(z) == Zero{SVector{2,<:Real},SVector{2,Float64},QHat}()
-@test derivative(z, 2) == Zero{SVector{2,<:Real},SMatrix{2,2,Float64},QHat}()
-@test derivativeat(z, SVector{2,Real}([1, 1])) == [0, 0]
+@test derivative(z) == Zero{InR2,InR2,QHat}()
+@test derivative(z, 2) == Zero{InR2,InRⁿˣᵐ{2,2},QHat}()
+@test derivativeat(z, InR2([1, 1])) == [0, 0]
 @test derivativeat(z, [1, 1]) == [0, 0]
 @test derivativeat(z, [1, 1], 2) == [0 0; 0 0]
 
@@ -89,14 +92,14 @@ z = Zero{SVector{2,<:Real},Float64,QHat}()
 # One function
 # -------------------------------------------------------------------------------------------------
 
-o1 = One{Real,R}()
+o1 = One{InR,R}()
+@test One(Sin()) === o1
 @test o1(1) == 1
 @test derivativeat(o1, 1) == 0
 validate(o1, atol=1e-8)
 
-o3 = One{SVector{3,<:Real},R^3}()
+o3 = One{InRⁿ{3},R3}()
 @test valueat(o3, [1, 2, 3]) == 1
-@test valueat(o3, SVector{3,Real}([1, 2, 3])) == 1
 @test valueat(o3, SVector{3,Float64}([1, 2, 3])) == 1
 @test o3(1, 2, 3) == 1
 @test derivativeat(o3, [1, 2, 3]) == [0, 0, 0]
@@ -119,6 +122,13 @@ g = MappingFromComponents(Sin(), Cos())
 @test derivative(g, 1)(1.0) ≈ derivativeat(g, 1.0, 1)
 @test derivative(g, 2)(1.0) ≈ derivativeat(g, 1.0, 2)
 # TODO generic test
+
+# To matrix
+m1 = MappingFromComponents(Sin(), 2 * Cos())
+m2 = MappingFromComponents(3 * Cos(), 4 * Sin())
+m3 = MappingFromComponents(m1, m2)
+@test typeof(m3) <: AbstractMapping{InR,InRⁿˣᵐ{2,2}}
+@test m3(1) == stack([m1(1), m2(1)])'
 
 # Vector field R2 -> R2
 x = SVector(1.0, 2.0)
@@ -184,6 +194,7 @@ p = fromroots(c)
 # Monomials
 @test Polynomial([1, 2, 3, 4, 5]) == [1, 2, 3, 4, 5]' * monomials(0:4)
 
+
 # Affine map
 f = AffineMapping(2, 3)
 @test f(2) == 7
@@ -194,7 +205,6 @@ f = AffineMapping(2, 3)
 
 u = AffineMapping([-1 1; 2 3], [1, 2], QHat)
 @test u(1, 2) == [2, 10]
-@test u(1, 2) isa SVector{2,Float64}
 @test derivativeat(u, [1, 2]) == [-1 1; 2 3]
 @test derivativeat(u, [1, 2], 2) == zeros(2, 2, 2)
 # TODO Derivative when needed. Requires product of something with mapping to R
@@ -208,10 +218,6 @@ h = f ∘ g
 # -------------------------------------------------------------------------------------------------
 # Functions Rn -> R
 # -------------------------------------------------------------------------------------------------
-
-# Domains
-@test isfinite(QHat)
-@test !isfinite(R2)
 
 ## _nn function
 using MMJMesh.Mathematics: _nn
@@ -298,7 +304,7 @@ f = ProductFunction(Sin(), Cos())
 
 
 # -------------------------------------------------------------------------------------------------
-# Parametric curves R → Rn
+# Parametric curves
 # -------------------------------------------------------------------------------------------------
 
 c = ParametricCurve(Sin(), Cos())
@@ -375,8 +381,8 @@ u1 = MappingFromComponents(Sin(), Cos(), Sin())
 f3 = MPolynomial([4 3 2; 3 2 1; 2 1 0], [1, 2, 3])
 @test o1 * f1 === f1
 @test f1 * o1 === f1
-@test one(f1) === o1
-@test one(Sin{R}) === o1
+@test One(f1) === o1
+@test One(Sin{R}) === o1
 @test o1 * u1 === u1
 @test u1 * o1 === u1
 @test o3 * f3 === f3
@@ -415,3 +421,5 @@ v = MappingFromComponents(ProductFunction(Sin(), Cos()), ProductFunction(Cos(), 
 @test divergenceat(v, [1.0, 2.0]) == divergenceat(v, x)
 @test divergence(v)(x) ≈ divergenceat(v, x)
 @test div(v) == divergence(v)
+
+
