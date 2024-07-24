@@ -1,4 +1,4 @@
-# Shape functions and finite elements
+# Finite elements
 
 ```{julia}
 #| echo: false
@@ -7,10 +7,26 @@ include("setup.jl")
 using Latexify
 using WGLMakie
 using Symbolics
-using DomainSets
 using CairoMakie
 using IntervalSets
 using LinearAlgebra
+CairoMakie.activate!()
+```
+
+## Elements
+
+```{julia}
+fig = Figure(size=(800, 800))
+Axis(fig)
+feplot(fig[1, 1], makeelement(:lagrange, IHat, k=1)) |> feconf()
+feplot(fig[1, 2], makeelement(:lagrange, IHat, k=3)) |> feconf()
+feplot(fig[2, 1], makeelement(:hermite, IHat)) |> feconf()
+feplot(fig[2, 2], makeelement(:lagrange, QHat, k=1)) |> feconf()
+feplot(fig[3, 1], makeelement(:lagrange, QHat, k=2)) |> feconf()
+feplot(fig[3, 2], makeelement(:serendipity, QHat, k=2)) |> feconf()
+feplot(fig[4, 1], makeelement(:hermite, QHat, conforming=true)) |> feconf()
+feplot(fig[4, 2], makeelement(:hermite, QHat, conforming=false)) |> feconf()
+fig
 ```
 
 ## Shape functions
@@ -18,79 +34,40 @@ using LinearAlgebra
 Linear shape functions
 
 ```{julia}
-N = [ValueAtLF(-1), ValueAtLF(1)]
-P = monomials(0:1, -1 .. 1)
-M = [n(p) for p ∈ P, n ∈ N]
-L11 = inv(M) * P
-
-fplot(L11...)
+e = makeelement(:lagrange, IHat, k=1)
+ϕ = nodalbasis(e)
+fplot(ϕ...)
 ```
 
 Hermite polynomials
 
 ```{julia}
-h = 2.0
-N = [ValueAtLF(-1), DerivativeAtLF(-1), ValueAtLF(1), DerivativeAtLF(1)]
-P = monomials(0:length(N)-1, IHat)
-M = [n(p) for p in P, n in N]
-H1 = inv(M) * P
-fplot(H1...)
-```
-
-Hermite like polynomials with middle node
-
-```{julia}
-h = 2.0
-N = [ValueAtLF.(0:h/2:h); DerivativeAtLF.([0, h])] |> vcat
-P = monomials(0:length(N)-1, 0 .. h)
-M = [n(p) for p in P, n in N]
-H = inv(M) * P
-fplot(H...)
+e = makeelement(:hermite, 1 .. 4)
+ϕ = nodalbasis(e)
+fplot(ϕ...)
 ```
 
 Bilinear shape functions
 
 ```{julia}
+#| echo: false
 GLMakie.activate!()
-V = [-1 1 1 -1; -1 -1 1 1]
-N = [ValueAtLF(p) for p in eachcol(V)]
-P = mmonomials(2, 1, QHat)
-M = [n(p) for p in P, n in N]
-L21 = inv(M) * P
-fplot3d(L21)
+```
+
+```{julia}
+makeelement(:lagrange, QHat, k=1) |> nodalbasis |> fplot3d
 ```
 
 Serendipity shape functions
 
 ```{julia}
-V = [-1 0 1 1 1 0 -1 -1; -1 -1 -1 0 1 1 1 0]
-P = mmonomials(2, 2, QHat, (p1, p2) -> p1 + p2 < 4)
-N = [ValueAtLF(p) for p in eachcol(V)]
-M = [n(p) for p in P, n in N]
-Q8 = inv(M) * P
-fplot3d(Q8)
+makeelement(:serendipity, (0 .. 2) × (0 .. 1), k=2) |> nodalbasis |> fplot3d
 ```
 
 Conforming rectangular plate element shape functions
 
 ```{julia}
-V = [-1 1 1 -1; -1 -1 1 1]
-P = mmonomials(2, 3, QHat)
-N = vcat(
-    [
-        [
-            ValueAtLF(p),
-            PDerivativeAtLF(p, [1, 0]),
-            PDerivativeAtLF(p, [0, 1]),
-            PDerivativeAtLF(p, [1, 1])
-        ]
-        for p in eachcol(V)
-    ]...
-)
-M = [n(p) for p in P, n in N]
-H4 = inv(M) * P
-
-fplot3d(H4)
+makeelement(:hermite, QHat) |> nodalbasis |> fplot3d
 ```
 
 ## Finite element stiffness matrices
@@ -102,6 +79,7 @@ fplot3d(H4)
 ### Truss
 
 ```{julia}
+L11 = nodalbasis(makeelement(:lagrange, IHat, k=1))
 D(u) = 2 / l * u'
 ae(u, δu) = EA * l / 2 * integrate(D(u) * D(δu), IHat)
 Ke = simplify.([ae(s1, s2) for s1 ∈ L11, s2 ∈ L11])
@@ -110,6 +88,7 @@ Ke = simplify.([ae(s1, s2) for s1 ∈ L11, s2 ∈ L11])
 ### Beam
 
 ```{julia}
+H1 = nodalbasis(makeelement(:hermite, IHat))
 H1l = [H1[1], l / 2 * H1[2], H1[3], l / 2 * H1[4]]
 D(w) = 4 / l^2 * w''
 ae(w, δw) = EI * l / 2 * integrate(D(w) * D(δw), IHat)
@@ -121,9 +100,10 @@ Ke = simplify.(l^3 / EI * [ae(s1, s2) for s1 ∈ H1l, s2 ∈ H1l])
 Integration on the reference quadrilateral
 
 ```{julia}
+L21 = nodalbasis(makeelement(:lagrange, QHat, k=1))
 D(u) = [2 / a * ∂x(u), 2 / b * ∂y(u)]
 ae(u, v) = a * b / 4 * integrate(D(u) ⋅ D(v), QHat)
-Ke = simplify.(expand.(6 * a * b * [ae(n1, n2) for n1 ∈ L21, n2 ∈ L21]))
+Ke = simplify.(6 * a * b * [ae(n1, n2) for n1 ∈ L21, n2 ∈ L21], expand=true)
 ```
 
 Alternative derivation in physical coordinates
@@ -131,9 +111,9 @@ Alternative derivation in physical coordinates
 ```{julia}
 V = [0 a a 0; 0 0 b b]
 N = [ValueAtLF(p) for p in eachcol(V)]
-P = mmonomials(2, 1, QHat)
-M = [n(p) for p in P, n in N]
-L21p = inv(M) * P
+PP = mmonomials(2, 1, QHat)
+M = [n(p) for p in PP, n in N]
+L21p = inv(M) * PP
 
 ae(u, v) = integrate(∇(u) ⋅ ∇(v), (0 .. a) × (0 .. b))
 Ke = simplify.(expand.(6 * a * b * [ae(n1, n2) for n1 ∈ L21p, n2 ∈ L21p]))
