@@ -1,15 +1,17 @@
 ---
-title: Thoughts -- Other's and mine
+title: Collection of Finite Elemente Theory
 format: 
     typst: default
 bibliography: references.bib
 ---
 
+
 # Notation
+
 
 ## Polynomial spaces
 
-::: {layout-ncol=2}
+::: {layout-ncol=2 #fig-polynomial-space}
 ![Breaess @braess_finite_2007 p.60](00-pics/polynomial-space-braess-1.png)
 
 ![Breaess @braess_finite_2007 p.68](00-pics/polynomial-space-braess-2.png)
@@ -17,19 +19,46 @@ bibliography: references.bib
 ![Brenner and Scott @brenner_mathematical_2008 p.71](00-pics/polynomial-space-bs-1.png)
 
 ![Brenner and Scott @brenner_mathematical_2008 p85](00-pics/polynomial-space-bs-2.png)
+
+Polynomial spaces
 :::
+
 
 ## Definition of a finite element
 
-::: {layout-ncol=2}
+::: {layout-ncol=2 #fig-definition-finite-element}
 ![Johnson @johnson_numerical_1987 p.79](00-pics/finite-element-johnson.png)
 
 ![Brenner and Scott @brenner_mathematical_2008 p.69](00-pics/finite-element-brenner-scott.png)
 
-![Boffi, Brezzi and Martin @boffi_mixed_2013 p.67](00-pics/finite-element-boffi-brezzi-martin.png)
+![Boffi, Brezzi and Fortin @boffi_mixed_2013 p.67](00-pics/finite-element-boffi-brezzi-fortin.png)
 
 ![Braess @braess_finite_2007 p.70](00-pics/finite-element-braess.png)
+
+Definition of a finite element
 :::
+
+
+## Examples of finite elements
+
+::: {#fig-examples-of-finite-elements-johnson}
+![](00-pics/examples-of-finite-elements-johnson.png)
+
+Johnson @johnson_numerical_1987 p.80
+:::
+
+::: {#fig-examples-of-finite-elements-bbm}
+![](00-pics/examples-of-finite-elements-boffi-brezzi-fortin.png)
+
+Boffi, Brezzi and Fortin @boffi_mixed_2013 p.69
+:::
+
+::: {#fig-examples-of-finite-elements-braess}
+![](00-pics/examples-of-finite-elements-braess.png){width=50%}
+
+Braess @braess_finite_2007 p.66
+:::
+
 
 ## Misc
 
