@@ -15,17 +15,27 @@ function gdim end
 """
     coordinate(o, i)
 
-TODO
+Returns the `i`th coordinate of `o`.
 """
 function coordinate end
 
 """
     coordinates(o)
-    coordinates(o, i)
+    coordinates(os, i)
 
-TODO
+Returns the coordinates of `o` or the coordinates of the `i`th 
+object in the collection `os`.
 """
 function coordinates end
 
+"""
+    dimension(o)
+
+The dimension of object `o`. 
+"""
+function dimension end
+
+
 export pdim, gdim
 export coordinate, coordinates
+export dimension

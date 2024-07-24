@@ -18,6 +18,8 @@ import MMJMesh.Mathematics.FixedPolynomials as FP
 
 using MMJMesh.MMJBase
 
+import MMJMesh: dimension
+
 include("domains.jl")
 include("mappings.jl")
 include("forms.jl")

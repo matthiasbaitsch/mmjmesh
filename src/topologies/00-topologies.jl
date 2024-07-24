@@ -4,6 +4,8 @@ module Topologies
 using Printf
 using MMJMesh
 
+import MMJMesh: dimension
+
 # Exports
 ## ConnectivityList
 export ConnectivityList
