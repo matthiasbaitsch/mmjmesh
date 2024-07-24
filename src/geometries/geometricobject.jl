@@ -41,5 +41,15 @@ struct GeometricObjectI{DT,DG,NP} <: GeometricObjectP{DT,DG}
         new{DT,size(points, 1),size(points, 2)}(points)
 end
 
-parametrization(o::GeometricObjectI{DT}) where {DT} = Interpolation(o.points, DT)
+parametrization(o::GeometricObjectI{DT}) where {DT} =
+    Interpolation(bases[(DT, size(o.points, 2))], o.points)
+
+"""
+Lookup `(DT, NN) → basis` where `DT` is the topological dimension and `NN` the number of nodes
+of the geometric entity.
+"""
+const bases = Dict(
+    (1, 2) => MappingFromComponents(nodalbasis(makeelement(:lagrange, IHat, k=1))...),
+    (2, 4) => MappingFromComponents(nodalbasis(makeelement(:lagrange, QHat, k=1))...)
+)
 

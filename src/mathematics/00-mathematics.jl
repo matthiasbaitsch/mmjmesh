@@ -23,8 +23,8 @@ import MMJMesh: dimension
 include("domains.jl")
 include("mappings.jl")
 include("forms.jl")
-include("fefunctions.jl")
 include("mpolynomials.jl")
+include("interpolations.jl")
 include("parametertypes.jl")
 
 include("spaces.jl")
