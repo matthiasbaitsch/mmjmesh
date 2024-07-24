@@ -1,9 +1,14 @@
+abstract type Form end
+abstract type LinearForm <: AbstractMapping{AbstractMapping,Real,Any} end
+abstract type BilinearForm <: AbstractMapping{SVector{2,AbstractMapping},Real,Any} end
+
+
 """
     ValueAtLF(x)
 
 Evaluates the function at `x`.
 """
-struct ValueAtLF <: AbstractMapping{AbstractMapping,Real,Any}
+struct ValueAtLF <: LinearForm
     x
     ValueAtLF(x::Real) = new(x)
     ValueAtLF(x::AbstractArray{<:Real}) = new(Vector(x))
@@ -15,7 +20,7 @@ valueat(u::ValueAtLF, f::FunctionToR) = valueat(f, u.x)
 
 Evaluates the derivative at `x`.
 """
-struct DerivativeAtLF <: AbstractMapping{AbstractMapping,Real,Any}
+struct DerivativeAtLF <: LinearForm
     x
     DerivativeAtLF(x::Real) = new(x)
     DerivativeAtLF(x::AbstractArray{<:Real}) = new(Vector(x))
@@ -30,10 +35,14 @@ Evaluates the partial derivative at `x` in directions `n` of a function
 order of the partial derivative in direction `i`. For instance, `[1, 2]`
 refers to the partial derivative ``f_{xyy}(\\mathbf{x})``.
 """
-struct PDerivativeAtLF <: AbstractMapping{AbstractMapping,Real,Any}
+struct PDerivativeAtLF <: LinearForm
     x
     n
-    PDerivativeAtLF(x::AbstractArray{<:Real}, n::AbstractArray{<:Integer}) = new(Vector(x), Vector(n))
+    PDerivativeAtLF(x::AbstractArray{<:Real}, n::AbstractArray{<:Integer}) =
+        new(Vector(x), Vector(n))
 end
 valueat(u::PDerivativeAtLF, f::FunctionToR) = derivativeat(f, u.x, u.n)
 
+∂xLF(x) = PDerivativeAtLF(x, [1, 0])
+∂yLF(x) = PDerivativeAtLF(x, [0, 1])
+∂xyLF(x) = PDerivativeAtLF(x, [1, 1])

@@ -62,6 +62,13 @@ export Polynomial, Interpolation, fromroots, lagrangepolynomials, monomials, lag
 export degree, degrees
 
 # Forms
-export ValueAtLF, DerivativeAtLF, DDerivativeAtLF, PDerivativeAtLF
+export Form, LinearForm, BilinearForm, ValueAtLF, DerivativeAtLF, DDerivativeAtLF, PDerivativeAtLF
+export ∂xLF, ∂yLF, ∂xyLF
+
+# Spaces
+export FunctionSpace, PolynomialSpace, P, Q, S, Q23R, basis
+
+# Finite elements
+export FiniteElement, makeelement, nodalbasis
 
 end
