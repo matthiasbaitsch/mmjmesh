@@ -1,82 +1,224 @@
 """
-	Space
+    FiniteElement(P, N)
 
-General concept of a vector space over the real numbers.
+Construct a finite element ``(K, \\mathcal{P}, \\mathcal{N})``  according to
+Ciarlet's definition. Members are
+
+- the domain `K`,
+
+- the space `P` of functions defined on `K`,
+
+- a vector of linear forms `N`,
+
+- a `cache` holding computed objects such as a nodal basis.
+
 """
-abstract type Space end
-basis(::Space) = @abstractmethod
-dimension(s::Space) = dimension(typeof(s))
-Base.in(x, ::Type{<:Space}) = false
-Base.in(x, s::Space) = in(x, typeof(s))
+struct FiniteElement
+    K
+    P::Type{<:FunctionSpace}
+    N::Vector{<:LinearForm}
+    cache::Dict{Symbol,Any}
 
-"""
-	PolynomialSpace{N,K}
-
-Space of possibly multivarite polynomials of N variables an maximum exponent K.
-"""
-abstract type PolynomialSpace{N,K} <: Space end
-dimension(::Type{<:PolynomialSpace{1,K}}) where {K} = K + 1
-Base.in(::AbstractArray{<:Integer}, ::Type{<:PolynomialSpace}) = @abstractmethod
-Base.in(f::MappingFromR, s::Type{<:PolynomialSpace{1}}) = in([degree(f)], s)
-Base.in(f::MPolynomial, s::Type{<:PolynomialSpace}) = all(in.(eachcol(f.p.exponents), s))
-
-basis(::Type{<:PolynomialSpace{1,K}}, domain) where {K} = monomials(0:K, domain)
-basis(s::Type{<:PolynomialSpace{N,K}}, domain) where {N,K} =
-    mmonomials(N, K, domain, (k...) -> [k...] ∈ s)
-basis(s::PolynomialSpace, domain) = basis(typeof(s), domain)
-
-function _dimension(s::Type{<:PolynomialSpace{2,K}}) where {K}
-    cnt = 0
-    for i = 0:K, j = 0:K
-        if [i, j] ∈ s
-            cnt += 1
-        end
-    end
-    return cnt
-end
-
-function printexponents(s::Type{<:PolynomialSpace{2,K}}) where {K}
-    for sum = 0:2K
-        k1 = sum
-        k2 = 0
-        b = false
-        for _ = 0:sum
-            if [k1, k2] ∈ s
-                print("($k1,$k2) ")
-                b = true
-            end
-            k1 -= 1
-            k2 += 1
-        end
-        b && println()
+    function FiniteElement(P::Type{<:FunctionSpace}, N::Vector{<:LinearForm})
+        @assert dimension(P) == length(N)
+        return new(domain(P), P, N, Dict{Symbol,Any}())
     end
 end
 
 
 """
-	P{N,K}
+    nodalbasis(e)
 
-Space of `n`-variate polynomials where the largest sum of exponents is not larger than `k`.
+Generate a nodal basis for element `e`. This default implementation might be overridden
+by specific element types.
 """
-struct P{N,K} <: PolynomialSpace{N,K} end
-dimension(::Type{P{2,K}}) where {K} = Int((K + 1) * (K + 2) / 2)
-Base.in(k::AbstractArray{<:Integer}, ::Type{P{N,K}}) where {N,K} = (length(k) == N && sum(k) <= K)
+function nodalbasis(e::FiniteElement)
+    if :nodalbasis ∉ keys(e.cache)
+        nn = dimension(e.P)
+        ps = basis(e.P)
+        M = [n(p) for p in ps, n in e.N]
+        I = [i == j for i = 1:nn, j = 1:nn]
+        e.cache[:nodalbasis] = (M \ I) * ps
+    end
+    return e.cache[:nodalbasis]
+end
+
 
 """
-	Q{N,K}
+    _combineforms(points, genforms)
 
-Space of `n`-variate polynomials where the largest exponent is not larger than `n`.
+Helper function to construct linear forms.
 """
-struct Q{N,K} <: PolynomialSpace{N,K} end
-dimension(::Type{Q{N,K}}) where {N,K} = (K + 1)^N
-Base.in(k::AbstractArray{<:Integer}, ::Type{Q{N,K}}) where {N,K} = (length(k) == N && maximum(k) <= K)
+function _combineforms(points, genforms)
+    if points isa Vector{<:Vector}
+        points = reduce(vcat, points)
+    end
+    if genforms isa DataType
+        genforms = [genforms]
+    end
+    return vec([gf(p) for gf in genforms, p in points])
+end
+
+
+# -------------------------------------------------------------------------------------------------
+# List of elements
+# -------------------------------------------------------------------------------------------------
+
+struct ElementDescriptor
+    description::String
+    domaintypes::Vector{Type}
+    degree::AbstractInterval{<:Integer}
+    namedparameters::Dict{Symbol,Any}
+    makeelement::Function
+end
+
+const elementdescriptors = Dict{Symbol,ElementDescriptor}()
+const elementcache = Dict{Tuple{Symbol,Any,Integer,Any},FiniteElement}()
+const elementdomainstocache = Set([IHat, QHat])
+
+function addelementtype!(
+    typeid; description, domaintypes, makeelement,
+    degree=(1 .. 10000), namedparameters=Dict{Symbol,Any}()
+)
+    elementdescriptors[typeid] =
+        ElementDescriptor(
+            description,
+            domaintypes,
+            degree,
+            namedparameters,
+            makeelement
+        )
+end
+
+function hasdomaintype(type, types)
+    for t in types
+        if type isa t
+            return true
+        end
+    end
+    return false
+end
+
+function domakeelement(K, d::ElementDescriptor, k::Integer, a...)
+    @assert hasdomaintype(K, d.domaintypes)
+    if k == -1
+        return d.makeelement(K; a...)
+    else
+        @assert k ∈ d.degree
+        return d.makeelement(K, k; a...)
+    end
+end
+
+function makeelement(id::Symbol, K; k=-1, a...)
+    d = elementdescriptors[id]
+
+    if K ∈ elementdomainstocache
+        key = (id, K, k, a)
+        if key ∉ keys(elementcache)
+            elementcache[key] = domakeelement(K, d, k, a...)
+        end
+        return elementcache[key]
+    else
+        return domakeelement(K, d, k, a...)
+    end
+end
+
+
+# -------------------------------------------------------------------------------------------------
+# Concrete element formulations
+# -------------------------------------------------------------------------------------------------
 
 """
-	S{N, K}
+    lagrangeelement(K, k)
 
-Space of serendipity polynomials. Only defined for n=2 and k=2,3.
+Lagrange type finite element.
 """
-struct S{N,K} <: PolynomialSpace{N,K} end
-dimension(s::Type{S{2,2}}) = 8
-dimension(s::Type{S{2,3}}) = 12
-Base.in(k::AbstractArray{<:Integer}, ::Type{S{2,K}}) where {K} = (k ∈ Q{2,K} && prod(k) <= K)
+function lagrangeelement(K, k::Integer)
+    @assert k >= 1
+    return FiniteElement(
+        Q{dimension(K),k,K},
+        _combineforms(
+            [
+                points(K, :corners),
+                points(K, :sides, k - 1),
+                points(K, :interior, k - 1)
+            ],
+            ValueAtLF
+        )
+    )
+end
+
+addelementtype!(
+    :lagrange, description="Standard Lagrange element",
+    domaintypes=[Interval, Rectangle],
+    makeelement=lagrangeelement
+)
+
+makeelement(:lagrange, IHat, k=1);
+makeelement(:lagrange, QHat, k=1);
+
+
+"""
+    serendipityelement(K, k)
+
+Serendipity element (currently only for k=1,2)
+"""
+function serendipityelement(K::Rectangle, k::Integer)
+    @assert 1 <= k <= 2
+    @assert dimension(K) == 2
+    return FiniteElement(
+        S{2,k,K},
+        _combineforms(
+            [
+                points(K, :corners),
+                points(K, :sides, k - 1)
+            ],
+            ValueAtLF
+        )
+    )
+end
+
+addelementtype!(
+    :serendipity, description="Serendipity element",
+    domaintypes=[Rectangle],
+    makeelement=serendipityelement,
+    degree=1 .. 2
+)
+
+
+
+"""
+    hermiteelement(K; conforming=true)
+
+Hermite type finite element. Generates the Bogner-Fox-Schmit rectangle if `K` is a rectangle 
+and `conforming` is true.
+"""
+hermiteelement(K::Interval) = FiniteElement(
+    Q{1,3,K},
+    _combineforms(points(K, :corners), [ValueAtLF, DerivativeAtLF])
+)
+
+function hermiteelement(K::Rectangle; conforming=true)
+    if conforming
+        return FiniteElement(
+            Q{2,3,K},
+            _combineforms(points(K, :corners), [ValueAtLF, ∂xLF, ∂yLF, ∂xyLF])
+        )
+    else
+        return FiniteElement(
+            Q23R{K},
+            _combineforms(points(K, :corners), [ValueAtLF, ∂xLF, ∂yLF])
+        )
+    end
+end
+
+addelementtype!(
+    :hermite,
+    description="Hermite element",
+    domaintypes=[Interval, Rectangle],
+    makeelement=hermiteelement
+)
+
+makeelement(:hermite, IHat);
+makeelement(:hermite, QHat);
+

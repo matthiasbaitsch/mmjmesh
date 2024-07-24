@@ -10,6 +10,7 @@ include("validatemappings.jl")
     include("mappingstests.jl")
     include("mpolynomialstests.jl")
     include("fefunctionstests.jl")
+    include("finiteelementstests.jl")
 end
 
 end

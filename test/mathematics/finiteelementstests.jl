@@ -2,44 +2,58 @@ using Test
 
 using MMJMesh
 using MMJMesh.Mathematics
-using MMJMesh.Mathematics: P, Q, S, dimension, _dimension, basis
-
-p3 = Polynomial(1, 2, 3, 4)
-p11 = MPolynomial([0 1; 1 0], [1, 2])
-p23 = MPolynomial([1 2; 3 2], [1, 2])
-
-@test dimension(Q{1,4}()) == 5
-@test dimension(Q{1,4}) == 5
-@test dimension(Q{2,4}) == 25
-@test dimension(P{2,3}) == 10
-@test dimension(P{2,4}) == _dimension(P{2,4})
-@test dimension(S{2,2}) == 8
-@test dimension(S{2,3}) == 12
-
-@test [1] ∉ Q{2,1}
-@test [1, 1] ∈ Q{2,1}
-@test [1, 1, 1] ∉ Q{2,1}
-
-@test p3 ∈ Q{1,3}
-@test p3 ∈ Q{1,4}
-@test p3 ∉ Q{1,2}
-@test p3 ∉ Q{2,2}
-@test p23 ∉ P{1,10}
-@test p23 ∈ P{2,5}
-@test p23 ∈ P{2,4}
-@test p23 ∉ P{2,3}
-@test p23 ∉ P{3,10}
-@test p23 ∉ Q{1,10}
-@test p23 ∈ Q{2,3}
-@test p23 ∈ Q{2,4}
-@test p23 ∉ Q{2,2}
-@test p23 ∉ Q{3,10}
-@test p11 ∈ S{2,2}
-@test p23 ∉ S{2,2}
-@test p23 ∉ S{2,3}
-
-@test basis(P{1,3}, IHat) == monomials(0:3, IHat)
-@test basis(P{1,3}(), IHat) == monomials(0:3, IHat)
-@test basis(Q{2,1}, QHat) == mmonomials(2,1,QHat)
+using MMJMesh.Mathematics: _combineforms
 
 
+# -------------------------------------------------------------------------------------------------
+# Test _combineforms
+# -------------------------------------------------------------------------------------------------
+
+@test _combineforms(points(IHat, :corners), ValueAtLF) |> length == 2
+@test _combineforms(
+    [points(IHat, :corners), points(IHat, :sides, 2), points(IHat, :interior, 2)],
+    ValueAtLF
+) |> length == 4
+@test _combineforms(points(QHat, :corners), ValueAtLF) |> length == 4
+@test _combineforms(points(QHat, :corners), [ValueAtLF, ∂xLF, ∂yLF]) |> length == 12
+@test _combineforms(
+    [points(QHat, :corners), points(QHat, :sides, 0), points(QHat, :interior, 0)],
+    [ValueAtLF, ∂xLF, ∂yLF]
+) |> length == 12
+
+
+# -------------------------------------------------------------------------------------------------
+# Test makeelement
+# -------------------------------------------------------------------------------------------------
+
+e1 = makeelement(:lagrange, QHat, k=5);
+e2 = makeelement(:lagrange, QHat, k=5);
+e3 = makeelement(:lagrange, QHat, k=8);
+e4 = makeelement(:lagrange, QHat, k=8);
+e5 = makeelement(:hermite, QHat);
+e6 = makeelement(:hermite, QHat, conforming=false);
+@test e1 === e2
+@test e1 != e3
+@test e3 === e4
+@test e5 != e6
+
+
+# -------------------------------------------------------------------------------------------------
+# Validate elements
+# -------------------------------------------------------------------------------------------------
+
+function validate(e::FiniteElement; atol)
+    N = dimension(e.P)
+    ϕ = nodalbasis(e)
+    for i = 1:N, j = 1:N
+        @test isapprox(e.N[i](ϕ[j]), i == j, atol=atol)
+    end
+end
+
+validate(makeelement(:lagrange, IHat, k=1), atol=1e-14)
+validate(makeelement(:lagrange, QHat, k=1), atol=1e-14)
+validate(makeelement(:lagrange, QHat, k=8), atol=1e-8)
+validate(makeelement(:serendipity, QHat, k=2), atol=1e-14)
+validate(makeelement(:hermite, IHat), atol=1e-14)
+validate(makeelement(:hermite, QHat), atol=1e-14)
+validate(makeelement(:hermite, QHat, conforming=false), atol=1e-14)

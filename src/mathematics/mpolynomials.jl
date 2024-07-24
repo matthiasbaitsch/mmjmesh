@@ -77,7 +77,7 @@ Base.:(==)(p1::MPolynomial{N,D}, p2::MPolynomial{N,D}) where {N,D} = (p1.p == p2
 
 
 """
-	mmonomials(n::Integer, p::Integer, dom=R^n, predicate=(...) -> true)
+	mmonomials(n::Integer, p::Integer, dom=R^n, predicate=(...) -> true; type=Float64)
 
 Generate multivariate momonials of `n` components up to degree `p`. Optionally, a domain
 and a predicate can be specified

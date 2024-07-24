@@ -24,7 +24,7 @@ using MMJMesh.Topologies
 using MMJMesh.Mathematics
 
 # Exports
-export mplot, mconf, fplot, fplot3d, vplot
+export mplot, mconf, fplot, fplot3d, vplot, feplot, feconf
 
 # Parts
 include("helperfunctions.jl")
@@ -35,5 +35,6 @@ include("mplot.jl")
 include("fplot.jl")
 include("vplot.jl")
 include("fplot3d.jl")
+include("feplot.jl")
 
 end

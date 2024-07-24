@@ -1,3 +1,7 @@
+# -------------------------------------------------------------------------------------------------
+# Basic functionality
+# -------------------------------------------------------------------------------------------------
+
 
 """ The real numbers """
 const R = -Inf .. Inf
@@ -51,3 +55,60 @@ const InR2 = InRⁿ{2}
 const InR² = InR2
 const InR3 = InRⁿ{3}
 const InR³ = InR3
+
+
+# -------------------------------------------------------------------------------------------------
+# Points on domain
+# -------------------------------------------------------------------------------------------------
+
+""" 
+    points(K, on, n=0)
+
+Pick certain points from domain `K` at locations `on` which can take the following values
+
+- `:corners` -- Returns points on corners of the domain
+
+- `:sides` -- Gives `n` points equidistantly distributed on each side
+
+- `:interior` -- Generates `n` by `n` points in the interior
+"""
+function points(K::AbstractInterval, on::Symbol, n::Integer=0)
+    p1 = leftendpoint(K)
+    p2 = rightendpoint(K)
+    h = 1 // (n + 1)
+    s = h:h:1-h
+
+    if on == :corners
+        return [p1, p2]
+    elseif on == :interior
+        return p1 .+ s' .* (p2 - p1) |> vec
+    elseif on == :sides
+        return []
+    end
+
+    error("Illegal value for on: $on")
+end
+
+function points(K::Rectangle, on::Symbol, n::Integer=0)
+    p11, p12 = leftendpoint(K)
+    p21, p22 = rightendpoint(K)
+    c = [SA[p11, p12], SA[p21, p12], SA[p21, p22], SA[p11, p22]]
+    h = 1 // (n + 1)
+    s = h:h:1-h
+    flatten(x) = reduce(vcat, x)
+
+    if on == :corners
+        return c
+    elseif on == :sides
+        return [
+            [SVector{2,Float64}(c) for c in eachcol((c[i] .+ (s' .* (c[i%4+1] - c[i]))))]
+            for i = 1:4
+        ] |> flatten
+    elseif on == :interior
+        p1 = p11 .+ s' .* (p21 - p11)
+        p2 = p12 .+ s' .* (p22 - p12)
+        return reshape([SA[p1[i], p2[j]] for i = 1:n, j = 1:n], :, 1) |> vec
+    end
+    error("Illegal value for on: $on")
+end
+
