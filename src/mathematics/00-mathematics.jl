@@ -37,7 +37,8 @@ export InR, InRⁿ, InR2, InR², InR3, InR³, InRnxm, InRⁿˣᵐ
 export points, dimension
 
 # General concept of mapping
-export AbstractMapping, MappingFromR, MappingFromRn, FunctionToR, FunctionRToR, FunctionRnToR
+export AbstractMapping, MappingFromR, MappingFromRn, FunctionToR
+export FunctionRToR, FunctionRnToR, MappingRnToRm
 export domaintype, codomaintype, domain, degree, degrees, valueat
 export derivativeat, derivative, pderivativeat, pderivative
 export antiderivative, integrate, sample, plot, pois, roots
@@ -52,6 +53,9 @@ export Zero, One
 export gradient, gradientat, hessian, hessianat, laplacian, laplacianat, ∇, H, Δ
 export ProductFunction
 export ∂x, ∂y, ∂xx, ∂yy, ∂xy
+
+# Mappings Rn to Rm
+export jacobian, jacobianat
 
 # Vector fields
 export VectorField, div, divergence, divergenceat

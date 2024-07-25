@@ -85,11 +85,6 @@ type `CT`. For instance, the second derivative of a function R2 to R is a 2x2 ma
 derivativetype(f::T, n::Integer=1) where {T<:AbstractMapping} = derivativetype(typeof(f), n)
 derivativetype(::Type{<:AbstractMapping{DT,CT}}, n::Integer) where {DT,CT} =
     derivativetype(DT, CT, n)
-
-
-# _concretetype(::Type{InRⁿ{N}}) where {N} = SVector{N,Float64}
-# _concretetype(::Type{InR}) = Float64
-
 derivativetype(::Type{InR}, t, ::Integer=1) = t
 
 function derivativetype(::Type{InRⁿ{N}}, ::Type{InR}, n::Int) where {N}
@@ -228,8 +223,9 @@ derivativeat(f::ProductMapping{DT}, x::DT, n::Integer=1) where {DT} = sum(
 )
 Base.show(io::IO, m::ProductMapping) = print(io, m.m1, " * ", m.m2)
 Base.:(==)(m1::ProductMapping{DT,CT,D}, m2::ProductMapping{DT,CT,D}) where {DT,CT,D} =
-    (m1.m1 == m2.m1 && m1.m2 == m2.m2)    
+    (m1.m1 == m2.m1 && m1.m2 == m2.m2)
 Base.promote_op(*, ::Type{InR}, ::Type{InRⁿ{N}}) where {N} = InRⁿ{N}
+Base.promote_op(*, ::Type{InR}, ::Type{InR}) = InR
 
 
 # Mapping divided by mapping, only useful if `/` is defined for type `CT`
@@ -269,7 +265,12 @@ Base.:(==)(m1::ComposedMapping{DT,CT,D}, m2::ComposedMapping{DT,CT,D}) where {DT
     (m1.m1 == m2.m1 && m1.m2 == m2.m2)
 
 
-# Mapping from components
+"""
+    MappingFromComponents(c1, c2, ..., cn)
+
+Construct a mapping ``X \\to Z`` from Mappings ``c_k: X \\to Y, k = 1, \\dots, n`` 
+such that ``Z = Y^n``.
+"""
 struct MappingFromComponents{DT,CT,D} <: AbstractMapping{DT,CT,D}
     components
     MappingFromComponents(components::AbstractMapping{DT,InR,D}...) where {DT,D} =
@@ -280,19 +281,31 @@ end
 
 valueat(m::MappingFromComponents{DT,CT,D}, x::DT) where {DT,CT,D} =
     SVector{size(CT, 1)}([valueat(m.components[i], x) for i ∈ eachindex(m.components)])
-derivativeat(m::MappingFromComponents{DT,CT,D}, x::DT, n::Integer=1) where {DT,CT,D} =
-    SVector{size(CT, 1)}([derivativeat(m.components[i], x, n) for i ∈ eachindex(m.components)])
 derivative(m::MappingFromComponents, n::Integer=1) =
     MappingFromComponents([derivative(c, n) for c ∈ m.components]...)
 
-function valueat(
-    m::MappingFromComponents{DT,InRⁿˣᵐ{N,M},D}, x::DT
-) where {DT,N,M,D}
+derivativeat(m::MappingFromComponents{DT,CT,D}, x::DT, n::Integer=1) where {DT,CT,D} =
+    SVector{size(CT, 1)}([derivativeat(m.components[i], x, n) for i ∈ eachindex(m.components)])
+
+# Derivative of mapping Rn to Rm (Jacobian)
+function derivativeat(
+    m::MappingFromComponents{InRⁿ{N},InRⁿ{M},D}, x::InRⁿ{N}, n::Integer=1
+) where {N,M,D}
+    @assert n == 1
+    J = MMatrix{M,N,Float64}(undef)
+    for i = 1:M
+        J[i, :] = derivativeat(m.components[i], x)
+    end
+    return J
+end
+
+# Value of mapping to Rn x Rm
+function valueat(m::MappingFromComponents{DT,InRⁿˣᵐ{N,M},D}, x::DT) where {DT,N,M,D}
     v = MMatrix{N,M,Float64}(undef)
     for i = 1:N
         v[i, :] = valueat(m.components[i], x)
     end
-    v
+    return v
 end
 
 Base.getindex(m::MappingFromComponents, i::Integer) = m.components[i]
@@ -558,14 +571,15 @@ function integrate(f::FunctionRnToR{2}, I1::Interval, I2::Interval)
     F = antiderivative(f, [1, 1])
     return F(a, c) + F(b, d) - F(a, d) - F(b, c)
 end
-integrate(f::FunctionRnToR{2}, d::DomainSets.Rectangle) = 
+integrate(f::FunctionRnToR{2}, d::DomainSets.Rectangle) =
     integrate(f, DomainSets.component(d, 1), DomainSets.component(d, 2))
 
 
 """
-    ProductFunction(fs::FunctionRToR...)
+    ProductFunction(f1, f2, ..., fn)
 
-Construct product function such as ``h(x, y) = f(x) g(y)``.
+Construct product function ``p: R^n \\to R`` with 
+``p(x_1, x_2, ..., x_n) = f_1(x_1) \\cdot f_2(x_2) \\cdot \\dots \\cdot f_n(x_n)``.
 """
 struct ProductFunction{N,D} <: FunctionRnToR{N,D}
     factors::Vector{FunctionRToR}
@@ -594,10 +608,19 @@ Base.:(==)(f1::ProductFunction, f2::ProductFunction) = f1.factors == f2.factors
 
 
 # -------------------------------------------------------------------------------------------------
+# Mappings Rn to Rm
+# -------------------------------------------------------------------------------------------------
+
+const MappingRnToRm{N,M,D} = AbstractMapping{InRⁿ{N},InRⁿ{M},D}
+
+jacobian(m::MappingRnToRm) = derivative(m)
+jacobianat(m::MappingRnToRm, x) = derivativeat(m, x)
+
+# -------------------------------------------------------------------------------------------------
 # Vector fields
 # -------------------------------------------------------------------------------------------------
 
-const VectorField{N,D} = AbstractMapping{InRⁿ{N},InRⁿ{N},D}
+const VectorField{N,D} = MappingRnToRm{N,N,D}
 
 divergence(v::VectorField{N}) where {N} = sum([derivative(v[i], _nn(N, i)) for i = 1:N])
 divergenceat(v::VectorField{N}, x::InRⁿ{N}) where {N} =

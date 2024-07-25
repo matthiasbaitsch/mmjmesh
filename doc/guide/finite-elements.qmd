@@ -124,3 +124,8 @@ Nicely formatted output. TODO: Handle LaTeX-String from `latexify`
 $$
     \mathbf{K}^\mathrm{e} = \frac{1}{6ab} \cdot `{julia} latexify(Ke, env=:raw)`
 $$
+
+```{julia}
+be(v) = integrate(v, (0 .. a) × (0 .. b))
+re = simplify.(expand.([be(n1) for n1 ∈ L21p]))
+```

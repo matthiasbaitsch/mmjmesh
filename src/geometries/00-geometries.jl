@@ -4,6 +4,8 @@ module Geometries
 using StaticArrays
 using LinearAlgebra
 
+import DomainSets
+
 using MMJMesh
 using MMJMesh.MMJBase
 using MMJMesh.Mathematics

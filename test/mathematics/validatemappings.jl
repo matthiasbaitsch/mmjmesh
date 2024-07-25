@@ -1,5 +1,12 @@
 using IntervalSets
-using FiniteDifferences
+
+import Random
+import DomainSets
+import FiniteDifferences
+
+using MMJMesh.Mathematics
+using MMJMesh.Geometries: Box, parametrization
+
 
 function _sample(I::Interval)
     xi = [
@@ -12,24 +19,31 @@ function _sample(I::Interval)
     return a .+ (b - a) * xi
 end
 
-function _validatederivatives(m::T, atol::Real, rtol::Real) where {T<:MappingFromR}
+
+function _sample(r::DomainSets.Rectangle)
+    @assert isfinite(r)
+    Random.seed!(1234)
+    N = DomainSets.dimension(r)
+    F = parametrization(Box(r))
+    return F.([-1 .+ 2 * rand(N) for _ = 1:10])
+end
+
+
+# Validate derivatives for function R to R
+function _validatederivatives(m::MappingFromR, atol::Real, rtol::Real)
     ed1 = m
     for n ∈ 1:5
-        fd = central_fdm(8, n)
+        fd = FiniteDifferences.central_fdm(8, n)
         ed1 = ed1'
         ed2 = derivative(m, n)
+
+        @test ed1 == ed2
+
         for x ∈ _sample(domain(m))
             d1 = derivativeat(m, x, n)
             d2 = ed1(x)
             d3 = ed2(x)
             d4 = fd(m, x)
-
-            if ed1 != ed2
-                println(ed1)
-                println(ed2)
-            end
-
-            @test ed1 == ed2
             @test d1 ≈ d2
             @test d1 ≈ d3
             @test isapprox(d1, d4, atol=atol, rtol=rtol)
@@ -37,8 +51,51 @@ function _validatederivatives(m::T, atol::Real, rtol::Real) where {T<:MappingFro
     end
 end
 
-function _validateantiderivative(f::T) where {T<:MappingFromR}
-    fd = central_fdm(8, 1)
+
+# Validate derivatives for functions Rn to R
+function _validatederivatives(f::FunctionRnToR, atol::Real, rtol::Real)
+
+    # Validate gradient
+    ed1 = f'
+    ed2 = gradient(f)
+    @test ed1 == ed2
+    for x ∈ _sample(domain(f))
+        d1 = gradientat(f, x)
+        d2 = ed1(x)
+        d3 = ed2(x)
+        d4 = FiniteDifferences.grad(FiniteDifferences.central_fdm(2, 1), f, Vector(x))[1]
+        @test d1 ≈ d2
+        @test d1 ≈ d3
+        @test isapprox(d1, d4, atol=atol, rtol=rtol)
+    end
+
+    # Validate Hessian
+    _validatederivatives(gradient(f), atol, rtol)
+end
+
+
+# Validate derivatives for mappings Rn to Rm
+function _validatederivatives(m::MappingRnToRm, atol::Real, rtol::Real)
+    ed1 = m'
+    ed2 = jacobian(m)
+    @test ed1 == ed2
+    for x ∈ _sample(domain(m))
+        d1 = jacobianat(m, x)
+        d2 = ed1(x)
+        d3 = ed2(x)
+        d4 = FiniteDifferences.jacobian(FiniteDifferences.central_fdm(2, 1), m, Vector(x))[1]
+
+        @test derivativeat(m, x) == derivativeat(m, x, 1)
+
+        @test d1 ≈ d2
+        @test d1 ≈ d3
+        @test isapprox(d1, d4, atol=atol, rtol=rtol)
+    end
+end
+
+
+function _validateantiderivative(f::MappingFromR)
+    fd = FiniteDifferences.central_fdm(8, 1)
     F = antiderivative(f)
     for x ∈ _sample(domain(f))
         v1 = f(x)
@@ -47,19 +104,36 @@ function _validateantiderivative(f::T) where {T<:MappingFromR}
     end
 end
 
-function validate(f::T; atol::Real=0.0, rtol::Real=1e-5) where {T<:MappingFromR}
-    # Derivatives
-    _validatederivatives(f, atol, rtol)
+_validatecodomaintype(x, ::Type{<:InR}) = x isa Real
+_validatecodomaintype(x, ::Type{<:InRⁿ{N}}) where {N} = (size(x) == (N,))
+_validatecodomaintype(x, ::Type{<:InRⁿˣᵐ{N,M}}) where {N,M} = size(x) == (N, M)
 
-    # Antiderivative for function R to R
-    if f isa FunctionRToR
+function _validatecodomaintype(m::AbstractMapping)
+    for x ∈ _sample(domain(m))
+        @test _validatecodomaintype(valueat(m, x), codomaintype(m))
+    end
+    return true
+end
+
+
+function validate(m::AbstractMapping; atol::Real=0.0, rtol::Real=1e-5)
+
+    # Types
+    _validatecodomaintype(m)
+
+    # Derivatives
+    _validatederivatives(m, atol, rtol)
+
+    # Antiderivative
+    if m isa FunctionRToR
         try
-            _validateantiderivative(f)
+            _validateantiderivative(m)
         catch e
             if !(e isa MMJMesh.MMJBase.NotImplementedError)
                 rethrow(e)
             end
         end
     end
+    return true
 end
 

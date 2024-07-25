@@ -96,7 +96,7 @@ o1 = One{InR,R}()
 @test One(Sin()) === o1
 @test o1(1) == 1
 @test derivativeat(o1, 1) == 0
-validate(o1, atol=1e-8)
+@test validate(o1, atol=1e-8)
 
 o3 = One{InRⁿ{3},R3}()
 @test valueat(o3, [1, 2, 3]) == 1
@@ -115,13 +115,13 @@ o3 = One{InRⁿ{3},R3}()
 # Parametric curve
 g = MappingFromComponents(Sin(), Cos())
 
+@test validate(g)
 @test g[1] == Sin()
 @test valueat(g, 1.0) == [sin(1.0), cos(1.0)]
 @test derivativeat(g, 1.0, 1) == [cos(1), -sin(1)]
 @test derivativeat(g, 1.0, 2) ≈ [-sin(1), -cos(1)]
 @test derivative(g, 1)(1.0) ≈ derivativeat(g, 1.0, 1)
 @test derivative(g, 2)(1.0) ≈ derivativeat(g, 1.0, 2)
-# TODO generic test
 
 # To matrix
 m1 = MappingFromComponents(Sin(), 2 * Cos())
@@ -132,14 +132,23 @@ m3 = MappingFromComponents(m1, m2)
 
 # Vector field R2 -> R2
 x = SVector(1.0, 2.0)
-f1 = MPolynomial([1 2; 2 1], [1, 2])
-f2 = ProductFunction(Sin(), Cos())
+d = (0 .. 3) × (1 .. 5)
+f1 = MPolynomial([1 2; 2 1], [1, 2], d)
+f2 = ProductFunction(Sin(0 .. 3), Cos(1 .. 5))
 g = MappingFromComponents(f1, f2)
 
+@test validate(g)
 @test valueat(g, x) == [f1(x), f2(x)]
-@test g(x) == [f1(x), f2(x)]
-# TODO generic test
-
+@test g(x) == valueat(g, x)
+@test divergenceat(g, x) == derivativeat(f1, x, [1, 0]) + derivativeat(f2, x, [0, 1])
+@test divergence(g)(x) == divergenceat(g, x)
+@test div(g)(x) == divergenceat(g, x)
+@test derivativeat(g, x) == [
+    derivativeat(f1, x, [1, 0]) derivativeat(f1, x, [0, 1])
+    derivativeat(f2, x, [1, 0]) derivativeat(f2, x, [0, 1])
+]
+@test jacobian(g)(x) == derivativeat(g, x)
+@test jacobianat(g, x) == derivativeat(g, x)
 
 # -------------------------------------------------------------------------------------------------
 # Ad hoc mapping
@@ -156,17 +165,17 @@ f = makefunction(x -> sin(x[1]) * sin(x[2]), 0 .. 5π, 0 .. 5π)
 # Sine and Cosine
 s = Sin(0 .. 2π)
 c = Cos(0 .. 2π)
-validate(s)
-validate(antiderivative(s))
-validate(c)
-validate(antiderivative(c))
+@test validate(s)
+@test validate(antiderivative(s))
+@test validate(c)
+@test validate(antiderivative(c))
 @test antiderivative(Sin(), 2) == -Sin()
 
 # Polynomials
 p = Polynomial(4, 6, 1, 9, 2, -1)
 @test degree(p) == 5
-validate(p)
-validate(antiderivative(p))
+@test validate(p)
+@test validate(antiderivative(p))
 
 # Constructor
 @test Polynomial([1, 2, 3]) == Polynomial(1, 2, 3)
@@ -181,7 +190,9 @@ validate(antiderivative(p))
 # Lagrange
 p = [0, 1, 3, 4, 5.5]
 l4 = lagrangepolynomials(p, 0 .. 5.5)
-validate.(l4, atol=1e-4)
+for l ∈ l4
+    @test validate(l, atol=1e-4)
+end
 for i ∈ 1:5, j ∈ 1:5
     @test isapprox(l4[i](p[j]), i == j ? 1 : 0, atol=1e-14)
 end
@@ -228,6 +239,7 @@ using MMJMesh.Mathematics: _nn
 f = ProductFunction(Sin(0 .. 1), Cos(0.5 .. 5))
 x = SVector(1.0, 2.0)
 
+@test validate(f)
 @test domain(f) == (0 .. 1) × (0.5 .. 5)
 @test valueat(f, x) == sin(1) * cos(2)
 @test derivativeat(f, x, [1, 0]) ≈ cos(1.0) * cos(2.0)
@@ -271,13 +283,12 @@ hf = derivative(f, 2)
 @test H(f) == derivative(f, 2)
 @test Δ(f)(x) ≈ laplacianat(f, x)
 
-# TODO Generic test
-
 
 # Product function three variables
 f = ProductFunction(Sin(1 .. 2), Cos(3 .. 4), Polynomial([2, 3], 6 .. 7))
 x = SVector(1.0, 2.0, 3.0)
 
+@test validate(f)
 @test domain(f) == (1 .. 2) × (3 .. 4) × (6 .. 7)
 @test valueat(f, x) == sin(1) * cos(2) * 11
 @test derivativeat(f, x, 1) ≈ [cos(1) * cos(2) * 11, -sin(1) * sin(2) * 11, sin(1) * cos(2) * 3]
@@ -289,7 +300,6 @@ x = SVector(1.0, 2.0, 3.0)
 @test derivative(f, 2)(x) ≈ derivativeat(f, x, 2)
 @test derivativeat(f, x, 1) isa SVector{3,Float64}
 @test derivativeat(f, x, 2) isa SMatrix{3,3,Float64}
-# TODO Generic test
 
 
 # Antiderivative
@@ -314,7 +324,7 @@ c = ParametricCurve(Sin(), Cos())
 @test derivativeat(c, 0, 2) ≈ [0, -1]
 @test c'(0) ≈ [1, 0]
 @test c''(0) ≈ [0, -1]
-validate(c)
+@test validate(c)
 
 n = UnitNormal(c)
 @test n(0.0) ≈ [0, 1]
@@ -345,7 +355,7 @@ m4 = Polynomial([0, 0, 1], 0 .. 4)
 @test 2 * m1 + 3 * m2 == 5 * m1
 @test (-1) * ((-1) * m1) == m1
 @test (-1) * (-m1) == m1
-validate(2 * m1, rtol=1e-4)
+@test validate(2 * m1, rtol=1e-4)
 
 # Add and subtract
 @test m1 + zero(m1) == m1
@@ -356,22 +366,24 @@ validate(2 * m1, rtol=1e-4)
 @test antiderivative(m1 + m3) == -Cos() + Sin()
 @test m1 - m1 == zero(m1)
 @test m3 - m1 == Cos() - Sin()
-validate(m1 + m3, rtol=1e-4)
+@test validate(m1 + m3, rtol=1e-4)
 
 # Composition m5 = Sin(x^2)
 m5 = m1 ∘ m4
 @test m5' == (Cos() ∘ Polynomial([0, 0, 1], 0 .. 4)) * Polynomial([0, 2], 0 .. 4)
 @test isapprox(m5(√π), 0, atol=1e-15)
-validate(m5, rtol=1e-4)
+@test validate(m5, rtol=1e-4)
 
 # Product
 p = m1 * m2
-validate(p)
+@test validate(p)
+
+##
 
 # Quotient
 p = m1 / m3
 @test p(0.2) ≈ tan(0.2)
-validate(p, rtol=1e-4)
+@test validate(p, rtol=1e-4)
 f = 2 / Polynomial(0, 1)
 @test f(0.2) ≈ 10
 @test pois(f) == [0]
@@ -422,5 +434,3 @@ v = MappingFromComponents(ProductFunction(Sin(), Cos()), ProductFunction(Cos(), 
 @test divergenceat(v, [1.0, 2.0]) == divergenceat(v, x)
 @test divergence(v)(x) ≈ divergenceat(v, x)
 @test div(v) == divergence(v)
-
-

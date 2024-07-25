@@ -12,9 +12,11 @@ using MMJMesh.Mathematics: _simplify, _isintegervalue, _integerize, _integerize!
 # -------------------------------------------------------------------------------------------------
 
 x = [1, 2, 3]
-f = MPolynomial([3 1; 1 1; 0 2], [-2.0, 3.0])
-g = MPolynomial([3 1 1; 1 1 2; 2 2 3], [1.0, 2.0, 4.0])
+f = MPolynomial([3 1; 1 1; 0 2], [-2.0, 3.0], (1 .. 3) × (0 .. 2π) × (2 .. 8))
+g = MPolynomial([3 1 1; 1 1 2; 2 2 3], [1.0, 2.0, 4.0], (1.1 .. 5.2) × (0.1 .. 0.4) × (1.8 .. 1.9))
 
+@test validate(f)
+@test validate(g)
 @test f == f
 @test f(x) == 50
 @test (3.1 * f)(x) == 3.1 * 50
@@ -149,5 +151,3 @@ F = antiderivative(f, [1, 1])
 f = MPolynomial([1; 0;;], [1])
 F = antiderivative(f, [1, 1])
 @test F.p.coefficients[1] == 0.5
-
-# TODO generic test
