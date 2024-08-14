@@ -29,23 +29,30 @@ vt = MMJMesh.Mathematics.TransposeMapping(jacobian(v))
 
 C1 = [1, 2]
 C2 = [1.0 2.0; 3.0 4.0]
-L11 = MappingFromComponents(nodalbasis(makeelement(:lagrange, IHat, k=1))...)
+L11 = nodalbasis(makeelement(:lagrange, IHat, k=1))
+L11c = MappingFromComponents(L11...)
 
 # Interpolate numbers
-m1 = Interpolation(L11, C1)
+m1 = Interpolation(L11c, C1)
 @test m1(-1) == 1.0
 @test m1(0) == 1.5
 @test m1(1) == 2.0
 validate(m1, atol=1e-7)
 
 # Interpolate vectors
-m2 = Interpolation(L11, C2)
+m2 = Interpolation(L11c, C2)
 n = UnitNormal(m2)
 @test m2(-1) == [1, 3]
 @test m2(0) == [1.5, 3.5]
 @test m2(1) == [2, 4]
 validate(m2, atol=1e-6)
 @test n(0) ≈ [-sqrt(0.5), sqrt(0.5)]
+
+# Alternative constructor
+m1 = Interpolation(L11, C1)
+@test m1(-1) == 1.0
+
+## 
 
 
 # -------------------------------------------------------------------------------------------------

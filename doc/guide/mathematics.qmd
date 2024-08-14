@@ -69,10 +69,15 @@ w = 0.025 * ParametricCurve(Sin(), Cos()) ∘ Polynomial(0, 200)
 fplot(u, u + v, u + w)
 ```
 
+Interpolate points
+
 ```{julia}
-pts = tomatrix([[0.0, 0], [1.5, 1], [2, 0], [1.5, -1], [0, 0]])
-fig, ax = fplot(Interpolation(pts, 1))
-scatter!(ax, pts, color=:tomato)
+points = tomatrix([[0.0, 0], [1.5, 1], [2, 0], [1.5, -1], [0, 0]])
+L = lagrangepolynomials(range(IHat, size(points, 2)), IHat)
+u = Interpolation(L, points)
+
+fig, ax = fplot(u)
+scatter!(ax, points, color=:tomato)
 fig
 ```
 
