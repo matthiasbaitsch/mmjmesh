@@ -47,13 +47,19 @@ const ReferenceQuadrilateral = QHat
 dimension(::Rectangle{<:SVector{N}}) where {N} = N
 Base.isfinite(r::DomainSets.Rectangle) = all(isfinite.(r.a)) && all(isfinite.(r.b))
 
-""" Element types """
+""" Element of the real numbers """
 const InR = Real
+""" Element of the set of ``n``-tuples of real numbers """
 const InRⁿ{N} = SVector{N,<:Real}
+""" Element of the set of ``n \\times m``-matrices of real numbers """
 const InRⁿˣᵐ{N,M} = SMatrix{N,M,<:Real}
+""" Element of the set of pairs of real numbers """
 const InR2 = InRⁿ{2}
+""" Element of the set of pairs of real numbers """
 const InR² = InR2
+""" Element of the set of triples of real numbers """
 const InR3 = InRⁿ{3}
+""" Element of the set of triples of real numbers """
 const InR³ = InR3
 
 

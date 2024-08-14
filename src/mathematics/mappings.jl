@@ -611,20 +611,59 @@ Base.:(==)(f1::ProductFunction, f2::ProductFunction) = f1.factors == f2.factors
 # Mappings Rn to Rm
 # -------------------------------------------------------------------------------------------------
 
+"""
+    VectorField{N,D}
+
+A mapping ''R^n \\to R^m'' with ``n,m > 1``.
+"""
 const MappingRnToRm{N,M,D} = AbstractMapping{InRⁿ{N},InRⁿ{M},D}
 
+"""
+    jacobian(m::MappingRnToRm)
+
+Jacobian of the mapping `m`.
+"""
 jacobian(m::MappingRnToRm) = derivative(m)
-jacobianat(m::MappingRnToRm, x) = derivativeat(m, x)
+
+"""
+    jacobianat(m::MappingRnToRm, x::InRⁿ)
+
+Evaluates the jacobian of the mapping `m` at point `x`.
+"""
+jacobianat(m::MappingRnToRm, x::InRⁿ{N}) where {N} = derivativeat(m, x)
+
 
 # -------------------------------------------------------------------------------------------------
 # Vector fields
 # -------------------------------------------------------------------------------------------------
 
+"""
+    VectorField{N,D}
+
+A mapping ''R^n \\to R^n'' with ``n > `1`.
+"""
 const VectorField{N,D} = MappingRnToRm{N,N,D}
 
+"""
+    divergence(v::VectorField)
+
+Divergence of the vector field `v`.
+"""
 divergence(v::VectorField{N}) where {N} = sum([derivative(v[i], _nn(N, i)) for i = 1:N])
+
+"""
+    divergenceat(v::VectorField, x::InRⁿ)
+
+Evaluates the divergence of the vector field `v` at point `x`.
+"""
 divergenceat(v::VectorField{N}, x::InRⁿ{N}) where {N} =
     sum([derivativeat(v[i], x, _nn(N, i)) for i = 1:N])
+
+"""
+    div(v)
+
+Shorthand notation for `divergence(v)`
+"""
 Base.div(v::VectorField) = divergence(v)
 
 
@@ -687,7 +726,11 @@ Base.:(*)(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = Polynomial(p1.
 Base.:(==)(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = (D1 == D2 && p1.p == p2.p)
 
 
-# Lagrange polynomials
+"""
+    lagrangepolynomials(x, D=R)
+
+Lagrange polynomials for nodes ``x_0, \\dots, x_k`` defined on the domain `D`.
+"""
 function lagrangepolynomials(c::AbstractArray{<:Float64}, d=R)
     indices = 1:length(c)
     normalize(f, x) = 1 / f(x) * f
@@ -695,7 +738,11 @@ function lagrangepolynomials(c::AbstractArray{<:Float64}, d=R)
 end
 
 
-# Monomials
+"""
+    monomials(p, D=R)
+
+Monomials of degree ``p_1, \\dots, p_n`` defined on the domain `D`.
+"""
 function monomials(p::AbstractArray{<:Integer}, d=R)
     coeffs(pp) = [i == pp + 1 ? 1 : 0 for i in 1:pp+1]
     return [Polynomial(coeffs(n), d) for n in p]

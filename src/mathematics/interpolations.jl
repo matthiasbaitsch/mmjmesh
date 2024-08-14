@@ -9,28 +9,35 @@ Base.:(==)(t1::TransposeMapping, t2::TransposeMapping) = (t1.u == t2.u)
 
 
 """
-    Interpolation(h, C)
+    Interpolation(h::MappingToRn, C)
+    Interpolation(h::AbstractVector{<:FunctionToR}, C)
 
-The interpolating mapping ``m: R^n \\to Y`` with
+The interpolating mapping ``m: R^n \\to Y``
 
-  ``m(x) = \\sum_{i=1}^m h_i(x) C_i``
+``
+    m(x) = \\sum_{i=1}^m h_i(x) C_i
+``
 
-with interpolation functions ``h_i : R^n \\to R``, coefficients 
-``C_i \\in Y`` and ``Y \\in R^{k_1} \\times \\dots \\times R^{k_l}``.
+with interpolation functions ``h_i : R^n \\to R`` and coefficients 
+``C_i \\in Y`` where ``Y`` can be numbers or vectors.
 """
 struct Interpolation{DT,CT,D} <: AbstractMapping{DT,CT,D}
     functions::AbstractMapping{DT,<:InRⁿ,D}
     coefficients::AbstractVecOrMat{<:Real}
 
     Interpolation(
-        h::AbstractMapping{DT,<:AbstractVector,D}, C::AbstractVector{<:Real}
+        h::AbstractMapping{DT,<:InRⁿ,D}, C::AbstractVector{<:Real}
     ) where {DT,D} = new{DT,InR,D}(h, C)
 
     Interpolation(
-        h::AbstractMapping{DT,<:AbstractVector,D}, C::AbstractMatrix{<:Real}
-    ) where {DT,D} =
-        new{DT,InRⁿ{size(C, 1)},D}(h, C)
+        h::AbstractMapping{DT,<:InRⁿ,D}, C::AbstractMatrix{<:Real}
+    ) where {DT,D} = new{DT,InRⁿ{size(C, 1)},D}(h, C)
 end
+
+Interpolation(
+    h::AbstractVector{<:FunctionToR}, C::VecOrMat{<:Real}
+) = Interpolation(MappingFromComponents(h...), C)
+
 
 valueat(m::Interpolation{DT}, x::DT) where {DT} = _mul(m.coefficients, m.functions(x))
 Base.show(io::IO, m::Interpolation) =
