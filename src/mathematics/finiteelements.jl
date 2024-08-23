@@ -19,26 +19,25 @@ struct FiniteElement
     N::Vector{<:LinearForm}
     cache::Dict{Symbol,Any}
 
-    function FiniteElement(P::Type{<:FunctionSpace}, N::Vector{<:LinearForm})
+    function FiniteElement(K, P::Type{<:FunctionSpace}, N::Vector{<:LinearForm})
         @assert dimension(P) == length(N)
-        return new(domain(P), P, N, Dict{Symbol,Any}())
+        return new(K, P, N, Dict{Symbol,Any}())
     end
 end
 
 
 """
-    nodalbasis(e)
+    nodalbasis(e, d=e.K)
 
-Generate a nodal basis for element `e`. This default implementation might be overridden
-by specific element types.
+Generate a nodal basis for element `e` defined on `d`. This default implementation 
+might be overridden by specific element types. Option to specify domain only useful 
+for symbolic domains.
 """
-function nodalbasis(e::FiniteElement)
+function nodalbasis(e::FiniteElement, d=e.K)
     if :nodalbasis ∉ keys(e.cache)
-        nn = dimension(e.P)
-        ps = basis(e.P)
+        ps = basis(e.P, d)
         M = [n(p) for p in ps, n in e.N]
-        I = [i == j for i = 1:nn, j = 1:nn]
-        e.cache[:nodalbasis] = (M \ I) * ps
+        e.cache[:nodalbasis] = inv(M) * ps
     end
     return e.cache[:nodalbasis]
 end
@@ -136,7 +135,8 @@ Lagrange type finite element.
 function lagrangeelement(K, k::Integer)
     @assert k >= 1
     return FiniteElement(
-        Q{dimension(K),k,K},
+        K,
+        Q{dimension(K),k},
         _combineforms(
             [
                 points(K, :corners),
@@ -161,13 +161,14 @@ makeelement(:lagrange, QHat, k=1);
 """
     serendipityelement(K, k)
 
-Serendipity element (currently only for k=1,2)
+Serendipity element (currently only for rectangles and ``k=1,2``).
 """
 function serendipityelement(K::Rectangle, k::Integer)
     @assert 1 <= k <= 2
     @assert dimension(K) == 2
     return FiniteElement(
-        S{2,k,K},
+        K,
+        S{2,k},
         _combineforms(
             [
                 points(K, :corners),
@@ -194,19 +195,22 @@ Hermite type finite element. Generates the Bogner-Fox-Schmit rectangle if `K` is
 and `conforming` is true.
 """
 hermiteelement(K::Interval) = FiniteElement(
-    Q{1,3,K},
+    K,
+    Q{1,3},
     _combineforms(points(K, :corners), [ValueAtLF, DerivativeAtLF])
 )
 
 function hermiteelement(K::Rectangle; conforming=true)
     if conforming
         return FiniteElement(
-            Q{2,3,K},
+            K,
+            Q{2,3},
             _combineforms(points(K, :corners), [ValueAtLF, ∂xLF, ∂yLF, ∂xyLF])
         )
     else
         return FiniteElement(
-            Q23R{K},
+            K,
+            Q23R,
             _combineforms(points(K, :corners), [ValueAtLF, ∂xLF, ∂yLF])
         )
     end

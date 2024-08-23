@@ -57,3 +57,18 @@ validate(makeelement(:serendipity, QHat, k=2), atol=1e-14)
 validate(makeelement(:hermite, IHat), atol=1e-14)
 validate(makeelement(:hermite, QHat), atol=1e-14)
 validate(makeelement(:hermite, QHat, conforming=false), atol=1e-14)
+
+
+# -------------------------------------------------------------------------------------------------
+# Serendipity element with symbolic domain
+# -------------------------------------------------------------------------------------------------
+
+@variables a, b
+K = (0 .. a) × (0 .. b)
+e = makeelement(:serendipity, K, k=2)
+ϕ = nodalbasis(e, R2)
+
+for i = 1:8, j = 1:8
+    @test isequal(e.N[i](ϕ[j]), i == j)
+end
+

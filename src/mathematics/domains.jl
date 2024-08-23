@@ -107,7 +107,7 @@ function points(K::Rectangle, on::Symbol, n::Integer=0)
         return c
     elseif on == :sides
         return [
-            [SVector{2,Float64}(c) for c in eachcol((c[i] .+ (s' .* (c[i%4+1] - c[i]))))]
+            [SVector{2}(c) for c in eachcol((c[i] .+ (s' .* (c[i%4+1] - c[i]))))]
             for i = 1:4
         ] |> flatten
     elseif on == :interior

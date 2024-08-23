@@ -1,4 +1,5 @@
 using Test
+using Symbolics
 using IntervalSets
 using DomainSets: ×
 
@@ -64,3 +65,12 @@ K = (1 .. 2) × (3 .. 5)
     [4 / 3, 11 / 3], [5 / 3, 11 / 3],
     [4 / 3, 13 / 3], [5 / 3, 13 / 3]
 ]
+
+@variables a, b
+K = (0 .. a) × (0 .. b)
+@test isequal(points(K, :corners), [[0, 0], [a, 0], [a, b], [0, b]])
+@test isequal(points(K, :sides, 1), [[a / 2, 0], [a, b / 2], [a / 2, b], [0, b / 2]])
+@test isequal(
+    points(K, :interior, 2),
+    [[a / 3, b / 3], [2a / 3, b / 3], [a / 3, 2b / 3], [2a / 3, 2b / 3]]
+)

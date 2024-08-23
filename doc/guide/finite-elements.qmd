@@ -109,11 +109,7 @@ Ke = simplify.(6 * a * b * [ae(n1, n2) for n1 ∈ L21, n2 ∈ L21], expand=true)
 Alternative derivation in physical coordinates
 
 ```{julia}
-V = [0 a a 0; 0 0 b b]
-N = [ValueAtLF(p) for p in eachcol(V)]
-PP = mmonomials(2, 1, QHat)
-M = [n(p) for p in PP, n in N]
-L21p = inv(M) * PP
+L21p = nodalbasis(makeelement(:lagrange, (0 .. a) × (0 .. b), k=1), R2)
 
 ae(u, v) = integrate(∇(u) ⋅ ∇(v), (0 .. a) × (0 .. b))
 Ke = simplify.(expand.(6 * a * b * [ae(n1, n2) for n1 ∈ L21p, n2 ∈ L21p]))

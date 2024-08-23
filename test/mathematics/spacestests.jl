@@ -12,27 +12,27 @@ using MMJMesh.Mathematics: P, Q, S, dimension, _dimension, basis
 # Example spaces
 # -------------------------------------------------------------------------------------------------
 
-const P22 = P{2,2,QHat}
-const P23 = P{2,3,QHat}
-const P24 = P{2,4,QHat}
-const P25 = P{2,5,QHat}
-const Q11 = Q{1,1,IHat}
-const Q12 = Q{1,2,IHat}
-const Q13 = Q{1,3,IHat}
-const Q14 = Q{1,4,IHat}
-const Q21 = Q{2,1,QHat}
-const Q22 = Q{2,2,QHat}
-const Q23 = Q{2,3,QHat}
-const Q24 = Q{2,4,QHat}
-const S22 = S{2,2,QHat}
-const S23 = S{2,3,QHat}
+const P22 = P{2,2}
+const P23 = P{2,3}
+const P24 = P{2,4}
+const P25 = P{2,5}
+const Q11 = Q{1,1}
+const Q12 = Q{1,2}
+const Q13 = Q{1,3}
+const Q14 = Q{1,4}
+const Q21 = Q{2,1}
+const Q22 = Q{2,2}
+const Q23 = Q{2,3}
+const Q24 = Q{2,4}
+const S22 = S{2,2}
+const S23 = S{2,3}
 
 
 # -------------------------------------------------------------------------------------------------
 # Dimension
 # -------------------------------------------------------------------------------------------------
 
-@test dimension(Q{1,4,IHat}()) == 5
+@test dimension(Q{1,4}()) == 5
 @test dimension(Q14) == 5
 @test dimension(Q24) == 25
 @test dimension(P23) == 10
@@ -58,38 +58,26 @@ p23 = MPolynomial([1 2; 3 2], [1, 2])
 @test p3 ∈ Q14
 @test p3 ∉ Q12
 @test p3 ∉ Q22
-@test p23 ∉ P{1,10,IHat}
-@test p23 ∈ P{2,5,QHat}
+@test p23 ∉ P{1,10}
+@test p23 ∈ P{2,5}
 @test p23 ∈ P24
 @test p23 ∉ P23
-@test p23 ∉ P{3,10,QHat}
-@test p23 ∉ Q{1,10,QHat}
-@test p23 ∈ Q{2,3,QHat}
+@test p23 ∉ P{3,10}
+@test p23 ∉ Q{1,10}
+@test p23 ∈ Q{2,3}
 @test p23 ∈ Q24
 @test p23 ∉ Q22
-@test p23 ∉ Q{3,10,QHat}
+@test p23 ∉ Q{3,10}
 @test p11 ∈ S22
 @test p23 ∉ S22
 @test p23 ∉ S23
-
 
 
 # -------------------------------------------------------------------------------------------------
 # Basis
 # -------------------------------------------------------------------------------------------------
 
-@test basis(P{1,3,IHat}) == monomials(0:3, IHat)
-@test basis(P{1,3,IHat}()) == monomials(0:3, IHat)
-@test basis(Q21) == mmonomials(2, 1, QHat)
-@test length(basis(Q23R{QHat})) == 12
-
-
-# -------------------------------------------------------------------------------------------------
-# Symbolic domains
-# -------------------------------------------------------------------------------------------------
-
-# TODO - Remove domain???
-# @variables a, b
-# K = (0 .. a) × (0 .. b)
-# QX = Q{2,1,K}()
-
+@test basis(P{1,3}, R) == monomials(0:3, R)
+@test basis(P{1,3}(), 1 .. 2) == monomials(0:3, 1 .. 2)
+@test basis(Q21, R²) == mmonomials(2, 1, R²)
+@test length(basis(Q23R, R²)) == 12
