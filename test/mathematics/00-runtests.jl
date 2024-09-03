@@ -9,6 +9,7 @@ include("validatemappings.jl")
     include("domainstests.jl")
     include("mappingstests.jl")
     include("mpolynomialstests.jl")
+    include("piecewisetests.jl")
     include("interpolationstests.jl")
     include("finiteelementstests.jl")
 end

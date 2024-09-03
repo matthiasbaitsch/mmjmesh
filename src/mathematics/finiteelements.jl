@@ -1,8 +1,22 @@
 """
-    FiniteElement(P, N)
+    hatfunctions(x::AbstractVector{<:Real})
+
+Given an ascending node vector ``x_1, x_2, \\dots, x_{N_N}``, returns the 1D piecewise 
+linear finite element basis functions ``\\varphi_1, \\dots, \\varphi_{N_N}`` such that
+``\\varphi_i(x_j) = \\delta_{ij}`` for ``i,j = 1, \\dots, N_N``.
+"""
+function hatfunctions(x::AbstractVector{<:Real})
+    N = length(x)
+    ei(i) = [i == j for j = 1:N]
+    return [interpolate(x, ei(i), order=1) for i = 1:N]
+end
+
+
+"""
+    FiniteElement(K, P, N)
 
 Construct a finite element ``(K, \\mathcal{P}, \\mathcal{N})``  according to
-Ciarlet's definition. Members are
+Ciarlet's definition. Parameters are
 
 - the domain `K`,
 

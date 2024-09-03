@@ -24,17 +24,42 @@ function MakieCore.plot!(plot::FPlot)
     for a ∈ plot.args
         f = a[]
         a, b = endpoints(domain(f))
-        xy = sample1d(f, a, b,
+        p = pois(f)
+
+        s1d(a, b) = sample1d(f, a, b,
             maxrecursion=att.maxrecursion[],
             maxangle=att.maxangle[],
             npoints=att.npoints[],
             yscale=att.yscale[],
             ir=att.ir[]
         )
+
+        if isempty(p)
+            xy = s1d(a, b)
+        else
+            δ = 1e-12 * (b - a)
+            x = Float32[]
+            y = Float32[]
+
+            s1da(a, b) = begin
+                xy = s1d(a, b)
+                append!(x, xy[1, :])
+                append!(y, xy[2, :])
+                push!(x, NaN)
+                push!(y, NaN)
+            end
+
+            s1da(a, p[1] - δ)
+            for i = 1:length(p)-1
+                s1da(p[i] + δ, p[i+1] - δ)
+            end
+            s1da(p[end] + δ, b)
+
+            xy = [x'; y']
+        end
+
+
         MakieCore.lines!(plot, xy)
-        # MakieCore.lines!(plot, x, y; plot.attributes)
-        # MakieCore.plot!(MakieCore.Lines, plot.attributes, x, y)
-        # MakieCore.plot!(MakieCore.Lines, rand(10))
     end
     return plot
 end

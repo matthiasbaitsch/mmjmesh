@@ -26,7 +26,7 @@ include("forms.jl")
 include("mpolynomials.jl")
 include("interpolations.jl")
 include("parametertypes.jl")
-
+include("piecewise.jl")
 include("spaces.jl")
 include("finiteelements.jl")
 
@@ -65,10 +65,11 @@ export ParametricCurve, UnitNormal
 
 # Special functions II
 export Sin, Cos
-export MPolynomial, mmonomials, simplifyx
+export MPolynomial, mmonomials, affinefunction, simplifyx
 export AdHocMapping, makefunction
 export AffineMapping
 export Polynomial, Interpolation, fromroots, lagrangepolynomials, monomials, lagrangebasis1d
+export PiecewiseFunction, npieces, interpolate
 
 # Forms
 export Form, LinearForm, BilinearForm, ValueAtLF, DerivativeAtLF, DDerivativeAtLF, PDerivativeAtLF
@@ -78,6 +79,6 @@ export ∂xLF, ∂yLF, ∂xyLF
 export FunctionSpace, PolynomialSpace, P, Q, S, Q23R, basis
 
 # Finite elements
-export FiniteElement, makeelement, nodalbasis
+export hatfunctions, FiniteElement, makeelement, nodalbasis
 
 end

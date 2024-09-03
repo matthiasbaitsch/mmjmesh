@@ -425,6 +425,9 @@ end
 The integral of the function `f` over the interval `I`.
 """
 function integrate(f::FunctionRToR, I::Interval)
+    if isempty(I)
+        return 0.0
+    end
     F = antiderivative(f)
     return F(rightendpoint(I)) - F(leftendpoint(I))
 end
@@ -750,6 +753,19 @@ end
 
 
 """
+    affinefunction(I₁::Interval, I₂::Interval)
+
+Affine function ``f: I_1 \\to I_2`` with ``f(I_1) = I_2``.
+"""
+function affinefunction(I1::Interval, I2::Interval)
+    a, b = endpoints(I1)
+    c, d = endpoints(I2)
+    s = (d - c) / (b - a)
+    return Polynomial(c - a * s, s)
+end
+
+
+"""
     AffineMapping(A, b)
 
 Creates the affine map `A*x + b`.
@@ -774,6 +790,8 @@ struct AffineMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
     end
 end
 
+degree(::AffineMapping) = 1
+
 valueat(m::AffineMapping{DT,CT}, x::DT) where {DT,CT} = CT(m.A * x + m.b)
 
 function derivativeat(m::AffineMapping{DT}, ::DT, n::Integer=1) where {DT}
@@ -785,7 +803,6 @@ function derivative(m::AffineMapping, n::Integer=1)
     n == 1 && return m.A * One(m)
     error("Not implemented yet")
 end
-
 
 
 # -------------------------------------------------------------------------------------------------

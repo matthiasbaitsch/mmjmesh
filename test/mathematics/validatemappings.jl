@@ -137,3 +137,15 @@ function validate(m::AbstractMapping; atol::Real=0.0, rtol::Real=1e-5)
     return true
 end
 
+
+function validateoperations(f1, f2)
+    h1 = f1 + f2
+    h2 = f1 * f2
+    h3 = π * f1
+    for x ∈ _sample(domain(f1) ∩ domain(f2))
+        @test h1(x) ≈ f1(x) + f2(x)
+        @test h2(x) ≈ f1(x) * f2(x)
+        @test h3(x) ≈ π * f1(x) 
+    end
+    return true
+end

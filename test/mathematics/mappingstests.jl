@@ -205,6 +205,12 @@ p = fromroots(c)
 # Monomials
 @test Polynomial([1, 2, 3, 4, 5]) == [1, 2, 3, 4, 5]' * monomials(0:4)
 
+# Affine function from one interval into another
+f = affinefunction(1 .. 2, 5 .. 1)
+@test degree(f) == 1
+@test f(1) == 5
+@test f(2) == 1
+@test integrate(f, 1..2) == 3
 
 # Affine map
 f = AffineMapping(2, 3)
