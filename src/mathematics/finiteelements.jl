@@ -2,7 +2,7 @@
     hatfunctions(x::AbstractVector{<:Real})
 
 Given an ascending node vector ``x_1, x_2, \\dots, x_{N_N}``, returns the 1D piecewise 
-linear finite element basis functions ``\\varphi_1, \\dots, \\varphi_{N_N}`` such that
+affine finite element basis functions ``\\varphi_1, \\dots, \\varphi_{N_N}`` with
 ``\\varphi_i(x_j) = \\delta_{ij}`` for ``i,j = 1, \\dots, N_N``.
 """
 function hatfunctions(x::AbstractVector{<:Real})
@@ -47,8 +47,16 @@ Generate a nodal basis for element `e` defined on `d`. This default implementati
 might be overridden by specific element types. Option to specify domain only useful 
 for symbolic domains.
 """
-function nodalbasis(e::FiniteElement, d=e.K)
+function nodalbasis(e::FiniteElement)
     if :nodalbasis ∉ keys(e.cache)
+        # Hack to handle domains with symbolic limits
+        d = e.K
+
+        if !(d |> eltype |> eltype |> isbitstype)
+            d = R^dimension(e.K)
+        end
+
+        # Generate nodal basis
         ps = basis(e.P, d)
         M = [n(p) for p in ps, n in e.N]
         e.cache[:nodalbasis] = inv(M) * ps
@@ -205,7 +213,7 @@ addelementtype!(
 """
     hermiteelement(K; conforming=true)
 
-Hermite type finite element. Generates the Bogner-Fox-Schmit rectangle if `K` is a rectangle 
+Hermite type finite element. Generates the Bogner-Fox-Schmit element (Braess, p. 72) if `K` is a rectangle 
 and `conforming` is true.
 """
 hermiteelement(K::Interval) = FiniteElement(

@@ -1,4 +1,7 @@
 using Test
+using Symbolics
+using IntervalSets
+using DomainSets: ×
 
 using MMJMesh
 using MMJMesh.Mathematics
@@ -60,15 +63,36 @@ validate(makeelement(:hermite, QHat, conforming=false), atol=1e-14)
 
 
 # -------------------------------------------------------------------------------------------------
-# Serendipity element with symbolic domain
+# Nodal basis
+# -------------------------------------------------------------------------------------------------
+
+e = makeelement(:serendipity, QHat, k=2)
+ϕ = nodalbasis(e)
+
+# Check that we get the domain right
+@test MMJMesh.Mathematics.domain(ϕ[1]) == QHat
+
+# Test nodal property
+for i = 1:8, j = 1:8
+    @test isequal(e.N[i](ϕ[j]), i == j)
+end
+
+
+# -------------------------------------------------------------------------------------------------
+# Handle symbolic domain
 # -------------------------------------------------------------------------------------------------
 
 @variables a, b
 K = (0 .. a) × (0 .. b)
 e = makeelement(:serendipity, K, k=2)
-ϕ = nodalbasis(e, R2)
+ϕ = nodalbasis(e)
 
+# Check that we get the domain right
+@test MMJMesh.Mathematics.domain(ϕ[1]) == R2
+
+# Test nodal property
 for i = 1:8, j = 1:8
     @test isequal(e.N[i](ϕ[j]), i == j)
 end
 
+̂̂
