@@ -5,5 +5,3 @@ demo/site_libs
 demo/*.ipynb
 demo/*.html
 *.cov
-
-doc/theory/theory.pdf

@@ -13,10 +13,23 @@ using LinearAlgebra
 CairoMakie.activate!()
 ```
 
+Variables and helper function
+
+```{julia}
+@variables a, b, x, y, l, EA, EI, ν
+
+function prettyprint(name, factor, value)
+    Nᵢ = name.s[2:end-1]
+    Nⱼ = latexify(simplify(factor), env=:raw)
+    s3 = latexify(simplify.(1 / factor * value, expand=true), env=:raw)
+    return L"%$Nᵢ = %$Nⱼ %$s3"
+end;
+```
+
 ## Elements
 
 ```{julia}
-fig = Figure(size=(800, 800))
+fig = Figure(size=(700, 700))
 Axis(fig)
 feplot(fig[1, 1], makeelement(:lagrange, IHat, k=1)) |> feconf()
 feplot(fig[1, 2], makeelement(:lagrange, IHat, k=3)) |> feconf()
@@ -34,17 +47,17 @@ fig
 Linear shape functions
 
 ```{julia}
-e = makeelement(:lagrange, IHat, k=1)
-ϕ = nodalbasis(e)
-fplot(ϕ...)
+makeelement(:lagrange, IHat, k=1) |> nodalbasis |> fplot
 ```
 
 Hermite polynomials
 
 ```{julia}
-e = makeelement(:hermite, 1 .. 4)
-ϕ = nodalbasis(e)
-fplot(ϕ...)
+N = nodalbasis(makeelement(:hermite, 1 .. 4))
+fig = Figure()
+fplot!(Axis(fig[1, 1], title="Functions"), N...)
+fplot!(Axis(fig[1, 2], title="Derivatives"), derivative.(N)...)
+fig
 ```
 
 Bilinear shape functions
@@ -70,29 +83,38 @@ Conforming rectangular plate element shape functions
 makeelement(:hermite, QHat) |> nodalbasis |> fplot3d
 ```
 
-## Finite element stiffness matrices
+Quadratic serendipity shape functions on the domain $[0, a] \times [0, b]$
 
 ```{julia}
-@variables l, a, b, EA, EI, ν;
+K = (0 .. a) × (0 .. b)
+N = nodalbasis(makeelement(:serendipity, K, k=2))
+
+prettyprint(L"\mathbf{N}(x, y)", 1 / (a^2 * b^2), [Nᵢ(x, y) for Nᵢ ∈ N])
 ```
+
+
+## Finite element stiffness matrices
 
 ### Truss
 
 ```{julia}
-L11 = nodalbasis(makeelement(:lagrange, IHat, k=1))
+N = nodalbasis(makeelement(:lagrange, IHat, k=1))
 D(u) = 2 / l * u'
-ae(u, δu) = EA * l / 2 * integrate(D(u) * D(δu), IHat)
-Ke = simplify.([ae(s1, s2) for s1 ∈ L11, s2 ∈ L11])
+aᵉ(u, δu) = EA * l / 2 * integrate(D(u) * D(δu), IHat)
+Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ N, Nⱼ ∈ N]
+
+prettyprint(L"\mathbf{K}^e", EA / l, Kᵉ)
 ```
 
 ### Beam
 
 ```{julia}
-H1 = nodalbasis(makeelement(:hermite, IHat))
-H1l = [H1[1], l / 2 * H1[2], H1[3], l / 2 * H1[4]]
+N = [1, l / 2, 1, l / 2] .* nodalbasis(makeelement(:hermite, IHat))
 D(w) = 4 / l^2 * w''
-ae(w, δw) = EI * l / 2 * integrate(D(w) * D(δw), IHat)
-Ke = simplify.(l^3 / EI * [ae(s1, s2) for s1 ∈ H1l, s2 ∈ H1l])
+aᵉ(w, δw) = EI * l / 2 * integrate(D(w) * D(δw), IHat)
+Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ N, Nⱼ ∈ N]
+
+prettyprint(L"\mathbf{K}^e", EI / l^3, Kᵉ)
 ```
 
 ### 2D Poisson equation
@@ -100,28 +122,28 @@ Ke = simplify.(l^3 / EI * [ae(s1, s2) for s1 ∈ H1l, s2 ∈ H1l])
 Integration on the reference quadrilateral
 
 ```{julia}
-L21 = nodalbasis(makeelement(:lagrange, QHat, k=1))
+N = nodalbasis(makeelement(:lagrange, QHat, k=1))
 D(u) = [2 / a * ∂x(u), 2 / b * ∂y(u)]
-ae(u, v) = a * b / 4 * integrate(D(u) ⋅ D(v), QHat)
-Ke = simplify.(6 * a * b * [ae(n1, n2) for n1 ∈ L21, n2 ∈ L21], expand=true)
+aᵉ(u, δu) = a * b / 4 * integrate(D(u) ⋅ D(δu), QHat)
+Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ N, Nⱼ ∈ N]
+
+prettyprint(L"\mathbf{K}^e", 1 / (6 * a * b), Kᵉ)
 ```
 
 Alternative derivation in physical coordinates
 
 ```{julia}
-L21p = nodalbasis(makeelement(:lagrange, (0 .. a) × (0 .. b), k=1), R2)
+K = (0 .. a) × (0 .. b)
+N = nodalbasis(makeelement(:lagrange, K, k=1))
+aᵉ(u, δu) = integrate(∇(u) ⋅ ∇(δu), K)
+Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ N, Nⱼ ∈ N]
 
-ae(u, v) = integrate(∇(u) ⋅ ∇(v), (0 .. a) × (0 .. b))
-Ke = simplify.(expand.(6 * a * b * [ae(n1, n2) for n1 ∈ L21p, n2 ∈ L21p]))
+prettyprint(L"\mathbf{K}^e", 1 / (6 * a * b), Kᵉ)
 ```
 
-Nicely formatted output. TODO: Handle LaTeX-String from `latexify`
-
-$$
-    \mathbf{K}^\mathrm{e} = \frac{1}{6ab} \cdot `{julia} latexify(Ke, env=:raw)`
-$$
-
 ```{julia}
-be(v) = integrate(v, (0 .. a) × (0 .. b))
-re = simplify.(expand.([be(n1) for n1 ∈ L21p]))
+bᵉ(δu) = integrate(δu, K)
+rᵉ = [bᵉ(Nᵢ) for Nᵢ ∈ N]
+
+prettyprint(L"\mathbf{r}^e", a * b / 4, rᵉ)
 ```
