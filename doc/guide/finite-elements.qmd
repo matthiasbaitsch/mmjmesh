@@ -19,10 +19,10 @@ Variables and helper function
 @variables a, b, x, y, l, EA, EI, ν
 
 function prettyprint(name, factor, value)
-    Nᵢ = name.s[2:end-1]
-    Nⱼ = latexify(simplify(factor), env=:raw)
+    s1 = name.s[2:end-1]
+    s2 = latexify(simplify(factor), env=:raw)
     s3 = latexify(simplify.(1 / factor * value, expand=true), env=:raw)
-    return L"%$Nᵢ = %$Nⱼ %$s3"
+    return L"%$s1 = %$s2 %$s3"
 end;
 ```
 
