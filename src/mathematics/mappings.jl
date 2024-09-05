@@ -553,11 +553,22 @@ const ∂yy = Operator(f -> derivative(f, [0, 2]))
 const ∂xy = Operator(f -> derivative(f, [1, 1]))
 
 # Gradient, Hessian, Laplacian
+""" Gradient of function `f` """
 const gradient(f::FunctionRnToR) = derivative(f, 1)
+
+""" Hessian of function `f` """
 const hessian(f::FunctionRnToR) = derivative(f, 2)
+
+""" Laplacian of function `f` """
 const laplacian(f::FunctionRnToR{N}) where {N} = sum([derivative(f, _nn(N, i, i)) for i = 1:N])
+
+""" `∇(f)` returns the gradient of function `f` """
 const ∇(f::FunctionRnToR) = gradient(f)
+
+""" `H(f)` returns the Hessian of function `f` """
 const H(f::FunctionRnToR) = hessian(f)
+
+""" `Δ(f)`` returns the Laplacian of function `f` """
 const Δ(f::FunctionRnToR) = laplacian(f)
 
 gradientat(f::FunctionRnToR, x::InRⁿ{N}) where {N} = derivativeat(f, x, 1)
