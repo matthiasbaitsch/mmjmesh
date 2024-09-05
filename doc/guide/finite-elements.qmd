@@ -26,6 +26,17 @@ function prettyprint(name, factor, value)
 end;
 ```
 
+## 1D basis functions
+
+```{julia}
+φs = hatfunctions([0, 0.25, 0.75, 1.5, 2.0])
+
+fig = Figure()
+fplot!(Axis(fig[1, 1], title="Functions"), φs...)
+fplot!(Axis(fig[2, 1], title="Derivatives"), derivative.(φs)...)
+fig
+```
+
 ## Elements
 
 ```{julia}
@@ -53,10 +64,10 @@ makeelement(:lagrange, IHat, k=1) |> nodalbasis |> fplot
 Hermite polynomials
 
 ```{julia}
-N = nodalbasis(makeelement(:hermite, 1 .. 4))
+Ns = nodalbasis(makeelement(:hermite, 1 .. 4))
 fig = Figure()
-fplot!(Axis(fig[1, 1], title="Functions"), N...)
-fplot!(Axis(fig[1, 2], title="Derivatives"), derivative.(N)...)
+fplot!(Axis(fig[1, 1], title="Functions"), Ns...)
+fplot!(Axis(fig[1, 2], title="Derivatives"), derivative.(Ns)...)
 fig
 ```
 
@@ -87,9 +98,9 @@ Quadratic serendipity shape functions on the domain $[0, a] \times [0, b]$
 
 ```{julia}
 K = (0 .. a) × (0 .. b)
-N = nodalbasis(makeelement(:serendipity, K, k=2))
+Ns = nodalbasis(makeelement(:serendipity, K, k=2))
 
-prettyprint(L"\mathbf{N}(x, y)", 1 / (a^2 * b^2), [Nᵢ(x, y) for Nᵢ ∈ N])
+prettyprint(L"\mathbf{N}(x, y)", 1 / (a^2 * b^2), [Nᵢ(x, y) for Nᵢ ∈ Ns])
 ```
 
 
@@ -98,10 +109,10 @@ prettyprint(L"\mathbf{N}(x, y)", 1 / (a^2 * b^2), [Nᵢ(x, y) for Nᵢ ∈ N])
 ### Truss
 
 ```{julia}
-N = nodalbasis(makeelement(:lagrange, IHat, k=1))
+Ns = nodalbasis(makeelement(:lagrange, IHat, k=1))
 D(u) = 2 / l * u'
 aᵉ(u, δu) = EA * l / 2 * integrate(D(u) * D(δu), IHat)
-Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ N, Nⱼ ∈ N]
+Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ Ns, Nⱼ ∈ Ns]
 
 prettyprint(L"\mathbf{K}^e", EA / l, Kᵉ)
 ```
@@ -109,10 +120,10 @@ prettyprint(L"\mathbf{K}^e", EA / l, Kᵉ)
 ### Beam
 
 ```{julia}
-N = [1, l / 2, 1, l / 2] .* nodalbasis(makeelement(:hermite, IHat))
+Ns = [1, l / 2, 1, l / 2] .* nodalbasis(makeelement(:hermite, IHat))
 D(w) = 4 / l^2 * w''
 aᵉ(w, δw) = EI * l / 2 * integrate(D(w) * D(δw), IHat)
-Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ N, Nⱼ ∈ N]
+Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ Ns, Nⱼ ∈ Ns]
 
 prettyprint(L"\mathbf{K}^e", EI / l^3, Kᵉ)
 ```
@@ -122,10 +133,10 @@ prettyprint(L"\mathbf{K}^e", EI / l^3, Kᵉ)
 Integration on the reference quadrilateral
 
 ```{julia}
-N = nodalbasis(makeelement(:lagrange, QHat, k=1))
+Ns = nodalbasis(makeelement(:lagrange, QHat, k=1))
 D(u) = [2 / a * ∂x(u), 2 / b * ∂y(u)]
 aᵉ(u, δu) = a * b / 4 * integrate(D(u) ⋅ D(δu), QHat)
-Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ N, Nⱼ ∈ N]
+Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ Ns, Nⱼ ∈ Ns]
 
 prettyprint(L"\mathbf{K}^e", 1 / (6 * a * b), Kᵉ)
 ```
@@ -134,16 +145,16 @@ Alternative derivation in physical coordinates
 
 ```{julia}
 K = (0 .. a) × (0 .. b)
-N = nodalbasis(makeelement(:lagrange, K, k=1))
+Ns = nodalbasis(makeelement(:lagrange, K, k=1))
 aᵉ(u, δu) = integrate(∇(u) ⋅ ∇(δu), K)
-Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ N, Nⱼ ∈ N]
+Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ Ns, Nⱼ ∈ Ns]
 
 prettyprint(L"\mathbf{K}^e", 1 / (6 * a * b), Kᵉ)
 ```
 
 ```{julia}
 bᵉ(δu) = integrate(δu, K)
-rᵉ = [bᵉ(Nᵢ) for Nᵢ ∈ N]
+rᵉ = [bᵉ(Nᵢ) for Nᵢ ∈ Ns]
 
 prettyprint(L"\mathbf{r}^e", a * b / 4, rᵉ)
 ```
