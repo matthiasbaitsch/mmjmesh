@@ -8,64 +8,85 @@ bibliography: references.bib
 
 # Notation
 
+::: {layout-ncol=2 #fig-approximate-solution}
+![@braess_2007, p. 53](00-pics/approximate-solution-braess.png)
 
-## Polynomial spaces
+![@brenner_2008, p. 3](00-pics/approximate-solution-brenner-scott.png)
+
+![@johnson_1987, p. 52](00-pics/approximate-solution-johnson.png)
+
+![@boffi_2013, p. 2](00-pics/approximate-solution-boffi-brezzi-fortin.png)
+
+![@ciarlet_1978, p. 41](00-pics/approximate-solution-ciarlet.png)
+
+Approximate solution
+:::
 
 ::: {layout-ncol=2 #fig-polynomial-space}
-![Breaess @braess_finite_2007 p.60](00-pics/polynomial-space-braess-1.png)
+![@braess_2007, p. 60](00-pics/polynomial-space-braess-1.png)
 
-![Breaess @braess_finite_2007 p.68](00-pics/polynomial-space-braess-2.png)
+![@braess_2007, p. 68](00-pics/polynomial-space-braess-2.png)
 
-![Brenner and Scott @brenner_mathematical_2008 p.71](00-pics/polynomial-space-bs-1.png)
+![@brenner_2008, p. 71](00-pics/polynomial-space-bs-1.png)
 
-![Brenner and Scott @brenner_mathematical_2008 p85](00-pics/polynomial-space-bs-2.png)
+![@brenner_2008, p. 85](00-pics/polynomial-space-bs-2.png)
 
 Polynomial spaces
 :::
 
-
-## Definition of a finite element
-
 ::: {layout-ncol=2 #fig-definition-finite-element}
-![Johnson @johnson_numerical_1987 p.79](00-pics/finite-element-johnson.png)
+![@johnson_1987, p. 79](00-pics/finite-element-johnson.png)
 
-![Brenner and Scott @brenner_mathematical_2008 p.69](00-pics/finite-element-brenner-scott.png)
+![@brenner_2008, p. 69](00-pics/finite-element-brenner-scott.png)
 
-![Boffi, Brezzi and Fortin @boffi_mixed_2013 p.67](00-pics/finite-element-boffi-brezzi-fortin.png)
+![@boffi_2013, p. 67](00-pics/finite-element-boffi-brezzi-fortin.png)
 
-![Braess @braess_finite_2007 p.70](00-pics/finite-element-braess.png)
+![@braess_2007, p. 70](00-pics/finite-element-braess.png)
 
 Definition of a finite element
 :::
 
 
-## Examples of finite elements
+## Examples of Finite Elements
 
 ::: {#fig-examples-of-finite-elements-johnson}
 ![](00-pics/examples-of-finite-elements-johnson.png)
 
-Johnson @johnson_numerical_1987 p.80
+@johnson_1987, p. 80
 :::
 
 ::: {#fig-examples-of-finite-elements-bbm}
 ![](00-pics/examples-of-finite-elements-boffi-brezzi-fortin.png)
 
-Boffi, Brezzi and Fortin @boffi_mixed_2013 p.69
+@boffi_2013, p. 69
 :::
 
 ::: {#fig-examples-of-finite-elements-braess}
 ![](00-pics/examples-of-finite-elements-braess.png){width=50%}
 
-Braess @braess_finite_2007 p.66
+@braess_2007, p. 66
 :::
 
 
-## Misc
+## Miscellaneous
 
 ::: {layout-ncol=2}
-![Reference Triangle,  Breass @braess_finite_2007 p.73](00-pics/reference-triangle-braess.png)
+![Reference Triangle,  @braess_2007, p. 73](00-pics/reference-triangle-braess.png)
 
-![Affine equivalence,  Brenner and Scott @brenner_mathematical_2008 p.82](00-pics/affine-equivalence-brenner-scott.png)
+![Affine equivalence,  @brenner_2008, p. 82](00-pics/affine-equivalence-brenner-scott.png)
+
+![Affine families,  @braess_2007, p. 73](00-pics/affine-family-braess.png)
 :::
 
 
+## Element formulations
+
+::: {layout-ncol=2}
+![Element matrix,  @brenner_2008, p. 12](00-pics/element-matrix-brenner-scott.png)
+
+![Element matrix,  @knabner_2000, p. 69](00-pics/element-matrix-knaber.png)
+
+![Element functions,  @fish_2007, p. 156](00-pics/element-functions-fb.png)
+
+![Global and local entities,  @ciarlet_1978, p. 12](00-pics/global-local-ciarlet.png)
+:::
