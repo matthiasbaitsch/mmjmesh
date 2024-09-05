@@ -64,3 +64,5 @@ function MakieCore.plot!(plot::FPlot)
     return plot
 end
 
+
+fplot(functions::AbstractArray; kwargs...) = fplot(functions...; kwargs)
