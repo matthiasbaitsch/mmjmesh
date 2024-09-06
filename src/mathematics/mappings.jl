@@ -568,7 +568,7 @@ const ∇(f::FunctionRnToR) = gradient(f)
 """ `H(f)` returns the Hessian of function `f` """
 const H(f::FunctionRnToR) = hessian(f)
 
-""" `Δ(f)`` returns the Laplacian of function `f` """
+""" `Δ(f)` returns the Laplacian of function `f` """
 const Δ(f::FunctionRnToR) = laplacian(f)
 
 gradientat(f::FunctionRnToR, x::InRⁿ{N}) where {N} = derivativeat(f, x, 1)
