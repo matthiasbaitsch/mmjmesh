@@ -37,7 +37,7 @@ end;
 
 fig = Figure()
 fplot!(Axis(fig[1, 1], title="Functions"), φs...)
-fplot!(Axis(fig[1, 2], title="Derivatives"), derivative.(φs)...)
+fplot!(Axis(fig[2, 1], title="Derivatives"), derivative.(φs)...)
 fig
 ```
 
@@ -71,7 +71,7 @@ Hermite polynomials
 Ns = nodalbasis(makeelement(:hermite, 1 .. 4))
 fig = Figure()
 fplot!(Axis(fig[1, 1], title="Functions"), Ns...)
-fplot!(Axis(fig[1, 2], title="Derivatives"), derivative.(Ns)...)
+fplot!(Axis(fig[2, 1], title="Derivatives"), derivative.(Ns)...)
 fig
 ```
 
