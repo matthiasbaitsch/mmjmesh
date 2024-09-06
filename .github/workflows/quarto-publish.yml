@@ -36,10 +36,16 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}      
           file: lcov.info
-      - name: Render
-        uses: quarto-dev/quarto-actions/publish@v2
+      - name: Render Guide
+        run: cd doc/guide && DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' quarto render
+      - name: Generate Apidoc
+        run: cd doc/apidoc && julia --project make.jl
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          target: gh-pages
-          path: doc/guide
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          path: 'doc/build'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

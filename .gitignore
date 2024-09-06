@@ -1,7 +1,4 @@
 Manifest.toml
 src/dev*.jl
-demo/*_files
-demo/site_libs
-demo/*.ipynb
-demo/*.html
+doc/build
 *.cov

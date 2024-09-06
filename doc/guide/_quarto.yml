@@ -1,5 +1,6 @@
 project:
   type: book
+  output-dir: "../build/guide"
 
 book:
   title: "The MMJMesh Library"
@@ -17,6 +18,3 @@ format:
   html: default
 
 fig-format: png
-
-execute:
-  freeze: auto

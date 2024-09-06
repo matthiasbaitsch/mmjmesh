@@ -7,6 +7,7 @@ using DocumenterMermaid
 makedocs(
     sitename = "MMJMesh",
     format = Documenter.HTML(prettyurls = false),
+    build = "../build/apidoc",
     pages = [
         "Home" => "index.md",
         "Meshes" => "meshes.md",
@@ -23,6 +24,6 @@ makedocs(
 # Documenter can also automatically deploy documentation to gh-pages.
 # See "Hosting Documentation" and deploydocs() in the Documenter manual
 # for more information.
-#=deploydocs(
+deploydocs(
     repo = "<repository url>"
-)=#
+)
