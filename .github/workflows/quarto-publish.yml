@@ -41,10 +41,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}      
           file: lcov.info
       - name: Render Guide
-        uses: quarto-dev/quarto-actions/render@v2
-        with:
-          to: html
-          path: doc/guide
+        run: cd doc/guide && DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' quarto --execute render
       - name: Install apidoc dependencies
         run: DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --project=doc/apidoc/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
       - name: Generate apidoc
