@@ -13,6 +13,7 @@ using LinearAlgebra
 using WGLMakie
 using CairoMakie
 using DomainSets
+CairoMakie.activate!()
 ```
 
 
