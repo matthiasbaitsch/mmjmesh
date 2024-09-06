@@ -37,7 +37,7 @@ end;
 
 fig = Figure()
 fplot!(Axis(fig[1, 1], title="Functions"), φs...)
-fplot!(Axis(fig[2, 1], title="Derivatives"), derivative.(φs)...)
+fplot!(Axis(fig[1, 2], title="Derivatives"), derivative.(φs)...)
 fig
 ```
 
