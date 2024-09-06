@@ -1,19 +1,18 @@
+name: Build, test and deploy
+
 on:
   push:
     branches: main
 
-
-name: Render and Publish
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  build-test-deploy:
+
+  build-test:
     name: Build, test and deploy
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages      
     runs-on: ubuntu-latest
     steps:
       - name: Set up Python
@@ -47,14 +46,21 @@ jobs:
         run: DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --project=doc/apidoc/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
       - name: Generate Apidoc
         run: cd doc/apidoc && julia --project make.jl
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'doc/build'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
       - name: Cache Julia packages
         uses: julia-actions/cache@v1
+
+  deploy:
+    needs: build-test
+    environment:
+      name: github-pages
+    runs-on: ubuntu-latest
+    steps:    
+    - name: Setup Pages
+      uses: actions/configure-pages@v5
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: 'doc/build'
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
