@@ -12,6 +12,8 @@ jobs:
       contents: read
       pages: write
       id-token: write
+    environment:
+      name: github-pages      
     runs-on: ubuntu-latest
     steps:
       - name: Set up Python
@@ -25,8 +27,6 @@ jobs:
         uses: quarto-dev/quarto-actions/setup@v2
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
-      - name: Cache Julia packages
-        uses: julia-actions/cache@v1
       - name: Set up X11
         run: sudo apt-get update && sudo apt-get install -y xorg-dev mesa-utils xvfb libgl1 freeglut3-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev xsettingsd x11-xserver-utils
       - name: Build
@@ -44,7 +44,7 @@ jobs:
       - name: Render Guide
         run: cd doc/guide && DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' quarto render
       - name: Install dependencies
-        run: julia --project=doc/apidoc/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        run: DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --project=doc/apidoc/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
       - name: Generate Apidoc
         run: cd doc/apidoc && julia --project make.jl
       - name: Setup Pages
@@ -56,3 +56,5 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Cache Julia packages
+        uses: julia-actions/cache@v1
