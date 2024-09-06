@@ -46,6 +46,10 @@ jobs:
         run: DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --project=doc/apidoc/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
       - name: Generate Apidoc
         run: cd doc/apidoc && julia --project make.jl
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'doc/build'
       - name: Cache Julia packages
         uses: julia-actions/cache@v1
 
@@ -57,10 +61,6 @@ jobs:
     steps:    
     - name: Setup Pages
       uses: actions/configure-pages@v5
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: 'doc/build'
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
