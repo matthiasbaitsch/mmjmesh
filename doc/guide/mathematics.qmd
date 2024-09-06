@@ -117,7 +117,7 @@ fplot3d!(f, npoints=250, mesh=nothing)
 fig
 ```
 
-A (sometimes?) interactive 3D plot is obtained using WebGL:
+A good 3D plot is obtained using `GLMakie`:
 
 ```{julia}
 GLMakie.activate!()
