@@ -38,6 +38,8 @@ jobs:
           file: lcov.info
       - name: Render Guide
         run: cd doc/guide && DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' quarto render
+      - name: Install dependencies
+        run: julia --project=doc/apidoc/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
       - name: Generate Apidoc
         run: cd doc/apidoc && julia --project make.jl
       - name: Setup Pages

@@ -11,7 +11,7 @@ apidoc:
 
 .PHONY: test
 test:
-	julia --project test/runtests.jl
+	julia --color=yes --project -e 'using Pkg; Pkg.test()'
 
 clean:
 	find . -name \*.cov | xargs rm

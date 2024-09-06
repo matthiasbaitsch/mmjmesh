@@ -94,5 +94,3 @@ e = makeelement(:serendipity, K, k=2)
 for i = 1:8, j = 1:8
     @test isequal(e.N[i](ϕ[j]), i == j)
 end
-
-̂̂
