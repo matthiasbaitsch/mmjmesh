@@ -1,3 +1,7 @@
+---
+engine: julia
+---
+
 # Finite elements
 
 ```{julia}

@@ -1,3 +1,7 @@
+---
+engine: julia
+---
+
 # Plotting
 
 This chapter is utterly incomplete and probably not worth reading.
