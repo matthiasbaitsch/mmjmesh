@@ -1,6 +1,6 @@
 # MMJMesh - Minh's and Matthias' Julia Mesh Library
 
-[![Build Status](https://github.com/matthiasbaitsch/mmjmesh.jl/actions/workflows/quarto-publish.yml/badge.svg?branch=main)](https://github.com/matthiasbaitsch/mmjmesh.jl/actions/workflows/quarto-publish.yml?query=branch%3Amain)
+(https://github.com/matthiasbaitsch/mmjmesh.jl/actions/workflows/quarto-publish.yml/badge.svg)
 
 Simple mesh library for the implementation of finite element methods and postprocessing tools.
 
