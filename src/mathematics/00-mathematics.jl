@@ -16,6 +16,7 @@ import Polynomials
 include("poly.jl")
 import MMJMesh.Mathematics.FixedPolynomials as FP
 
+using MMJMesh
 using MMJMesh.MMJBase
 
 import MMJMesh: dimension
@@ -24,6 +25,7 @@ include("domains.jl")
 include("mappings.jl")
 include("forms.jl")
 include("mpolynomials.jl")
+include("curves.jl")
 include("interpolations.jl")
 include("parametertypes.jl")
 include("piecewise.jl")
@@ -77,6 +79,9 @@ export ∂xLF, ∂yLF, ∂xyLF
 
 # Spaces
 export FunctionSpace, PolynomialSpace, P, Q, S, Q23R, basis
+
+# Curves
+export linesegment
 
 # Finite elements
 export hatfunctions, FiniteElement, makeelement, nodalbasis
