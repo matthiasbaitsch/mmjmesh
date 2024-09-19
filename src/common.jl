@@ -1,4 +1,11 @@
 """
+    id(o)
+
+Returns the numerical id of an object
+"""
+function id end
+
+"""
     pdim(o)
 
 Parametric dimension of object `o`.
@@ -35,7 +42,15 @@ The dimension of object `o`.
 """
 function dimension end
 
-
+export id
 export pdim, gdim
 export coordinate, coordinates
 export dimension
+
+
+const RealVec = AbstractVector{<:Real}
+const RealVecVec = AbstractVector{<:AbstractVector{<:Real}}
+const IntegerVec = AbstractVector{<:Integer}
+const IntegerVecVec = AbstractVector{<:AbstractVector{<:Integer}}
+
+export RealVec, RealVecVec, IntegerVec, IntegerVecVec
