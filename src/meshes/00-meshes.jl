@@ -7,6 +7,7 @@ using MMJMesh
 using MMJMesh.MMJBase
 using MMJMesh.Topologies
 using MMJMesh.Geometries
+using MMJMesh.Mathematics
 
 import MMJMesh: coordinate, coordinates
 
@@ -28,6 +29,8 @@ export groupids, edim
 export ngroups, groupnames, hasgroups
 export group, groups
 export NodeGroup, EdgeGroup, FaceGroup, SolidGroup
+## build.jl
+export addnode!, addnodes!, addelement!, addelements!
 
 # Parts
 include("data.jl")
@@ -37,5 +40,6 @@ include("meshentities.jl")
 include("entitygroups.jl")
 include("entitydata.jl")
 include("common.jl")
+include("build.jl")
 
 end

@@ -4,7 +4,7 @@ engine: julia
 
 # The Mesh interface
 
-This chapter is incomplete and probably not worth reading.
+This chapter is utterly incomplete
 
 ```{julia}
 #| echo: false
@@ -14,7 +14,7 @@ include("setup.jl")
 
 ## Basic usage
 
-Create mesh
+Create mesh with coordinates and connectivity
 
 ```{julia}
 coords = [0.0 1.0 2.0 0.1 0.9 1.9; 0.0 0.1 0.0 0.9 1.0 0.9]
@@ -46,6 +46,27 @@ for e ∈ elements(m)
 end
 ```
 
+## Build mesh incrementally
+
+```{julia}
+l = 80
+h1 = 2
+h2 = 12
+nn = 21
+ne = nn - 1
+ne2 = ne ÷ 2
+
+m = Mesh(1, 2)
+is1 = addnodes!(m, [-l / 2, 0], [l / 2, 0], nn)
+is2 = addnodes!(m, polynomialinterpolation([-l / 2, h1], [0, h2], [l / 2, h1]), nn)
+addelements!(m, is1, is1 .+ 1, n=ne, group=:chord)
+addelements!(m, is2, is2 .+ 1, n=ne, group=:chord)
+addelements!(m, is1, is2, group=:vert)
+addelements!(m, is2, is1 .+ 1, n=ne2, group=:diag)
+addelements!(m, is1 .+ ne2, is2 .+ (ne2 + 1), n=ne2, group=:diag)
+mplot(m, edgecolor=:groups, nodesvisible=true) |> mconf()
+```
+
 ## Read mesh from Gmsh file
 
 ```{julia}
@@ -70,7 +91,7 @@ Groups can be used to filter access
 ```{julia}
 m = Mesh(meshpath("complex-g1.msh"))
 p = mplot(m)
-scatter!(p.axis, coordinates(m, :boundarynodes), color = :hotpink)
+scatter!(p.axis, coordinates(m, :boundarynodes), color=:hotpink)
 p |> mconf()
 ```
 

@@ -330,6 +330,7 @@ function plotedges(plot::MPlot, featureedges::Bool)
             @assert ngroups(mesh, d=1) > 0
             ids = groupids(mesh, d=1, predefined=true)
             lc = reshape(repeat(ids[indices], 1, 3)', :)
+            plot.colorbygroups = true
         end
     end
 
