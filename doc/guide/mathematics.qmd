@@ -77,9 +77,8 @@ fplot(u, u + v, u + w)
 Interpolate points
 
 ```{julia}
-points = tomatrix([[0.0, 0], [1.5, 1], [2, 0], [1.5, -1], [0, 0]])
-L = lagrangepolynomials(range(IHat, size(points, 2)), IHat)
-u = Interpolation(L, points)
+points = tomatrix([[0.0, 0.0], [1.5, 1.0], [2.0, 0.0], [1.5, -1.0], [0.0, 0.0]])
+u = polynomialinterpolation(points)
 
 fig, ax = fplot(u)
 scatter!(ax, points, color=:tomato)
