@@ -20,6 +20,7 @@ function Mesh(
     T = Mesh{dt,dg,g1,g2}
     mesh = T(Topology(dt, nn), Geometry(dg, nn), GroupCollection(), MeshData{T}())
     mesh.data.mesh = mesh
+    _registergrouprecipies(mesh)
     return mesh
 end
 
@@ -39,7 +40,6 @@ function Mesh(
 )
     m = Mesh(coordinates, dt, g1=g1, g2=g2)
     addlinks!(m.topology, dt, 0, elements)
-    populatepredfinedgroups!(m)
     return m
 end
 

@@ -1,21 +1,20 @@
+# -------------------------------------------------------------------------------------------------
+# Type definitions
+# -------------------------------------------------------------------------------------------------
 
-# Short names
-const NodeGroup = Group{Node}
-const EdgeGroup = Group{Edge}
-const FaceGroup = Group{Face}
-const SolidGroup = Group{Solid}
+const MeshEntityGroup = Group{<:MeshEntity}
+const NodeGroup = MeshEntityGroup{Node}
+const EdgeGroup = MeshEntityGroup{Edge}
+const FaceGroup = MeshEntityGroup{Face}
+const SolidGroup = MeshEntityGroup{Solid}
 
-
-# To my understanding, that should work like this
-# edim(::Group{MeshEntity{DT}}) where {DT} = DT
-# Why not?
-edim(::NodeGroup) = 0
-edim(::EdgeGroup) = 1
-edim(::FaceGroup) = 2
-edim(::SolidGroup) = 3
+edim(::Type{<:Group{<:MeshEntity{DT}}}) where {DT} = DT
+edim(g::Group{<:MeshEntity}) = edim(typeof(g))
 
 
+# -------------------------------------------------------------------------------------------------
 # Helper functions
+# -------------------------------------------------------------------------------------------------
 
 function _collectboundary(m::Mesh{1})
     bn = Int[]
@@ -41,15 +40,26 @@ function _collectboundary(m::Mesh{2})
 end
 
 
-function _idvector(s::AbstractVector)
-    d = Dict([(j, i) for (i, j) in enumerate(Set(s))])
-    return [d[k] for k in s]
+"""
+    _idvector(values::AbstractVector) -> ids
+
+Assigns an integer id to each unique entry in `values` and returns the `ids` vector
+such that `ids[i]` is the id of the `i`-th value. Larger values have a larger id such 
+that the resulting `ids` array satisfies  `cmp(values[i], values[j]) == cmp(ids[i], ids[j])`.
+"""
+function _idvector(values::AbstractVector)
+    d = Dict([(val, idx) for (idx, val) in enumerate(unique!(sort(values)))])
+    return [d[val] for val in values]
 end
 
 
-# Mesh entity group functions
+"""
+    _registergrouprecipies(m::Mesh)
 
-function populatepredfinedgroups!(m::Mesh)
+Registers recipes to generate groups for boundary entities and entities of a certain
+parametric dimension. To be called once on `Mesh` creation.
+"""
+function _registergrouprecipies(m::Mesh)
 
     # On the boundary
     function boundaryrecipe()
@@ -72,49 +82,67 @@ function populatepredfinedgroups!(m::Mesh)
 end
 
 
-function collectgroups(m::Mesh; d::Int=-1, predefined::Bool=false)
-    namelists = [Symbol[] for _ in 1:nentities(m, d)]
-    for name ∈ groupnames(m.groups, d=d, predefined=predefined)
+"""
+    _collectgroups(m::Mesh; d::Int, predefined::Bool=false)
+
+Collect all groups the mesh entities of parametric dimension `d` belong to.
+"""
+function _collectgroups(m::Mesh; d::Int, predefined::Bool=false)
+    names = [Symbol[] for _ in 1:nentities(m, d)]
+    for name ∈ groupnames(m, d=d, predefined=predefined)
         for index ∈ m.groups[name]
-            push!(namelists[index], name)
+            push!(names[index], name)
         end
     end
-    return namelists
+    return names
 end
 
 
+# -------------------------------------------------------------------------------------------------
+# Interface
+# -------------------------------------------------------------------------------------------------
+
 """
-    groupnames(gc::GroupCollection; d::Int=-1, predefined::Bool=false)
-    ngroups(gc::GroupCollection; d::Int=-1, predefined::Bool=false)
-    hasgroups(gc::GroupCollection; d::Int=-1, predefined::Bool=false)
-    groupids(m::Mesh; d::Int=-1, predefined::Bool=false)
+    groupnames(m::Mesh; d::Int=-1, predefined::Bool=false)
 
-Returns
-    - names of groups
-    - number of groups
-    - whether there are groups
-    - IDs for groups entities belong to
-
-in the `GroupCollection` or `Mesh` `m` with dimension `d`. If `d` is not specified,
-groups of all dimensions are included. If `predefined` is `false`, only user-defined
-groups are considered.
+Returns all groups of dimension `d`. If `d` is not specified,
+groups of all dimensions are included. If `predefined` is `false`, only 
+user-defined groups are considered.
 """
-
-function groupnames(gc::GroupCollection; d::Int=-1, predefined::Bool=false)
+function groupnames(m::Mesh; d::Int=-1, predefined::Bool=false)
+    gc = m.groups
     isvalid(name) =
         (predefined || !ispredefined(gc, name)) &&
         (d == -1 || (!isempty(gc[name]) && edim(gc[name]) == d))
     return [name for name ∈ names(gc) if isvalid(name)]
 end
 
-ngroups(gc::GroupCollection; d::Int=-1, predefined::Bool=false) =
-    length(groupnames(gc, d=d, predefined=predefined))
 
-hasgroups(gc::GroupCollection; d::Int=-1, predefined::Bool=false) =
-    !isempty(groupnames(gc, d=d, predefined=predefined))
+"""
+    groupids(m::Mesh; d::Int, predefined::Bool=false)
 
-groupids(m::Mesh; d::Int=-1, predefined::Bool=false) =
-    _idvector(collectgroups(m, d=d, predefined=predefined))
+Unique numerical ids groups of specified dimension.
+"""
+groupids(m::Mesh; d::Int, predefined::Bool=false) =
+    _idvector(_collectgroups(m, d=d, predefined=predefined))
+
+
+"""
+    ngroups(m::Mesh; d::Int=-1, predefined::Bool=false)
+
+Number of groups.
+"""
+ngroups(m::Mesh; d::Int=-1, predefined::Bool=false) =
+    length(groupnames(m, d=d, predefined=predefined))
+
+
+"""
+    hasgroups(m::Mesh; d::Int=-1, predefined::Bool=false)
+
+Tests groups are defined.
+"""
+hasgroups(m::Mesh; d::Int=-1, predefined::Bool=false) =
+    ngroups(m, d=d, predefined=predefined) > 0
 
 
 """
@@ -124,13 +152,18 @@ Names of groups entity e belongs to sorted by group size. That is, the most spec
 group is returned first.
 """
 groups(e::MeshEntity{DT}) where {DT} = return sort!(
-    [name for name ∈ groupnames(e.mesh.groups, d=DT, predefined=true) if e ∈ e.mesh.groups[name]],
+    [
+        group
+        for group ∈ groupnames(e.mesh, d=DT, predefined=true)
+        if e ∈ e.mesh.groups[group]
+    ],
     lt=(n1, n2) -> length(e.mesh.groups[n1]) < length(e.mesh.groups[n2])
 )
+
 
 """
     group(e, gc::GroupCollection)
 
-Returns the smallest group containing e.
+Returns the smallest group containing `e``.
 """
-group(e) = groups(e)[1]
+group(e::MeshEntity) = groups(e)[1]

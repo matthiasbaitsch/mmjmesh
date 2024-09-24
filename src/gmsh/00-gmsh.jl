@@ -67,9 +67,6 @@ function MMJMesh.Meshes.Mesh(filepath::String)
         links(m.topology, D, d1)
     end
 
-    # Predefined groups, make sure that all links are created
-    populatepredfinedgroups!(m)
-
     return m
 end
 

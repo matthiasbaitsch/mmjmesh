@@ -24,7 +24,7 @@ export node, edge, face, solid
 export nodes, edges, faces, solids
 export nodeindices, edgeindices, faceindices, solidindices
 ## entitygroups.jl
-export collectgroups, groupids, populatepredfinedgroups!, edim
+export groupids, edim
 export ngroups, groupnames, hasgroups
 export group, groups
 export NodeGroup, EdgeGroup, FaceGroup, SolidGroup

@@ -2,6 +2,7 @@
 # Group
 # -------------------------------------------------------------------------------------------------
 
+
 """
     struct Group{T} <: AbstractVector{Int}
 
@@ -33,8 +34,9 @@ Base.show(io::IO, g::Group{T}) where {T} = print(io, "$(T)Group$(g.indices)")
 
 
 # -------------------------------------------------------------------------------------------------
-# GroupCollection
+# Group collection
 # -------------------------------------------------------------------------------------------------
+
 
 """
     struct GroupCollection
@@ -87,3 +89,4 @@ function clearcache!(gc::GroupCollection)
         gc.entries[key] = nothing
     end
 end
+

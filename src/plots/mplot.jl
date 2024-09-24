@@ -108,7 +108,7 @@ function MakieCore.plot!(plot::MPlot)
     # Settings for mesh of 2D elements
     if pdim(mesh) == 2
         havedata = color isa Vector
-        colorbygroups = !havedata && isundefined(:facecolor) && hasgroups(mesh.groups, d=2)
+        colorbygroups = !havedata && isundefined(:facecolor) && hasgroups(mesh, d=2)
         setifundefined(:featureedgesvisible, true)
         setifundefined(:edgesvisible, nfaces(mesh) <= 100)
         setifundefined(:edgecolor, MakieCore.theme(plot, :linecolor))
@@ -140,11 +140,15 @@ function MakieCore.plot!(plot::MPlot)
         plotfacefunctions(plot)
     else # Plot
         lineplotvisible && plotlineplot(plot)
-        plot.facesvisible[] && plotfaces(plot)
-        plot.edgesvisible[] && plotedges(plot, false)
-        plot.featureedgesvisible[] && plotedges(plot, true)
+        plot.facesvisible[] && nfaces(mesh) > 0 && plotfaces(plot)
+        plot.edgesvisible[] && nedges(mesh) > 0 && plotedges(plot, false)
+        plot.featureedgesvisible[] && nedges(mesh) > 0 && plotedges(plot, true)
         plot.nodesvisible[] && plotnodes(plot)
     end
+
+    # XXX Configure
+    println(plot)
+
 
     # Return
     return plot
@@ -218,6 +222,7 @@ function plotlineplot(plot::MPlot, mesh::Mesh, functions::AbstractVector{<:Funct
     end
 end
 
+
 function plotfaces(plot::MPlot)
 
     # Mesh and color
@@ -235,8 +240,9 @@ function plotfaces(plot::MPlot)
     Nf = nfaces(mesh)
 
     # Color by groups
-    if !haveData && !haveColor && hasgroups(mesh.groups, d=2)
+    if !haveData && !haveColor && hasgroups(mesh, d=2)
         color = groupids(mesh, d=2, predefined=false)
+        color = maximum(color) .- color
         haveData = true
     end
 
@@ -294,7 +300,7 @@ function plotedges(plot::MPlot, featureedges::Bool)
     # Collect indices of edges to plot
     if featureedges
         indices = mesh.groups[:boundaryedges]
-        for n in groupnames(mesh.groups, d=1, predefined=false)
+        for n in groupnames(mesh, d=1, predefined=false)
             indices = indices ∪ mesh.groups[n]
         end
     else
@@ -309,7 +315,7 @@ function plotedges(plot::MPlot, featureedges::Bool)
         lc = plot.featureedgecolor[]
         lw = plot.featureedgelinewidth[]
         if isnothing(lc)
-            if ngroups(mesh.groups, d=1) > 0
+            if ngroups(mesh, d=1) > 0
                 ids = groupids(mesh, d=1, predefined=true)
                 lc = reshape(repeat(ids[indices], 1, 3)', :)
             else
@@ -319,6 +325,12 @@ function plotedges(plot::MPlot, featureedges::Bool)
     else
         lw = plot.edgelinewidth[]
         lc = plot.edgecolor[]
+
+        if lc == :groups
+            @assert ngroups(mesh, d=1) > 0
+            ids = groupids(mesh, d=1, predefined=true)
+            lc = reshape(repeat(ids[indices], 1, 3)', :)
+        end
     end
 
     MakieCore.lines!(plot, _collectlines(points)..., linewidth=lw, color=lc, colormap=:tab10)

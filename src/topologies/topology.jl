@@ -68,6 +68,7 @@ end
 
 dimension(::Topology{D}) where {D} = D
 isanonymous(t::Topology, d::Int) = !haskey(t.entities, d)
+MMJMesh.id(t::Topology, d::Int, index::Int) = t.entities[d][index]
 
 
 # -------------------------------------------------------------------------------------------------
@@ -102,7 +103,7 @@ entity(t::Topology, dim::Int, idx::Int) = t.entities[dim][idx]
 Add links from entities of dimension `d0` to entities of dimension `d1` by specifying the
 entities `ids` and the `ConnectivityList` `cl`.
 """
-function addlinks!(t::Topology{D}, d0::Int, d1::Int, ids::AbstractVector{Int}, cl::ConnectivityList) where {D}
+function addlinks!(t::Topology{D}, d0::Int, d1::Int, ids::IntegerVec, cl::ConnectivityList) where {D}
     @assert d0 ≤ D && d0 > d1 "Only downward links with d0 ≤ $D are allowed."
 
     if !haskey(t.links, (d0, d1))                   # First time: Set
@@ -131,7 +132,7 @@ addlinks!(t::Topology, d0::Int, d1::Int, cl::ConnectivityList) = addlinks!(
     collect(nentities(t, d0, false) .+ (1:length(cl))),
     cl
 )
-addlinks!(t::Topology, d0::Int, d1::Int, cl::Vector{Vector{Int}}) = addlinks!(t, d0, d1, ConnectivityList(cl))
+addlinks!(t::Topology, d0::Int, d1::Int, cl::IntegerVecVec) = addlinks!(t, d0, d1, ConnectivityList(cl))
 
 # TODO: Make idx second parameter
 """
@@ -148,12 +149,16 @@ Links from entities of dimension `d0` to entities of dimension `d1` in the form 
 a `ConnectivityList`.
 """
 function links(t::Topology{D}, d0::Int, d1::Int) where {D}
+    @assert d0 >= 0 && d1 >= 0
     @assert d0 <= D && d1 <= D
+    
     key = (d0, d1)
 
     if (haskey(t.links, key))
         return t.links[key]
-    elseif d0 > 0 && d1 == 0                                        # a.1) Links to nodes
+    end
+
+    if d0 > 0 && d1 == 0                                   # a.1) Links to nodes
         visited = Set{Set{Int}}()
         linkslist = Vector{Vector{Int}}()
         for gl ∈ links(t, D, 0)
@@ -167,7 +172,7 @@ function links(t::Topology{D}, d0::Int, d1::Int) where {D}
             end
         end
         cl = ConnectivityList(linkslist)
-    elseif d0 > d1 && d1 > 0                                        # a.2) Links entities of lower dimension
+    elseif d0 > d1 && d1 > 0                               # a.2) Links entities of lower dimension
         linkslist = Vector{Vector{Int}}()
         l0td1 = inverse(links(t, d1, 0))
         for ld0t0 ∈ links(t, d0, 0)
@@ -184,7 +189,7 @@ function links(t::Topology{D}, d0::Int, d1::Int) where {D}
             push!(linkslist, llinks)
         end
         cl = ConnectivityList(linkslist)
-    elseif d0 == d1                                                 #a.3) Links to entities of same dimension
+    elseif d0 == d1                                        #a.3) Links to entities of same dimension
         ne = d0 == 0 ? nentities(t, 0) : length(links(t, d0, 0))
         linkslist = [Int[] for _ in 1:ne]
         if d0 > 0
@@ -196,8 +201,10 @@ function links(t::Topology{D}, d0::Int, d1::Int) where {D}
         end
         foreach(sort!, linkslist)
         cl = ConnectivityList(linkslist)
-    elseif d1 > d0                                                  # a.4) Upward links
+    elseif d1 > d0                                         # a.4) Upward links
         cl = links(t, d1, d0)'
+    else
+        error("Links $d1 to $d0 not handled - should not happen")
     end
 
     t.links[key] = cl

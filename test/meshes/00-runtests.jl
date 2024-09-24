@@ -2,12 +2,12 @@ module MeshesTests
 
 using Test
 
-@testset "Common" include("datatests.jl")
-@testset "Common" include("groupstests.jl")
-@testset "Meshes" include("meshtests.jl")
-@testset "Meshes" include("meshentitiestests.jl")
-@testset "Common" include("entitydatatests.jl")
-@testset "Common" include("entitygroupstests.jl")
+@testset "Data" include("datatests.jl")
+@testset "Group" include("groupstests.jl")
+@testset "Mesh" include("meshtests.jl")
+@testset "MeshEntity" include("meshentitiestests.jl")
+@testset "EntityData" include("entitydatatests.jl")
+@testset "MeshEntityGroup" include("entitygroupstests.jl")
 
 end
 

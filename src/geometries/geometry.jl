@@ -91,7 +91,8 @@ Base.setindex!(g::Geometry{D}, p::Point{D}, d::Int, idx::Int) where {D} = setind
 function Base.push!(g::Geometry{D}, p::Vector{T}) where {D,T<:Number}
     @assert length(p) == D
     if g.points.n == size(g.points.coordinates, 2)
-        g.points.coordinates = hcat(g.points.coordinates, Matrix{Float64}(undef, D, g.points.n))
+        nnew = max(10, g.points.n)
+        g.points.coordinates = hcat(g.points.coordinates, Matrix{Float64}(undef, D, nnew))
     end
     g.points.n += 1
     g.points.coordinates[:, g.points.n] = p

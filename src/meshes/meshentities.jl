@@ -19,33 +19,40 @@ function MeshEntity(
     return me
 end
 
-# Basic
-MMJMesh.pdim(::MeshEntity{DT}) where {DT} = DT
-MMJMesh.gdim(::MeshEntity{DT,DG}) where {DT,DG} = DG
-nnodes(::MeshEntity{DT,DG,NN}) where {DT,DG,NN} = NN
-geometrytype(::MeshEntity{DT,DG,NN,G}) where {DT,DG,NN,G} = G
-nentities(me::MeshEntity{DT}, pdim::Integer) where {DT} =
-    nlinks(me.mesh.topology, DT, pdim, me.index)
-index(me::MeshEntity) = me.index
-index(me::MeshEntity{DT}, pdim::Integer, i::Integer) where {DT} =
-    links(me.mesh.topology, DT, pdim)[me.index][i]
-indices(me::MeshEntity{DT}, pdim::Integer) where {DT} =
-    links(me.mesh.topology, DT, pdim)[me.index]
-
-# Show
-Base.show(io::IO, e::T) where {T<:MeshEntity} = print(io, "$(T)[$(e.index)]")
-
 # Short names
 const Node{DG} = MeshEntity{0,DG,0}
 const Edge{DG,NN} = MeshEntity{1,DG,NN}
 const Face{DG,NN} = MeshEntity{2,DG,NN}
 const Solid{DG,NN} = MeshEntity{3,DG,NN}
 
+# Basic
+MMJMesh.pdim(::Type{<:MeshEntity{DT}}) where {DT} = DT
+MMJMesh.pdim(me::MeshEntity) = pdim(typeof(me))
+MMJMesh.gdim(::Type{<:MeshEntity{DT,DG}}) where {DT,DG} = DG
+MMJMesh.gdim(me::MeshEntity) = gdim(typeof(me))
+MMJMesh.id(me::MeshEntity{DT}) where {DT} = MMJMesh.id(me.mesh.topology, DT, me.index)
+
+nnodes(::Type{<:Node}) = 0
+nnodes(::Type{<:MeshEntity{DT,DG,NN}}) where {DT,DG,NN} = NN
+nnodes(me::MeshEntity) = nnodes(typeof(me))
+geometrytype(::MeshEntity{DT,DG,NN,G}) where {DT,DG,NN,G} = G
+
+index(me::MeshEntity) = me.index
+index(me::MeshEntity{DT}, pdim::Integer, i::Integer) where {DT} =
+    links(me.mesh.topology, DT, pdim)[me.index][i]
+indices(me::MeshEntity{DT}, pdim::Integer) where {DT} =
+    links(me.mesh.topology, DT, pdim)[me.index]
+nentities(me::MeshEntity{DT}, pdim::Integer) where {DT} =
+    nlinks(me.mesh.topology, DT, pdim, me.index)
+
+# Show
+Base.show(io::IO, e::T) where {T<:MeshEntity} = print(io, "$(T)[$(e.index)]")
+
 # Coordinates
 coordinate(n::Node, c::Integer) = n.mesh.geometry.points.coordinates[c, n.index]
 coordinates(n::Node) = n.mesh.geometry.points.coordinates[:, n.index]
 coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, indices(me, 0)]
-coordinates(me::MeshEntity, i::Integer) = 
+coordinates(me::MeshEntity, i::Integer) =
     me.mesh.geometry.points.coordinates[:, index(me, 0, i)]
 
 # Specialized functions
@@ -73,9 +80,9 @@ end
 # AbstractArray interface
 Base.length(el::MeshEntityList) = length(el.indices)
 Base.size(el::MeshEntityList) = (length(el),)
-Base.getindex(el::MeshEntityList{DT}, i::Integer) where {DT} = 
+Base.getindex(el::MeshEntityList{DT}, i::Integer) where {DT} =
     entity(el.mesh, DT, el.indices[i])
-Base.iterate(el::MeshEntityList, state=1) = 
+Base.iterate(el::MeshEntityList, state=1) =
     state > length(el) ? nothing : (el[state], state + 1)
 
 # Get entities
