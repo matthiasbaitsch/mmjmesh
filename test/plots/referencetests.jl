@@ -9,6 +9,7 @@ using MMJMesh.Plots
 using MMJMesh.Meshes
 using MMJMesh.Utilities
 using MMJMesh.Mathematics
+using MMJMesh.Plots.Symbols.Structural2D
 
 # Make sure to use CairoMakie
 cm.activate!()
@@ -165,6 +166,15 @@ f = gm.Figure()
 gm.Axis3(f[1, 1], aspect=:data)
 mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2, facecolor=:tomato)
 @test_reference ref("m2d-22.png") f
+
+
+# -------------------------------------------------------------------------------------------------
+# Symbols
+# -------------------------------------------------------------------------------------------------
+
+cm.activate!()
+f = MMJMesh.Plots.Symbols.Structural2D.demo()
+@test_reference ref("sym-01.png") f
 
 
 # -------------------------------------------------------------------------------------------------

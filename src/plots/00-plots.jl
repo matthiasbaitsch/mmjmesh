@@ -36,5 +36,6 @@ include("fplot.jl")
 include("vplot.jl")
 include("fplot3d.jl")
 include("feplot.jl")
+include("symbols.jl")
 
 end
