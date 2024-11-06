@@ -38,6 +38,13 @@ fplot(c, s, g, p)
 ```
 
 ```{julia}
+f = Exp(-1 .. 1)
+g = f ∘ Polynomial([0, -1], -1 .. 1)
+
+fplot(f, g, -f, -g)
+```
+
+```{julia}
 f = Polynomial([0, 1], -1 .. 1)
 F = antiderivative(f)
 fplot(f, F)

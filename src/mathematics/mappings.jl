@@ -710,6 +710,18 @@ _antiderivative(::Cos{D}) where {D} = Sin(D)
 Base.show(io::IO, ::Cos) = print(io, "cos(x)")
 
 
+# Exp function
+struct Exp{D} <: FunctionRToR{D}
+    Exp(d=R) = new{d}()
+end
+
+valueat(::Exp, x::InR) = exp(x)
+derivativeat(::Exp, x::InR, ::Integer=1) = exp(x)
+derivative(f::Exp, ::Integer=1) = f 
+antiderivative(f::Exp, ::Integer=1) = f 
+Base.show(io::IO, ::Exp) = print(io, "exp(x)")
+
+
 """
     Polynomial([a0, a1, a2, ...], d=R)
 

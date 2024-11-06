@@ -66,7 +66,7 @@ export VectorField, div, divergence, divergenceat
 export ParametricCurve, UnitNormal
 
 # Special functions II
-export Sin, Cos
+export Sin, Cos, Exp
 export MPolynomial, mmonomials, affinefunction, simplifyx
 export AdHocMapping, makefunction
 export AffineMapping
