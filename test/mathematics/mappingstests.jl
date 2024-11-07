@@ -172,15 +172,21 @@ c = Cos(0 .. 2π)
 @test validate(antiderivative(c))
 @test antiderivative(Sin(), 2) == -Sin()
 
+x = parameter(0 .. 2)
+@test sin(x) == Sin(0 .. 2)
+@test cos(x) == Cos(0 .. 2)
+
 # Exp
 f = Exp(0 .. 2π)
 @test validate(f)
 @test validate(antiderivative(f))
+@test exp(x) == Exp(0 .. 2)
 
 # Identity
-id = Identity(0 .. 5)
+id = Identity(0.0 .. 5.0)
 @test id(3) == 3
 @test validate(id, atol=1e-6)
+@test antiderivative(id, 2) == 1 / 6 * id^3
 
 # Polynomials
 p = Polynomial(4, 6, 1, 9, 2, -1)
@@ -247,7 +253,7 @@ h = f ∘ g
 # Functions Rn -> R
 # -------------------------------------------------------------------------------------------------
 
-## _nn function
+# _nn function
 using MMJMesh.Mathematics: _nn
 @test _nn(2, 1, 1) == [2, 0]
 @test _nn(2, 1, 2, 1, 2) == [2, 2]
@@ -385,7 +391,6 @@ m4 = Polynomial([0, 0, 1], 0 .. 4)
 @test m3 - m1 == Cos() - Sin()
 @test validate(m1 + m3, rtol=1e-4)
 
-
 # Add or subtract constant
 f = Exp()
 
@@ -399,7 +404,6 @@ f = Exp()
 @test validate(f - 2)
 @test validate(2 - f)
 
-
 # Composition m5 = Sin(x^2)
 m5 = m1 ∘ m4
 @test m5' == (Cos() ∘ Polynomial([0, 0, 1], 0 .. 4)) * Polynomial([0, 2], 0 .. 4)
@@ -410,7 +414,6 @@ m5 = m1 ∘ m4
 p = m1 * m2
 @test validate(p)
 
-
 # Quotient
 p = m1 / m3
 @test p(0.2) ≈ tan(0.2)
@@ -420,6 +423,7 @@ f = 2 / Polynomial(0, 1)
 @test pois(f) == [0]
 
 # Multiply by one function
+o1 = One{InR,R}()
 f1 = Sin()
 u1 = MappingFromComponents(Sin(), Cos(), Sin())
 f3 = MPolynomial([4 3 2; 3 2 1; 2 1 0], [1, 2, 3])
@@ -431,6 +435,33 @@ f3 = MPolynomial([4 3 2; 3 2 1; 2 1 0], [1, 2, 3])
 @test u1 * o1 === u1
 @test o3 * f3 === f3
 @test f3 * o3 === f3
+
+# Multiply by scaled one function
+f1 = 3 * One{InR,R}()
+f2 = Sin()
+f3 = Polynomial(1, 2, 3)
+
+@test f1 * f2 === 3 * f2
+@test f2 * f1 === 3 * f2
+@test f1 * f3 == Polynomial(3, 6, 9)
+@test f3 * f1 == Polynomial(3, 6, 9)
+
+# Polynomial special
+f1 = Polynomial(1, 2, 3)
+f3 = 2 * Sin()
+
+@test 2 + f1 == Polynomial(3, 2, 3)
+@test Identity(R) + f1 == Polynomial(1, 3, 3)
+@test 2 * Identity(R) + f1 == Polynomial(1, 4, 3)
+@test f1 + f3 === f1 + f3
+@test f3 + f1 === f1 + f3
+
+# Polynomial from Identity
+x = Identity(1 .. 2)
+f = 3 + 3x^2 + x - 7x^4 + 7
+
+@test typeof(f) === Polynomial{1.0 .. 2.0}
+@test f == Polynomial(10.0, 1, 3, 0, -7, d=1.0 .. 2.0)
 
 
 # -------------------------------------------------------------------------------------------------

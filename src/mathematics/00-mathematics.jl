@@ -53,7 +53,7 @@ export MappingFromComponents
 export Zero, One, Identity
 
 # Variable
-export variable
+export parameter
 
 # Functions Rn to R
 export gradient, gradientat, hessian, hessianat, laplacian, laplacianat, ∇, H, Δ

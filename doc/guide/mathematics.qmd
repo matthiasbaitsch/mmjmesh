@@ -16,30 +16,31 @@ using DomainSets
 CairoMakie.activate!()
 ```
 
-
 ## Mappings
 
 ### Functions $\mathbb{R} \to \mathbb{R}$
 
 ```{julia}
-x = variable(0 .. 0.05)
+x = parameter(0 .. 0.05)
 fplot(sin(1 / x), yscale=0.05, npoints=11)
 ```
 
 ```{julia}
-x = variable(0..3π)
+x = parameter(0 .. 2π)
 s = sin(x)
 c = cos(x)
 
 f = 2s
 g = s + f'
-p = 1 / 20 * Polynomial([2, -1], 1 .. 8) * Polynomial([3, -1]) * Polynomial([4.5, -1]) * Polynomial([8, -1])
+h = 1 / 10 * (0.5 - x) * (pi/2 - x) * (3pi/2 - x) * (2pi - x)
 
-fplot(c, s, g, p)
+p = fplot(c, s, g, h)
+scatter!([0.5, pi/2, 3pi/2, 2pi], zeros(4), color=:tomato)
+p
 ```
 
 ```{julia}
-x = variable(-1 .. 1)
+x = parameter(-1 .. 1)
 f = exp(x)
 g = exp(-x)
 h = exp(x - 1)
@@ -48,7 +49,8 @@ fplot(f, g, h, -f, -g, -h)
 ```
 
 ```{julia}
-f = Polynomial([0, 1], -1 .. 1)
+x = parameter(-1 .. 1)
+f = x
 F = antiderivative(f)
 fplot(f, F)
 ```
@@ -64,6 +66,8 @@ scatter!(p, 0 * p, color=:tomato)
 f
 ```
 
+Lagrange polynomials
+
 ```{julia}
 p = [0, 1.5, 2]
 f = fplot(lagrangepolynomials(p, 0 .. 2)...)
@@ -72,13 +76,27 @@ scatter!(p, [1, 1, 1], color=:blue)
 f
 ```
 
+Maclaurin polynomials
+
+```{julia}
+function maclaurin_polynomial(f, n)
+    x = parameter(domain(f))
+    sum([derivativeat(f, 0.0, k) / factorial(k) * x^k for k = 0:n])
+end
+
+f = Sin(-pi..pi)
+p1 = maclaurin_polynomial(f, 1)
+p3 = maclaurin_polynomial(f, 3)
+p5 = maclaurin_polynomial(f, 5)
+fplot(f, p1, p3, p5)
+```
 
 ### Parametric curves
 
 Lissajous curve
 
 ```{julia}
-x = variable(0 .. 2π)
+x = parameter(0 .. 2π)
 u = ParametricCurve(cos(x), sin(2x))
 v = 0.075 * sin(100x) * UnitNormal(u)
 w = 0.025 * ParametricCurve(sin(200x), cos(200x))
@@ -96,13 +114,11 @@ scatter!(ax, points, color=:tomato)
 fig
 ```
 
-
 ### Monomials
 
 ```{julia}
 fplot(monomials(0:100, 0 .. 1)...)
 ```
-
 
 ### Functions of two variables
 
@@ -164,5 +180,3 @@ fplot3d!(g, mesh=nothing)
 vplot!(gradient(g), npoints=9, lengthscale=0.3)
 fig
 ```
-
-

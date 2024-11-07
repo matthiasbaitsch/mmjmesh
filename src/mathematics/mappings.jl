@@ -176,11 +176,13 @@ degree(::Identity) = 1
 valueat(::Identity{DT}, x::DT) where {DT} = x
 _derivative(::Identity{DT,D}) where {DT,D} = One{DT,D}()
 _derivativeat(::Identity{DT}, x::DT, n::Int=1) where {DT} = one(derivativetype(DT, DT, 1))
+antiderivative(::Identity{InR,D}, n::Int=1) where {D} =
+    1 / factorial(n + 1) * Polynomial(_monomial_coeffs(n + 1), D)
 Base.show(io::IO, ::Identity) = print(io, "identity(x)")
 
 
 """ An independent variable of a function. """
-variable(d::AbstractInterval = R) = Identity(d)
+parameter(d::AbstractInterval=R) = Identity(d)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -224,10 +226,14 @@ Base.:(==)(m1::ScaledMapping{DT,CT,D}, m2::ScaledMapping{DT,CT,D}) where {DT,CT,
 struct ProductMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
     m1::AbstractMapping
     m2::AbstractMapping
-    ProductMapping(
-        m1::AbstractMapping{DT,CT1,D1}, m2::AbstractMapping{DT,CT2,D2}
-    ) where {DT,CT1,CT2,D1,D2} = new{DT,Base.promote_op(*, CT1, CT2),D1 ∩ D2}(m1, m2)
 end
+
+ProductMapping(
+    m1::AbstractMapping{DT,CT1,D1}, m2::AbstractMapping{DT,CT2,D2}
+) where {DT,CT1,CT2,D1,D2} = ProductMapping{DT,Base.promote_op(*, CT1, CT2),D1 ∩ D2}(m1, m2)
+
+ProductMapping(m::AbstractMapping{DT,CT,D1}, f::AbstractMapping{DT,InR,D2}) where {DT,CT,D1,D2} =
+    ProductMapping{DT,CT,D1 ∩ D2}(f, m)
 
 valueat(p::ProductMapping{DT}, x::DT) where {DT} = valueat(p.m1, x) * valueat(p.m2, x)
 _derivative(f::ProductMapping) = f.m1' * f.m2 + f.m1 * f.m2'
@@ -708,6 +714,7 @@ struct Sin{D} <: FunctionRToR{D}
     Sin(d=R) = new{d}()
 end
 
+Sin(::Identity{DT,D}) where {DT,D} = Sin(D)
 Sin(f::T) where {T<:FunctionToR} = Sin() ∘ f
 Base.sin(f::T) where {T<:FunctionToR} = Sin(f)
 
@@ -723,6 +730,7 @@ struct Cos{D} <: FunctionRToR{D}
     Cos(d=R) = new{d}()
 end
 
+Cos(::Identity{DT,D}) where {DT,D} = Cos(D)
 Cos(f::T) where {T<:FunctionToR} = Cos() ∘ f
 Base.cos(f::T) where {T<:FunctionToR} = Cos(f)
 
@@ -739,6 +747,7 @@ struct Exp{D} <: FunctionRToR{D}
     Exp(d=R) = new{d}()
 end
 
+Exp(::Identity{DT,D}) where {DT,D} = Exp(D)
 Exp(f::T) where {T<:FunctionRToR} = Exp() ∘ f
 Base.exp(f::T) where {T<:FunctionRToR} = Exp(f)
 
@@ -796,9 +805,9 @@ end
 
 Monomials of degree ``p_1, \\dots, p_n`` defined on the domain `D`.
 """
+_monomial_coeffs(n) = [i == n + 1 for i = 1:n+1]
 function monomials(p::AbstractArray{<:Integer}, d=R)
-    coeffs(pp) = [i == pp + 1 ? 1 : 0 for i in 1:pp+1]
-    return [Polynomial(coeffs(n), d) for n in p]
+    return [Polynomial(_monomial_coeffs(n), d) for n in p]
 end
 
 
@@ -874,7 +883,6 @@ makefunction(f::Function, xrange::Interval, yrange::Interval) = makefunction(f, 
 # Operators and simplification rules
 # -------------------------------------------------------------------------------------------------
 
-
 # +
 Base.:(+)(m1::AbstractMapping, m2::AbstractMapping) = Sum(m1, m2)
 Base.:(+)(z::Zero, ::Zero) = z
@@ -888,35 +896,45 @@ Base.:(+)(m1::ScaledMapping, m2::ScaledMapping) =
     m1.m === m2.m ? (m1.a + m2.a) * m1.m : Sum(m1, m2)
 Base.:(+)(m1::T, m2::T) where {T<:AbstractMapping} = m1 == m2 ? 2.0 * m1 : Sum(m1, m2)
 
+# + polynomial special
+_add(f::Polynomial, a::Real, ::One) = Polynomial(a) + f
+_add(f::Polynomial, a::Real, ::Identity) = Polynomial(0, a) + f
+_add(f::Polynomial, a::Real, m::AbstractMapping) = Sum(f, a * m)
+Base.:(+)(f1::Polynomial, f2::ScaledMapping) = _add(f1, f2.a, f2.m)
+Base.:(+)(f1::ScaledMapping, f2::Polynomial) = f2 + f1
+
+Base.:(+)(f::Polynomial, ::Identity{DT,D}) where {DT,D} = f + Polynomial(0, 1, d=D)
+Base.:(+)(::Identity{DT,D}, f::Polynomial) where {DT,D} = f + Polynomial(0, 1, d=D)
+Base.:(+)(f::Polynomial, ::One{DT,D}) where {DT,D} = f + Polynomial(1, d=D)
+Base.:(+)(::One{DT,D}, f::Polynomial) where {DT,D} = f + Polynomial(1, d=D)
 
 # -
 Base.:-(m::AbstractMapping) = -1.0 * m
-Base.:-(m1::AbstractMapping, m2::AbstractMapping) = m1 + (-m2)
-
+Base.:-(m1::AbstractMapping{DT}, m2::AbstractMapping{DT}) where {DT} = m1 + (-m2)
 
 # *
-Base.:(*)(m1::AbstractMapping{DT,CT1}, m2::AbstractMapping{DT,CT2}) where {DT,CT1,CT2} =
+Base.:(*)(m1::AbstractMapping{DT}, m2::AbstractMapping{DT}) where {DT} =
     ProductMapping(m1, m2)
-Base.:(*)(m1::AbstractMapping{DT,CT1}, m2::AbstractMapping{DT,CT2}) where {DT,CT1,CT2<:Real} =
-    ProductMapping(m2, m1)
 
 Base.:(*)(::One{DT}, m::AbstractMapping{DT}) where {DT} = m
 Base.:(*)(m::AbstractMapping{DT}, ::One{DT}) where {DT} = m
-Base.:(*)(::One{DT}, m::AbstractMapping{DT,<:Real}) where {DT} = m
-Base.:(*)(m::AbstractMapping{DT,<:Real}, ::One{DT}) where {DT} = m
 
 Base.:(*)(a::Real, m::AbstractMapping) = a == 1 ? m : a == 0 ? zero(m) : ScaledMapping(a, m)
 Base.:(*)(m::AbstractMapping, a::Real) = a * m
 Base.:(*)(a::Real, m::ScaledMapping) = (a * m.a) * m.m
 
+Base.:(*)(m1::ScaledMapping{DT}, m2::AbstractMapping{DT}) where {DT} = m1.a * (m1.m * m2)
+Base.:(*)(m1::AbstractMapping{DT}, m2::ScaledMapping{DT}) where {DT} = m2.a * (m1 * m2.m)
 
 # /
 Base.:(/)(m1::AbstractMapping, m2::AbstractMapping) = QuotientMapping(m1, m2)
 Base.:(/)(a::Real, m2::AbstractMapping) = QuotientMapping(Polynomial(a), m2)
 Base.:(/)(m2::AbstractMapping, a::Real) = 1 / a * m2
 
+# ^
+Base.:(^)(::Identity{InR,D}, n::Int) where {D} = Polynomial(_monomial_coeffs(n), D)
 
-# Add or subtract a constant
+# Add or subtract a Number
 Base.:(+)(f::FunctionToR, a::Real) = f + a * One(f)
 Base.:(+)(a::Real, f::FunctionToR) = f + a
 Base.:(-)(a::Real, f::FunctionToR) = a + (-f)
