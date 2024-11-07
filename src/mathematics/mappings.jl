@@ -891,3 +891,11 @@ Base.:(*)(a::Real, m::ScaledMapping) = (a * m.a) * m.m
 # /
 Base.:(/)(m1::AbstractMapping, m2::AbstractMapping) = QuotientMapping(m1, m2)
 Base.:(/)(a::Real, m2::AbstractMapping) = QuotientMapping(Polynomial(a), m2)
+Base.:(/)(m2::AbstractMapping, a::Real) = 1 / a * m2
+
+
+# Add or subtract a constant
+Base.:(+)(f::FunctionToR, a::Real) = f + a * One(f)
+Base.:(+)(a::Real, f::FunctionToR) = f + a
+Base.:(-)(a::Real, f::FunctionToR) = a + (-f)
+Base.:(-)(f::FunctionToR, a::Real) = f + (-a)
