@@ -1,9 +1,10 @@
 module Mathematics
 
+using QuadGK
 using Symbolics
-using SymbolicUtils
 using IntervalSets
 using StaticArrays
+using SymbolicUtils
 using LinearAlgebra
 using SymbolicUtils: Postwalk, Chain
 using DomainSets: ×, ProductDomain, Rectangle

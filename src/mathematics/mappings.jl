@@ -428,8 +428,12 @@ function integrate(f::FunctionRToR, I::Interval)
     if isempty(I)
         return 0.0
     end
+    try
     F = antiderivative(f)
     return F(rightendpoint(I)) - F(leftendpoint(I))
+    catch _
+        return quadgk(f, leftendpoint(I), rightendpoint(I))[1]
+    end
 end
 
 
@@ -684,6 +688,7 @@ Base.div(v::VectorField) = divergence(v)
 # -------------------------------------------------------------------------------------------------
 # Special functions
 # -------------------------------------------------------------------------------------------------
+
 
 # Sine function
 struct Sin{D} <: FunctionRToR{D}
