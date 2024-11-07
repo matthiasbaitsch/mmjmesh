@@ -8,6 +8,7 @@ MakieCore.@recipe(FPlot, functions) do scene
         npoints=5,
         yscale=1.0,
         ir=false,
+        connect_jumps=false,
         cycle=[:color],
     )
     MakieCore.generic_plot_attributes!(attr,)
@@ -38,15 +39,18 @@ function MakieCore.plot!(plot::FPlot)
             xy = s1d(a, b)
         else
             δ = 1e-12 * (b - a)
-            x = Float32[]
-            y = Float32[]
+            x = Float64[]
+            y = Float64[]
 
             s1da(a, b) = begin
                 xy = s1d(a, b)
                 append!(x, xy[1, :])
                 append!(y, xy[2, :])
-                push!(x, NaN)
-                push!(y, NaN)
+
+                if !att.connect_jumps[]
+                    push!(x, NaN)
+                    push!(y, NaN)
+                end
             end
 
             s1da(a, p[1] - δ)
