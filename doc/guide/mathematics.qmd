@@ -22,13 +22,14 @@ CairoMakie.activate!()
 ### Functions $\mathbb{R} \to \mathbb{R}$
 
 ```{julia}
-f = Sin() ∘ (1 / Polynomial(0, 1, d=0.0 .. 0.05))
-fplot(f, yscale=0.05, npoints=11)
+x = variable(0 .. 0.05)
+fplot(sin(1 / x), yscale=0.05, npoints=11)
 ```
 
 ```{julia}
-s = Sin(0 .. 3π)
-c = Cos(0 .. 3π)
+x = variable(0..3π)
+s = sin(x)
+c = cos(x)
 
 f = 2s
 g = s + f'
@@ -38,10 +39,12 @@ fplot(c, s, g, p)
 ```
 
 ```{julia}
-f = Exp(-1 .. 1)
-g = f ∘ Polynomial([0, -1], -1 .. 1)
+x = variable(-1 .. 1)
+f = exp(x)
+g = exp(-x)
+h = exp(x - 1)
 
-fplot(f, g, -f, -g)
+fplot(f, g, h, -f, -g, -h)
 ```
 
 ```{julia}
@@ -75,9 +78,10 @@ f
 Lissajous curve
 
 ```{julia}
-u = ParametricCurve(Cos(0 .. 2π), Sin() ∘ Polynomial(0, 2, d=0 .. 2pi))
-v = 0.075 * Sin() ∘ Polynomial(0, 100) * UnitNormal(u)
-w = 0.025 * ParametricCurve(Sin(), Cos()) ∘ Polynomial(0, 200)
+x = variable(0 .. 2π)
+u = ParametricCurve(cos(x), sin(2x))
+v = 0.075 * sin(100x) * UnitNormal(u)
+w = 0.025 * ParametricCurve(sin(200x), cos(200x))
 fplot(u, u + v, u + w)
 ```
 

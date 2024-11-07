@@ -177,6 +177,11 @@ f = Exp(0 .. 2π)
 @test validate(f)
 @test validate(antiderivative(f))
 
+# Identity
+id = Identity(0 .. 5)
+@test id(3) == 3
+@test validate(id, atol=1e-6)
+
 # Polynomials
 p = Polynomial(4, 6, 1, 9, 2, -1)
 @test degree(p) == 5
@@ -216,7 +221,7 @@ f = affinefunction(1 .. 2, 5 .. 1)
 @test degree(f) == 1
 @test f(1) == 5
 @test f(2) == 1
-@test integrate(f, 1..2) == 3
+@test integrate(f, 1 .. 2) == 3
 
 # Affine map
 f = AffineMapping(2, 3)
@@ -380,6 +385,21 @@ m4 = Polynomial([0, 0, 1], 0 .. 4)
 @test m3 - m1 == Cos() - Sin()
 @test validate(m1 + m3, rtol=1e-4)
 
+
+# Add or subtract constant
+f = Exp()
+
+@test (2 + f)(1) == 2 + ℯ
+@test (f + 2)(1) == ℯ + 2
+@test (2 - f)(1) == 2 - ℯ
+@test (f - 2)(1) == ℯ - 2
+
+@test validate(f + 2)
+@test validate(2 + f)
+@test validate(f - 2)
+@test validate(2 - f)
+
+
 # Composition m5 = Sin(x^2)
 m5 = m1 ∘ m4
 @test m5' == (Cos() ∘ Polynomial([0, 0, 1], 0 .. 4)) * Polynomial([0, 2], 0 .. 4)
@@ -390,7 +410,6 @@ m5 = m1 ∘ m4
 p = m1 * m2
 @test validate(p)
 
-##
 
 # Quotient
 p = m1 / m3

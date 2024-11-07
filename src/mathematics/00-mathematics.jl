@@ -50,7 +50,10 @@ export antiderivative, integrate, sample, plot, pois, roots
 export MappingFromComponents
 
 # Special functions I
-export Zero, One
+export Zero, One, Identity
+
+# Variable
+export variable
 
 # Functions Rn to R
 export gradient, gradientat, hessian, hessianat, laplacian, laplacianat, ∇, H, Δ

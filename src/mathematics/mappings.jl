@@ -167,7 +167,20 @@ Base.show(io::IO, ::One) = print(io, "1(x)")
 Base.isequal(::One{DT,D}, ::One{DT,D}) where {DT,D} = true
 
 
-# TODO: Transform a f(b(x + c)) + d ???
+""" Identity function. """
+struct Identity{DT,D} <: AbstractMapping{DT,DT,D} end
+
+Identity(d::T) where {T<:AbstractInterval} = Identity{InR,d}()
+
+degree(::Identity) = 1
+valueat(::Identity{DT}, x::DT) where {DT} = x
+_derivative(::Identity{DT,D}) where {DT,D} = One{DT,D}()
+_derivativeat(::Identity{DT}, x::DT, n::Int=1) where {DT} = one(derivativetype(DT, DT, 1))
+Base.show(io::IO, ::Identity) = print(io, "identity(x)")
+
+
+""" An independent variable of a function. """
+variable(d::AbstractInterval = R) = Identity(d)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -429,8 +442,8 @@ function integrate(f::FunctionRToR, I::Interval)
         return 0.0
     end
     try
-    F = antiderivative(f)
-    return F(rightendpoint(I)) - F(leftendpoint(I))
+        F = antiderivative(f)
+        return F(rightendpoint(I)) - F(leftendpoint(I))
     catch _
         return quadgk(f, leftendpoint(I), rightendpoint(I))[1]
     end
@@ -695,6 +708,9 @@ struct Sin{D} <: FunctionRToR{D}
     Sin(d=R) = new{d}()
 end
 
+Sin(f::T) where {T<:FunctionToR} = Sin() ∘ f
+Base.sin(f::T) where {T<:FunctionToR} = Sin(f)
+
 valueat(::Sin, x::InR) = sin(x)
 derivativeat(::Sin, x::InR, n::Integer=1) = sin(x + n * π / 2)
 derivative(::Sin{D}, n::Integer=1) where {D} = (-1.0)^(n ÷ 2) * (mod(n, 2) == 0 ? Sin(D) : Cos(D))
@@ -706,6 +722,9 @@ Base.show(io::IO, ::Sin) = print(io, "sin(x)")
 struct Cos{D} <: FunctionRToR{D}
     Cos(d=R) = new{d}()
 end
+
+Cos(f::T) where {T<:FunctionToR} = Cos() ∘ f
+Base.cos(f::T) where {T<:FunctionToR} = Cos(f)
 
 valueat(::Cos, x::InR) = cos(x)
 derivativeat(::Cos, x::InR, n::Integer=1) = cos(x + n * π / 2)
@@ -720,10 +739,13 @@ struct Exp{D} <: FunctionRToR{D}
     Exp(d=R) = new{d}()
 end
 
+Exp(f::T) where {T<:FunctionRToR} = Exp() ∘ f
+Base.exp(f::T) where {T<:FunctionRToR} = Exp(f)
+
 valueat(::Exp, x::InR) = exp(x)
 derivativeat(::Exp, x::InR, ::Integer=1) = exp(x)
-derivative(f::Exp, ::Integer=1) = f 
-antiderivative(f::Exp, ::Integer=1) = f 
+derivative(f::Exp, ::Integer=1) = f
+antiderivative(f::Exp, ::Integer=1) = f
 Base.show(io::IO, ::Exp) = print(io, "exp(x)")
 
 
