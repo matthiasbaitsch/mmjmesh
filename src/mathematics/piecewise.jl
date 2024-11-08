@@ -79,6 +79,11 @@ Base.:(*)(f1::PiecewiseFunction, f2::FunctionRToR) = _applyoperator(f1, f2, *)
 Base.:(*)(f1::PiecewiseFunction, f2::PiecewiseFunction) = _applyoperator(f1, f2, *)
 Base.:(*)(a::Real, f::PiecewiseFunction) = PiecewiseFunction(f.breakpoints, a * f.functions)
 
+# TODO find better solution
+Base.:(+)(f1::ScaledMapping{InR,InR}, f2::PiecewiseFunction) = _applyoperator(f2, f1, +)
+Base.:(+)(f1::PiecewiseFunction, f2::ScaledMapping{InR,InR}) = _applyoperator(f1, f2, +)
+Base.:(*)(f1::ScaledMapping{InR,InR}, f2::PiecewiseFunction) = _applyoperator(f2, f1, *)
+Base.:(*)(f1::PiecewiseFunction, f2::ScaledMapping{InR,InR}) = _applyoperator(f1, f2, *)
 
 """
     interpolate(x::AbstractVector{<:Real}, y::AbstractVector{<:Real}; order=1)

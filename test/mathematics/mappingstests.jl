@@ -378,6 +378,7 @@ m4 = Polynomial([0, 0, 1], 0 .. 4)
 @test 2 * m1 + 3 * m2 == 5 * m1
 @test (-1) * ((-1) * m1) == m1
 @test (-1) * (-m1) == m1
+@test (2m1) * (4m3) == 8 * m1 * m3
 @test validate(2 * m1, rtol=1e-4)
 
 # Add and subtract
@@ -435,6 +436,11 @@ f3 = MPolynomial([4 3 2; 3 2 1; 2 1 0], [1, 2, 3])
 @test u1 * o1 === u1
 @test o3 * f3 === f3
 @test f3 * o3 === f3
+
+@test o1 * (3 * f1) === 3 * f1
+@test (3 * f1) * o1 === 3 * f1
+
+##
 
 # Multiply by scaled one function
 f1 = 3 * One{InR,R}()

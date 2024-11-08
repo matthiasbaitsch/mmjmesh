@@ -55,6 +55,8 @@ pw2 = PiecewiseFunction([1.1, 6.5, 11.1], [Polynomial(3, 2, 1), Polynomial(1, 2,
 @test (pw1 * Sin()) isa PiecewiseFunction
 @test (Sin() * pw1) isa PiecewiseFunction
 @test (π * pw1) isa PiecewiseFunction
+@test (pw1 + 3Sin()) isa PiecewiseFunction
+@test (3Sin() + pw1) isa PiecewiseFunction
 
 @test validateoperations(pw1, Sin())
 @test validateoperations(pw1, pw1)

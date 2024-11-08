@@ -894,19 +894,20 @@ Base.:(+)(m1::AbstractMapping, m2::ScaledMapping) =
     m1 == m2.m ? (1 + m2.a) * m2.m : Sum(m1, m2)
 Base.:(+)(m1::ScaledMapping, m2::ScaledMapping) =
     m1.m === m2.m ? (m1.a + m2.a) * m1.m : Sum(m1, m2)
-Base.:(+)(m1::T, m2::T) where {T<:AbstractMapping} = m1 == m2 ? 2.0 * m1 : Sum(m1, m2)
+Base.:(+)(m1::AbstractMapping{DT}, m2::AbstractMapping{DT}) where {DT} =
+    m1 == m2 ? 2.0 * m1 : Sum(m1, m2)
 
 # + polynomial special
 _add(f::Polynomial, a::Real, ::One) = Polynomial(a) + f
 _add(f::Polynomial, a::Real, ::Identity) = Polynomial(0, a) + f
-_add(f::Polynomial, a::Real, m::AbstractMapping) = Sum(f, a * m)
-Base.:(+)(f1::Polynomial, f2::ScaledMapping) = _add(f1, f2.a, f2.m)
-Base.:(+)(f1::ScaledMapping, f2::Polynomial) = f2 + f1
+_add(f::Polynomial, a::Real, m::AbstractMapping{InR,InR}) = Sum(f, a * m)
+Base.:(+)(f1::Polynomial, f2::ScaledMapping{InR,InR}) = _add(f1, f2.a, f2.m)
+Base.:(+)(f1::ScaledMapping{InR,InR}, f2::Polynomial) = f2 + f1
 
-Base.:(+)(f::Polynomial, ::Identity{DT,D}) where {DT,D} = f + Polynomial(0, 1, d=D)
-Base.:(+)(::Identity{DT,D}, f::Polynomial) where {DT,D} = f + Polynomial(0, 1, d=D)
-Base.:(+)(f::Polynomial, ::One{DT,D}) where {DT,D} = f + Polynomial(1, d=D)
-Base.:(+)(::One{DT,D}, f::Polynomial) where {DT,D} = f + Polynomial(1, d=D)
+Base.:(+)(f::Polynomial, ::Identity{InR,D}) where {D} = f + Polynomial(0, 1, d=D)
+Base.:(+)(::Identity{InR,D}, f::Polynomial) where {D} = f + Polynomial(0, 1, d=D)
+Base.:(+)(f::Polynomial, ::One{InR,D}) where {D} = f + Polynomial(1, d=D)
+Base.:(+)(::One{InR,D}, f::Polynomial) where {D} = f + Polynomial(1, d=D)
 
 # -
 Base.:-(m::AbstractMapping) = -1.0 * m
@@ -918,11 +919,14 @@ Base.:(*)(m1::AbstractMapping{DT}, m2::AbstractMapping{DT}) where {DT} =
 
 Base.:(*)(::One{DT}, m::AbstractMapping{DT}) where {DT} = m
 Base.:(*)(m::AbstractMapping{DT}, ::One{DT}) where {DT} = m
+Base.:(*)(::One{DT}, m::ScaledMapping{DT}) where {DT} = m
+Base.:(*)(m::ScaledMapping{DT}, ::One{DT}) where {DT} = m
 
 Base.:(*)(a::Real, m::AbstractMapping) = a == 1 ? m : a == 0 ? zero(m) : ScaledMapping(a, m)
 Base.:(*)(m::AbstractMapping, a::Real) = a * m
 Base.:(*)(a::Real, m::ScaledMapping) = (a * m.a) * m.m
 
+Base.:(*)(m1::ScaledMapping{DT}, m2::ScaledMapping{DT}) where {DT} = m1.a * m2.a * (m1.m * m2.m)
 Base.:(*)(m1::ScaledMapping{DT}, m2::AbstractMapping{DT}) where {DT} = m1.a * (m1.m * m2)
 Base.:(*)(m1::AbstractMapping{DT}, m2::ScaledMapping{DT}) where {DT} = m2.a * (m1 * m2.m)
 
