@@ -6,13 +6,11 @@ engine: julia
 
 ```{julia}
 #| echo: false
-#| warning: false
 include("setup.jl")
 using IntervalSets
 using LinearAlgebra
 using WGLMakie
 using CairoMakie
-using DomainSets
 CairoMakie.activate!()
 ```
 
