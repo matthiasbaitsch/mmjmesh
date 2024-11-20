@@ -144,3 +144,13 @@ println("e0005.data[:kefunc] = ", e0005.data[:kefunc])
 println("e0490.data[:kefunc] = ", e0490.data[:kefunc])
 println("e1132.data[:kefunc] = ", e1132.data[:kefunc])
 ```
+
+Example how to attach data to elements:
+
+```{julia}
+m = Mesh(0 .. 10, 20)
+m.data[:test, :elements] = 99
+
+e1 = element(m, 1)
+println(e1.data[:test])
+```

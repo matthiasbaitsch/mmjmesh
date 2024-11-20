@@ -79,6 +79,15 @@ function _registergrouprecipies(m::Mesh)
     addrecipe!(m.groups, :edges, () -> EdgeGroup(1:nedges(m)))
     addrecipe!(m.groups, :faces, () -> FaceGroup(1:nfaces(m)))
     addrecipe!(m.groups, :solids, () -> SolidGroup(1:nsolids(m)))
+
+    # Elements - TODO elegant solution
+    if pdim(m) == 1
+        addrecipe!(m.groups, :elements, () -> EdgeGroup(1:nedges(m)))
+    elseif pdim(m) == 2
+        addrecipe!(m.groups, :elements, () -> FaceGroup(1:nfaces(m)))
+    elseif pdim(m) == 3
+        addrecipe!(m.groups, :elements, () -> SolidGroup(1:nsolids(m)))
+    end
 end
 
 
