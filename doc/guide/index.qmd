@@ -18,7 +18,7 @@ include("setup.jl")
 In the simplest case, a 1D mesh is defined by parameter bounds and the number of elements. 
 
 ```{julia}
-m = makemeshoninterval(0.0, 8.0, 4)
+m = Mesh(0 .. 8, 4)
 mplot(m) |> mconf()
 ```
 

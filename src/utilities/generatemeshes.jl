@@ -22,6 +22,8 @@ function makemeshoninterval(a::Number, b::Number, n::Int, g=t -> [t; 0.0])
     return m
 end
 
+Meshes.Mesh(Ω::AbstractInterval, n::Int, g=t -> [t; 0.0]) =
+    makemeshoninterval(leftendpoint(Ω), rightendpoint(Ω), n, g)
 
 """
     Meshtype

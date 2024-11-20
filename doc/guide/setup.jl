@@ -10,6 +10,7 @@ using MMJMesh.Utilities
 using MMJMesh.Topologies
 using MMJMesh.Mathematics
 
+using IntervalSets
 using DomainSets: ×, (..)
 
 CairoMakie.activate!()
