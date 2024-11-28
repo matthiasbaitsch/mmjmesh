@@ -44,6 +44,10 @@ end
 parametrization(o::GeometricObjectI{DT}) where {DT} =
     Interpolation(bases[(DT, size(o.points, 2))], o.points)
 
+measure(e::GeometricObjectI{1,DG,2}) where {DG} = norm(diff(e.points, dims=2))
+measure(f::GeometricObjectI{2,2,NP}) where {NP} =
+    0.5 * sum([det(f.points[:, [i, i % NP + 1]]) for i = 1:NP])
+
 """
 Lookup `(DT, NN) → basis` where `DT` is the topological dimension and `NN` the number of nodes
 of the geometric entity.

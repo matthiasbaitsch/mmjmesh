@@ -22,8 +22,13 @@ function makemeshoninterval(a::Number, b::Number, n::Int, g=t -> [t; 0.0])
     return m
 end
 
-Meshes.Mesh(Ω::AbstractInterval, n::Int, g=t -> [t; 0.0]) =
-    makemeshoninterval(leftendpoint(Ω), rightendpoint(Ω), n, g)
+"""
+    Mesh(I::Interval, n::Int)
+
+Construct uniform mesh by dividing interval `I` into `n` elements.
+"""
+Meshes.Mesh(I::AbstractInterval, n::Int, g=t -> [t; 0.0]) =
+    makemeshoninterval(leftendpoint(I), rightendpoint(I), n, g)
 
 """
     Meshtype

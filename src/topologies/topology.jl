@@ -68,7 +68,8 @@ end
 
 dimension(::Topology{D}) where {D} = D
 isanonymous(t::Topology, d::Int) = !haskey(t.entities, d)
-MMJMesh.id(t::Topology, d::Int, index::Int) = t.entities[d][index]
+MMJMesh.id(t::Topology, d::Int, index::Int) =
+    haskey(t.entities, d) ? t.entities[d][index] : index
 
 
 # -------------------------------------------------------------------------------------------------
@@ -151,7 +152,7 @@ a `ConnectivityList`.
 function links(t::Topology{D}, d0::Int, d1::Int) where {D}
     @assert d0 >= 0 && d1 >= 0
     @assert d0 <= D && d1 <= D
-    
+
     key = (d0, d1)
 
     if (haskey(t.links, key))

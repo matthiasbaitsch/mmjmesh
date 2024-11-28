@@ -46,7 +46,12 @@ nentities(me::MeshEntity{DT}, pdim::Integer) where {DT} =
     nlinks(me.mesh.topology, DT, pdim, me.index)
 
 # Show
-Base.show(io::IO, e::T) where {T<:MeshEntity} = print(io, "$(T)[$(e.index)]")
+function _mpname(t::Type)
+    s = string(t)
+    return s[1:findfirst('{', s)-1]
+end
+
+Base.show(io::IO, e::T) where {T<:MeshEntity} = print(io, "$(_mpname(T))($(id(e)))$(nodeindices(e))")
 
 # Coordinates
 coordinate(n::Node, c::Integer) = n.mesh.geometry.points.coordinates[c, n.index]
@@ -56,7 +61,8 @@ coordinates(me::MeshEntity, i::Integer) =
     me.mesh.geometry.points.coordinates[:, index(me, 0, i)]
 
 # Specialized functions
-Base.length(e::Edge{DG,2}) where {DG} = norm(diff(coordinates(e), dims=2))
+Base.length(e::Edge{DG,2}) where {DG} = measure(geometry(e))
+area(f::Face{2}) = measure(geometry(f))
 
 # Geometry
 geometry(node::Node{DG}) where {DG} = Point{DG}(coordinates(node))
