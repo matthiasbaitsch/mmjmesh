@@ -44,7 +44,7 @@ Base.show(io::IO, g::Group{T}) where {T} = print(io, "$(T)Group$(g.indices)")
 A collection of `Group`s each identified by a `Symbol`. Predefined groups are created by
 associating a `Symbol` with a recipe function. The recipe function is called when the group
 is first accessed. The recipe function either returns a `Group` object which is then cached 
-or `nothing`` in the case it manipulates the `GroupCollection` directly.
+or `nothing` in the case it manipulates the `GroupCollection` directly.
 """
 struct GroupCollection
     recipes::Dict{Symbol,Function}

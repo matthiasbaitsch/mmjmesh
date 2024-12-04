@@ -25,10 +25,10 @@ export node, edge, face, solid
 export nodes, edges, faces, solids
 export nodeindices, edgeindices, faceindices, solidindices
 ## entitygroups.jl
-export groupids, edim
+export definegroup!, group, groupids, edim
 export ngroups, groupnames, hasgroups
-export group, groups
-export NodeGroup, EdgeGroup, FaceGroup, SolidGroup
+export groupname, groupnames
+# XXX export MeshEntityGroup{0}, MeshEntityGroup{1}, MeshEntityGroup{2}, MeshEntityGroup{3}
 ## build.jl
 export addnode!, addnodes!, addelement!, addelements!
 

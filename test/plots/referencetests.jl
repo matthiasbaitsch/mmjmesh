@@ -83,18 +83,21 @@ cm.scatter!(p.axis, x[:, bn], color=:magenta)
 # Face groups
 a = 5
 m = makemeshonrectangle(4, 2, 2a, a)
-m.groups[:g1] = FaceGroup([1, 2, 3, 6, 22])
-m.groups[:g2] = FaceGroup([5, 6, 7, 8, 22, 33])
-m.groups[:g3] = FaceGroup([34])
+definegroup!(m, 2, :g1, [1, 2, 3, 6, 22])
+definegroup!(m, 2, :g2, [5, 6, 7, 8, 22, 33])
+definegroup!(m, 2, :g3, [34])
+
+
 @test_reference ref("m2d-009.png") mplot(m) |> mconf()
 @test_reference ref("m2d-010.png") mplot(m, facecolor=:orange) |> mconf()
 
 # Edge groups
 a = 5
 m = makemeshonrectangle(4, 2, 2a, a)
-m.groups[:g1] = EdgeGroup(1:10)
-m.groups[:g2] = EdgeGroup(8:16)
-m.groups[:g3] = EdgeGroup(62:71)
+definegroup!(m, 1, :g1, 1:10)
+definegroup!(m, 1, :g2, 8:16)
+definegroup!(m, 1, :g3, 62:71)
+
 @test_reference ref("m2d-011.png") mplot(m) |> mconf()
 @test_reference ref("m2d-012.png") mplot(m, featureedgecolor=:orange) |> mconf()
 

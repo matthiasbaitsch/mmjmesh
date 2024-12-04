@@ -122,9 +122,3 @@ Read mesh from Gmsh
 m = Mesh(meshpath("advanced.msh"))
 mplot(m) |> mconf()
 ```
-
-Indices of nodes on boundary
-```{julia}
-m.groups[:boundarynodes]
-```
-

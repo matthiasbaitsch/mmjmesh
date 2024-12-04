@@ -28,8 +28,9 @@ m.data[:bar, :edges] = 77
 # Prepare test data
 a = 5
 m = makemeshonrectangle(9.0, 4.5, 2a, a)
-m.groups[:g1] = FaceGroup([1, 2, 3, 13, 14, 7, 15])
-m.groups[:g2] = FaceGroup([1, 45, 56])
+definegroup!(m, 2, :g1, [1, 2, 3, 13, 14, 7, 15])
+definegroup!(m, 2, :g2, [1, 45, 56])
+
 e1 = edge(m, 1)
 f1 = element(m, 1)
 f13 = element(m, 13)

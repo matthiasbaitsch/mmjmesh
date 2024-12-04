@@ -62,7 +62,7 @@ end
 
 # Make _GroupMapping callable
 function (gd::_GroupMapping)(e::MeshEntity)
-    for g ∈ groups(e)
+    for g ∈ groupnames(e)
         haskey(gd.values, g) && return gd.values[g]
     end
 end

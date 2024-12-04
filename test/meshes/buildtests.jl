@@ -36,7 +36,7 @@ es8 = addelements!(m, is2, is4, group=:g1)
 @test id(node(m, i2)) == 2
 
 @test es7 == 80:98
-@test group(edge(m, 64)) == :chord
+@test groupname(edge(m, 64)) == :chord
 
 
 # -------------------------------------------------------------------------------------------------

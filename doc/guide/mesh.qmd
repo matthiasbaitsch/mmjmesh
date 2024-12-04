@@ -120,11 +120,12 @@ println("     Total area: ", sum(area.(faces(m))))
 Mesh entities can be collected in groups some of which are predefined.
 
 ```{julia}
-keys(m.groups.recipes)
+groupnames(m)
+groupnames(m, predefined=true)
 ```
 
 ```{julia}
-show(m.groups[:boundarynodes])
+show(group(m, :boundarynodes))
 ```
 
 Groups can be used to filter access
@@ -132,17 +133,17 @@ Groups can be used to filter access
 ```{julia}
 m = Mesh(meshpath("complex-g1.msh"))
 p = mplot(m)
-scatter!(p.axis, coordinates(m, :boundarynodes), color=:hotpink)
+scatter!(coordinates(m, :boundarynodes), color=:hotpink)
 p |> mconf()
 ```
 
 Additional groups can be defined
 
 ```{julia}
-m.groups[:f1] = FaceGroup(100:300)
-m.groups[:f2] = FaceGroup(200:600)
-m.groups[:e1] = EdgeGroup(600:800)
-m.groups[:e2] = EdgeGroup(700:900)
+definegroup!(m, 2, :f1, 100:300)
+definegroup!(m, 2, :f2, 200:600)
+definegroup!(m, 1, :e1, 600:800)
+definegroup!(m, 1, :e2, 700:900)
 mplot(m) |> mconf()
 ```
 
