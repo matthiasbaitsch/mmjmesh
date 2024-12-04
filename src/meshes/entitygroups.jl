@@ -116,12 +116,25 @@ end
 # -------------------------------------------------------------------------------------------------
 
 """
+    name(g)
+
+Name of group `g`.
+"""
+function name(g::Group)
+    for n = groupnames(g.mesh, predefined=true)
+        g.mesh.groups.entries[n] === g && return n
+    end
+end
+
+"""
     definegroup!(m, dim, name, indices)
 
 For mesh `m`, define group of `dim`-dimensional entities called `name` with entities `indices`.
 """
-function definegroup!(m::Mesh, dim::Int, name::Symbol, indices) 
-    m.groups[name] = MeshEntityGroup{MeshEntity{dim}}(indices)
+function definegroup!(m::Mesh, dim::Int, name::Symbol, indices)
+    g = MeshEntityGroup{MeshEntity{dim}}(indices)
+    g.mesh = m
+    m.groups[name] = g
 end
 
 """
@@ -188,4 +201,9 @@ hasgroups(m::Mesh; d::Int=-1, predefined::Bool=false) =
     ngroups(m, d=d, predefined=predefined) > 0
 
 
-group(m::Mesh, name::Symbol) = m.groups[name]
+function group(m::Mesh, name::Symbol)
+    # Hack to set group for recipes
+    g = m.groups[name]
+    g.mesh = m
+    return g
+end

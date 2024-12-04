@@ -7,15 +7,13 @@ space connected to `NN` nodes with a geometry of type `G`.
 struct MeshEntity{DT,DG,NN,G}
     mesh::Mesh
     index::Integer
-    data::EntityData{MeshEntity{DT}}
 end
 
 function MeshEntity(
     mesh::Mesh{DT,DG}, pdim::Integer, idx::Integer, g=GeometricObjectI{DT,DG}
 ) where {DT,DG}
     nn = nlinks(mesh.topology, pdim, 0, idx)
-    me = MeshEntity{pdim,DG,nn,g}(mesh, idx, EntityData{MeshEntity{pdim}}())
-    me.data.entity = me
+    me = MeshEntity{pdim,DG,nn,g}(mesh, idx)
     return me
 end
 

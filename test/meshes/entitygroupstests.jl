@@ -52,6 +52,17 @@ definegroup!(m, 2, :g1, [1, 2, 3, 13, 14, 7, 15])
 definegroup!(m, 2, :g2, [2, 13, 7, 5])
 definegroup!(m, 1, :g3, [1, 2, 3, 13, 14, 7, 15])
 
+
+@test mesh(group(m, :g1)) === m
+@test mesh(group(m, :g2)) === m
+@test mesh(group(m, :g3)) === m
+@test mesh(group(m, :elements)) === m
+
+for gn = groupnames(m, predefined=true)      
+      @test name(group(m, gn)) == gn
+end
+
+
 @test edim(group(m, :g1)) == 2
 @test edim(group(m, :g2)) == 2
 @test edim(group(m, :g3)) == 1

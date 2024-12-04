@@ -42,10 +42,19 @@ The dimension of object `o`.
 """
 function dimension end
 
+"""
+    mesh(o)
+
+Returns the mesh, object `o` belongs to.
+"""
+function mesh end
+
+
 export id
 export pdim, gdim
 export coordinate, coordinates
 export dimension
+export mesh
 
 
 const RealVec = AbstractVector{<:Real}

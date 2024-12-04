@@ -10,7 +10,7 @@ struct Mesh{DT,DG,G1,G2}
     topology::Topology{DT}
     geometry::Geometry{DG}
     groups::GroupCollection
-    data::MeshData{Mesh{DT,DG,G1,G2}}
+    data::Data
 end
 
 function Mesh(
@@ -18,7 +18,7 @@ function Mesh(
     g1=GeometricObjectI, g2=GeometricObjectI
 )
     T = Mesh{dt,dg,g1,g2}
-    mesh = T(Topology(dt, nn), Geometry(dg, nn), GroupCollection(), MeshData{T}())
+    mesh = T(Topology(dt, nn), Geometry(dg, nn), GroupCollection(), Data())
     mesh.data.mesh = mesh
     _registergrouprecipies(mesh)
     return mesh

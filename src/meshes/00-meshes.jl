@@ -13,7 +13,7 @@ import MMJMesh: coordinate, coordinates
 
 # Exports
 ## groups.jl
-export Group, GroupCollection, addrecipe!, clearcache!, names
+export Group, GroupCollection, addrecipe!, clearcache!, name, names
 ## mesh.jl
 export Mesh
 export nelements, element, elements, entity, entities
@@ -28,6 +28,8 @@ export nodeindices, edgeindices, faceindices, solidindices
 export definegroup!, group, groupids, edim
 export ngroups, groupnames, hasgroups
 export groupname, groupnames
+## data-implementation.jl
+export setdata!, data
 # XXX export MeshEntityGroup{0}, MeshEntityGroup{1}, MeshEntityGroup{2}, MeshEntityGroup{3}
 ## build.jl
 export addnode!, addnodes!, addelement!, addelements!
@@ -38,7 +40,7 @@ include("groups.jl")
 include("mesh.jl")
 include("meshentities.jl")
 include("entitygroups.jl")
-include("entitydata.jl")
+include("data-implementation.jl")
 include("common.jl")
 include("build.jl")
 

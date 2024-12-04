@@ -1,46 +1,26 @@
-using Test
-using MMJMesh
 using MMJMesh.Meshes
 
-using MMJMesh.Meshes: MeshData
+# Create test mesh
+coords = [0.0 1.0 2.0 0.1 0.9 1.9; 0.0 0.1 0.0 0.9 1.0 0.9]
+elts = [[1, 2, 5, 4], [2, 3, 6], [2, 6, 5]]
+m = Mesh(coords, elts, 2)
+definegroup!(m, 2, :bar, [2])
 
+# Assign data
+setdata!(m, :foo, 1)
+setdata!(group(m, :bar), :foo, 2)
+setdata!(group(m, :elements), :foo, 3)
+setdata!(node(m, 1), :foo, 4)
+setdata!(element(m, 1), :foo, 5)
 
-# -------------------------------------------------------------------------------------------------
-# Testee
-# -------------------------------------------------------------------------------------------------
-
-md = MeshData{Int}()
-
-
-# -------------------------------------------------------------------------------------------------
-# Global data
-# -------------------------------------------------------------------------------------------------
-
-md[:foo] = 42
-@test md[:foo] == 42
-@test md[:foo, 22] == 42
-
-
-# -------------------------------------------------------------------------------------------------
-# Actual mapping using a callable object
-# -------------------------------------------------------------------------------------------------
-
-mutable struct Foo
-    a::Int
-    b::Vector{Int}
-    value::Int
-end
-
-(f::Foo)(p1::Int, p2::Int) = p1 == f.a && p2 in f.b ? f.value : nothing
-
-md.mappings[:bar] = Foo(2, [1, 2, 33], 43)
-
-@test md[:bar, 2, 1] == 43
-@test md[:bar, 2, 2] == 43
-@test md[:bar, 2, 33] == 43
-@test isnothing(md[:bar, 3, 33])
-
-md.mappings[:bar].value = 44
-@test md[:bar, 2, 1] == 44
-
+# Test direct access
+@test data(m, :foo) == 1
+@test data(group(m, :bar), :foo) == 2
+@test data(group(m, :elements), :foo) == 3
+@test data(node(m, 1), :foo) == 4
+@test data(element(m, 1), :foo) == 5
+@test data(element(m, 2), :foo) == 2
+@test data(element(m, 3), :foo) == 3
+@test data(edge(m, 1), :foo) == 1
+@test data(edge(m, 1), :baz) === nothing
 
