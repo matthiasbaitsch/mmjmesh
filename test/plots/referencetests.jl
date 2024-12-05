@@ -153,7 +153,7 @@ function results(face, name) # Warp using postprocessing function
         return ProductFunction(Sin() ∘ s, Cos() ∘ s)
     end
 end
-m.data[:post] = results
+setdata!(m, :post, results)
 
 f = gm.Figure()
 gm.Axis3(f[1, 1], aspect=:data)

@@ -157,12 +157,20 @@ m = Mesh(meshpath("complex-g1.msh"))
 n1 = node(m, 1)
 n2 = node(m, 2)
 e22 = element(m, 22)
-n1.data[:d1] = 42
-e22.data[:d2] = 61
 
-println(" n1.data[:d1] = ", n1.data[:d1])
-println(" n2.data[:d1] = ", n2.data[:d1])
-println("e22.data[:d2] = ", e22.data[:d2])
+setdata!(n1, :d1, 42)
+setdata!(e22, :d2, 61)
+
+println("data( n1, :d1) = ", data(n1, :d1))
+println("data( n2, :d1) = ", data(n2, :d1))
+println("data(e22, :d2) = ", data(e22, :d2))
+```
+
+Use `hasdata` to test, if data is defined:
+
+```{julia}
+println("hasdata( n1, :d1) = ", hasdata(n1, :d1))
+println("hasdata( n2, :d1) = ", hasdata(n2, :d1))
 ```
 
 Example how to attach data to groups:
@@ -170,29 +178,31 @@ Example how to attach data to groups:
 ```{julia}
 m = Mesh(meshpath("complex-g1.msh"))
 
-println("s1: ", m.groups[:s1].indices)
-println("s2: ", m.groups[:s2].indices)
-println("s3: ", m.groups[:s3].indices)
+g1 = group(m, :s1)
+g2 = group(m, :s2)
+g3 = group(m, :s3)
 
-m.data[:kefunc, :s1] = "f1";
-m.data[:kefunc, :s2] = "f2";
-m.data[:kefunc, :s3] = "f3";
+println("s1: ", g1)
+println("s2: ", g2)
+println("s3: ", g3)
 
-e0005 = element(m, 0005)
-e0490 = element(m, 0490)
+setdata!(g1, :foo, "f1")
+setdata!(g2, :foo, "f2")
+setdata!(g3, :foo, "f3")
+
+e2 = element(m, 5)
+e490 = element(m, 490)
 e1132 = element(m, 1132)
 
-println("e0005.data[:kefunc] = ", e0005.data[:kefunc])
-println("e0490.data[:kefunc] = ", e0490.data[:kefunc])
-println("e1132.data[:kefunc] = ", e1132.data[:kefunc])
+println("data(e2, :foo) = ", data(e2, :foo))
+println("data(e490, :foo) = ", data(e490, :foo))
+println("data(e1132, :foo) = ", data(e1132, :foo))
 ```
 
 Example how to attach data to elements:
 
 ```{julia}
 m = Mesh(0 .. 10, 20)
-m.data[:test, :elements] = 99
-
-e1 = element(m, 1)
-println(e1.data[:test])
+setdata!(group(m, :elements), :foo, 99)
+println(data(element(m, 2), :foo))
 ```

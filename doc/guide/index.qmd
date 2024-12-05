@@ -41,14 +41,14 @@ coordinates(m)
 Properties are associated with the mesh using the `data` field of the mesh and a name for the property in the form `:name`
 
 ```{julia}
-m.data[:foo] = 99
-m.data[:bar] = sqrt;
+setdata!(m, :foo, 99)
+setdata!(m, :bar, sqrt)
 ```
 
 and then are ready to be used in a later stage
 
 ```{julia}
-f = m.data[:bar]
+f = data(m, :bar)
 f(4)
 ```
 

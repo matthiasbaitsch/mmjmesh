@@ -15,6 +15,8 @@ data(m::Mesh, id::Symbol) = m.data.meshdata[id]
 
 data(g::Group, id::Symbol) = g.mesh.data.groupdata[Pair(id, name(g))]
 
+hasdata(o, id::Symbol) = !isnothing(data(o, id))
+
 function data(e::MeshEntity, id::Symbol)
     d = e.mesh.data
 

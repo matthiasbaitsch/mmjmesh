@@ -375,7 +375,7 @@ function plotfacefunctions(plot::MPlot)
 
     # Function to plot
     if colors isa Symbol
-        facefunction(face) = face.data[:post](face, colors)
+        facefunction(face) = data(face, :post)(face, colors)
     else
         facefunction = colors
     end

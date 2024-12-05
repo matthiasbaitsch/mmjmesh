@@ -25,12 +25,9 @@ Base.iterate(g::Group) = iterate(g.indices)
 Base.iterate(g::Group, state) = iterate(g.indices, state)
 
 # Set operations
-Base.union(g1::Group{T}, g2::Group{T}) where {T} = 
-    Group{T}(g1.mesh, union(g1.indices, g2.indices))
-Base.intersect(g1::Group{T}, g2::Group{T}) where {T} = 
-    Group{T}(g1.mesh, intersect(g1.indices, g2.indices))
-Base.setdiff(g1::Group{T}, g2::Group{T}) where {T} = 
-    Group{T}(g1.mesh, setdiff(g1.indices, g2.indices))
+Base.union(g1::Group{T}, g2::Group{T}) where {T} = Group{T}(union(g1.indices, g2.indices))
+Base.intersect(g1::Group{T}, g2::Group{T}) where {T} = Group{T}(intersect(g1.indices, g2.indices))
+Base.setdiff(g1::Group{T}, g2::Group{T}) where {T} = Group{T}(setdiff(g1.indices, g2.indices))
 
 # Others
 Base.in(target::T1, g::Group{T2}) where {T1,T2} = T1 <: T2 && index(target) ∈ g.indices

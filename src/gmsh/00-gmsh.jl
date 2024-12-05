@@ -52,7 +52,7 @@ function MMJMesh.Meshes.Mesh(filepath::String)
             for tag ∈ gm.entities[d0][eb.entityTag].physicaltags
                 name = groupnamesbytag[tag]
                 m.groups[name] = m.groups[name] ∪ Group{MeshEntity{d0}}(indices)
-
+                
                 if d0 == 1
                     nn = ng(name)
                     m.groups[nn] = m.groups[nn] ∪ Group{MeshEntity{0}}(reshape(eb.nodetags, :))

@@ -1,3 +1,4 @@
+using Test
 using MMJMesh.Meshes
 
 # Create test mesh
@@ -24,3 +25,5 @@ setdata!(element(m, 1), :foo, 5)
 @test data(edge(m, 1), :foo) == 1
 @test data(edge(m, 1), :baz) === nothing
 
+@test hasdata(edge(m, 1), :foo)
+@test !hasdata(edge(m, 1), :baz)
