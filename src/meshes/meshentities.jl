@@ -43,6 +43,8 @@ indices(me::MeshEntity{DT}, pdim::Integer) where {DT} =
 nentities(me::MeshEntity{DT}, pdim::Integer) where {DT} =
     nlinks(me.mesh.topology, DT, pdim, me.index)
 
+nodeindices(n::Node) = [n.index]
+
 # Show
 function _mpname(t::Type)
     s = string(t)
