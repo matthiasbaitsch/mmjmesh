@@ -18,14 +18,14 @@ import MMJMesh.Plots: approximationerror, sampleadaptive
 ### On a straight line
 
 ```{julia}
-m = makemeshoninterval(0, 4, 20)
+m = Mesh(0 .. 4, 20)
 mplot(m) |> mconf()
 ```
 
 Nodes hidden if too many.
 
 ```{julia}
-m = makemeshoninterval(0, 4, 60)
+m = Mesh(0 .. 4, 60)
 mplot(m) |> mconf()
 ```
 
@@ -196,7 +196,7 @@ function results(face, name)
         return ProductFunction(Sin() ∘ s, Cos() ∘ s)
     end
 end
-m.data[:post] = results;
+setdata!(m, :post, results)
 ```
 
 Plot result `w`:
