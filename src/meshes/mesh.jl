@@ -47,6 +47,27 @@ nentities(m::Mesh, dim::Int) = Topologies.nentities(m.topology, dim, true)
 entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx, geometrytype(m, pdim))
 indices(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
 
+# Iterate over all entities
+struct EntityIterator
+    m::Mesh
+end
+
+Base.iterate(it::EntityIterator) = node(it.m, 1), (0, 1)
+
+function Base.iterate(it::EntityIterator, state)
+    dim, index = state
+    index += 1
+    if index > nentities(it.m, dim)
+        dim += 1
+        index = 1
+    end
+    dim > pdim(it.m) && return nothing
+    return entity(it.m, dim, index), (dim, index)
+end
+
+entities(m::Mesh) = EntityIterator(m)
+
+# Geometry
 function geometrytype(::Mesh{DT,DG,G1,G2}, pdim::Integer) where {DT,DG,G1,G2}
     pdim == 0 && return Point
     pdim == 1 && return G1
