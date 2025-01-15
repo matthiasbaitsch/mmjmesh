@@ -88,7 +88,7 @@ A mesh consists of mesh parts:
 
 The element type simply refers to the parts of the highest dimension present in the mesh. It is introduced in order to be compatible with common finite element terminology.
 
-For the nodes of mesh or mesh part `m`, the functions
+For the nodes of mesh or mesh entity `m`, the functions
 
 - `nnodes(m)`: Number of nodes
 
@@ -112,6 +112,7 @@ println("           Edge: ", edge(m, 21))
 println("           Face: ", face(m, 67))
 println("   Node indices: ", nodeindices(element(m, 67)))
 println("    Coordinates: ", coordinates(element(m, 67)))
+println("    Coordinates: ", coordinates(element(m, 67), 3))
 println("     Total area: ", sum(area.(faces(m))))
 ```
 

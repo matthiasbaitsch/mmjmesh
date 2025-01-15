@@ -81,7 +81,7 @@ mplot(m, [Polynomial(rand(-1 .. 1, 4), IHat) for _ ∈ 1:nelements(m)]) |> mconf
 Furthermore, 1D meshes can be created with a parametric function
 
 ```{julia}
-m = makemeshoninterval(0, 5, 60, t -> [t; 0.3 * sin(π * t)])
+m = Mesh(0 .. 5, 60, t -> [t; 0.3 * sin(π * t)])
 mplot(m) |> mconf()
 ```
 
@@ -104,7 +104,7 @@ Create mesh on rectangular grid
 
 ```{julia}
 a = 80
-m = makemeshonrectangle(9.0, 4.5, 2a, a)
+m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 mplot(m) |> mconf()
 ```
 
@@ -112,7 +112,7 @@ Mesh with coordinate transformation
 
 ```{julia}
 cartesianfrompolar(x) = x[1] * [cos(x[2]), sin(x[2])]
-m = makemeshonrectangle((1 .. 2) × (0 .. (3 / 2)π), 10, 70, gmap=cartesianfrompolar)
+m = Mesh((1 .. 2) × (0 .. (3 / 2)π), 10, 70, gmap=cartesianfrompolar)
 mplot(m, edgesvisible=true) |> mconf()
 ```
 

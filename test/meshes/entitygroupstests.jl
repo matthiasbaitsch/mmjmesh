@@ -1,4 +1,5 @@
 using Test
+using DomainSets: ×
 
 using MMJMesh
 using MMJMesh.Meshes
@@ -31,7 +32,7 @@ ids = _idvector(values)
 
 # _entitygroupnames
 a = 5
-m = makemeshonrectangle(9.0, 4.5, 2a, a)
+m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 definegroup!(m, 2, :g1, [1, 2, 3, 13, 14, 7, 15])
 definegroup!(m, 2, :g2, [2, 13, 7, 5])
 fg = _entitygroupnames(m, d=2)
@@ -47,7 +48,7 @@ ng = _entitygroupnames(m, d=0, predefined=true)
 # -------------------------------------------------------------------------------------------------
 
 a = 5
-m = makemeshonrectangle(9.0, 4.5, 2a, a)
+m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 definegroup!(m, 2, :g1, [1, 2, 3, 13, 14, 7, 15])
 definegroup!(m, 2, :g2, [2, 13, 7, 5])
 definegroup!(m, 1, :g3, [1, 2, 3, 13, 14, 7, 15])
@@ -58,7 +59,7 @@ definegroup!(m, 1, :g3, [1, 2, 3, 13, 14, 7, 15])
 @test mesh(group(m, :g3)) === m
 @test mesh(group(m, :elements)) === m
 
-for gn = groupnames(m, predefined=true)      
+for gn = groupnames(m, predefined=true)
       @test name(group(m, gn)) == gn
 end
 
@@ -79,7 +80,7 @@ e42 = element(m, 42)
 # -------------------------------------------------------------------------------------------------
 
 a = 5
-m = makemeshonrectangle(9.0, 4.5, 2a, a)
+m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 @test isnothing(m.groups.entries[:boundarynodes])
 @test isnothing(m.groups.entries[:boundaryedges])
 @test length(group(m, :boundarynodes)) == 30
@@ -92,7 +93,7 @@ m = makemeshonrectangle(9.0, 4.5, 2a, a)
 
 # Test predefined only
 a = 5
-m = makemeshonrectangle(9.0, 4.5, 2a, a)
+m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 @test groupnames(m) == []
 @test groupnames(m, d=1) == []
 @test groupnames(m, d=1, predefined=true) == [:edges, :boundaryedges]

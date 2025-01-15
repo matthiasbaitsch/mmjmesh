@@ -1,6 +1,6 @@
 function sample2d(f; domain::Rectangle, npoints::Integer, gmap=identity)
     n1, n2 = _getnintervals(domain, npoints)
-    m = makemeshonrectangle(domain, n1, n2, TRIANGLE)
+    m = Mesh(domain, n1, n2, TRIANGLE)
     x = tomatrix([[gmap(x)..., f(x)] for x in m.geometry.points])
     t = tomatrix([l for l in links(m.topology, 2, 0)], ROWS)
     return x, t

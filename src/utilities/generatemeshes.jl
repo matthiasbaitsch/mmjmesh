@@ -1,3 +1,6 @@
+_isscaling(gmap) = (gmap == identity)
+_isscaling(m::AffineMapping) = m.A[1, 2] == 0 && m.A[2, 1] == 0
+
 
 function makemeshoninterval(a::Number, b::Number, n::Int, g=t -> [t; 0.0])
     # Coordinates
@@ -102,5 +105,6 @@ function makemeshonrectangle(
     return m
 end
 
-_isscaling(gmap) = (gmap == identity)
-_isscaling(m::AffineMapping) = m.A[1, 2] == 0 && m.A[2, 1] == 0
+Meshes.Mesh(
+    Ω::Rectangle, nex::Integer, ney::Integer=-1, meshtype::Meshtype=QUADRANGLE; gmap=identity
+) = makemeshonrectangle(Ω, nex, ney, meshtype, gmap=gmap)

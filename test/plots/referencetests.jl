@@ -1,4 +1,6 @@
 using Random
+using IntervalSets
+using DomainSets: ×
 using ReferenceTests
 import CairoMakie as cm
 import GLMakie as gm
@@ -33,8 +35,8 @@ meshpath(m) = joinpath(@__DIR__(), "../../data/gmsh", m)
 # -------------------------------------------------------------------------------------------------
 # 1D meshes
 # -------------------------------------------------------------------------------------------------
-m = makemeshoninterval(0, 4, 60)
-@test_reference ref("m1d-001.png") makemeshoninterval(0, 4, 20) |> mplot |> mconf()
+m = Mesh(0 .. 4, 60)
+@test_reference ref("m1d-001.png") Mesh(0 .. 4, 20) |> mplot |> mconf()
 @test_reference ref("m1d-002.png") m |> mplot |> mconf()
 @test_reference ref("m1d-003.png") mplot(m, -1.1 .+ 2.6 * rand(nnodes(m))) |> mconf()
 @test_reference ref("m1d-004.png") mplot(m, -1.1 .+ 2.2 * rand(nedges(m))) |> mconf()
@@ -49,21 +51,21 @@ m = makemeshoninterval(0, 4, 60)
 
 # Quadrilaterals
 a = 80
-m = makemeshonrectangle(9.0, 4.5, 2a, a)
+m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 @test_reference ref("m2d-001.png") mplot(m, edgesvisible=true, edgecolor=:hotpink) |> mconf()
 @test_reference ref("m2d-002.png") mplot(m, 4.1 * (rand(nnodes(m)) .- 0.25)) |> mconf()
 @test_reference ref("m2d-003.png") mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf()
 
 # Triangles
 a = 20
-m = makemeshonrectangle(9.0, 4.5, 2a, a, TRIANGLE)
+m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a, TRIANGLE)
 @test_reference ref("m2d-004.png") mplot(m, edgesvisible=true) |> mconf()
 @test_reference ref("m2d-005.png") mplot(m, 4.1 * (rand(nnodes(m)) .- 0.25)) |> mconf()
 @test_reference ref("m2d-006.png") mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf()
 
 # Configuration
 a = 10
-m1 = makemeshonrectangle(4, 2, 2a, a)
+m1 = Mesh((0 .. 4) × (0 .. 2), 2a, a)
 @test_reference ref("m2d-007.png") mplot(m1, 3 * rand(nfaces(m1)),
     nodesvisible=true, nodecolor=:hotpink, nodesize=12,
     edgesvisible=true, edgecolor=:lightblue, edgelinewidth=3,
@@ -73,7 +75,7 @@ m1 = makemeshonrectangle(4, 2, 2a, a)
 
 # Plot boundary nodes
 a = 20
-m = makemeshonrectangle(9.0, 4.5, 2a, a)
+m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 p = mplot(m)
 x = coordinates(m)
 bn = m.groups[:boundarynodes]
@@ -82,7 +84,7 @@ cm.scatter!(p.axis, x[:, bn], color=:magenta)
 
 # Face groups
 a = 5
-m = makemeshonrectangle(4, 2, 2a, a)
+m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 definegroup!(m, 2, :g1, [1, 2, 3, 6, 22])
 definegroup!(m, 2, :g2, [5, 6, 7, 8, 22, 33])
 definegroup!(m, 2, :g3, [34])
@@ -93,7 +95,7 @@ definegroup!(m, 2, :g3, [34])
 
 # Edge groups
 a = 5
-m = makemeshonrectangle(4, 2, 2a, a)
+m = Mesh((0 .. 4) × (0 .. 2), 2a, a)
 definegroup!(m, 1, :g1, 1:10)
 definegroup!(m, 1, :g2, 8:16)
 definegroup!(m, 1, :g3, 62:71)
@@ -119,7 +121,7 @@ gm.activate!()
 
 # Warp in z-direction
 a = 4
-m = makemeshonrectangle(4, 2, 2a, a)
+m = Mesh((0 .. 4) × (0 .. 2), 2a, a)
 function warp(node)
     x = coordinates(node)
     x3 = 0.1 * sin(0.25 * pi * (x[1] - 2)) * sin(0.5 * pi * (x[2] - 1))
@@ -137,7 +139,7 @@ mplot!(m, rand(nfaces(m)), nodewarp=0.5 * rand(nnodes(m)))
 @test_reference ref("m2d-018.png") f
 
 # Plot function on face
-m = makemeshonrectangle(8, 4, 4, 2)
+m = Mesh((0 .. 8) × (0 .. 4), 4, 2)
 w(face) = x -> index(face) * (1 - x[1]^2) * (1 - x[2]^2)
 
 f = gm.Figure() # Warp by one function on face

@@ -15,7 +15,6 @@ using MMJMesh.Mathematics
 # Exports
 ## generatemeshes.jl
 export Meshtype, QUADRANGLE, TRIANGLE
-export makemeshoninterval, makemeshonrectangle
 
 # Parts
 include("generatemeshes.jl")
