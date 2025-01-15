@@ -4,17 +4,15 @@ engine: julia
 
 # The Mesh interface
 
-This chapter is utterly incomplete
-
 ```{julia}
 #| echo: false
 #| warning: false
 include("setup.jl")
 ```
 
-## Basic usage
+## Making meshes
 
-Create mesh with coordinates and connectivity
+### Mesh by coordinates and connectivity.
 
 ```{julia}
 coords = [0.0 1.0 2.0 0.1 0.9 1.9; 0.0 0.1 0.0 0.9 1.0 0.9]
@@ -23,30 +21,8 @@ m = Mesh(coords, elts, 2)
 mplot(m) |> mconf()
 ```
 
-Coordinates of a node
 
-```{julia}
-coordinates(node(m, 2))
-```
-
-Coordinates of a face
-
-```{julia}
-coordinates(face(m, 3))
-```
-
-Process faces and print node and edge indices
-
-```{julia}
-for e ∈ elements(m)
-    println(e)
-    println("- ", nodeindices(e))
-    println("- ", edgeindices(e))
-    println("- ", faceindices(e))
-end
-```
-
-## Build mesh incrementally
+### Build mesh incrementally
 
 ```{julia}
 l = 80
@@ -67,7 +43,7 @@ addelements!(m, is1 .+ ne2, is2 .+ (ne2 + 1), n=ne2, group=:diag)
 mplot(m, edgecolor=:groups, nodesvisible=true) |> mconf()
 ```
 
-## Read mesh from Gmsh file
+### Read mesh from Gmsh file
 
 ```{julia}
 m = Mesh(meshpath("complex-g1.msh"))
@@ -76,17 +52,17 @@ mplot(m, edgesvisible=true) |> mconf()
 
 ## Working with meshes
 
-A mesh consists of mesh parts:
+A mesh consists of mesh entities:
 
-| Type    | Parametric dimension      |
-|---------|---------------------------|
-| Node    | 0                         |
-| Edge    | 1                         |
-| Face    | 2                         |
-| Solid   | 3                         |
-| Element | Maximum dimension in mesh | 
+| Entity Type | Parametric dimension      |
+|-------------|---------------------------|
+| Node        | 0                         |
+| Edge        | 1                         |
+| Face        | 2                         |
+| Solid       | 3                         |
+| Element     | Maximum dimension in mesh | 
 
-The element type simply refers to the parts of the highest dimension present in the mesh. It is introduced in order to be compatible with common finite element terminology.
+The Element type simply refers to the parts of the highest dimension present in the mesh. It is introduced in order to be compatible with common finite element terminology.
 
 For the nodes of mesh or mesh entity `m`, the functions
 
@@ -98,22 +74,55 @@ For the nodes of mesh or mesh entity `m`, the functions
 
 - `nodeindices(m)`: Indices of nodes
 
+exist. There are similar functions for edges, faces, solids and elements. In addition, the functions `length(edge)` and `area(face)` exist.
+
+Coordinates of the mesh or mesh entities are accessed using
+
 - `coordinates(m, n)`: Coordinates of node `n`
 
 - `coordinates(m)`: All node coordinates in a matrix
 
-exist. There are similar functions for edges, faces and solids and elements. In addition, the functions `length(edge)` and `area(face)` exist.
+Here is an example
 
 ```{julia}
-m = Mesh(meshpath("complex-g1.msh"))
+coords = [0.0 1.0 2.0 0.1 0.9 1.9; 0.0 0.1 0.0 0.9 1.0 0.9]
+elts = [[1, 2, 5, 4], [2, 3, 6], [2, 6, 5]]
+m = Mesh(coords, elts, 2)
 
-println("Number of nodes: ", nnodes(m))
-println("           Edge: ", edge(m, 21))
-println("           Face: ", face(m, 67))
-println("   Node indices: ", nodeindices(element(m, 67)))
-println("    Coordinates: ", coordinates(element(m, 67)))
-println("    Coordinates: ", coordinates(element(m, 67), 3))
-println("     Total area: ", sum(area.(faces(m))))
+e = element(m, 2)
+println("Total node count: ", nnodes(m))
+println("      Total area: ", sum(area.(faces(m))))
+println("          Node 3: ", node(m, 3))
+println("          Edge 8: ", edge(m, 8))
+println("         Element: ", e)
+println(" Edge of element: ", edge(e, 2))
+println("    Node indices: ", nodeindices(e))
+println("     Coordinates: ", coordinates(e))
+println("     Coordinates: ", coordinates(e, 3))
+```
+
+A loop can be used to process specific entity types
+
+```{julia}
+for e = faces(m)
+    println(e)
+end
+```
+
+or all entities of the mesh
+
+```{julia}
+for e = entities(m)
+    println(e)
+end
+```
+
+or a mesh entity
+
+```{julia}
+for e = entities(face(m, 3))
+    println(e)
+end
 ```
 
 ## Groups and predefined groups

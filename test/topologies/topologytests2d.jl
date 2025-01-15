@@ -2,6 +2,7 @@ using Test
 
 using MMJMesh
 using MMJMesh.Topologies
+using MMJMesh.Topologies: entities
 
 """
 Test topology

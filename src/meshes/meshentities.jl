@@ -43,6 +43,8 @@ indices(me::MeshEntity{DT}, pdim::Integer) where {DT} =
 nentities(me::MeshEntity{DT}, pdim::Integer) where {DT} =
     nlinks(me.mesh.topology, DT, pdim, me.index)
 
+entity(me::MeshEntity, pdim::Int, idx::Int) = entity(me.mesh, pdim, index(me, pdim, idx))
+
 nodeindices(n::Node) = [n.index]
 
 # Show
@@ -51,7 +53,10 @@ function _mpname(t::Type)
     return s[1:findfirst('{', s)-1]
 end
 
-Base.show(io::IO, e::T) where {T<:MeshEntity} = print(io, "$(_mpname(T))($(id(e)))$(nodeindices(e))")
+Base.show(io::IO, e::T) where {T<:MeshEntity{0}} = 
+    print(io, "$(_mpname(T))($(id(e)))$(coordinates(e))")
+Base.show(io::IO, e::T) where {T<:MeshEntity} = 
+    print(io, "$(_mpname(T))($(id(e)))$(nodeindices(e))")
 
 # Coordinates
 coordinate(n::Node, c::Integer) = n.mesh.geometry.points.coordinates[c, n.index]

@@ -1,4 +1,6 @@
 using Test
+using IntervalSets
+using DomainSets: ×
 
 using MMJMesh
 using MMJMesh.Meshes
@@ -91,7 +93,7 @@ f3 = face(m, 3)
 # Geometry
 # -------------------------------------------------------------------------------------------------
 
-m = makemeshonrectangle(4, 2, 4, 2)
+m = Mesh((0 .. 4) × (0 .. 2), 4, 1)
 n = node(m, 1)
 f = face(m, 3)
 phi = parametrization(geometry(f))
@@ -104,3 +106,21 @@ phi = parametrization(geometry(f))
 @test phi(1, -1) == coordinates(f, 2)
 @test phi(1, 1) == coordinates(f, 3)
 @test phi(-1, 1) == coordinates(f, 4)
+
+
+# -------------------------------------------------------------------------------------------------
+# Access to parts
+# -------------------------------------------------------------------------------------------------
+
+m = Mesh((0 .. 1) × (0 .. 1), 3, 3)
+
+e = element(m, 1)
+@test node(e, 1) === node(m, 1)
+@test node(e, 2) === node(m, 2)
+@test node(e, 3) === node(m, 6)
+@test node(e, 4) === node(m, 5)
+@test edge(e, 1) == edge(m, 1)
+
+e = element(m, 9)
+@test node(e, 1) === node(m, 11)
+@test edge(e, 3) === edge(m, 24)

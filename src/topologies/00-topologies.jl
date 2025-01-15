@@ -12,7 +12,7 @@ export ConnectivityList
 export inverse, maxlinkssize
 ## Topology
 export Topology
-export addlinks!, nentities, entities, entity, dimension, isanonymous, nlinks, links
+export addlinks!, nentities, entity, dimension, isanonymous, nlinks, links
 
 # Parts
 include("connectivitylist.jl")
