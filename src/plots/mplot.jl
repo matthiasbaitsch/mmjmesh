@@ -146,10 +146,6 @@ function MakieCore.plot!(plot::MPlot)
         plot.nodesvisible[] && plotnodes(plot)
     end
 
-    # XXX Configure
-    println(plot)
-
-
     # Return
     return plot
 end
