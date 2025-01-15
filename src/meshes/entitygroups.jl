@@ -148,7 +148,7 @@ function groupnames(m::Mesh; d::Int=-1, predefined::Bool=false)
     isvalid(name) =
         (predefined || !ispredefined(m.groups, name)) &&
         (d == -1 || (!isempty(m.groups[name]) && edim(m.groups[name]) == d))
-    return [name for name ∈ names(m.groups) if isvalid(name)]
+    return sort([name for name ∈ names(m.groups) if isvalid(name)])
 end
 
 """
