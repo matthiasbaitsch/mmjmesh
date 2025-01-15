@@ -4,10 +4,8 @@ using LinearAlgebra
 
 using MMJMesh
 using MMJMesh.Plots
+using MMJMesh.Tests
 using MMJMesh.Mathematics
-
-include("validatemappings.jl")
-
 
 # -------------------------------------------------------------------------------------------------
 # Test transpose mapping
@@ -20,7 +18,7 @@ v = MappingFromComponents(
     ProductFunction(Sin(IHat), Sin(IHat)))
 vt = MMJMesh.Mathematics.TransposeMapping(jacobian(v))
 @test valueat(vt, x) ≈ jacobianat(v, x)'
-@test _validatecodomaintype(vt)
+@test MMJMesh.Tests._validatecodomaintype(vt)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -84,5 +82,5 @@ validate(m2)
 # Interpolate vectors R2 -> R3
 m3 = Interpolation(L21, C3)
 @test validate(m3)
-@test _validatecodomaintype(jacobian(m3))
+@test MMJMesh.Tests._validatecodomaintype(jacobian(m3))
 

@@ -45,14 +45,6 @@ e6 = makeelement(:hermite, QHat, conforming=false);
 # Validate elements
 # -------------------------------------------------------------------------------------------------
 
-function validate(e::FiniteElement; atol)
-    N = dimension(e.P)
-    ϕ = nodalbasis(e)
-    for i = 1:N, j = 1:N
-        @test isapprox(e.N[i](ϕ[j]), i == j, atol=atol)
-    end
-end
-
 validate(makeelement(:lagrange, IHat, k=1), atol=1e-14)
 validate(makeelement(:lagrange, QHat, k=1), atol=1e-14)
 validate(makeelement(:lagrange, QHat, k=8), atol=1e-8)

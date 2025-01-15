@@ -4,10 +4,11 @@ using LinearAlgebra
 using DomainSets: ×, Rectangle, ProductDomain
 
 using MMJMesh
+using MMJMesh.Tests
 using MMJMesh.Mathematics
 using MMJMesh.Mathematics: derivativetype, dimension
 
-include("validatemappings.jl")
+
 
 
 # -------------------------------------------------------------------------------------------------

@@ -3,10 +3,9 @@ using Test
 using IntervalSets
 
 using MMJMesh
+using MMJMesh.Tests
 using MMJMesh.Mathematics
 using MMJMesh.Mathematics: _makebreakpoints, indexofpieceat
-
-include("validatemappings.jl")
 
 # Helpers
 @test _makebreakpoints(1:2, 0 .. 3) == 0:3

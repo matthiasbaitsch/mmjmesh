@@ -1,9 +1,12 @@
+
+using Test
 using IntervalSets
 
 import Random
 import DomainSets
 import FiniteDifferences
 
+using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Geometries: Box, parametrization
 
@@ -138,6 +141,15 @@ function validate(m::AbstractMapping; atol::Real=0.0, rtol::Real=1e-5)
 end
 
 
+function validate(e::FiniteElement; atol)
+    N = dimension(e.P)
+    ϕ = nodalbasis(e)
+    for i = 1:N, j = 1:N
+        @test isapprox(e.N[i](ϕ[j]), i == j, atol=atol)
+    end
+end
+
+
 function validateoperations(f1, f2)
     h1 = f1 + f2
     h2 = f1 * f2
@@ -145,7 +157,7 @@ function validateoperations(f1, f2)
     for x ∈ _sample(domain(f1) ∩ domain(f2))
         @test h1(x) ≈ f1(x) + f2(x)
         @test h2(x) ≈ f1(x) * f2(x)
-        @test h3(x) ≈ π * f1(x) 
+        @test h3(x) ≈ π * f1(x)
     end
     return true
 end

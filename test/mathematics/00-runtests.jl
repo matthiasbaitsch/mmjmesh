@@ -2,8 +2,8 @@ module MathematicsTests
 
 using Test
 
+using MMJMesh.Tests
 using MMJMesh.Mathematics
-include("validatemappings.jl")
 
 @testset "Mappings" begin
     include("domainstests.jl")
