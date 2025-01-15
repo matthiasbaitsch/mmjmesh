@@ -1,14 +1,17 @@
 
 function setdata!(m::Mesh, id::Symbol, value)
     m.data.meshdata[id] = value
+    nothing
 end
 
 function setdata!(g::Group, id::Symbol, value)
     g.mesh.data.groupdata[Pair(id, name(g))] = value
+    nothing
 end
 
 function setdata!(e::MeshEntity, id::Symbol, value)
     e.mesh.data.entitydata[(id, pdim(e), index(e))] = value
+    nothing
 end
 
 data(m::Mesh, id::Symbol) = m.data.meshdata[id]
@@ -33,5 +36,5 @@ function data(e::MeshEntity, id::Symbol)
     # Mesh
     haskey(d.meshdata, id) && return d.meshdata[id]
 
-    return nothing
+    nothing
 end
