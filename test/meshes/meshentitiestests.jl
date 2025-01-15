@@ -124,3 +124,12 @@ e = element(m, 1)
 e = element(m, 9)
 @test node(e, 1) === node(m, 11)
 @test edge(e, 3) === edge(m, 24)
+
+
+# -------------------------------------------------------------------------------------------------
+# Access multiple coordinates
+# -------------------------------------------------------------------------------------------------
+
+m = Mesh(meshpath("complex-g1.msh"))
+@test coordinates(m, [3, 9]) == stack([coordinates(m, 3), coordinates(m, 9)])
+@test coordinates(face(m, 1), [1, 3]) == coordinates(m, [329, 176])

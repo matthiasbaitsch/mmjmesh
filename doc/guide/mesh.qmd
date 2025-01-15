@@ -78,9 +78,12 @@ exist. There are similar functions for edges, faces, solids and elements. In add
 
 Coordinates of the mesh or mesh entities are accessed using
 
+- `coordinates(m)`: All node coordinates in a matrix
+
 - `coordinates(m, n)`: Coordinates of node `n`
 
-- `coordinates(m)`: All node coordinates in a matrix
+- `coordinates(m, indices)`: Coordinates of nodes with `indices`
+
 
 Here is an example
 

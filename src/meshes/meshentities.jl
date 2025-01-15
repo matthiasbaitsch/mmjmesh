@@ -53,17 +53,19 @@ function _mpname(t::Type)
     return s[1:findfirst('{', s)-1]
 end
 
-Base.show(io::IO, e::T) where {T<:MeshEntity{0}} = 
+Base.show(io::IO, e::T) where {T<:MeshEntity{0}} =
     print(io, "$(_mpname(T))($(id(e)))$(coordinates(e))")
-Base.show(io::IO, e::T) where {T<:MeshEntity} = 
+Base.show(io::IO, e::T) where {T<:MeshEntity} =
     print(io, "$(_mpname(T))($(id(e)))$(nodeindices(e))")
 
 # Coordinates
-coordinate(n::Node, c::Integer) = n.mesh.geometry.points.coordinates[c, n.index]
+coordinate(n::Node, c::Int) = n.mesh.geometry.points.coordinates[c, n.index]
 coordinates(n::Node) = n.mesh.geometry.points.coordinates[:, n.index]
 coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, indices(me, 0)]
-coordinates(me::MeshEntity, i::Integer) =
+coordinates(me::MeshEntity, i::Int) =
     me.mesh.geometry.points.coordinates[:, index(me, 0, i)]
+coordinates(me::MeshEntity, ii::AbstractVector{Int}) =
+    me.mesh.geometry.points.coordinates[:, indices(me, 0)[ii]]
 
 # Specialized functions
 Base.length(e::Edge{DG,2}) where {DG} = measure(geometry(e))

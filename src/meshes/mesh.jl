@@ -61,6 +61,7 @@ MMJMesh.gdim(::Mesh{DT,DG}) where {DT,DG} = DG
 coordinates(m::Mesh) = m.geometry.points.coordinates[:, nodeindices(m)]
 coordinates(m::Mesh, group::Symbol) = m.geometry.points.coordinates[:, m.groups[group]]
 coordinates(m::Mesh, index::Int) = m.geometry.points.coordinates[:, index]
+coordinates(m::Mesh, indices::AbstractVector{Int}) = m.geometry.points.coordinates[:, indices]
 
 nelements(m::Mesh{DT,DG}) where {DT,DG} = nentities(m, DT)
 element(m::Mesh{DT,DG}, index::Int) where {DT,DG} = entity(m, DT, index)
