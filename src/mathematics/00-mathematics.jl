@@ -85,7 +85,7 @@ export ∂xLF, ∂yLF, ∂xyLF
 export FunctionSpace, PolynomialSpace, P, Q, S, Q23R, basis
 
 # Curves
-export linesegment, polynomialinterpolation
+export linesegment, polynomialinterpolation, parameterof
 
 # Finite elements
 export hatfunctions, FiniteElement, makeelement, nodalbasis

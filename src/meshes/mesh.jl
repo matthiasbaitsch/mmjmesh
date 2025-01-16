@@ -63,6 +63,14 @@ coordinates(m::Mesh, group::Symbol) = m.geometry.points.coordinates[:, m.groups[
 coordinates(m::Mesh, index::Int) = m.geometry.points.coordinates[:, index]
 coordinates(m::Mesh, indices::AbstractVector{Int}) = m.geometry.points.coordinates[:, indices]
 
+function nodes(m::Mesh, predicate)
+    ps = predicate.(nodes(m))
+    idxs = [i for i = eachindex(ps) if !isnan(ps[i])]
+    pars = ps[idxs]
+    perm = sortperm(pars)
+    nodes(m)[idxs[perm]]
+end
+
 nelements(m::Mesh{DT,DG}) where {DT,DG} = nentities(m, DT)
 element(m::Mesh{DT,DG}, index::Int) where {DT,DG} = entity(m, DT, index)
 elements(m::Mesh{DT,DG}) where {DT,DG} = entities(m, DT)

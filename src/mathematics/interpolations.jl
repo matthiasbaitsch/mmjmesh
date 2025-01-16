@@ -86,6 +86,30 @@ function derivativeat(u::Interpolation{InRⁿ{N},InRⁿ{M}}, x::InRⁿ{N}, n::In
     return ju
 end
 
+function parameterof(u::Interpolation, p::RealVec, tol=1e-12)
+    size(u.coefficients) != (2, 2) && error()
+
+    # Parameters
+    p1 = u.coefficients[:, 1]
+    p2 = u.coefficients[:, 2]
+    u = p2 - p1
+    n = normalize([-u[2], u[1]])
+
+    # Intersection of lines
+    # p1 + t1 * u = p + t2 * n
+    # t1 * u - t2 * n = p - p1
+    A = stack([u, -n], dims=2)
+    b = p - p1
+    t1, t2 = A \ b
+
+    # Return condition
+    if abs(t2) <= tol && 0 <= t1 && t1 <= 1
+        return t1
+    else
+        return NaN
+    end
+end
+
 
 # -------------------------------------------------------------------------------------------------
 # Helper functions
