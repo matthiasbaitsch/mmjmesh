@@ -18,4 +18,4 @@ CairoMakie.activate!()
 CairoMakie.set_theme!(CairoMakie.theme_minimal())
 CairoMakie.update_theme!(colormap=:jet)
 
-meshpath(m) = joinpath(@__DIR__(), "../../data/gmsh", m)
+meshpath(m) = joinpath(@__DIR__(), "../../data/gmsh", m);
