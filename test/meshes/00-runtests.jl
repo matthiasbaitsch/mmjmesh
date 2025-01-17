@@ -8,6 +8,7 @@ using Test
 @testset "MeshEntity" include("meshentitiestests.jl")
 @testset "MeshEntityGroup" include("entitygroupstests.jl")
 @testset "Build" include("buildtests.jl")
+@testset "Predicates" include("predicatestests.jl")
 
 end
 

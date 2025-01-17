@@ -7,6 +7,7 @@ using MMJMesh.Plots
 using MMJMesh.Meshes
 using MMJMesh.MMJBase
 using MMJMesh.Utilities
+using MMJMesh.Geometries
 using MMJMesh.Topologies
 using MMJMesh.Mathematics
 

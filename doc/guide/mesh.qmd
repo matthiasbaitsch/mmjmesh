@@ -131,15 +131,21 @@ Nodes can be selected based on a predicate.
 
 ```{julia}
 m = Mesh(meshpath("complex-g1.msh"))
-
-s = linesegment([0, 0], [2, 0])
-pred(n) = parameterof(s, coordinates(n))
-nds = nodes(m, pred)
-idxs = index.(nds)
+n1 = nodeindices(m, on(Point(0.75, 1)))
+n2 = nodeindices(m, on(Segment([0.75, 0], [2, 0])))
+n3 = nodeindices(m, on(VLine(0.5)))
 
 p = mplot(m) |> mconf()
-scatter!(coordinates(m, idxs), color=:hotpink)
+scatter!(coordinates(m, n1), color=:green)
+scatter!(coordinates(m, n2), color=:hotpink)
+scatter!(coordinates(m, n3), color=:orange)
 p
+```
+
+In addition, a single can be identified as well.
+
+```{julia}
+nodeindex(m, on(Point(0.75, 1)))
 ```
 
 ## Collections of Entities: Groups

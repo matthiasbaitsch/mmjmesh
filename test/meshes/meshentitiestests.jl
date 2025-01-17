@@ -130,6 +130,6 @@ e = element(m, 9)
 # Access multiple coordinates
 # -------------------------------------------------------------------------------------------------
 
-m = Mesh(meshpath("complex-g1.msh"))
+m = Mesh((0 .. 4) × (0 .. 2), 4, 1)
 @test coordinates(m, [3, 9]) == stack([coordinates(m, 3), coordinates(m, 9)])
-@test coordinates(face(m, 1), [1, 3]) == coordinates(m, [329, 176])
+@test coordinates(face(m, 2), [1, 3]) == coordinates(m, [2, 8])

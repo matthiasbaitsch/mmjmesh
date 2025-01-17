@@ -20,10 +20,10 @@ end
 Constructs a polynomial parametric curve interpolating the specified points. 
 The curve is defined on the unit interval [-1, 1].
 """
-function polynomialinterpolation(points::AbstractMatrix{<:Real})
-    dps = [0, cumsum(norm.(eachcol(diff(points, dims=2))))] |> flatten |> collect
+function polynomialinterpolation(pts::AbstractMatrix{<:Real})
+    dps = [0, cumsum(norm.(eachcol(diff(pts, dims=2))))] |> flatten |> collect
     phi = affinefunction(0 .. dps[end], IHat)
-    return Interpolation(lagrangepolynomials(phi.(dps), IHat), points)
+    return Interpolation(lagrangepolynomials(phi.(dps), IHat), pts)
 end
-polynomialinterpolation(points::AbstractVector) = polynomialinterpolation(tomatrix(points))
-polynomialinterpolation(points::RealVec...) = polynomialinterpolation(collect(points))
+polynomialinterpolation(pts::AbstractVector) = polynomialinterpolation(tomatrix(pts))
+polynomialinterpolation(pts::RealVec...) = polynomialinterpolation(collect(pts))

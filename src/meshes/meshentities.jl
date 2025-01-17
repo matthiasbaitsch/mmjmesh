@@ -62,9 +62,8 @@ Base.show(io::IO, e::T) where {T<:MeshEntity} =
 coordinate(n::Node, c::Int) = n.mesh.geometry.points.coordinates[c, n.index]
 coordinates(n::Node) = n.mesh.geometry.points.coordinates[:, n.index]
 coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, indices(me, 0)]
-coordinates(me::MeshEntity, i::Int) =
-    me.mesh.geometry.points.coordinates[:, index(me, 0, i)]
-coordinates(me::MeshEntity, ii::AbstractVector{Int}) =
+coordinates(me::MeshEntity, i::Int) = me.mesh.geometry.points.coordinates[:, index(me, 0, i)]
+coordinates(me::MeshEntity, ii::AbstractVector{Int}) = 
     me.mesh.geometry.points.coordinates[:, indices(me, 0)[ii]]
 
 # Specialized functions
@@ -93,10 +92,8 @@ end
 # AbstractArray interface
 Base.length(el::MeshEntityList) = length(el.indices)
 Base.size(el::MeshEntityList) = (length(el),)
-Base.getindex(el::MeshEntityList{DT}, i::Integer) where {DT} =
-    entity(el.mesh, DT, el.indices[i])
-Base.iterate(el::MeshEntityList, state=1) =
-    state > length(el) ? nothing : (el[state], state + 1)
+Base.getindex(el::MeshEntityList{DT}, i::Integer) where {DT} = entity(el.mesh, DT, el.indices[i])
+Base.iterate(el::MeshEntityList, state=1) = state > length(el) ? nothing : (el[state], state + 1)
 
 # Get entities
 entities(m::Mesh, pdim::Integer) = MeshEntityList(m, pdim, 1:nentities(m, pdim))

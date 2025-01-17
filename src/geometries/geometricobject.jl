@@ -1,3 +1,7 @@
+# -------------------------------------------------------------------------------------------------
+# Basic geometric object
+# -------------------------------------------------------------------------------------------------
+
 """
     GeometricObject{DT, DG}
 
@@ -14,8 +18,12 @@ MMJMesh.pdim(::Type{<:GeometricObject}) = @notimplemented
 center(::GeometricObject) = @notimplemented
 measure(::GeometricObject) = @notimplemented
 boundingbox(::GeometricObject) = @notimplemented
-Base.in(::GeometricObject, x; eps::Float64=0.0) = @notimplemented
+Base.in(::RealVec, ::GeometricObject; atol::Real=0.0) = @notimplemented
 
+
+# -------------------------------------------------------------------------------------------------
+# Geometric object with parametrization
+# -------------------------------------------------------------------------------------------------
 
 """
     GeometricObjectP{DT,DG}
@@ -25,8 +33,26 @@ image of a simple `DT`-dimensional reference domain into `DG` dimensions.
 """
 abstract type GeometricObjectP{DT,DG} <: GeometricObject{DT,DG} end
 
+"""
+    parametrization(o)
+
+Returns the map `F` such that the geometric object `o` is the image of `F`.
+"""
 parametrization(::GeometricObjectP) = @notimplemented
 
+"""
+    parameterof(o, p, atol=1e-12)
+
+Returns the parameter of point `p` on the one-dimensional geometric object o. The functions returns
+`NaN` if `p` is further than `atol` away from `o`.
+"""
+parameterof(o::GeometricObjectP{1}, p; atol::Real=1e-12) = @notimplemented
+
+Base.in(p::RealVec, o::GeometricObject{1}; atol::Real=0.0) = !isnan(parameterof(o, p, atol=atol))
+
+# -------------------------------------------------------------------------------------------------
+# Geometric object from point interpolation
+# -------------------------------------------------------------------------------------------------
 
 """
     GeometricObjectI{DT,DG,NP}

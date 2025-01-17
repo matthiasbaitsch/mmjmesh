@@ -4,35 +4,33 @@
 
 _lastnodeid(m::Mesh) = nnodes(m) == 0 ? 0 : MMJMesh.Topologies.entities(m.topology, 0)[end]
 
-function addnode!(m::Mesh, x::RealVec)
-    @assert length(x) == gdim(m)
-    push!(m.geometry, Vector(x))
+addnodes!(m::Mesh, xs::RealVec, ys::RealVec) = addnodes!(m, [xs, ys])
+addnodes!(m::Mesh, xs::RealVec, ys::RealVec, zs::RealVec) = addnodes!(m, [xs, ys, zs])
+addnodes!(m::Mesh, p1::RealVec, p2::RealVec, n::Int) = addnodes!(m, linesegment(p1, p2), n)
+
+function addnode!(m::Mesh, p::RealVec)
+    @assert length(p) == gdim(m)
+    push!(m.geometry, Vector(p))
     push!(m.topology.entities[0], _lastnodeid(m) + 1)
     return nnodes(m)
 end
 
-function addnodes!(m::Mesh, x::RealVecVec)
-    if length(x) == gdim(m)
-        @assert all(length(x[1]) .== length.(x))
-        return [addnode!(m, getindex.(x, i)) for i ∈ 1:length(x[1])]
+function addnodes!(m::Mesh, ps::RealVecVec)
+    if length(ps) == gdim(m)
+        @assert all(length(ps[1]) .== length.(ps))
+        return [addnode!(m, getindex.(ps, i)) for i ∈ 1:length(ps[1])]
     end
-    if length(x[1]) == gdim(m)
-        return [addnode!(m, xx) for xx ∈ x]
+    if length(ps[1]) == gdim(m)
+        return [addnode!(m, xx) for xx ∈ ps]
     end
 end
 
-addnodes!(m::Mesh, x::RealVec, y::RealVec) = addnodes!(m, [x, y])
-addnodes!(m::Mesh, x::RealVec, y::RealVec, z::RealVec) = addnodes!(m, [x, y, z])
-
-function addnodes!(m::Mesh, x::ParametricCurve{N}, n::Int) where {N}
+function addnodes!(m::Mesh{DT,DG}, x::ParametricCurve{DG}, n::Int) where {DT,DG}
     @assert n >= 2
-    @assert N == gdim(m)
     @assert isfinite(domain(x))
     return [addnode!(m, x(t)) for t = range(domain(x), n)]
 end
 
-addnodes!(m::Mesh, x1::RealVec, x2::RealVec, n::Int) =
-    addnodes!(m, linesegment(x1, x2), n)
 
 
 # -------------------------------------------------------------------------------------------------

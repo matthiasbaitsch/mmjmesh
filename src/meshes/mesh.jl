@@ -43,11 +43,11 @@ function Mesh(
     return m
 end
 
-nentities(m::Mesh, dim::Int) = Topologies.nentities(m.topology, dim, true)
-entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx, geometrytype(m, pdim))
-indices(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
 
-# Geometry
+# -------------------------------------------------------------------------------------------------
+# Dimensions, entities and indices
+# -------------------------------------------------------------------------------------------------
+
 function geometrytype(::Mesh{DT,DG,G1,G2}, pdim::Integer) where {DT,DG,G1,G2}
     pdim == 0 && return Point
     pdim == 1 && return G1
@@ -58,22 +58,56 @@ end
 MMJMesh.pdim(::Mesh{DT}) where {DT} = DT
 MMJMesh.gdim(::Mesh{DT,DG}) where {DT,DG} = DG
 
-coordinates(m::Mesh) = m.geometry.points.coordinates[:, nodeindices(m)]
-coordinates(m::Mesh, group::Symbol) = m.geometry.points.coordinates[:, m.groups[group]]
-coordinates(m::Mesh, index::Int) = m.geometry.points.coordinates[:, index]
-coordinates(m::Mesh, indices::AbstractVector{Int}) = m.geometry.points.coordinates[:, indices]
+nentities(m::Mesh, dim::Int) = Topologies.nentities(m.topology, dim, true)
+entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx, geometrytype(m, pdim))
 
-function nodes(m::Mesh, predicate)
+indices(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
+
+
+# -------------------------------------------------------------------------------------------------
+# Coordinates
+# -------------------------------------------------------------------------------------------------
+
+MMJMesh.coordinates(m::Mesh) = m.geometry.points.coordinates[:, nodeindices(m)]
+MMJMesh.coordinates(m::Mesh, group::Symbol) = m.geometry.points.coordinates[:, m.groups[group]]
+MMJMesh.coordinates(m::Mesh, index::Int) = m.geometry.points.coordinates[:, index]
+MMJMesh.coordinates(m::Mesh, indices::AbstractVector{Int}) = m.geometry.points.coordinates[:, indices]
+
+
+# -------------------------------------------------------------------------------------------------
+# Nodes
+# -------------------------------------------------------------------------------------------------
+
+function nodeindex(m::Mesh, predicate)
+    for n = nodes(m)
+        !isnan(predicate(n)) && return index(n)
+    end
+    return -1
+end
+
+function nodeindices(m::Mesh, predicate)
     ps = predicate.(nodes(m))
     idxs = [i for i = eachindex(ps) if !isnan(ps[i])]
     pars = ps[idxs]
     perm = sortperm(pars)
-    nodes(m)[idxs[perm]]
+    return idxs[perm]
 end
+
+nodes(m::Mesh, predicate) = nodes(m)[nodeindices(m, predicate)]
+
+
+# -------------------------------------------------------------------------------------------------
+# Elements
+# -------------------------------------------------------------------------------------------------
 
 nelements(m::Mesh{DT,DG}) where {DT,DG} = nentities(m, DT)
 element(m::Mesh{DT,DG}, index::Int) where {DT,DG} = entity(m, DT, index)
 elements(m::Mesh{DT,DG}) where {DT,DG} = entities(m, DT)
+
+
+# -------------------------------------------------------------------------------------------------
+# Show
+# -------------------------------------------------------------------------------------------------
 
 function Base.show(io::IO, m::Mesh{DT,DG}) where {DT,DG}
     n = 100

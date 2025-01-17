@@ -1,4 +1,5 @@
 using Test
+using IntervalSets
 using DomainSets: ×
 
 using MMJMesh
@@ -96,7 +97,7 @@ a = 5
 m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 @test groupnames(m) == []
 @test groupnames(m, d=1) == []
-@test groupnames(m, d=1, predefined=true) == [:edges, :boundaryedges]
+@test groupnames(m, d=1, predefined=true) == [:boundaryedges, :edges]
 @test groupnames(m, predefined=true) |> sort ==
       [:boundaryedges, :boundaryfaces, :boundarynodes, :edges, :elements, :faces, :nodes, :solids]
 @test !hasgroups(m, d=0)
@@ -110,20 +111,20 @@ definegroup!(m, 0, :g1, [1, 2, 3, 13, 14, 7, 15])
 definegroup!(m, 2, :g2, [2, 13, 7, 5])
 definegroup!(m, 1, :g3, [4, 5, 9])
 @test groupnames(m) |> sort == [:g1, :g2, :g3]
-@test groupnames(m, predefined=true) |> sort ==
+@test groupnames(m, predefined=true) ==
       [
       :boundaryedges, :boundaryfaces, :boundarynodes, :edges, :elements,
       :faces, :g1, :g2, :g3, :nodes, :solids
 ]
-@test groupnames(m, d=1, predefined=true) |> sort == [:boundaryedges, :edges, :g3]
+@test groupnames(m, d=1, predefined=true) == [:boundaryedges, :edges, :g3]
 
 # Group by entity
 f5 = face(m, 5)
 f7 = face(m, 7)
 f33 = face(m, 33)
-@test groupnames(node(m, 3)) == [:g1, :boundarynodes, :nodes]
-@test groupnames(f5) == [:g2, :elements, :faces]
-@test groupnames(f7) == [:g2, :elements, :faces]
+@test groupnames(node(m, 3)) |> sort == [:boundarynodes, :g1, :nodes]
+@test groupnames(f5) |> sort == [:elements, :faces, :g2]
+@test groupnames(f7) |> sort == [:elements, :faces, :g2]
 @test groupnames(f33) == [:elements, :faces]
 @test groupname(f5) == :g2
 @test groupname(f7) == :g2
