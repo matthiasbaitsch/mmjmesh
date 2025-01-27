@@ -68,6 +68,14 @@ function SeqIntSet(a::AbstractVector{Int})
     return SeqIntSet(start, step, index)
 end
 
+
+# Handle empty vectors
+function SeqIntSet(a::AbstractVector{Any})
+    @assert isempty(a)
+    return SeqIntSet(Int[], Int[], [1])
+end
+
+
 # Helpers
 nsequences(set::SeqIntSet) = length(set.start)
 nsteps(set::SeqIntSet, s::Int) = set.index[s+1] - set.index[s] - 1
