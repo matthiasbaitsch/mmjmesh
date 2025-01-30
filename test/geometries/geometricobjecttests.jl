@@ -14,6 +14,7 @@ e2 = edge(m, 2)
 g2 = geometry(e2)
 F = parametrization(g2)
 
+@test center(g2) == [0.95, 0.55]
 @test measure(g2) ≈ sqrt(0.82)
 @test F(-1) == coordinates(e2, 1)
 @test F(1) == coordinates(e2, 2)
