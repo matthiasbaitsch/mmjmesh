@@ -217,6 +217,7 @@ end
 valueat(s::ScaledMapping{DT}, x::DT) where {DT} = s.a * valueat(s.m, x)
 derivative(f::ScaledMapping, n::Integer=1) = f.a * derivative(f.m, n)
 derivativeat(f::ScaledMapping{DT}, x::DT, n::Integer=1) where {DT} = f.a * derivativeat(f.m, x, n)
+antiderivative(f::ScaledMapping{InR,InR}) = f.a * antiderivative(f.m)
 Base.show(io::IO, s::ScaledMapping) = print(io, s.a, " * ", s.m)
 Base.:(==)(m1::ScaledMapping{DT,CT,D}, m2::ScaledMapping{DT,CT,D}) where {DT,CT,D} =
     (m1.a == m2.a && m1.m == m2.m)
@@ -279,6 +280,13 @@ valueat(c::ComposedMapping{DT}, x::DT) where {DT} = valueat(c.m1, valueat(c.m2, 
 _derivative(f::ComposedMapping) = (f.m1' ∘ f.m2) * f.m2'
 _derivativeat(f::ComposedMapping{DT}, x::DT) where {DT} =
     derivativeat(f.m1, valueat(f.m2, x)) * derivativeat(f.m2, x)
+
+_adc(::AbstractMapping, ::AbstractMapping) = @notimplemented
+_adc(::AbstractMapping, ::Real, ::AbstractMapping) = @notimplemented
+_adc(g::AbstractMapping, s::Real, h::Identity{InR}) = 1 / s * antiderivative(g) ∘ (s * h)
+_adc(g::AbstractMapping, h::ScaledMapping{InR,InR}) = _adc(g, h.a, h.m)
+_antiderivative(f::ComposedMapping{InR,InR}) = _adc(f.m1, f.m2)
+
 Base.show(io::IO, m::ComposedMapping) = print(io, m.m1, " ∘ ", m.m2)
 Base.:(==)(m1::ComposedMapping{DT,CT,D}, m2::ComposedMapping{DT,CT,D}) where {DT,CT,D} =
     (m1.m1 == m2.m1 && m1.m2 == m2.m2)
@@ -934,6 +942,9 @@ Base.:(*)(m1::AbstractMapping{DT}, m2::ScaledMapping{DT}) where {DT} = m2.a * (m
 Base.:(/)(m1::AbstractMapping, m2::AbstractMapping) = QuotientMapping(m1, m2)
 Base.:(/)(a::Real, m2::AbstractMapping) = QuotientMapping(Polynomial(a), m2)
 Base.:(/)(m2::AbstractMapping, a::Real) = 1 / a * m2
+
+# ∘
+Base.:(∘)(m1::ScaledMapping, m2::AbstractMapping) = m1.a * (m1.m ∘ m2)
 
 # ^
 Base.:(^)(::Identity{InR,D}, n::Int) where {D} = Polynomial(_monomial_coeffs(n), D)

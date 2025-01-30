@@ -1,4 +1,5 @@
 using Test
+using IntervalSets
 using StaticArrays
 using LinearAlgebra
 using DomainSets: ×, Rectangle, ProductDomain
@@ -7,8 +8,6 @@ using MMJMesh
 using MMJMesh.Tests
 using MMJMesh.Mathematics
 using MMJMesh.Mathematics: derivativetype, dimension
-
-
 
 
 # -------------------------------------------------------------------------------------------------
@@ -251,6 +250,20 @@ h = f ∘ g
 
 
 # -------------------------------------------------------------------------------------------------
+# Some special cases for antiderivatives
+# -------------------------------------------------------------------------------------------------
+
+x = parameter(R)
+f = sin(10x)
+@test antiderivative(f)' == f
+
+f = 3sin(10x)
+ff = antiderivative(f)' 
+@test f.a ≈ ff.a
+@test f.m == ff.m
+
+
+# -------------------------------------------------------------------------------------------------
 # Functions Rn -> R
 # -------------------------------------------------------------------------------------------------
 
@@ -440,8 +453,6 @@ f3 = MPolynomial([4 3 2; 3 2 1; 2 1 0], [1, 2, 3])
 
 @test o1 * (3 * f1) === 3 * f1
 @test (3 * f1) * o1 === 3 * f1
-
-##
 
 # Multiply by scaled one function
 f1 = 3 * One{InR,R}()
