@@ -40,7 +40,7 @@ const R² = R2
 const R3 = R^3
 const R³ = R3
 
-""" Reference square ``[-1, 1]^2`` """
+""" Reference square ``\\hat{Q} = [-1, 1]^2`` """
 const QHat = IHat × IHat
 const ReferenceQuadrilateral = QHat
 
