@@ -75,34 +75,42 @@ MMJMesh.coordinates(m::Mesh, indices::AbstractVector{Int}) = m.geometry.points.c
 
 
 # -------------------------------------------------------------------------------------------------
-# Nodes
-# -------------------------------------------------------------------------------------------------
-
-function nodeindex(m::Mesh, predicate)
-    for n = nodes(m)
-        !isnan(predicate(n)) && return index(n)
-    end
-    return -1
-end
-
-function nodeindices(m::Mesh, predicate)
-    ps = predicate.(nodes(m))
-    idxs = [i for i = eachindex(ps) if !isnan(ps[i])]
-    pars = ps[idxs]
-    perm = sortperm(pars)
-    return idxs[perm]
-end
-
-nodes(m::Mesh, predicate) = nodes(m)[nodeindices(m, predicate)]
-
-
-# -------------------------------------------------------------------------------------------------
 # Elements
 # -------------------------------------------------------------------------------------------------
 
 nelements(m::Mesh{DT,DG}) where {DT,DG} = nentities(m, DT)
 element(m::Mesh{DT,DG}, index::Int) where {DT,DG} = entity(m, DT, index)
 elements(m::Mesh{DT,DG}) where {DT,DG} = entities(m, DT)
+
+
+# -------------------------------------------------------------------------------------------------
+# Access based onredicates
+# -------------------------------------------------------------------------------------------------
+
+function index(m::Mesh, pdim::Integer, predicate)
+    for n = entities(m, pdim)
+        !isnan(predicate(n)) && return index(n)
+    end
+    return -1
+end
+
+function indices(m::Mesh, pdim::Integer, predicate)
+    ps = predicate.(entities(m, pdim))
+    idxs = [i for i = eachindex(ps) if !isnan(ps[i])]
+    pars = ps[idxs]
+    perm = sortperm(pars)
+    return idxs[perm]
+end
+
+nodeindex(m::Mesh, predicate) = index(m, 0, predicate)
+nodeindices(m::Mesh, predicate) = indices(m, 0, predicate)
+nodes(m::Mesh, predicate) = entities(m, 0)[indices(m, 0, predicate)]
+edgeindex(m::Mesh, predicate) = index(m, 1, predicate)
+edgeindices(m::Mesh, predicate) = indices(m, 1, predicate)
+edges(m::Mesh, predicate) = entities(m, 1)[indices(m, 1, predicate)]
+faceindex(m::Mesh, predicate) = index(m, 2, predicate)
+faceindices(m::Mesh, predicate) = indices(m, 2, predicate)
+faces(m::Mesh, predicate) = entities(m, 2)[indices(m, 2, predicate)]
 
 
 # -------------------------------------------------------------------------------------------------
