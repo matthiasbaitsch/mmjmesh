@@ -63,7 +63,7 @@ coordinate(n::Node, c::Int) = n.mesh.geometry.points.coordinates[c, n.index]
 coordinates(n::Node) = n.mesh.geometry.points.coordinates[:, n.index]
 coordinates(me::MeshEntity) = me.mesh.geometry.points.coordinates[:, indices(me, 0)]
 coordinates(me::MeshEntity, i::Int) = me.mesh.geometry.points.coordinates[:, index(me, 0, i)]
-coordinates(me::MeshEntity, ii::AbstractVector{Int}) = 
+coordinates(me::MeshEntity, ii::AbstractVector{Int}) =
     me.mesh.geometry.points.coordinates[:, indices(me, 0)[ii]]
 
 # Specialized functions
@@ -82,9 +82,9 @@ geometry(me::MeshEntity{DT,DG,NN,GeometricObjectI}) where {DT,DG,NN} =
 
 List of entities of a finite element mesh of parametric dimension `DT`.
 """
-struct MeshEntityList{DT} <: AbstractVector{MeshEntity}
+struct MeshEntityList{DT} <: AbstractVector{MeshEntity{DT}}
     mesh::Mesh
-    indices::AbstractVector{Int}
+    indices::AbstractVector{<:Integer}
     MeshEntityList(mesh::Mesh, pdim::Integer, indices::AbstractVector{<:Integer}) =
         new{pdim}(mesh, indices)
 end
@@ -95,7 +95,11 @@ Base.size(el::MeshEntityList) = (length(el),)
 Base.getindex(el::MeshEntityList{DT}, i::Integer) where {DT} = entity(el.mesh, DT, el.indices[i])
 Base.iterate(el::MeshEntityList, state=1) = state > length(el) ? nothing : (el[state], state + 1)
 
+# Indices
+indices(mel::MeshEntityList) = mel.indices
+
 # Get entities
-entities(m::Mesh, pdim::Integer) = MeshEntityList(m, pdim, 1:nentities(m, pdim))
+entities(m::Mesh, pdim::Integer) = entities(m, pdim, indices(m, pdim))
+entities(m::Mesh, pdim::Integer, indices::AbstractVector{<:Integer}) = MeshEntityList(m, pdim, indices)
 entities(me::MeshEntity, pdim::Integer) = MeshEntityList(me.mesh, pdim, indices(me, pdim))
 

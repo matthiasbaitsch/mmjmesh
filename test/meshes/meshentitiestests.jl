@@ -133,3 +133,15 @@ e = element(m, 9)
 m = Mesh((0 .. 4) × (0 .. 2), 4, 1)
 @test coordinates(m, [3, 9]) == stack([coordinates(m, 3), coordinates(m, 9)])
 @test coordinates(face(m, 2), [1, 3]) == coordinates(m, [2, 8])
+
+
+# -------------------------------------------------------------------------------------------------
+# Access multiple entities
+# -------------------------------------------------------------------------------------------------
+
+m = Mesh((0 .. 4) × (0 .. 2), 4, 2)
+ee = entities(m, 1, [3, 8, 11])
+@test length(ee) == 3
+@test typeof(ee) == MMJMesh.Meshes.MeshEntityList{1}
+@test ee == edges(m)[[3, 8, 11]]
+

@@ -28,10 +28,10 @@ function coordinate end
 
 """
     coordinates(o)
-    coordinates(os, i)
+    coordinates(o, s)
+    coordinates(o, s, c)
 
-Returns the coordinates of `o` or the coordinates of the `i`th 
-object in the collection `os`.
+Returns coordinates of `o`.
 """
 function coordinates end
 

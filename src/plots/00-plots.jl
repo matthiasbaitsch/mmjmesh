@@ -24,7 +24,7 @@ using MMJMesh.Topologies
 using MMJMesh.Mathematics
 
 # Exports
-export mplot, mconf, fplot, fplot3d, vplot, feplot, feconf
+export plot, plot!, mplot, mconf, fplot, fplot3d, vplot, feplot, feconf
 
 # Parts
 include("helperfunctions.jl")
@@ -37,5 +37,10 @@ include("vplot.jl")
 include("fplot3d.jl")
 include("feplot.jl")
 include("symbols.jl")
+
+plot(m::Mesh, args...; kwargs...) = mplot(m, args...; kwargs...) |> mconf()
+plot!(m::Mesh, args...; kwargs...) = mplot!(m, args...; kwargs...) |> mconf()
+plot(f::AbstractMapping, args...; kwargs...) = fplot(f, args...; kwargs...)
+plot!(f::AbstractMapping, args...; kwargs...) = fplot!(f, args...; kwargs...)
 
 end

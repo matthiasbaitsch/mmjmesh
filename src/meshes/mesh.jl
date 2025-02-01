@@ -69,24 +69,28 @@ indices(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
 # -------------------------------------------------------------------------------------------------
 
 MMJMesh.coordinates(m::Mesh) = m.geometry.points.coordinates[:, nodeindices(m)]
-MMJMesh.coordinates(m::Mesh, group::Symbol) = m.geometry.points.coordinates[:, m.groups[group]]
-MMJMesh.coordinates(m::Mesh, index::Int) = m.geometry.points.coordinates[:, index]
-MMJMesh.coordinates(m::Mesh, indices::AbstractVector{Int}) = m.geometry.points.coordinates[:, indices]
+MMJMesh.coordinates(m::Mesh, g::Symbol) = m.geometry.points.coordinates[:, group(m, g)]
+MMJMesh.coordinates(m::Mesh, index::Integer) = m.geometry.points.coordinates[:, index]
+MMJMesh.coordinates(m::Mesh, indices::IntegerVec) = m.geometry.points.coordinates[:, indices]
+MMJMesh.coordinates(m::Mesh, g::Symbol, c::Integer) = m.geometry.points.coordinates[c, group(m, g)]
+MMJMesh.coordinates(m::Mesh, index::Integer, c::Integer) = m.geometry.points.coordinates[c, index]
+MMJMesh.coordinates(m::Mesh, indices::IntegerVec, c::Integer) = m.geometry.points.coordinates[c, indices]
 
 
 # -------------------------------------------------------------------------------------------------
-# Elements
+# Elements for convenience
 # -------------------------------------------------------------------------------------------------
 
-nelements(m::Mesh{DT,DG}) where {DT,DG} = nentities(m, DT)
-element(m::Mesh{DT,DG}, index::Int) where {DT,DG} = entity(m, DT, index)
-elements(m::Mesh{DT,DG}) where {DT,DG} = entities(m, DT)
+nelements(m::Mesh{DT}) where {DT} = nentities(m, DT)
+element(m::Mesh{DT}, index::Int) where {DT} = entity(m, DT, index)
+elements(m::Mesh{DT}) where {DT} = entities(m, DT)
 
 
 # -------------------------------------------------------------------------------------------------
-# Access based onredicates
+# Access based on predicates
 # -------------------------------------------------------------------------------------------------
 
+# Generic
 function index(m::Mesh, pdim::Integer, predicate)
     for n = entities(m, pdim)
         !isnan(predicate(n)) && return index(n)
@@ -102,15 +106,21 @@ function indices(m::Mesh, pdim::Integer, predicate)
     return idxs[perm]
 end
 
+entities(m::Mesh, pdim::Integer, predicate) = entities(m, pdim, indices(m, pdim, predicate))
+
+# Specialized versions
 nodeindex(m::Mesh, predicate) = index(m, 0, predicate)
 nodeindices(m::Mesh, predicate) = indices(m, 0, predicate)
-nodes(m::Mesh, predicate) = entities(m, 0)[indices(m, 0, predicate)]
+nodes(m::Mesh, predicate) = entities(m, 0, predicate)
 edgeindex(m::Mesh, predicate) = index(m, 1, predicate)
 edgeindices(m::Mesh, predicate) = indices(m, 1, predicate)
-edges(m::Mesh, predicate) = entities(m, 1)[indices(m, 1, predicate)]
+edges(m::Mesh, predicate) = entities(m, 1, predicate)
 faceindex(m::Mesh, predicate) = index(m, 2, predicate)
 faceindices(m::Mesh, predicate) = indices(m, 2, predicate)
-faces(m::Mesh, predicate) = entities(m, 2)[indices(m, 2, predicate)]
+faces(m::Mesh, predicate) = entities(m, 2, predicate)
+elementindex(m::Mesh{DT}, predicate) where {DT} = index(m, DT, predicate)
+elementindices(m::Mesh{DT}, predicate) where {DT} = indices(m, DT, predicate)
+elements(m::Mesh{DT}, predicate) where {DT} = entities(m, DT, predicate)
 
 
 # -------------------------------------------------------------------------------------------------

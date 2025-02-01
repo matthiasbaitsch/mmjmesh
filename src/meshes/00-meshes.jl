@@ -29,7 +29,7 @@ export Group, GroupCollection, addrecipe!, clearcache!, name, names
 
 ## mesh.jl
 export Mesh
-export nelements, element, elements, entity, entities
+export indices, nelements, element, elements, entity, entities
 
 ## meshentities.jl
 export MeshEntity, Node, Edge, Face, Solid, index, geometry, geometrytype, area

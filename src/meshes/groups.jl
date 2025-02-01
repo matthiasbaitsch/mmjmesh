@@ -2,14 +2,13 @@
 # Group
 # -------------------------------------------------------------------------------------------------
 
-
 """
     struct Group{T} <: AbstractVector{Int}
 
 A set of indices of objects of type `T`. Requires a function `index(o::T) -> Int` in
 this module.
 """
-mutable struct Group{T} <: AbstractVector{Int}
+mutable struct Group{T} <: AbstractVector{Integer}
     mesh
     indices::SeqIntSet
     Group{T}(a) where {T} = new{T}(undef, SeqIntSet(a))
@@ -36,10 +35,12 @@ Base.show(io::IO, g::Group{T}) where {T} = print(io, "$(T)Group$(g.indices)")
 # MMJMesh
 MMJMesh.mesh(g::Group) = g.mesh
 
+indices(g::Group) = g.indices
+
+
 # -------------------------------------------------------------------------------------------------
 # Group collection
 # -------------------------------------------------------------------------------------------------
-
 
 """
     struct GroupCollection

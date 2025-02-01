@@ -137,6 +137,8 @@ function definegroup!(m::Mesh, dim::Int, name::Symbol, indices)
     m.groups[name] = g
 end
 
+definegroup!(name::Symbol, es::MeshEntityList{DT}) where {DT} = definegroup!(es.mesh, DT, name, indices(es))
+
 """
     groupnames(m; d=-1, predefined=false)
 
@@ -207,3 +209,6 @@ function group(m::Mesh, name::Symbol)
     g.mesh = m
     return g
 end
+
+entities(m::Mesh, groupname::Symbol) = entities(group(m, groupname))
+entities(g::MeshEntityGroup) = entities(g.mesh, edim(g), indices(g))
