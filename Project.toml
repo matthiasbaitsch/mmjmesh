@@ -1,7 +1,7 @@
 name = "MMJMesh"
 uuid = "010ee2c9-7ff8-468a-b3f6-2ff8c4732c90"
 authors = ["Matthias Baitsch <matthias.baitsch@hs-bochum.de>"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
