@@ -11,9 +11,6 @@ using MMJMesh.Geometries
 using MMJMesh.Topologies
 using MMJMesh.Mathematics
 
-using IntervalSets
-using DomainSets: ×, (..)
-
 CairoMakie.activate!()
 CairoMakie.set_theme!(CairoMakie.theme_minimal())
 CairoMakie.update_theme!(colormap=:jet)
