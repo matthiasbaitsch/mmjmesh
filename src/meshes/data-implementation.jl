@@ -21,7 +21,7 @@ data(g::Group, id::Symbol) = g.mesh.data.groupdata[Pair(id, name(g))]
 hasdata(o, id::Symbol) = !isnothing(data(o, id))
 
 
-_retrieve_entitydata(::MeshEntity, v::Number) = v
+_retrieve_entitydata(::MeshEntity, v) = v
 
 function _retrieve_entitydata(e::MeshEntity, v::AbstractVector)
     @assert nentities(e.mesh, pdim(e)) == length(v)
