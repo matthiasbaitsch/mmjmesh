@@ -38,9 +38,4 @@ include("fplot3d.jl")
 include("feplot.jl")
 include("symbols.jl")
 
-plot(m::Mesh, args...; kwargs...) = mplot(m, args...; kwargs...) |> mconf()
-plot!(m::Mesh, args...; kwargs...) = mplot!(m, args...; kwargs...) |> mconf()
-plot(f::AbstractMapping, args...; kwargs...) = fplot(f, args...; kwargs...)
-plot!(f::AbstractMapping, args...; kwargs...) = fplot!(f, args...; kwargs...)
-
 end
