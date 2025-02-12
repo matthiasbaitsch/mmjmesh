@@ -5,7 +5,7 @@ engine: julia
 # Mathematics
 
 ```{julia}
-#| echo: false
+#| include: false
 include("setup.jl")
 using IntervalSets
 using LinearAlgebra

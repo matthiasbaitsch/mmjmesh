@@ -7,8 +7,7 @@ engine: julia
 This chapter is utterly incomplete and probably not worth reading.
 
 ```{julia}
-#| echo: false
-#| warning: false
+#| include: false
 include("setup.jl")
 import MMJMesh.Plots: approximationerror, sampleadaptive
 ```
@@ -135,7 +134,7 @@ mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf()
 ## Plot functions on meshes
 
 ```{julia}
-#| echo: false
+#| include: false
 GLMakie.activate!()
 ```
 
@@ -172,7 +171,7 @@ f
 
 For each face, a function from the face geometry reference domain into the real numbers can be provided. Function values are visualized by colors and/or by warping the face. 
 
-The function is specified by the first parameter to the mplot function, settings are the `faceplotXXX` named parameters.
+The function is specified by the first parameter to the `mplot` function, settings are the `faceplotXXX` named parameters.
 
 Method 1: Specify one function:
 
@@ -225,7 +224,7 @@ f
 ## Plot options
 
 ```{julia}
-#| echo: false
+#| include: false
 CairoMakie.activate!()
 ```
 

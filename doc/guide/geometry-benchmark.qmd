@@ -1,6 +1,6 @@
 ---
 title: "Development sandbox"
-execut:
+execute:
     echo: false
 ---
 

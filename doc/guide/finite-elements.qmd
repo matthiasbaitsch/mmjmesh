@@ -5,8 +5,7 @@ engine: julia
 # Finite elements
 
 ```{julia}
-#| echo: false
-#| warning: false
+#| include: false
 include("setup.jl")
 using Latexify
 using WGLMakie
@@ -78,7 +77,7 @@ fig
 Bilinear shape functions
 
 ```{julia}
-#| echo: false
+#| include: false
 GLMakie.activate!()
 ```
 

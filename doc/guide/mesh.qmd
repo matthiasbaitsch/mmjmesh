@@ -5,8 +5,7 @@ engine: julia
 # The Mesh interface
 
 ```{julia}
-#| echo: false
-#| warning: false
+#| include: false
 include("setup.jl")
 ```
 
