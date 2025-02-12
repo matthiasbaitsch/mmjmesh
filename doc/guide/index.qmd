@@ -11,7 +11,7 @@ The `MMJMesh` library is intended to become a simple yet versatile basis for the
 First, we need to load the required modules. Note that `CairoMakie` included by `import` and not by `using` in order to avoid name collissions.
 
 ```{julia}
-#| warning: false
+#| include: false
 include("setup.jl")
 ```
 
