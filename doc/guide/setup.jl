@@ -1,3 +1,12 @@
+using Pkg
+
+ipkgs = keys(Pkg.installed())
+for pkg = ["GLMakie", "CairoMakie"]
+    if pkg ∉ ipkgs
+        Pkg.add(pkg)
+    end
+end
+
 import GLMakie
 import CairoMakie
 import CairoMakie: Figure, Axis3, scatter!, lines
