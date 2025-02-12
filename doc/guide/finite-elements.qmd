@@ -8,7 +8,6 @@ engine: julia
 #| include: false
 include("setup.jl")
 using Latexify
-using WGLMakie
 using Symbolics
 using CairoMakie
 using IntervalSets

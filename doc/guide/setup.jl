@@ -1,7 +1,7 @@
 using Pkg
 
 ipkgs = keys(Pkg.installed())
-for pkg = ["GLMakie", "CairoMakie"]
+for pkg = ["GLMakie", "WGLMakie", "CairoMakie"]
     if pkg ∉ ipkgs
         Pkg.add(pkg)
     end
