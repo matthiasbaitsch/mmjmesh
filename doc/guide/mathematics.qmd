@@ -172,9 +172,7 @@ Plot gradient of product function
 ```{julia}
 CairoMakie.activate!()
 g = ProductFunction(Sin(0 .. 2π), Sin(0 .. 2π))
-fig = Figure()
-Axis(fig[1, 1])
-fplot3d!(g, mesh=nothing)
+p = fplot3d(g, mesh=nothing)
 vplot!(gradient(g), npoints=9, lengthscale=0.3)
-fig
+p
 ```
