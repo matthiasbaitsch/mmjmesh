@@ -82,6 +82,6 @@ end
 # Symbol collections for special purposes
 # -------------------------------------------------------------------------------------------------
 
-include("symbols.structural2d.jl")
+# include("symbols.structural2d.jl")
 
 end
