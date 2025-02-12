@@ -2,8 +2,7 @@ module Structural2D
 
 using StaticArrays
 using Base.Iterators
-using MakieCore: Point2f, lines!
-using CairoMakie: DataAspect, Figure, Axis, MoveTo, LineTo, ClosePath, BezierPath
+using Makie: Point2f, lines!, DataAspect, Figure, Axis, MoveTo, LineTo, ClosePath, BezierPath
 
 using MMJMesh
 using MMJMesh.MMJBase

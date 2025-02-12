@@ -1,6 +1,6 @@
 module Symbols
 
-using MakieCore
+using Makie
 using LinearAlgebra
 
 using MMJMesh
@@ -67,7 +67,7 @@ end
 function drawsymbols!(ax, sps::SymbolCollection)
     for (symbol, placements) = sps
         if !isempty(placements.points)
-            MakieCore.scatter!(
+            Makie.scatter!(
                 ax,
                 placements.points |> tomatrix;
                 marker=symbol.marker,
@@ -82,6 +82,6 @@ end
 # Symbol collections for special purposes
 # -------------------------------------------------------------------------------------------------
 
-# include("symbols.structural2d.jl")
+include("symbols.structural2d.jl")
 
 end

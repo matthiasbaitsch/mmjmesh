@@ -11,7 +11,7 @@ using MMJMesh.Plots
 using MMJMesh.Meshes
 using MMJMesh.Utilities
 using MMJMesh.Mathematics
-# XXX using MMJMesh.Plots.Symbols.Structural2D
+using MMJMesh.Plots.Symbols.Structural2D
 
 # Make sure to use CairoMakie
 cm.activate!()
@@ -177,9 +177,9 @@ mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2, facecolor=:tomato)
 # Symbols
 # -------------------------------------------------------------------------------------------------
 
-# XXX cm.activate!()
-# f = MMJMesh.Plots.Symbols.Structural2D.demo()
-# @test_reference ref("sym-01.png") f
+cm.activate!()
+f = MMJMesh.Plots.Symbols.Structural2D.demo()
+@test_reference ref("sym-01.png") f
 
 
 # -------------------------------------------------------------------------------------------------
