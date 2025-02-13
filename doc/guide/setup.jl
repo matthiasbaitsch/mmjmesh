@@ -1,15 +1,16 @@
+# From Makie.jl/docs/makedocs.jl
 using Pkg
 
-ipkgs = keys(Pkg.installed())
-for pkg = ["GLMakie", "WGLMakie", "CairoMakie"]
-    if pkg ∉ ipkgs
-        Pkg.add(pkg)
-    end
-end
+cd(@__DIR__)
+Pkg.activate(".")
+Pkg.develop(path="../..")
+Pkg.precompile()
 
 import GLMakie
 import CairoMakie
-import CairoMakie: Figure, Axis3, scatter!, lines
+
+using LinearAlgebra
+using CairoMakie: Figure, Axis3, scatter!, lines
 
 using MMJMesh
 using MMJMesh.Plots

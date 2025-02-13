@@ -7,11 +7,7 @@ engine: julia
 ```{julia}
 #| include: false
 include("setup.jl")
-using IntervalSets
-using LinearAlgebra
-using WGLMakie
-using CairoMakie
-CairoMakie.activate!()
+
 ```
 
 ## Mappings
