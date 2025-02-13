@@ -7,18 +7,17 @@ engine: julia
 ```{julia}
 #| include: false
 include("setup.jl")
+
 using Latexify
 using Symbolics
-using CairoMakie
-using IntervalSets
-using LinearAlgebra
-CairoMakie.activate!()
+using LaTeXStrings
+using CairoMakie: Axis, Figure
 ```
 
 Variables and helper function
 
 ```{julia}
-@variables a, b, x, y, l, EA, EI, ν
+@variables a b x y l EA EI ν
 
 function prettyprint(name, factor, value)
     s1 = name.s[2:end-1]
