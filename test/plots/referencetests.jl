@@ -1,9 +1,9 @@
-using Random
-using IntervalSets
-using DomainSets: ×
+using Test
 using ReferenceTests
-import CairoMakie as cm
+
+import Random
 import GLMakie as gm
+import CairoMakie as cm
 
 using MMJMesh
 using MMJMesh.Gmsh
@@ -13,7 +13,6 @@ using MMJMesh.Utilities
 using MMJMesh.Mathematics
 using MMJMesh.Plots.Symbols.Structural2D
 
-# Make sure to use CairoMakie
 cm.activate!()
 
 
@@ -183,10 +182,10 @@ f = MMJMesh.Plots.Symbols.Structural2D.demo()
 
 
 # -------------------------------------------------------------------------------------------------
-# Other
+# Function R2 -> R
 # -------------------------------------------------------------------------------------------------
 
-# Plot function R2 -> R
+gm.activate!()
 ff = MPolynomial([0 2 0; 0 0 2], [1, -1, -1], QHat)
 f = gm.Figure()
 gm.Axis3(f[1, 1], aspect=:data)

@@ -1,7 +1,5 @@
 using Test
 using Symbolics
-using IntervalSets
-using DomainSets: ×
 
 using MMJMesh
 using MMJMesh.Mathematics
@@ -29,12 +27,12 @@ using MMJMesh.Mathematics: _combineforms
 # Test makeelement
 # -------------------------------------------------------------------------------------------------
 
-e1 = makeelement(:lagrange, QHat, k=5);
-e2 = makeelement(:lagrange, QHat, k=5);
-e3 = makeelement(:lagrange, QHat, k=8);
-e4 = makeelement(:lagrange, QHat, k=8);
-e5 = makeelement(:hermite, QHat);
-e6 = makeelement(:hermite, QHat, conforming=false);
+e1 = makeelement(:lagrange, QHat, k=5)
+e2 = makeelement(:lagrange, QHat, k=5)
+e3 = makeelement(:lagrange, QHat, k=8)
+e4 = makeelement(:lagrange, QHat, k=8)
+e5 = makeelement(:hermite, QHat)
+e6 = makeelement(:hermite, QHat, conforming=false)
 @test e1 === e2
 @test e1 != e3
 @test e3 === e4

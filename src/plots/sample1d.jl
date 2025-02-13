@@ -30,7 +30,7 @@ function sample1d(
     h = w / (npoints - 1)
 
     # Initial sampling points
-    x = wiggle!(collect(range(start=a, stop=b, length=npoints)), 0.5 * h, Xoshiro(22421))
+    x = wiggle!(collect(range(start=a, stop=b, length=npoints)), 0.5 * h)
 
     # Curve approximation and refinement
     ca = CurveApproximation(x, f)
@@ -63,9 +63,9 @@ sample1d(
 # Helper functions
 # -------------------------------------------------------------------------------------------------
 
-function wiggle!(x::Vector{<:Real}, eps::Real, rng::AbstractRNG)
+function wiggle!(x::Vector{<:Real}, eps::Real)
     n = length(x)
-    x[2:n-1] += 0.5 * rand(rng, -eps .. eps, n - 2)
+    x[2:n-1] += 0.5 * rand(Random.Random.Xoshiro(22421), -eps .. eps, n - 2)
     return x
 end
 

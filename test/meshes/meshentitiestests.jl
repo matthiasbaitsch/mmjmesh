@@ -1,6 +1,4 @@
 using Test
-using IntervalSets
-using DomainSets: ×
 
 using MMJMesh
 using MMJMesh.Meshes

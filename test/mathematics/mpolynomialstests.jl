@@ -1,11 +1,13 @@
 using Test
 using Symbolics
-using IntervalSets
 using StaticArrays
 
 using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Mathematics: _simplify, _isintegervalue, _integerize, _integerize!
+
+using .Validate
+
 
 # -------------------------------------------------------------------------------------------------
 # Real coefficients

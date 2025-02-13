@@ -1,14 +1,17 @@
+module Validate
 
 using Test
 using IntervalSets
+
+using MMJMesh
+using MMJMesh.Geometries
+using MMJMesh.Mathematics
 
 import Random
 import DomainSets
 import FiniteDifferences
 
-using MMJMesh
-using MMJMesh.Mathematics
-using MMJMesh.Geometries: Box, parametrization
+export validate, validateoperations
 
 
 function _sample(I::Interval)
@@ -111,6 +114,7 @@ _validatecodomaintype(x, ::Type{<:InR}) = x isa Real
 _validatecodomaintype(x, ::Type{<:InRⁿ{N}}) where {N} = (size(x) == (N,))
 _validatecodomaintype(x, ::Type{<:InRⁿˣᵐ{N,M}}) where {N,M} = size(x) == (N, M)
 
+
 function _validatecodomaintype(m::AbstractMapping)
     for x ∈ _sample(domain(m))
         @test _validatecodomaintype(valueat(m, x), codomaintype(m))
@@ -160,4 +164,6 @@ function validateoperations(f1, f2)
         @test h3(x) ≈ π * f1(x)
     end
     return true
+end
+
 end

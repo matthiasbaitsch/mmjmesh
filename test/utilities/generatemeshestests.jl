@@ -1,6 +1,4 @@
 using Test
-using DomainSets
-using DomainSets: ×
 using LinearAlgebra
 
 using MMJMesh

@@ -14,7 +14,6 @@ include("meshes/00-meshes.jl")
 include("utilities/00-utilities.jl")
 include("gmsh/00-gmsh.jl")
 include("plots/00-plots.jl")
-include("tests/00-tests.jl")
 
 # Export some
 include("reexports.jl")

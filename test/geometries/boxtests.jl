@@ -1,8 +1,4 @@
 using Test
-using IntervalSets
-
-import DomainSets
-using DomainSets: ×
 
 using MMJMesh
 using MMJMesh.Geometries

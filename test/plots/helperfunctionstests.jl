@@ -1,5 +1,4 @@
 using Test
-using DomainSets
 using LinearAlgebra
 
 using MMJMesh.Mathematics

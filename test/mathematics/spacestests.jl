@@ -1,7 +1,5 @@
 using Test
 using Symbolics
-using IntervalSets
-using DomainSets: ×
 
 using MMJMesh
 using MMJMesh.Mathematics

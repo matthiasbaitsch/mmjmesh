@@ -2,18 +2,15 @@ module MathematicsTests
 
 using Test
 
-using MMJMesh.Tests
-using MMJMesh.Mathematics
+include("Validate.jl")
 
-@testset "Mappings" begin
-    include("domainstests.jl")
-    include("mappingstests.jl")
-    include("mpolynomialstests.jl")
-    include("piecewisetests.jl")
-    include("curvestests.jl")
-    include("interpolationstests.jl")
-    include("finiteelementstests.jl")
-end
+@testset "Domains"          include("domainstests.jl")
+@testset "Mappings"         include("mappingstests.jl")
+@testset "MPolynomials"     include("mpolynomialstests.jl")
+@testset "Piecewise"        include("piecewisetests.jl")
+@testset "Curves"           include("curvestests.jl")
+@testset "Interpolations"   include("interpolationstests.jl")
+@testset "Finiteelements"   include("finiteelementstests.jl")
 
 end
 
