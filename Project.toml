@@ -4,7 +4,6 @@ authors = ["Matthias Baitsch <matthias.baitsch@hs-bochum.de>"]
 version = "0.1.2"
 
 [deps]
-BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 DomainSets = "5b8099bc-c8ec-5219-889f-1d9e522a28bf"
 FiniteDifferences = "26cc04aa-876d-5657-8c51-4c34ba976000"
 Gmsh = "705231aa-382f-11e9-3f0c-b7cb4346fdeb"
