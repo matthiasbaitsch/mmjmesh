@@ -897,25 +897,24 @@ Base.:(+)(z::Zero, ::Zero) = z
 Base.:(+)(::Zero, m::AbstractMapping) = m
 Base.:(+)(::Zero, m::ScaledMapping) = m
 Base.:(+)(m::AbstractMapping, ::Zero) = m
-Base.:(+)(m1::ScaledMapping, m2::AbstractMapping) = m2 + m1
-Base.:(+)(m1::AbstractMapping, m2::ScaledMapping) =
-    m1 == m2.m ? (1 + m2.a) * m2.m : Sum(m1, m2)
-Base.:(+)(m1::ScaledMapping, m2::ScaledMapping) =
-    m1.m === m2.m ? (m1.a + m2.a) * m1.m : Sum(m1, m2)
 Base.:(+)(m1::AbstractMapping{DT}, m2::AbstractMapping{DT}) where {DT} =
     m1 == m2 ? 2.0 * m1 : Sum(m1, m2)
 
 # + polynomial special
-_add(f::Polynomial, a::Real, ::One) = Polynomial(a) + f
-_add(f::Polynomial, a::Real, ::Identity) = Polynomial(0, a) + f
-_add(f::Polynomial, a::Real, m::AbstractMapping{InR,InR}) = Sum(f, a * m)
-Base.:(+)(f1::Polynomial, f2::ScaledMapping{InR,InR}) = _add(f1, f2.a, f2.m)
-Base.:(+)(f1::ScaledMapping{InR,InR}, f2::Polynomial) = f2 + f1
-
+_addscaled(f::Polynomial, a::Real, ::One{InR,D}) where {D} = Polynomial(a, d=D) + f
+_addscaled(f::Polynomial, a::Real, ::Identity{InR,D}) where {D} = Polynomial(0, a, d=D) + f
 Base.:(+)(f::Polynomial, ::Identity{InR,D}) where {D} = f + Polynomial(0, 1, d=D)
 Base.:(+)(::Identity{InR,D}, f::Polynomial) where {D} = f + Polynomial(0, 1, d=D)
-Base.:(+)(f::Polynomial, ::One{InR,D}) where {D} = f + Polynomial(1, d=D)
-Base.:(+)(::One{InR,D}, f::Polynomial) where {D} = f + Polynomial(1, d=D)
+
+# + one special
+Base.:(+)(f::MappingFromR{InR}, ::One{InR,D}) where {D} = f + Polynomial(1, d=D)
+Base.:(+)(::One{InR,D}, f::MappingFromR{InR}) where {D} = f + Polynomial(1, d=D)
+
+# + one/identity special
+_addscaled(a1::Real, ::One{InR,D1}, a2::Real, ::Identity{InR,D2}) where {D1,D2} =
+    Polynomial([a1, a2], D1 ∩ D2)
+_addscaled(a1::Real, id::Identity, a2::Real, one::One) = _addscaled(a2, one, a1, id)
+_addscaled(one::One, a2::Real, id::Identity) = _addscaled(1, one, a2, id)
 
 # -
 Base.:-(m::AbstractMapping) = -1.0 * m
@@ -950,7 +949,27 @@ Base.:(∘)(m1::ScaledMapping, m2::AbstractMapping) = m1.a * (m1.m ∘ m2)
 Base.:(^)(::Identity{InR,D}, n::Int) where {D} = Polynomial(_monomial_coeffs(n), D)
 
 # Add or subtract a Number
+Base.:(+)(f::Identity{Real,D}, a::Real) where {D} = a == 0 ? f : Polynomial([a, 1], D)
 Base.:(+)(f::FunctionToR, a::Real) = f + a * One(f)
 Base.:(+)(a::Real, f::FunctionToR) = f + a
 Base.:(-)(a::Real, f::FunctionToR) = a + (-f)
 Base.:(-)(f::FunctionToR, a::Real) = f + (-a)
+
+# Scaled mapping special
+Base.:(+)(m1::ScaledMapping{DT,CT}, ::Zero{DT,CT}) where {DT,CT} = m1
+
+# Two scaled functions
+_addscaled(a1::Real, m1::AbstractMapping, a2::Real, m2::AbstractMapping) =
+    m1 == m2 ? (a1 + a2) * m1 : Sum(a1 * m1, a2 * m2)
+
+Base.:(+)(m1::ScaledMapping{DT,CT}, m2::ScaledMapping{DT,CT}) where {DT,CT} =
+    _addscaled(m1.a, m1.m, m2.a, m2.m)
+
+# Scaled and other function
+_addscaled(m1::AbstractMapping, a::Real, m2::AbstractMapping) =
+    m1 == m2 ? (1 + a) * m1 : Sum(m1, a * m2)
+
+Base.:(+)(f1::AbstractMapping{DT,CT}, f2::ScaledMapping{DT,CT}) where {DT,CT} =
+    _addscaled(f1, f2.a, f2.m)
+Base.:(+)(f1::ScaledMapping{InR,InR}, f2::One{InR}) = _addscaled(f2, f1.a, f1.m)
+Base.:(+)(m1::ScaledMapping{DT,CT}, m2::AbstractMapping{DT,CT}) where {DT,CT} = m2 + m1

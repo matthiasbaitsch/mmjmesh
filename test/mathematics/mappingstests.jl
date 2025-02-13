@@ -218,6 +218,19 @@ c = [1, 2, 3]
 p = fromroots(c)
 @test roots(p) ≈ c
 
+# From expression
+x = parameter(0 .. 5)
+@test 1x == x
+@test 1 + x == Polynomial([1, 1], 0 .. 5)
+@test 2 + x == Polynomial([2, 1], 0 .. 5)
+@test 1 + 3x == Polynomial([1, 3], 0 .. 5)
+@test 2 + 3x == Polynomial([2, 3], 0 .. 5)
+@test 3x + 1 == Polynomial([1, 3], 0 .. 5)
+@test 3x + 2 == Polynomial([2, 3], 0 .. 5)
+@test 3 + 3x - 7x^2 == Polynomial([3, 3, -7], 0 .. 5)
+@test 3x - 7x^2 + 3 == Polynomial([3, 3, -7], 0 .. 5)
+@test -7x^2 + 3 + 3x == Polynomial([3, 3, -7], 0 .. 5)
+
 # Monomials
 @test Polynomial([1, 2, 3, 4, 5]) == [1, 2, 3, 4, 5]' * monomials(0:4)
 
@@ -257,7 +270,7 @@ f = sin(10x)
 @test antiderivative(f)' == f
 
 f = 3sin(10x)
-ff = antiderivative(f)' 
+ff = antiderivative(f)'
 @test f.a ≈ ff.a
 @test f.m == ff.m
 
@@ -405,6 +418,12 @@ m4 = Polynomial([0, 0, 1], 0 .. 4)
 @test m3 - m1 == Cos() - Sin()
 @test validate(m1 + m3, rtol=1e-4)
 
+# Add and subtract a number
+@test m1 + 1 == m1 + One(m1)
+@test m1 + 2 == m1 + 2 * One(m1)
+@test m1 - 1 == m1 - One(m1)
+@test m1 - 2 == m1 - 2 * One(m1)
+
 # Add or subtract constant
 f = Exp()
 
@@ -474,7 +493,7 @@ f3 = 2 * Sin()
 @test f3 + f1 === f1 + f3
 
 # Polynomial from Identity
-x = Identity(1 .. 2)
+x = Identity(1.0 .. 2.0)
 f = 3 + 3x^2 + x - 7x^4 + 7
 
 @test typeof(f) === Polynomial{1.0 .. 2.0}
