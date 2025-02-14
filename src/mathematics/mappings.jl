@@ -161,8 +161,8 @@ valueat(::One{DT}, x::DT) where {DT} = 1.0
 derivative(::One{DT,D}, n::Integer=1) where {DT,D} = Zero{DT,derivativetype(DT, InR, n),D}()
 derivativeat(::One{DT}, x::DT, n::Integer=1) where {DT} = zero(derivativetype(DT, InR, n))
 
-Base.one(::Type{<:AbstractMapping{DT,Float64,D}}) where {DT,D} = One{DT,D}()
-Base.one(m::AbstractMapping{DT,Float64,D}) where {DT,D} = one(typeof(m))
+Base.one(::Type{<:AbstractMapping{DT,InR,D}}) where {DT,D} = One{DT,D}()
+Base.one(m::AbstractMapping{DT,InR,D}) where {DT,D} = one(typeof(m))
 Base.show(io::IO, ::One) = print(io, "1(x)")
 Base.isequal(::One{DT,D}, ::One{DT,D}) where {DT,D} = true
 
