@@ -214,6 +214,7 @@ struct ScaledMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
     ScaledMapping(a::Real, m::AbstractMapping{DT,CT,D}) where {DT,CT,D} = new{DT,CT,D}(a, m)
 end
 
+degree(s::ScaledMapping) = degree(s.m)
 valueat(s::ScaledMapping{DT}, x::DT) where {DT} = s.a * valueat(s.m, x)
 derivative(f::ScaledMapping, n::Integer=1) = f.a * derivative(f.m, n)
 derivativeat(f::ScaledMapping{DT}, x::DT, n::Integer=1) where {DT} = f.a * derivativeat(f.m, x, n)
@@ -281,11 +282,16 @@ _derivative(f::ComposedMapping) = (f.m1' ∘ f.m2) * f.m2'
 _derivativeat(f::ComposedMapping{DT}, x::DT) where {DT} =
     derivativeat(f.m1, valueat(f.m2, x)) * derivativeat(f.m2, x)
 
-_adc(::AbstractMapping, ::AbstractMapping) = @notimplemented
-_adc(::AbstractMapping, ::Real, ::AbstractMapping) = @notimplemented
-_adc(g::AbstractMapping, s::Real, h::Identity{InR}) = 1 / s * antiderivative(g) ∘ (s * h)
-_adc(g::AbstractMapping, h::ScaledMapping{InR,InR}) = _adc(g, h.a, h.m)
-_antiderivative(f::ComposedMapping{InR,InR}) = _adc(f.m1, f.m2)
+function antiderivative(f::ComposedMapping{InR,InR}, n::Integer=1)
+    g = f.m1
+    h = f.m2
+    
+    if degree(h) == 1 
+        return (1 / derivativeat(h, 0))^n * (antiderivative(g, n) ∘ h)
+    else
+        @notimplemented
+    end
+end
 
 Base.show(io::IO, m::ComposedMapping) = print(io, m.m1, " ∘ ", m.m2)
 Base.:(==)(m1::ComposedMapping{DT,CT,D}, m2::ComposedMapping{DT,CT,D}) where {DT,CT,D} =
@@ -808,12 +814,13 @@ function lagrangepolynomials(c::AbstractArray{<:Float64}, d=R)
 end
 
 
+_monomial_coeffs(n) = [i == n + 1 for i = 1:n+1]
+
 """
     monomials(p, D=R)
 
 Monomials of degree ``p_1, \\dots, p_n`` defined on the domain `D`.
 """
-_monomial_coeffs(n) = [i == n + 1 for i = 1:n+1]
 function monomials(p::AbstractArray{<:Integer}, d=R)
     return [Polynomial(_monomial_coeffs(n), d) for n in p]
 end

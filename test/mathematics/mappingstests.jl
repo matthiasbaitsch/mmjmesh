@@ -274,6 +274,10 @@ ff = antiderivative(f)'
 @test f.a ≈ ff.a
 @test f.m == ff.m
 
+f = sin(2x)
+@test degree(2x) == 1
+@test antiderivative(f, 4)'''' == f
+
 
 # -------------------------------------------------------------------------------------------------
 # Functions Rn -> R
