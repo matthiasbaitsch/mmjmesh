@@ -150,19 +150,19 @@ Base.show(io::IO, ::Zero) = print(io, "0(x)")
 Base.isequal(::Zero{DT,CT,D}, ::Zero{DT,CT,D}) where {DT,CT,D} = true
 
 
-""" Neutral element w.r.t. multiplication, currently only for real valued functions. """
+""" Neutral element w.r.t. multiplication. """
 struct One{DT,D} <: AbstractMapping{DT,InR,D} end
 
-One(::Type{<:AbstractMapping{DT,InR,D}}) where {DT,D} = One{DT,D}()
-One(m::AbstractMapping{DT,InR}) where {DT} = One(typeof(m))
+One(::Type{<:AbstractMapping{DT,CT,D}}) where {DT,CT,D} = One{DT,D}()
+One(m::AbstractMapping) = One(typeof(m))
 
 degree(::One) = 0
 valueat(::One{DT}, x::DT) where {DT} = 1.0
 derivative(::One{DT,D}, n::Integer=1) where {DT,D} = Zero{DT,derivativetype(DT, InR, n),D}()
 derivativeat(::One{DT}, x::DT, n::Integer=1) where {DT} = zero(derivativetype(DT, InR, n))
 
-Base.one(::Type{<:AbstractMapping{DT,InR,D}}) where {DT,D} = One{DT,D}()
-Base.one(m::AbstractMapping{DT,InR,D}) where {DT,D} = one(typeof(m))
+Base.one(::Type{<:AbstractMapping{DT,CT,D}}) where {DT,CT,D} = One{DT,D}()
+Base.one(m::AbstractMapping) = one(typeof(m))
 Base.show(io::IO, ::One) = print(io, "1(x)")
 Base.isequal(::One{DT,D}, ::One{DT,D}) where {DT,D} = true
 
@@ -183,6 +183,15 @@ Base.show(io::IO, ::Identity) = print(io, "identity(x)")
 
 """ An independent variable of a function. """
 parameter(d::AbstractInterval=R) = Identity(d)
+
+
+""" Constant mapping. """
+struct ConstantMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
+    c::Any
+    ConstantMapping(c, dt, d) = new{dt,typeof(c),d}(c)
+end
+
+valueat(m::ConstantMapping{DT}, ::DT) where {DT} = m.c
 
 
 # -------------------------------------------------------------------------------------------------
@@ -285,8 +294,8 @@ _derivativeat(f::ComposedMapping{DT}, x::DT) where {DT} =
 function antiderivative(f::ComposedMapping{InR,InR}, n::Integer=1)
     g = f.m1
     h = f.m2
-    
-    if degree(h) == 1 
+
+    if degree(h) == 1
         return (1 / derivativeat(h, 0))^n * (antiderivative(g, n) ∘ h)
     else
         @notimplemented
@@ -663,16 +672,16 @@ Base.:(==)(f1::ProductFunction, f2::ProductFunction) = f1.factors == f2.factors
 # -------------------------------------------------------------------------------------------------
 
 """
-    VectorField{N,D}
+    MappingRnToRm{N,M,D}
 
-A mapping ''R^n \\to R^m'' with ``n,m > 1``.
+A mapping ''\\mathbf{u}: R^n \\to R^m'' with ``n,m > 1``.
 """
 const MappingRnToRm{N,M,D} = AbstractMapping{InRⁿ{N},InRⁿ{M},D}
 
 """
-    jacobian(m::MappingRnToRm)
+    jacobian(u::MappingRnToRm)
 
-Jacobian of the mapping `m`.
+Jacobian of the mapping `u`.
 """
 jacobian(m::MappingRnToRm) = derivative(m)
 
@@ -873,10 +882,7 @@ function derivativeat(m::AffineMapping{DT}, ::DT, n::Integer=1) where {DT}
     return zero(derivativetype(m, n))
 end
 
-function derivative(m::AffineMapping, n::Integer=1)
-    n == 1 && return m.A * One(m)
-    error("Not implemented yet")
-end
+_derivative(m::AffineMapping{DT,CT,D}) where {DT,CT,D} = ConstantMapping(m.A, DT, D)
 
 
 # -------------------------------------------------------------------------------------------------

@@ -250,10 +250,11 @@ f = AffineMapping(2, 3)
 @test f'(2) == 2
 
 u = AffineMapping([-1 1; 2 3], [1, 2], QHat)
+Ju = derivative(u)
 @test u(1, 2) == [2, 10]
 @test derivativeat(u, [1, 2]) == [-1 1; 2 3]
 @test derivativeat(u, [1, 2], 2) == zeros(2, 2, 2)
-# TODO Derivative when needed. Requires product of something with mapping to R
+@test Ju(1, 2) == [-1 1; 2 3]
 
 f = ProductFunction(Sin(), Sin())
 g = AffineMapping(Diagonal([π, π]), zeros(2))
@@ -502,6 +503,13 @@ f = 3 + 3x^2 + x - 7x^4 + 7
 
 @test typeof(f) === Polynomial{1.0 .. 2.0}
 @test f == Polynomial(10.0, 1, 3, 0, -7, d=1.0 .. 2.0)
+
+
+# Constant mapping
+u = MMJMesh.Mathematics.ConstantMapping(99, InRⁿ{3}, R3)
+@test u(1, 2, 3) == 99
+u = MMJMesh.Mathematics.ConstantMapping([1, 2, 3], InRⁿ{3}, R3)
+@test u(1, 2, 3) == [1, 2, 3]
 
 
 # -------------------------------------------------------------------------------------------------
