@@ -1,4 +1,5 @@
 using Test
+using Symbolics
 using StaticArrays
 using LinearAlgebra
 
@@ -6,6 +7,9 @@ using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Mathematics: derivativetype, dimension
 
+
+# Uncomment in order to work with this file
+# include("Validate.jl")
 using .Validate
 
 
@@ -544,3 +548,19 @@ v = MappingFromComponents(ProductFunction(Sin(), Cos()), ProductFunction(Cos(), 
 @test divergenceat(v, [1.0, 2.0]) == divergenceat(v, x)
 @test divergence(v)(x) ≈ divergenceat(v, x)
 @test div(v) == divergence(v)
+
+
+# -------------------------------------------------------------------------------------------------
+# Dot product
+# -------------------------------------------------------------------------------------------------
+
+x = parameter(R)
+
+@test [sin(x), cos(x)] ⋅ [6, 2] == 6sin(x) + 2cos(x)
+
+
+@variables a b
+
+a * cos(x)
+
+[sin(x), cos(x)] ⋅ [a, b]

@@ -986,3 +986,9 @@ Base.:(+)(f1::AbstractMapping{DT,CT}, f2::ScaledMapping{DT,CT}) where {DT,CT} =
     _addscaled(f1, f2.a, f2.m)
 Base.:(+)(f1::ScaledMapping{InR,InR}, f2::One{InR}) = _addscaled(f2, f1.a, f1.m)
 Base.:(+)(m1::ScaledMapping{DT,CT}, m2::AbstractMapping{DT,CT}) where {DT,CT} = m2 + m1
+
+# Enable dot product
+LinearAlgebra.dot(a::Real, m::AbstractMapping) = a * m
+LinearAlgebra.dot(m::AbstractMapping, a::Real) = a * m
+LinearAlgebra.dot(a::Num, m::AbstractMapping) = a * m
+LinearAlgebra.dot(m::AbstractMapping, a::Num) = a * m

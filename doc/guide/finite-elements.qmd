@@ -17,7 +17,7 @@ using CairoMakie: Axis, Figure
 Variables and helper function
 
 ```{julia}
-@variables a b x y l EA EI ν
+@variables a b x y l EA EI ν q
 
 function prettyprint(name, factor, value)
     s1 = name.s[2:end-1]
@@ -127,6 +127,13 @@ aᵉ(w, δw) = EI * l / 2 * integrate(D(w) * D(δw), IHat)
 Kᵉ = [aᵉ(Nᵢ, Nⱼ) for Nᵢ ∈ Ns, Nⱼ ∈ Ns]
 
 prettyprint(L"\mathbf{K}^e", EI / l^3, Kᵉ)
+```
+
+```{julia}
+bᵉ(δw) = q * l / 2 * integrate(δw, IHat)
+rᵉ = [bᵉ(Nᵢ) for Nᵢ ∈ Ns]
+
+prettyprint(L"\mathbf{r}^e", q/12, rᵉ)
 ```
 
 ### 2D Poisson equation

@@ -1,9 +1,15 @@
 using Test
 using Symbolics
+using LinearAlgebra
 
 using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Mathematics: _combineforms
+
+
+# Uncomment in order to work with this file
+# include("Validate.jl")
+using .Validate: validate
 
 
 # -------------------------------------------------------------------------------------------------
@@ -66,6 +72,8 @@ e = makeelement(:serendipity, QHat, k=2)
 for i = 1:8, j = 1:8
     @test isequal(e.N[i](ϕ[j]), i == j)
 end
+
+@test nodalbasis(:serendipity, QHat; k=2) == ϕ
 
 
 # -------------------------------------------------------------------------------------------------
