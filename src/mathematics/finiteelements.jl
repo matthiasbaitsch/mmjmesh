@@ -41,7 +41,8 @@ end
 
 
 """
-    nodalbasis(e, d=e.K)
+    nodalbasis(e)
+    nodalbasis(t, d)
 
 Generate a nodal basis for element `e` defined on `d`. This default implementation 
 might be overridden by specific element types. Option to specify domain only useful 
@@ -63,6 +64,8 @@ function nodalbasis(e::FiniteElement)
     end
     return e.cache[:nodalbasis]
 end
+
+nodalbasis(type::Symbol, domain; k = -1, a...) = makeelement(type, domain; k, a...) |> nodalbasis
 
 
 """
@@ -176,6 +179,7 @@ addelementtype!(
     makeelement=lagrangeelement
 )
 
+# Put in Cache
 makeelement(:lagrange, IHat, k=1);
 makeelement(:lagrange, QHat, k=1);
 
@@ -245,6 +249,7 @@ addelementtype!(
     makeelement=hermiteelement
 )
 
+# Put in Cache
 makeelement(:hermite, IHat);
 makeelement(:hermite, QHat);
 
