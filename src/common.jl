@@ -1,3 +1,8 @@
+# -------------------------------------------------------------------------------------------------
+# Operations for various mesh components
+# -------------------------------------------------------------------------------------------------
+
+
 """
     id(o)
 
@@ -50,6 +55,8 @@ Returns the mesh, object `o` belongs to.
 function mesh end
 
 
+## Export
+
 export id
 export pdim, gdim
 export coordinate, coordinates
@@ -57,9 +64,19 @@ export dimension
 export mesh
 
 
+# -------------------------------------------------------------------------------------------------
+# Common vector types
+# -------------------------------------------------------------------------------------------------
+
 const RealVec = AbstractVector{<:Real}
+const RealMat = AbstractMatrix{<:Real}
 const RealVecVec = AbstractVector{<:AbstractVector{<:Real}}
 const IntegerVec = AbstractVector{<:Integer}
+const IntegerMat = AbstractMatrix{<:Integer}
 const IntegerVecVec = AbstractVector{<:AbstractVector{<:Integer}}
 
-export RealVec, RealVecVec, IntegerVec, IntegerVecVec
+
+## Export
+
+export RealVec, RealMat, RealVecVec
+export IntegerVec, IntegerMat, IntegerVecVec

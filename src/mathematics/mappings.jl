@@ -22,6 +22,9 @@ There are many things missing
 # General concept of mapping
 # -------------------------------------------------------------------------------------------------
 
+
+## Type declaration
+
 """
     AbstractMapping{DT,CT,D}
 
@@ -32,7 +35,7 @@ domain. TODO: Use DomainSets.Full
 abstract type AbstractMapping{DT,CT,D} end
 
 
-# Fundamental operations
+## Fundamental operationsx
 
 """
     valueat(m::AbstractMapping{DT, CT}, x::DT) -> CT
@@ -62,6 +65,9 @@ function derivativeat end
 - The (generalized) `ns`-th partial derivative of `m`.
 """
 function derivative end
+
+
+## Types of domain, codomain and derivatives
 
 """ Type of elements in the domain of the mapping. """
 domaintype(::Type{<:AbstractMapping{DT}}) where {DT} = DT
@@ -136,6 +142,10 @@ function Base.similar(a::Vector, ::Type{T}, dims::AbstractUnitRange...) where {T
 end
 
 
+# -------------------------------------------------------------------------------------------------
+# Neutral elements
+# -------------------------------------------------------------------------------------------------
+
 """ Neutral element w.r.t. addition. """
 struct Zero{DT,CT,D} <: AbstractMapping{DT,CT,D} end
 
@@ -166,6 +176,10 @@ Base.one(m::AbstractMapping) = one(typeof(m))
 Base.show(io::IO, ::One) = print(io, "1(x)")
 Base.isequal(::One{DT,D}, ::One{DT,D}) where {DT,D} = true
 
+
+# -------------------------------------------------------------------------------------------------
+# Identity and constant mappings
+# -------------------------------------------------------------------------------------------------
 
 """ Identity function. """
 struct Identity{DT,D} <: AbstractMapping{DT,DT,D} end
@@ -199,7 +213,8 @@ valueat(m::ConstantMapping{DT}, ::DT) where {DT} = m.c
 # -------------------------------------------------------------------------------------------------
 
 
-# Sum of mappings
+## Sum of mappings
+
 struct Sum{DT,CT,D} <: AbstractMapping{DT,CT,D}
     m1::AbstractMapping{DT,CT}
     m2::AbstractMapping{DT,CT}
@@ -216,7 +231,8 @@ Base.show(io::IO, s::Sum) = print(io, s.m1, " + ", s.m2)
 Base.:(==)(m1::Sum{DT,CT,D}, m2::Sum{DT,CT,D}) where {DT,CT,D} = (m1.m1 == m2.m1 && m1.m2 == m2.m2)
 
 
-# Number times mapping
+## Number times mapping
+
 struct ScaledMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
     a::Real
     m::AbstractMapping
@@ -233,7 +249,8 @@ Base.:(==)(m1::ScaledMapping{DT,CT,D}, m2::ScaledMapping{DT,CT,D}) where {DT,CT,
     (m1.a == m2.a && m1.m == m2.m)
 
 
-# Mapping times mapping, only useful if `*` is defined for type `CT`
+## Mapping times mapping, only useful if `*` is defined for type `CT`
+
 struct ProductMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
     m1::AbstractMapping
     m2::AbstractMapping
@@ -258,7 +275,8 @@ Base.promote_op(*, ::Type{InR}, ::Type{InRⁿ{N}}) where {N} = InRⁿ{N}
 Base.promote_op(*, ::Type{InR}, ::Type{InR}) = InR
 
 
-# Mapping divided by mapping, only useful if `/` is defined for type `CT`
+## Mapping divided by mapping, only useful if `/` is defined for type `CT`
+
 struct QuotientMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
     m1::AbstractMapping{DT,CT}
     m2::AbstractMapping{DT,CT}
@@ -276,7 +294,8 @@ Base.:(==)(m1::QuotientMapping{DT,CT,D}, m2::QuotientMapping{DT,CT,D}) where {DT
     (m1.m1 == m2.m1 && m1.m2 == m2.m2)
 
 
-# Composition of mappings m1 ∘ m2
+## Composition of mappings m1 ∘ m2
+
 struct ComposedMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
     m1::AbstractMapping
     m2::AbstractMapping
@@ -306,6 +325,10 @@ Base.show(io::IO, m::ComposedMapping) = print(io, m.m1, " ∘ ", m.m2)
 Base.:(==)(m1::ComposedMapping{DT,CT,D}, m2::ComposedMapping{DT,CT,D}) where {DT,CT,D} =
     (m1.m1 == m2.m1 && m1.m2 == m2.m2)
 
+
+# -------------------------------------------------------------------------------------------------
+# Mappings D -> R^n or D -> R^nxm from components
+# -------------------------------------------------------------------------------------------------
 
 """
     MappingFromComponents(c1, c2, ..., cn)
@@ -520,8 +543,8 @@ const FunctionRnToR{N,D} = AbstractMapping{InRⁿ{N},InR,D}
     _nn(n, indices...)
 
 Converts sequence of variable indices to vector of length `n` indicating orders
-of partial derivatives. For instance, calling `_nn(2, 1, 2, 1, 1)` returns `[3, 1]` 
-which corresponds to ``w_{xyxx}``.
+of partial derivatives. For instance, calling `_nn(2, 1, 2, 1, 1)` representing 
+``w_{xyxx}`` returns `[3, 1]` which corresponds to ``w_{xxxy}``.
 """
 function _nn(n::Integer, indices::Integer...)
     n = zeros(Int, n)
@@ -534,7 +557,7 @@ end
 """
     _derivative(f::FunctionRnToR{N}, n::Integer)
 
-Default implementation of `n`-th order derivative of multivariate function `f`.  Currently
+Default implementation of `n`-th order derivative of multivariate function `f`. Currently
 implemented for 
 
 - `n = 1`: Returns the gradient function
