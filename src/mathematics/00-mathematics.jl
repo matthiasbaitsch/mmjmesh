@@ -26,6 +26,7 @@ include("domains.jl")
 include("mappings.jl")
 include("forms.jl")
 include("mpolynomials.jl")
+include("mpolynomials2.jl")
 include("curves.jl")
 include("interpolations.jl")
 include("parametertypes.jl")
@@ -71,11 +72,15 @@ export ParametricCurve, UnitNormal
 
 # Special functions II
 export Sin, Cos, Exp
-export MPolynomial, mmonomials, affinefunction, simplifyx
+export mmonomials, affinefunction, simplifyx
 export AdHocMapping, makefunction
 export AffineMapping
 export Polynomial, Interpolation, fromroots, lagrangepolynomials, monomials, lagrangebasis1d
 export PiecewiseFunction, npieces, interpolate
+
+# Polynomials of multiple variables
+export MPolynomial
+export MPolynomial2, nterms, exponents, coefficients
 
 # Forms
 export Form, LinearForm, BilinearForm, ValueAtLF, DerivativeAtLF, DDerivativeAtLF, PDerivativeAtLF
