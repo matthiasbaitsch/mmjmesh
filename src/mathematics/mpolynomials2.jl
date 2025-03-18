@@ -9,9 +9,9 @@ Return the product ``m (m - 1) ... (m - n)
 """
 _factorialpower(m::Integer, n::Integer) = prod([m - i for i = 0:n-1])
 
-function _monomialsat(exponents::SMatrix{N,M}, x::InRⁿ{N}) where {N,M}
-    c = MVector{M,Float64}(undef)
-    for i = 1:M
+function _monomialsat(exponents::SMatrix{N,NT}, x::InRⁿ{N}) where {N,NT}
+    c = MVector{NT,Float64}(undef)
+    for i = 1:NT
         v = 1
         for j = 1:N
             v *= Base.FastMath.pow_fast(x[j], exponents[j, i])
@@ -22,11 +22,11 @@ function _monomialsat(exponents::SMatrix{N,M}, x::InRⁿ{N}) where {N,M}
 end
 
 function _monomialsderivativeat(
-    exponents::StaticMatrix{N,M}, x::InRⁿ{N}, ns::IntegerVec
-) where {N,M}
-    @assert N == length(ns)
-    c = MVector{M,Float64}(undef)
-    for i = 1:M
+    exponents::StaticMatrix{N,NT}, x::InRⁿ{N}, ns::IntegerVec
+) where {N,NT}
+    @assert length(ns) == N
+    c = MVector{NT,Float64}(undef)
+    for i = 1:NT
         v = 1
         for j = 1:N
             e = exponents[j, i]
@@ -155,13 +155,33 @@ derivativeat(p::MPolynomial2{NT,S,N}, x::InRⁿ{N}, ns::IntegerVec) where {NT,S,
     _mulop(p)(coefficients(p), _monomialsderivativeat(exponents(p), x, ns))
 
 function derivativeat(
-    p::MPolynomial2{NT,S,N}, x::InRⁿ{N}, ns::StaticMatrix{M,N,<:Integer}
-) where {NT,S,N,M}
-    d = MArray{S,Float64}(undef)
-    println(S)
-    # println(size(S))
-    println(M)
-    d
+    p::PolynomialRnToR{NT,N}, x::InRⁿ{N}, ns::StaticMatrix{ND,N,<:Integer}
+) where {NT,N,ND}
+    d = MVector{ND,Float64}(undef)
+    for i = 1:ND
+        d[i] = derivativeat(p, x, ns[i, :])
+    end
+    return d
+end
+
+function derivativeat(
+    p::PolynomialRnToR{NT,N}, x::InRⁿ{N}, ns::StaticArray{Tuple{ND,MD,N},<:Integer}
+) where {NT,N,ND,MD}
+    d = MArray{Tuple{ND,MD},Float64}(undef)
+    for i = 1:ND, j = 1:MD
+        d[i, j] = derivativeat(p, x, ns[i, j, :])
+    end
+    return d
+end
+
+function derivativeat(
+    p::PolynomialRnToRm{NT,N,M}, x::InRⁿ{N}, ns::StaticMatrix{ND,N,<:Integer}
+) where {NT,N,M,ND}
+    d = MMatrix{M,ND,Float64}(undef)
+    for i = 1:ND
+        d[:, i] = derivativeat(p, x, ns[i, :])
+    end
+    return d
 end
 
 

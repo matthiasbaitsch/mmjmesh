@@ -5,7 +5,7 @@ using StaticArrays
 using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Mathematics: MPolynomial2, _monomialsat, _monomialsderivativeat, _lt,
-    _subscript, _superscript, _prettymonomial, _factorialpower
+      _subscript, _superscript, _prettymonomial, _factorialpower
 using MMJMesh.Mathematics: _simplify, _isintegervalue, _integerize, _integerize!
 
 
@@ -55,7 +55,7 @@ using MMJMesh.Mathematics: _simplify, _isintegervalue, _integerize, _integerize!
 
 
 # -------------------------------------------------------------------------------------------------
-# Very basic tests
+# Basic tests
 # -------------------------------------------------------------------------------------------------
 
 # Polynomials
@@ -118,5 +118,15 @@ x = [3, 2]
 # Derivative[-4, -1][v][3, 2] // N
 
 # Composed derivatives
-derivativeat(u, x, SA[1 0; 0 1; 3 3])
+@test derivativeat(u, x, SA[1 0; 0 1; 3 3]) ==
+      [derivativeat(u, x, [1, 0]), derivativeat(u, x, [0, 1]), derivativeat(u, x, [3, 3])]
+@test derivativeat(u, x, SArray{Tuple{2,3,2},Int}([2 1 3; 1 0 2;;; 0 1 2; 1 2 3])) ==
+      [derivativeat(u, x, [2, 0]) derivativeat(u, x, [1, 1]) derivativeat(u, x, [3, 2])
+      derivativeat(u, x, [1, 1]) derivativeat(u, x, [0, 2]) derivativeat(u, x, [2, 3])]
+@test derivativeat(v, x, SA[1 0; 0 1; 3 3]) ==
+      hcat(derivativeat(v, x, [1, 0]), derivativeat(v, x, [0, 1]), derivativeat(v, x, [3, 3]))
 
+
+# using BenchmarkTools
+# @btime derivativeat(u, x, SA[1 0; 0 1; 3 3]);
+# @btime derivativeat(v, x, SA[1 0; 0 1; 3 3]);
