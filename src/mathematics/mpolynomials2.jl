@@ -44,24 +44,33 @@ function _monomialsderivativeat(
     return c
 end
 
-function _check(exponents, coefficients)
-    @assert size(exponents, 2) == size(coefficients, ndims(coefficients))
-    return true
-end
+function _monomialsderivative(
+    exponents::StaticMatrix{N,NT}, ns::IntegerVec
+) where {N,NT}
+    factors = MVector{NT,Float64}(undef)
+    nexponents = MMatrix{N,NT,Int}(undef)
 
-function _lt(a::AbstractArray, b::AbstractArray)
-    sa = sum(a)
-    sb = sum(b)
-    sa != sb && return sa < sb
-    for (ea, eb) = zip(a, b)
-        ea != eb && return ea < eb
+    for i = 1:NT
+        v = 1.0
+        for j = 1:N
+            e = exponents[j, i]
+            d = ns[j]
+            if d < 0
+                v *= 1 / _factorialpower(e - d, -d)
+                nexponents[j, i] = e - d
+            elseif d <= e
+                v *= _factorialpower(e, d)
+                nexponents[j, i] = e - d
+            else
+                v = 0
+                nexponents[j, i] = 0
+            end
+        end
+        factors[i] = v
     end
-    return false
+
+    return factors, nexponents
 end
-
-_arrange(::Type{Tuple{N}}, c::Array, p::AbstractVector) where {N} = c[p]
-_arrange(::Type{Tuple{N,M}}, c::Array, p::AbstractVector) where {N,M} = c[:, p]
-
 
 # Helper functions to print
 
@@ -90,73 +99,149 @@ function _prettymonomial(exponents)
     return a
 end
 
+
+# Construction helpers
+
 _dd(exponents) = InRⁿ{size(exponents, 1)}
+
+function _lt(a::AbstractArray, b::AbstractArray)
+    sa = sum(a)
+    sb = sum(b)
+    sa != sb && return sa < sb
+    for (ea, eb) = zip(a, b)
+        ea != eb && return ea < eb
+    end
+    return false
+end
+
+# Sort handling
+_arrange(c::AbstractVector, p::AbstractVector) = c[p]
+_arrange(c::AbstractMatrix, p::AbstractVector) = c[:, p]
+
+# Duplicates handling
+function _squeeze(duplicates, coefficients::AbstractVector)
+    idx = 0
+    nd = sum(duplicates)
+    nt = length(coefficients)
+    sc = similar(coefficients, eltype(coefficients), nt - nd)
+    for i = eachindex(coefficients)
+        if duplicates[i]
+            sc[idx] += coefficients[i]
+        else
+            idx += 1
+            sc[idx] = coefficients[i]
+        end
+    end
+    return sc
+end
+
+function _squeeze(duplicates, coefficients::AbstractMatrix)
+    idx = 0
+    nd = sum(duplicates)
+    nt = size(coefficients, 2)
+    sc = similar(coefficients, eltype(coefficients), (size(coefficients, 1), nt - nd))
+    for i = 1:nt
+        if duplicates[i]
+            sc[:, idx] += coefficients[:, i]
+        else
+            idx += 1
+            sc[:, idx] = coefficients[:, i]
+        end
+    end
+    return sc
+end
+
+# Zero handling
+_findnonzeros(coefficients::AbstractVector) = coefficients .!= 0
+_findnonzeros(coefficients::AbstractMatrix) = [norm(col) != 0 for col = eachcol(coefficients)]
+_dropzeros(coefficients::AbstractVector, nonzeros) = coefficients[nonzeros]
+_dropzeros(coefficients::AbstractMatrix, nonzeros) = coefficients[:, nonzeros]
+
+# Normalize
+function _normalize(exponents, coefficients)
+    @assert size(exponents, 2) == size(coefficients, ndims(coefficients))
+    nt = size(exponents, 2)
+    perm = sort!(collect(1:nt), lt=(i, j) -> _lt(exponents[:, i], exponents[:, j]), rev=true)
+    exponents = exponents[:, perm]
+    coefficients = _arrange(coefficients, perm)
+
+    # Duplicates
+    duplicates = [false; [exponents[:, i] == exponents[:, i+1] for i = 1:nt-1]]
+    if any(duplicates)
+        exponents = exponents[:, .!duplicates]
+        coefficients = _squeeze(duplicates, coefficients)
+    end
+
+    # Zeros
+    nonzeros = _findnonzeros(coefficients)
+    if !all(nonzeros)
+        exponents = exponents[:, nonzeros]
+        coefficients = _dropzeros(coefficients, nonzeros)
+    end
+
+    return exponents, coefficients
+end
 
 
 # -------------------------------------------------------------------------------------------------
 # Implementation
 # -------------------------------------------------------------------------------------------------
 
-struct MPolynomial2{NT,S,N,CT,D} <: AbstractMapping{InRⁿ{N},CT,D}
-
+struct MPolynomial2{N,CT,D,NT,S} <: AbstractMapping{InRⁿ{N},CT,D}
     exponents::SMatrix{N,NT,Int}
     coefficients::SArray{S}
-
-    function MPolynomial2{NT,S,N,CT,D}(exponents, coefficients) where {NT,S,N,CT,D}
-        p = sort!(collect(1:NT), lt=(i, j) -> _lt(exponents[:, i], exponents[:, j]), rev=true)
-        return new{NT,S,N,CT,D}(exponents[:, p], _arrange(S, coefficients, p))
-    end
 end
 
-function MPolynomial2(exponents::Matrix{Int}, coefficients::AbstractVector, D=_dd(exponents))
-    @assert _check(exponents, coefficients)
+function MPolynomial2(exponents::IntegerMat, coefficients::AbstractVector, D=_dd(exponents))
+    exponents, coefficients = _normalize(exponents, coefficients)
     N = size(exponents, 1)
     NT = length(coefficients)
     S = Tuple{NT}
-    return MPolynomial2{NT,S,N,InR,D}(exponents, coefficients)
+    return MPolynomial2{N,InR,D,NT,S}(exponents, coefficients)
 end
 
-function MPolynomial2(exponents::Matrix{Int}, coefficients::AbstractMatrix, D=_dd(exponents))
-    @assert _check(exponents, coefficients)
+function MPolynomial2(exponents::IntegerMat, coefficients::AbstractMatrix, D=_dd(exponents))
+    exponents, coefficients = _normalize(exponents, coefficients)
     N = size(exponents, 1)
     M = size(coefficients, 1)
     NT = size(coefficients, 2)
     S = Tuple{M,NT}
-    return MPolynomial2{NT,S,N,InRⁿ{M},D}(exponents, coefficients)
+    return MPolynomial2{N,InRⁿ{M},D,NT,S}(exponents, coefficients)
 end
 
 
-# Typedefs
+## Typedefs
 
-const PolynomialRnToR{NT,N,D} = MPolynomial2{NT,Tuple{NT},N,InR,D}
-const PolynomialRnToRm{NT,N,M,D} = MPolynomial2{NT,Tuple{M,NT},N,InRⁿ{M},D}
+const PolynomialRnToR{N,D,NT} = MPolynomial2{N,InR,D,NT,Tuple{NT}}
+const PolynomialRnToRm{N,M,D,NT} = MPolynomial2{N,InRⁿ{M},D,NT,Tuple{M,NT}}
 
 
-# Properties
+## Properties
 
 exponents(p::MPolynomial2) = p.exponents
 exponents(p::MPolynomial2, idx::Integer) = p.exponents[:, idx]
 coefficients(p::MPolynomial2) = p.coefficients
 coefficient(p::PolynomialRnToR, idx::Integer) = p.coefficients[idx]
 coefficient(p::PolynomialRnToRm, idx::Integer) = p.coefficients[:, idx]
-nterms(::Type{<:MPolynomial2{NT}}) where {NT} = NT
+nterms(::Type{<:MPolynomial2{N,CT,D,NT}}) where {N,CT,D,NT} = NT
 nterms(p::MPolynomial2) = nterms(typeof(p))
+Base.getindex(p::PolynomialRnToRm, i::Integer) = MPolynomial2(exponents(p), coefficients(p)[i, :])
 
 
-# Evaluation
+## Evaluation
 
 _mulop(::PolynomialRnToR) = dot
 _mulop(::PolynomialRnToRm) = *
 
-valueat(p::MPolynomial2{NT,S,N}, x::InRⁿ{N}) where {NT,S,N} =
+valueat(p::MPolynomial2{N}, x::InRⁿ{N}) where {N} =
     _mulop(p)(coefficients(p), _monomialsat(exponents(p), x))
 
-derivativeat(p::MPolynomial2{NT,S,N}, x::InRⁿ{N}, ns::IntegerVec) where {NT,S,N} =
+derivativeat(p::MPolynomial2{N}, x::InRⁿ{N}, ns::IntegerVec) where {N} =
     _mulop(p)(coefficients(p), _monomialsderivativeat(exponents(p), x, ns))
 
 function derivativeat(
-    p::PolynomialRnToR{NT,N}, x::InRⁿ{N}, ns::StaticMatrix{ND,N,<:Integer}
-) where {NT,N,ND}
+    p::PolynomialRnToR{N}, x::InRⁿ{N}, ns::StaticMatrix{ND,N,<:Integer}
+) where {N,ND}
     d = MVector{ND,Float64}(undef)
     for i = 1:ND
         d[i] = derivativeat(p, x, ns[i, :])
@@ -165,8 +250,8 @@ function derivativeat(
 end
 
 function derivativeat(
-    p::PolynomialRnToR{NT,N}, x::InRⁿ{N}, ns::StaticArray{Tuple{ND,MD,N},<:Integer}
-) where {NT,N,ND,MD}
+    p::PolynomialRnToR{N}, x::InRⁿ{N}, ns::StaticArray{Tuple{ND,MD,N},<:Integer}
+) where {N,ND,MD}
     d = MArray{Tuple{ND,MD},Float64}(undef)
     for i = 1:ND, j = 1:MD
         d[i, j] = derivativeat(p, x, ns[i, j, :])
@@ -175,13 +260,42 @@ function derivativeat(
 end
 
 function derivativeat(
-    p::PolynomialRnToRm{NT,N,M}, x::InRⁿ{N}, ns::StaticMatrix{ND,N,<:Integer}
-) where {NT,N,M,ND}
+    p::PolynomialRnToRm{N,M}, x::InRⁿ{N}, ns::StaticMatrix{ND,N,<:Integer}
+) where {N,M,ND}
     d = MMatrix{M,ND,Float64}(undef)
     for i = 1:ND
         d[:, i] = derivativeat(p, x, ns[i, :])
     end
     return d
+end
+
+
+## Derivatives
+
+function derivative(p::PolynomialRnToR, ns::IntegerVec)
+    a, e = _monomialsderivative(exponents(p), ns)
+    return MPolynomial2(e, a .* coefficients(p))
+end
+
+function derivative(
+    p::PolynomialRnToR{N,D,NT}, ns::StaticMatrix{ND,N,<:Integer}
+) where {N,D,NT,ND}
+    idx = 1
+    e = MMatrix{N,NT * ND,Int}(undef)
+    c = MMatrix{ND,NT * ND,eltype(coefficients(p))}(undef)
+    c .= 0
+    for i = 1:ND
+        ai, ei = _monomialsderivative(exponents(p), ns[i, :])
+        e[:, idx:(idx+NT-1)] = ei
+        c[i, idx:(idx+NT-1)] = ai .* coefficients(p)
+        idx += NT
+    end
+    return MPolynomial2(e, c)
+end
+
+function derivative(p::PolynomialRnToRm, ns::IntegerVec)
+    a, e = _monomialsderivative(exponents(p), ns)
+    return MPolynomial2(e, (a .* coefficients(p)')')
 end
 
 

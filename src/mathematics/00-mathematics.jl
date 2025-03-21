@@ -61,6 +61,9 @@ export gradient, gradientat, hessian, hessianat, laplacian, laplacianat, ∇, H,
 export ProductFunction
 export ∂x, ∂y, ∂xx, ∂yy, ∂xy
 
+# Mappings to Rn
+export components
+
 # Mappings Rn to Rm
 export jacobian, jacobianat
 

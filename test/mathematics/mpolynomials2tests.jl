@@ -4,7 +4,9 @@ using StaticArrays
 
 using MMJMesh
 using MMJMesh.Mathematics
-using MMJMesh.Mathematics: MPolynomial2, _monomialsat, _monomialsderivativeat, _lt,
+using MMJMesh.Mathematics: MPolynomial2,
+      _monomialsat, _monomialsderivativeat, _monomialsderivative,
+      _lt,
       _subscript, _superscript, _prettymonomial, _factorialpower
 using MMJMesh.Mathematics: _simplify, _isintegervalue, _integerize, _integerize!
 
@@ -20,10 +22,10 @@ using MMJMesh.Mathematics: _simplify, _isintegervalue, _integerize, _integerize!
 @test _factorialpower(3, 3) == 6
 @test _factorialpower(3, 4) == 0
 
-# Monomial evaluation with [x₁x₃⁵, x₁³x₂⁴] at (3, 2)
+# Monomial evaluation with [x₁x₂⁵, x₁³x₂⁴] at (3, 2)
 @test _monomialsat(SA[1 3; 5 4], SA[3, 2]) == [3^1 * 2^5, 3^3 * 2^4]
 
-# Monomial derivative evaluation with [x₁x₃⁵, x₁³x₂⁴] at (3, 2)
+# Monomial derivative evaluation with [x₁x₂⁵, x₁³x₂⁴] at (3, 2)
 @test _monomialsderivativeat(SA[1 3; 5 4], SA[3, 2], [0, 0]) == [3 * 2^5, 3^3 * 2^4]
 @test _monomialsderivativeat(SA[1 3; 5 4], SA[3, 2], -[0, 0]) == [3 * 2^5, 3^3 * 2^4]
 @test _monomialsderivativeat(SA[1 3; 5 4], SA[3, 2], [1, 1]) == [5 * 2^4, 3 * 3^2 * 4 * 2^3]
@@ -35,6 +37,18 @@ using MMJMesh.Mathematics: _simplify, _isintegervalue, _integerize, _integerize!
       [1 / 6 * 3^3 * 1 / 6 * 2^6, 1 / 20 * 3^5 * 1 / 5 * 2^5]
 @test _monomialsderivativeat(SA[1 3; 5 4], SA[3, 2], -[1, 2]) ==
       [1 / 2 * 3^2 * 1 / 42 * 2^7, 1 / 4 * 3^4 * 1 / 30 * 2^6]
+
+# Monomial derivatives with [x₁x₂⁵, x₁³x₂⁴]
+@test _monomialsderivative(SA[1 3; 5 4], [0, 0]) == ([1.0, 1.0], [1 3; 5 4])
+@test _monomialsderivative(SA[1 3; 5 4], [1, 0]) == ([1, 3], [0 2; 5 4])
+@test _monomialsderivative(SA[1 3; 5 4], [0, 1]) == ([5, 4], [1 3; 4 3])
+@test _monomialsderivative(SA[1 3; 5 4], [1, 2]) == ([1 * 5 * 4, 3 * 4 * 3], [0 2; 3 2])
+@test _monomialsderivative(SA[1 3; 5 4], -[0, 0]) == ([1.0, 1.0], [1 3; 5 4])
+@test _monomialsderivative(SA[1 3; 5 4], -[1, 0]) == ([1 / 2, 1 / 4], [2 4; 5 4])
+@test _monomialsderivative(SA[1 3; 5 4], -[0, 1]) == ([1 / 6, 1 / 5], [1 3; 6 5])
+@test _monomialsderivative(SA[1 3; 5 4], [-1, 2]) == ([1 / 2 * 5 * 4, 1 / 4 * 4 * 3], [2 4; 3 2])
+@test _monomialsderivative(SA[1 3; 5 4], -[1, 2]) ==
+      ([1 / 2 * 1 / 6 * 1 / 7, 1 / 4 * 1 / 5 * 1 / 6], [2 4; 7 6])
 
 # Exponent comparison
 @test _lt([1, 2], [2, 2])
@@ -62,6 +76,21 @@ using MMJMesh.Mathematics: _simplify, _isintegervalue, _integerize, _integerize!
 u = MPolynomial2([1 3; 5 4], [2, 3])              # 3x₁³x₂⁴ + 2x₁¹x₂⁵
 v = MPolynomial2([1 2 3; 5 6 7], [1 2 3; 6 5 4])  # x₁³x₂⁷⋅[3, 4] + x₁²x₂⁶⋅[2, 5] + x₁¹x₂⁵⋅[1, 6]
 
+# Test point
+x = [3, 2]
+
+# Comparison
+@test u === u
+@test u === MPolynomial2([1 3; 5 4], [2, 3])
+
+# Simplify in constructor: Duplicates
+@test u === MPolynomial2([1 3 3 1; 5 4 4 5], [1, 2, 1, 1])
+@test v === MPolynomial2([1 2 3 3 2 1; 5 6 7 7 6 5], [0 1 2 1 1 1; 5 4 3 1 1 1])
+
+# Simplify in constructor: Zeros
+@test nterms(MPolynomial2([1 3 3 1; 5 4 4 5], [1, 1, 1, -1])) == 1
+@test nterms(MPolynomial2([1 2 3 3 2 1; 5 6 7 7 6 5], [0 1 2 -2 1 1; 5 4 3 -3 1 1])) == 2
+
 # Properties
 @test exponents(u) == [3 1; 4 5]
 @test coefficients(u) == [3, 2]
@@ -70,14 +99,15 @@ v = MPolynomial2([1 2 3; 5 6 7], [1 2 3; 6 5 4])  # x₁³x₂⁷⋅[3, 4] + x�
 @test nterms(u) == 2
 @test nterms(v) == 3
 
-# Test point
-x = [3, 2]
+# Components
+@test [v[1](x), v[2](x)] == v(x)
+@test MappingFromComponents(components(v)...)(x) == v(x)
 
 # Values
 @test valueat(u, x) == 2 * 3 * 2^5 + 3 * 3^3 * 2^4
 @test valueat(v, x) == 3 * 2^5 * [1, 6] + 3^2 * 2^6 * [2, 5] + 3^3 * 2^7 * [3, 4]
 
-# Derivatives
+# Evaluation of derivatives
 @test derivativeat(u, x, [0, 1]) == 3072
 @test derivativeat(u, x, [1, 0]) == 1360
 @test derivativeat(u, x, [2, 3]) == 2592
@@ -87,7 +117,7 @@ x = [3, 2]
 @test derivativeat(v, x, [2, 3]) == [185280, 251520]
 @test derivativeat(v, x, [4, 1]) == [0, 0]
 
-# Antiderivatives
+# Evaluation of antiderivatives
 @test derivativeat(u, x, -[0, 1]) ≈ 582.4
 @test derivativeat(u, x, -[1, 0]) == 1260
 @test derivativeat(u, x, -[2, 3]) ≈ 29.0742857
@@ -117,7 +147,8 @@ x = [3, 2]
 # N[Derivative[-2, -3][v][3, 2], 16];
 # Derivative[-4, -1][v][3, 2] // N
 
-# Composed derivatives
+
+# Evaluation of composed derivatives
 @test derivativeat(u, x, SA[1 0; 0 1; 3 3]) ==
       [derivativeat(u, x, [1, 0]), derivativeat(u, x, [0, 1]), derivativeat(u, x, [3, 3])]
 @test derivativeat(u, x, SArray{Tuple{2,3,2},Int}([2 1 3; 1 0 2;;; 0 1 2; 1 2 3])) ==
@@ -127,6 +158,26 @@ x = [3, 2]
       hcat(derivativeat(v, x, [1, 0]), derivativeat(v, x, [0, 1]), derivativeat(v, x, [3, 3]))
 
 
-# using BenchmarkTools
+# Derivative functions
+@test derivative(u, [1, 0])(x) == derivativeat(u, x, [1, 0])
+@test derivative(u, [0, 1])(x) == derivativeat(u, x, [0, 1])
+@test derivative(u, [1, 3])(x) == derivativeat(u, x, [1, 3])
+@test derivative(v, [1, 0])(x) == derivativeat(v, x, [1, 0])
+@test derivative(v, [0, 1])(x) == derivativeat(v, x, [0, 1])
+@test derivative(v, [1, 3])(x) == derivativeat(v, x, [1, 3])
+@test derivative(u, SA[1 0; 0 1])(x) == derivativeat(u, x, SA[1 0; 0 1])
+
+
+using BenchmarkTools
+# @btime MPolynomial2([1 2 3; 5 6 7], [1 2 3; 6 5 4]);
+# @btime MPolynomial2([1 2 3 3 2 1; 5 6 7 7 6 5], [0 1 2 1 1 1; 5 4 3 1 1 1]);
 # @btime derivativeat(u, x, SA[1 0; 0 1; 3 3]);
 # @btime derivativeat(v, x, SA[1 0; 0 1; 3 3]);
+# @btime derivative(u, [1, 3]);
+# @btime derivative(v, [1, 3]);
+# gradu = derivative(u, SA[1 0; 0 1])
+# u1 = derivative(u, [1, 0])
+# u2 = derivative(u, [0, 1])
+# @btime(gradu(x));
+# @btime(u1(x) + u2(x));
+

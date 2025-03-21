@@ -452,6 +452,9 @@ const MappingToRn{DT,N,D} = AbstractMapping{DT,InRⁿ{N},D}
 LinearAlgebra.dot(u1::MappingToRn{DT,N,D}, u2::MappingToRn{DT,N,D}) where {DT,N,D} =
     sum([u1[i] * u2[i] for i = 1:N])
 
+Base.getindex(u::MappingToRn, i::Integer) = @notimplemented
+components(u::MappingToRn{DT,N}) where {DT,N} = [u[i] for i = 1:N]
+
 
 # -------------------------------------------------------------------------------------------------
 # Functions R → R
