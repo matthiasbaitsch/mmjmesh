@@ -13,6 +13,8 @@ function MPolynomial(
     return MPolynomial{n,d}(FP.Polynomial(_simplify(exponents, coefficients)...))
 end
 
+coefficients(p::MPolynomial) = FP.coefficients(p.p)
+
 valueat(p::MPolynomial{N}, x::InRⁿ{N}) where {N} = p.p(x)
 
 derivativeat(
@@ -71,6 +73,8 @@ function Base.:(*)(p1::MPolynomial{N}, p2::MPolynomial{N}) where {N}
 end
 
 Base.:(*)(a::Real, p::MPolynomial{N,D}) where {N,D} =
+    MPolynomial(FP.exponents(p.p), a * FP.coefficients(p.p), D)
+Base.:(*)(a::Num, p::MPolynomial{N,D}) where {N,D} =
     MPolynomial(FP.exponents(p.p), a * FP.coefficients(p.p), D)
 Base.show(io::IO, p::MPolynomial) = print(io, p.p)
 Base.:(==)(p1::MPolynomial{N,D}, p2::MPolynomial{N,D}) where {N,D} = (p1.p == p2.p)

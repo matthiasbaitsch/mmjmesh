@@ -246,7 +246,7 @@ derivativeat(f::ScaledMapping{DT}, x::DT, n::Integer=1) where {DT} = f.a * deriv
 antiderivative(f::ScaledMapping{InR,InR}) = f.a * antiderivative(f.m)
 Base.show(io::IO, s::ScaledMapping) = print(io, s.a, " * ", s.m)
 Base.:(==)(m1::ScaledMapping{DT,CT,D}, m2::ScaledMapping{DT,CT,D}) where {DT,CT,D} =
-    (m1.a == m2.a && m1.m == m2.m)
+    (isequal(m1.a, m2.a) && m1.m == m2.m)
 
 
 ## Mapping times mapping, only useful if `*` is defined for type `CT`
@@ -820,6 +820,8 @@ Polynomial(p::Polynomials.Polynomial, d=R) = Polynomial{d}(p)
 Polynomial(c::AbstractArray, d=R) = Polynomial{d}(Polynomials.Polynomial(c))
 Polynomial(c::Real...; d=R) = Polynomial{d}(Polynomials.Polynomial(c))
 
+coefficients(p::Polynomial) = Polynomials.coeffs(p.p)
+
 _roots(p::Polynomial) = Polynomials.roots(p.p)
 degree(p::Polynomial) = Polynomials.degree(p.p)
 fromroots(roots::AbstractArray{<:Real}, d=R) = Polynomial(Polynomials.fromroots(roots), d)
@@ -832,6 +834,7 @@ antiderivative(p::Polynomial{D}, n::Integer=1) where {D} =
 
 Base.show(io::IO, p::Polynomial) = print(io, p.p)
 Base.:(+)(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = Polynomial(p1.p + p2.p, D1 ∩ D2)
+Base.:(*)(a::Num, p::Polynomial{D}) where {D} = Polynomial(a * p.p, D)
 Base.:(*)(a::Real, p::Polynomial{D}) where {D} = Polynomial(a * p.p, D)
 Base.:(*)(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = Polynomial(p1.p * p2.p, D1 ∩ D2)
 Base.:(==)(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = (D1 == D2 && p1.p == p2.p)
@@ -960,21 +963,28 @@ Base.:-(m::AbstractMapping) = -1.0 * m
 Base.:-(m1::AbstractMapping{DT}, m2::AbstractMapping{DT}) where {DT} = m1 + (-m2)
 
 # *
-Base.:(*)(m1::AbstractMapping{DT}, m2::AbstractMapping{DT}) where {DT} =
-    ProductMapping(m1, m2)
+function Base.:(*)(a::Real, m::AbstractMapping)
+    if a == 1
+        return m
+    elseif a == 0
+        return zero(m)
+    else
+        return ScaledMapping(a, m)
+    end
+end
 
+Base.:(*)(a::Num, m::AbstractMapping) = ScaledMapping(a, m)
+Base.:(*)(m::AbstractMapping, a::Real) = a * m
 Base.:(*)(::One{DT}, m::AbstractMapping{DT}) where {DT} = m
 Base.:(*)(m::AbstractMapping{DT}, ::One{DT}) where {DT} = m
+Base.:(*)(a::Real, m::ScaledMapping) = (a * m.a) * m.m
 Base.:(*)(::One{DT}, m::ScaledMapping{DT}) where {DT} = m
 Base.:(*)(m::ScaledMapping{DT}, ::One{DT}) where {DT} = m
-
-Base.:(*)(a::Real, m::AbstractMapping) = a == 1 ? m : a == 0 ? zero(m) : ScaledMapping(a, m)
-Base.:(*)(m::AbstractMapping, a::Real) = a * m
-Base.:(*)(a::Real, m::ScaledMapping) = (a * m.a) * m.m
-
 Base.:(*)(m1::ScaledMapping{DT}, m2::ScaledMapping{DT}) where {DT} = m1.a * m2.a * (m1.m * m2.m)
 Base.:(*)(m1::ScaledMapping{DT}, m2::AbstractMapping{DT}) where {DT} = m1.a * (m1.m * m2)
 Base.:(*)(m1::AbstractMapping{DT}, m2::ScaledMapping{DT}) where {DT} = m2.a * (m1 * m2.m)
+Base.:(*)(m1::AbstractMapping{DT}, m2::AbstractMapping{DT}) where {DT} =
+    ProductMapping(m1, m2)
 
 # /
 Base.:(/)(m1::AbstractMapping, m2::AbstractMapping) = QuotientMapping(m1, m2)
