@@ -4,9 +4,18 @@ using StaticArrays
 
 using MMJMesh
 using MMJMesh.Mathematics
-using MMJMesh.Mathematics: _simplify, _isintegervalue, _integerize, _integerize!
+using MMJMesh.Mathematics: _simplify
 
+# Uncomment in order to work with this file
+# include("Validate.jl")
 using .Validate
+
+
+# -------------------------------------------------------------------------------------------------
+# Variables
+# -------------------------------------------------------------------------------------------------
+
+@variables a, b
 
 
 # -------------------------------------------------------------------------------------------------
@@ -97,38 +106,25 @@ ps = mmonomials(2, 1, type=BigInt)
 
 
 # -------------------------------------------------------------------------------------------------
+# Integration
+# -------------------------------------------------------------------------------------------------
+
+f = MPolynomial([1 3; 1 2], [1, 3])
+@test integrate(f, 1 .. 2, 5 .. 9) == 2307
+
+
+# -------------------------------------------------------------------------------------------------
 # Symbolic coefficients
 # -------------------------------------------------------------------------------------------------
 
-# Declarations
-@variables a, b
-
-# Integration
+# Multiplication with symbol
 f = MPolynomial([1 3; 1 2], [1, 3])
-@test integrate(f, 1 .. 2, 5 .. 9) == 2307
+@test isequal(coefficients(a * f), [3a, a])
 
 # Simplification
 @test ([0; 0;;], [0]) == _simplify([1 2; 2 1], [0, 0])
 @test isequal(([3; 1;;], [a]), _simplify([3 2; 1 1], [a, 0]))
 @test isequal(([0; 0;;], [0]), _simplify([3 2; 1 1], [0 * a, 0]))
-
-# Make integers
-u = [2.0 + 3.0a, b]
-
-@test _isintegervalue(1)
-@test _isintegervalue(2 // 2)
-@test _isintegervalue(1.0)
-@test !_isintegervalue(1.1)
-@test !_isintegervalue(3 // 2)
-
-@test string(_integerize(1.0a + a)) == "2a"
-@test string(_integerize(2.0a)) == "2a"
-@test string(_integerize(12 // 6 * a)) == "2a"
-@test string(_integerize(2.0a + 6 // 3)) == "2 + 2a"
-@test string(_integerize(0.0a)) == "0"
-
-@test string(_integerize!(u)) == string([2 + 3a, b])
-@test string(u) == string([2 + 3a, b])
 
 # Symbolic coefficients and parameters
 f = MPolynomial([1 2; 2 1], [a, b]);
@@ -153,3 +149,4 @@ F = antiderivative(f, [1, 1])
 f = MPolynomial([1; 0;;], [1])
 F = antiderivative(f, [1, 1])
 @test F.p.coefficients[1] == 0.5
+

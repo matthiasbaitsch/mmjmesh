@@ -106,6 +106,8 @@ end
 # Helpers
 # -------------------------------------------------------------------------------------------------
 
+MMJMesh.MMJBase.integerize!(c) = c
+
 function _simplify(e::Matrix{ET}, c::Vector{CT}) where {ET,CT}
     m = Dict{AbstractArray{Int},CT}()
 
@@ -119,7 +121,7 @@ function _simplify(e::Matrix{ET}, c::Vector{CT}) where {ET,CT}
         end
     end
     if !isempty(m)
-        return stack(keys(m)), _integerize!(collect(values(m)))
+        return stack(keys(m)), integerize!(collect(values(m)))
     else
         return zeros(ET, size(e, 1), 1), zeros(CT, 1)
     end
@@ -135,28 +137,7 @@ function _extract(p1::MPolynomial, p2::MPolynomial)
     return n1, e1, c1, n2, e2, c2
 end
 
-_isintegervalue(x::T) where {T<:Integer} = true
-_isintegervalue(x::Rational) = denominator(x) == 1
-_isintegervalue(x::T) where {T<:AbstractFloat} = x == round(x, digits=0)
-_isintegervalue(x) = false
 
-function _integerize(expression::Num)
-    @variables xone, xnull
-    r = @rule ~x::_isintegervalue => xone * (Int(~x) + xnull)
-    expression = simplify(expression)
-    expression = simplify(expression, rewriter=Postwalk(Chain([r])))
-    expression = simplify(substitute(expression, Dict(xone => 1, xnull => 0)))
-    return expression
-end
-
-function _integerize!(c::Vector{Num})
-    for i ∈ eachindex(c)
-        c[i] = _integerize(c[i])
-    end
-    return c
-end
-
-_integerize!(c) = c
 
 """
 	simplifyx(expression::Num) -> Num
