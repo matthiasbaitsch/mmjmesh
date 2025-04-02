@@ -5,19 +5,15 @@ using MMJMesh.MMJBase
 
 
 # -------------------------------------------------------------------------------------------------
-# To matrix
+# tomatrix
 # -------------------------------------------------------------------------------------------------
 
-# Input
-x = [rand(3) for _ in 1:10]
+vectors = [rand(18) for _ = 1:21]
+A = tomatrix(vectors)
 
-# From column vectors
-a1 = tomatrix(x)
-for i ∈ axes(a1, 2)
-    @test a1[:, i] == x[i]
+for (i, col) = enumerate(eachcol(A))
+    @test col == vectors[i]
 end
-@test a1 == tomatrix(x, COLS)
-
-# From row vectors
-@test tomatrix(x, ROWS) == a1'
+@test tomatrix(vectors, COLS) == A
+@test tomatrix(vectors, ROWS) == A'
 
