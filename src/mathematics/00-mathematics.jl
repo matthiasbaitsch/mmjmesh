@@ -83,7 +83,8 @@ export PiecewiseFunction, npieces, interpolate
 
 # Polynomials of multiple variables
 export MPolynomial
-export MPolynomial2, nterms, exponents, coefficients
+export MPolynomial2, PolynomialRnToR, PolynomialRnToRm, PolynomialRnToRpxq, 
+    nterms, exponents, coefficient, coefficients, degrees, mmonomials2
 
 # Forms
 export Form, LinearForm, BilinearForm, ValueAtLF, DerivativeAtLF, DDerivativeAtLF, PDerivativeAtLF
