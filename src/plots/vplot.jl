@@ -22,8 +22,8 @@ function MakieCore.plot!(plot::VPlot)
     for arg ∈ plot.args
         f = arg[]
         d = domain(f)
-        rx = component(d, 1)
-        ry = component(d, 2)
+        rx = DomainSets.component(d, 1)
+        ry = DomainSets.component(d, 2)
         xs = range(rx, np)
         ys = range(ry, np)
         p = reshape([[x, y] for x in xs, y in ys], :)

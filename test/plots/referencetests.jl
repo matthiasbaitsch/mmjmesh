@@ -196,3 +196,11 @@ f = gm.Figure()
 gm.Axis3(f[1, 1], aspect=:data)
 fplot3d!(ff, zscale=0.5, mesh=nothing)
 @test_reference ref("plot-02.png") f
+
+cm.activate!()
+g = ProductFunction(Sin(0 .. 2π), Sin(0 .. 2π))
+f = cm.Figure()
+cm.Axis(f[1, 1])
+fplot3d!(g, mesh=nothing)
+vplot!(gradient(g), npoints=9, lengthscale=0.3)
+@test_reference ref("plot-03.png") f
