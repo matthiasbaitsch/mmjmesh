@@ -30,8 +30,8 @@ end
 
 Construct uniform mesh by dividing interval `I` into `n` elements.
 """
-Meshes.Mesh(I::AbstractInterval, n::Int, g=t -> [t; 0.0]) =
-    makemeshoninterval(leftendpoint(I), rightendpoint(I), n, g)
+Meshes.Mesh(I::IntervalSets.AbstractInterval, n::Int, g=t -> [t; 0.0]) =
+    makemeshoninterval(IntervalSets.leftendpoint(I), IntervalSets.rightendpoint(I), n, g)
 
 """
     Meshtype
@@ -52,15 +52,16 @@ makemeshonrectangle(
 ) = makemeshonrectangle((0 .. w) × (0 .. h), nex, ney, meshtype, gmap=gmap)
 
 function makemeshonrectangle(
-    Ω::Rectangle, nex::Integer, ney::Integer=-1, meshtype::Meshtype=QUADRANGLE; gmap=identity
+    Ω::DomainSets.Rectangle, nex::Integer, ney::Integer=-1, 
+    meshtype::Meshtype=QUADRANGLE; gmap=identity
 )
     # Bounds
-    i1, i2 = components(Ω)
+    i1, i2 = DomainSets.components(Ω)
 
     # Choose ny such that faces are nearly quadric if not specified
     if ney == -1
-        w1 = width(i1)
-        w2 = width(i2)
+        w1 = IntervalSets.width(i1)
+        w2 = IntervalSets.width(i2)
         ney = w2 / (w1 / nex) |> ceil |> Int
     end
 
@@ -106,5 +107,6 @@ function makemeshonrectangle(
 end
 
 Meshes.Mesh(
-    Ω::Rectangle, nex::Integer, ney::Integer=-1, meshtype::Meshtype=QUADRANGLE; gmap=identity
+    Ω::DomainSets.Rectangle, nex::Integer, ney::Integer=-1, 
+    meshtype::Meshtype=QUADRANGLE; gmap=identity
 ) = makemeshonrectangle(Ω, nex, ney, meshtype, gmap=gmap)
