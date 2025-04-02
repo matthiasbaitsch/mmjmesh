@@ -204,3 +204,23 @@ cm.Axis(f[1, 1])
 fplot3d!(g, mesh=nothing)
 vplot!(gradient(g), npoints=9, lengthscale=0.3)
 @test_reference ref("plot-03.png") f
+
+
+# -------------------------------------------------------------------------------------------------
+# Finite elements
+# -------------------------------------------------------------------------------------------------
+
+cm.activate!()
+fig = cm.Figure(size=(700, 700))
+cm.Axis(fig)
+feplot(fig[1, 1], makeelement(:lagrange, IHat, k=1)) |> feconf()
+feplot(fig[1, 2], makeelement(:lagrange, IHat, k=3)) |> feconf()
+feplot(fig[2, 1], makeelement(:hermite, IHat)) |> feconf()
+feplot(fig[2, 2], makeelement(:lagrange, QHat, k=1)) |> feconf()
+feplot(fig[3, 1], makeelement(:lagrange, QHat, k=2)) |> feconf()
+feplot(fig[3, 2], makeelement(:serendipity, QHat, k=2)) |> feconf()
+feplot(fig[4, 1], makeelement(:hermite, QHat, conforming=true)) |> feconf()
+feplot(fig[4, 2], makeelement(:hermite, QHat, conforming=false)) |> feconf()
+@test_reference ref("fe-01.png") fig
+
+ 

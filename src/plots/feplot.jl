@@ -5,8 +5,8 @@ MakieCore.@recipe(FEPlot, element) do scene
 end
 
 function plotit!(plot, K::IntervalSets.AbstractInterval)
-    p1 = leftendpoint(K)
-    p2 = rightendpoint(K)
+    p1 = IntervalSets.leftendpoint(K)
+    p2 = IntervalSets.rightendpoint(K)
     MakieCore.lines!(plot, [p1, p2], [0, 0], color=:black, linewidth=3)
 end
 
