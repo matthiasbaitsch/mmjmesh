@@ -5,9 +5,9 @@ Returns the number of intervals for each coordinate direction such that
 the `Rectangle` parameter `r` is divided into approximate squares. The longer side
 of `r` is divided into `nintervals` intervals.
 """
-function _getnintervals(r::Rectangle, nintervals::Integer)
+function _getnintervals(r::DomainSets.Rectangle, nintervals::Integer)
     @assert nintervals >= 1
-    l1, l2 = width.(components(r))
+    l1, l2 = IntervalSets.width.(DomainSets.components(r))
     h = max(l1, l2) / nintervals
     n1 = Int(ceil(l1 / h))
     n2 = Int(ceil(l2 / h))

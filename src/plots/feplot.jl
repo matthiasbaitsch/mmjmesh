@@ -4,13 +4,13 @@ MakieCore.@recipe(FEPlot, element) do scene
     return attr
 end
 
-function plotit!(plot, K::AbstractInterval)
+function plotit!(plot, K::IntervalSets.AbstractInterval)
     p1 = leftendpoint(K)
     p2 = rightendpoint(K)
     MakieCore.lines!(plot, [p1, p2], [0, 0], color=:black, linewidth=3)
 end
 
-function plotit!(plot, K::Rectangle)
+function plotit!(plot, K::DomainSets.Rectangle)
     corners = points(K, :corners)
     MakieCore.poly!(plot, corners, color=:seashell, strokecolor=:black, strokewidth=3)
 end

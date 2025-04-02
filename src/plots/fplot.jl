@@ -24,7 +24,7 @@ function MakieCore.plot!(plot::FPlot)
     # TODO: Plot options, sample options
     for a ∈ plot.args
         f = a[]
-        a, b = endpoints(domain(f))
+        a, b = IntervalSets.endpoints(domain(f))
         p = pois(f)
 
         s1d(a, b) = sample1d(f, a, b,

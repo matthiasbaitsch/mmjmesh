@@ -1,4 +1,4 @@
-function sample2d(f; domain::Rectangle, npoints::Integer, gmap=identity)
+function sample2d(f; domain::DomainSets.Rectangle, npoints::Integer, gmap=identity)
     n1, n2 = _getnintervals(domain, npoints)
     m = Mesh(domain, n1, n2, TRIANGLE)
     x = tomatrix([[gmap(x)..., f(x)] for x in m.geometry.points])
@@ -7,7 +7,7 @@ function sample2d(f; domain::Rectangle, npoints::Integer, gmap=identity)
 end
 
 function sample2dlines(
-    f; domain::Rectangle, npoints::Integer, nmeshlines=0, gmap=identity, zscale=1
+    f; domain::DomainSets.Rectangle, npoints::Integer, nmeshlines=0, gmap=identity, zscale=1
 )
     points = []
 

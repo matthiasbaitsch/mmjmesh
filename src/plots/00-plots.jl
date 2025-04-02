@@ -5,14 +5,13 @@ module Plots
 ## Others
 using Printf
 using StaticArrays
-using IntervalSets
 using LinearAlgebra
 
 import Makie
 import Random
 import MakieCore
-
-using DomainSets: Rectangle, component, components
+import DomainSets
+import IntervalSets
 
 ## Own
 using MMJMesh
