@@ -14,6 +14,13 @@ using .Validate
 
 
 # -------------------------------------------------------------------------------------------------
+# Symbolic variables
+# -------------------------------------------------------------------------------------------------
+
+@variables a b
+
+
+# -------------------------------------------------------------------------------------------------
 # Similar
 # -------------------------------------------------------------------------------------------------
 
@@ -195,7 +202,7 @@ id = Identity(0.0 .. 5.0)
 p = Polynomial(4, 6, 1, 9, 2, -1)
 @test degree(p) == 5
 @test validate(p)
-# XXX @test validate(antiderivative(p))
+@test validate(antiderivative(p))
 
 # Constructor
 @test Polynomial([1, 2, 3]) == Polynomial(1, 2, 3)
@@ -206,6 +213,9 @@ p = Polynomial(4, 6, 1, 9, 2, -1)
 @test roots(Polynomial([-1, 0, 1], -5 .. 0)) == [-1]
 @test roots(Polynomial([-1, 0, 1]), -5 .. 0) == [-1]
 @test roots(Polynomial([-1, 0, 1]), 4 .. 5) == []
+
+# Operations
+@test isequal(coefficients(a * p), [4a, 6a, a, 9a, 2a, -a])
 
 # Lagrange
 p = [0, 1, 3, 4, 5.5]
@@ -401,6 +411,8 @@ f2 = c * Polynomial(1, 2, 3)
 # Operations and simplification rules
 # -------------------------------------------------------------------------------------------------
 
+x = parameter(R)
+
 m1 = Sin()
 m2 = Sin()
 m3 = Cos()
@@ -415,6 +427,7 @@ m4 = Polynomial([0, 0, 1], 0 .. 4)
 @test (-1) * (-m1) == m1
 @test (2m1) * (4m3) == 8 * m1 * m3
 @test validate(2 * m1, rtol=1e-4)
+@test typeof(a * cos(x)) <: MMJMesh.Mathematics.ScaledMapping
 
 # Add and subtract
 @test m1 + zero(m1) == m1
@@ -557,10 +570,4 @@ v = MappingFromComponents(ProductFunction(Sin(), Cos()), ProductFunction(Cos(), 
 x = parameter(R)
 
 @test [sin(x), cos(x)] ⋅ [6, 2] == 6sin(x) + 2cos(x)
-
-
-@variables a b
-
-a * cos(x)
-
-[sin(x), cos(x)] ⋅ [a, b]
+@test [sin(x), cos(x)] ⋅ [a, b] == a * sin(x) + b * cos(x)
