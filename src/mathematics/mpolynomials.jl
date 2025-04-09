@@ -230,73 +230,73 @@ end
 # Implementation
 # -------------------------------------------------------------------------------------------------
 
-struct MPolynomial2{N,CT,D,NT,S} <: AbstractMapping{InRⁿ{N},CT,D}
+struct MPolynomial{N,CT,D,NT,S} <: AbstractMapping{InRⁿ{N},CT,D}
     exponents::SMatrix{N,NT,Int}
     coefficients::SArray{S}
 end
 
-function MPolynomial2(exponents::IntegerMat, coefficients::AbstractVector, D=_dd(exponents))
+function MPolynomial(exponents::IntegerMat, coefficients::AbstractVector, D=_dd(exponents))
     exponents, coefficients = _normalize(exponents, coefficients)
     N = size(exponents, 1)
     NT = length(coefficients)
     S = Tuple{NT}
-    return MPolynomial2{N,InR,D,NT,S}(exponents, coefficients)
+    return MPolynomial{N,InR,D,NT,S}(exponents, coefficients)
 end
 
-function MPolynomial2(exponents::IntegerMat, coefficients::AbstractMatrix, D=_dd(exponents))
+function MPolynomial(exponents::IntegerMat, coefficients::AbstractMatrix, D=_dd(exponents))
     exponents, coefficients = _normalize(exponents, coefficients)
     N = size(exponents, 1)
     M = size(coefficients, 1)
     NT = size(coefficients, 2)
     S = Tuple{M,NT}
-    return MPolynomial2{N,InRⁿ{M},D,NT,S}(exponents, coefficients)
+    return MPolynomial{N,InRⁿ{M},D,NT,S}(exponents, coefficients)
 end
 
-function MPolynomial2(exponents::IntegerMat, coefficients::AbstractArray{T,3}, D=_dd(exponents)) where {T}
+function MPolynomial(exponents::IntegerMat, coefficients::AbstractArray{T,3}, D=_dd(exponents)) where {T}
     exponents, coefficients = _normalize(exponents, coefficients)
     N = size(exponents, 1)
     P = size(coefficients, 1)
     Q = size(coefficients, 2)
     NT = size(coefficients, 3)
     S = Tuple{P,Q,NT}
-    return MPolynomial2{N,InRᵐˣⁿ{P,Q},D,NT,S}(exponents, coefficients)
+    return MPolynomial{N,InRᵐˣⁿ{P,Q},D,NT,S}(exponents, coefficients)
 end
 
 
 ## Typedefs
 
-const PolynomialRnToR{N,D,NT} = MPolynomial2{N,InR,D,NT,Tuple{NT}}
-const PolynomialRnToRm{N,M,D,NT} = MPolynomial2{N,InRⁿ{M},D,NT,Tuple{M,NT}}
-const PolynomialRnToRpxq{N,P,Q,D,NT} = MPolynomial2{N,InRᵐˣⁿ{P,Q},D,NT,Tuple{P,Q,NT}}
+const PolynomialRnToR{N,D,NT} = MPolynomial{N,InR,D,NT,Tuple{NT}}
+const PolynomialRnToRm{N,M,D,NT} = MPolynomial{N,InRⁿ{M},D,NT,Tuple{M,NT}}
+const PolynomialRnToRpxq{N,P,Q,D,NT} = MPolynomial{N,InRᵐˣⁿ{P,Q},D,NT,Tuple{P,Q,NT}}
 
 
 ## Properties
 
-exponents(p::MPolynomial2) = p.exponents
-exponents(p::MPolynomial2, idx::Integer) = p.exponents[:, idx]
-coefficients(p::MPolynomial2) = p.coefficients
+exponents(p::MPolynomial) = p.exponents
+exponents(p::MPolynomial, idx::Integer) = p.exponents[:, idx]
+coefficients(p::MPolynomial) = p.coefficients
 coefficient(p::PolynomialRnToR, idx::Integer) = p.coefficients[idx]
 coefficient(p::PolynomialRnToRm, idx::Integer) = p.coefficients[:, idx]
 coefficient(p::PolynomialRnToRpxq, idx::Integer) = p.coefficients[:, :, idx]
-nterms(::Type{<:MPolynomial2{N,CT,D,NT}}) where {N,CT,D,NT} = NT
-nterms(p::MPolynomial2) = nterms(typeof(p))
-degree(p::MPolynomial2) = sum(exponents(p, 1))
-degree(p::MPolynomial2, c::Integer) = maximum(exponents(p)[c, :])
-degrees(p::MPolynomial2) = vec(maximum(exponents(p), dims=2))
+nterms(::Type{<:MPolynomial{N,CT,D,NT}}) where {N,CT,D,NT} = NT
+nterms(p::MPolynomial) = nterms(typeof(p))
+degree(p::MPolynomial) = sum(exponents(p, 1))
+degree(p::MPolynomial, c::Integer) = maximum(exponents(p)[c, :])
+degrees(p::MPolynomial) = vec(maximum(exponents(p), dims=2))
 Base.getindex(p::PolynomialRnToRm{N,M,D}, i::Integer) where {N,M,D} =
-    MPolynomial2(exponents(p), coefficients(p)[i, :], D)
+    MPolynomial(exponents(p), coefficients(p)[i, :], D)
 Base.getindex(p::PolynomialRnToRpxq{N,P,Q,D}, i::Integer, j::Integer) where {N,P,Q,D} =
-    MPolynomial2(exponents(p), coefficients(p)[i, j, :], D)
+    MPolynomial(exponents(p), coefficients(p)[i, j, :], D)
 
 
 ## Evaluation
 
 # Value
-valueat(p::MPolynomial2{N}, x::InRⁿ{N}) where {N} =
+valueat(p::MPolynomial{N}, x::InRⁿ{N}) where {N} =
     _mulcm(coefficients(p), _monomialsat(exponents(p), x))
 
 # Partial derivative
-derivativeat(p::MPolynomial2{N}, x::InRⁿ{N}, ns::IntegerVec) where {N} =
+derivativeat(p::MPolynomial{N}, x::InRⁿ{N}, ns::IntegerVec) where {N} =
     _mulcm(coefficients(p), _monomialsderivativeat(exponents(p), x, ns))
 
 # To R: Vector of partial derivatives (e.g. gradient)
@@ -323,7 +323,7 @@ end
 
 # To R: Derivative of specific order (shorthand notation)
 function derivativeat(
-    p::MPolynomial2{N}, x::InRⁿ{N}, n::Integer
+    p::MPolynomial{N}, x::InRⁿ{N}, n::Integer
 ) where {N}
     n == 1 && return derivativeat(p, x, _id(N))
     @notimplemented
@@ -346,7 +346,7 @@ end
 # To R: Partial derivative
 function derivative(p::PolynomialRnToR, ns::IntegerVec)
     a, e = _monomialsderivative(exponents(p), ns)
-    return MPolynomial2(e, a .* coefficients(p), domain(p))
+    return MPolynomial(e, a .* coefficients(p), domain(p))
 end
 
 # To R: Vector of partial derivatives (e.g. gradient)
@@ -363,7 +363,7 @@ function derivative(
         c[i, idx:(idx+NT-1)] = ai .* coefficients(p)
         idx += NT
     end
-    return MPolynomial2(e, c, domain(p))
+    return MPolynomial(e, c, domain(p))
 end
 
 # To R: Matrix of partial derivatives (e.g. Hessian)
@@ -380,13 +380,13 @@ function derivative(
         c[i, j, idx:(idx+NT-1)] = ai .* coefficients(p)
         idx += NT
     end
-    return MPolynomial2(e, c, domain(p))
+    return MPolynomial(e, c, domain(p))
 end
 
 # Derivative of specific order
 # TODO: Move to mappings.jl
 function derivative(
-    p::MPolynomial2{N}, n::Integer
+    p::MPolynomial{N}, n::Integer
 ) where {N}
     n == 1 && return derivative(p, _id(N))
 
@@ -406,7 +406,7 @@ end
 # To Rm: Partial derivative as function Rn -> Rm
 function derivative(p::PolynomialRnToRm, ns::IntegerVec)
     a, e = _monomialsderivative(exponents(p), ns)
-    return MPolynomial2(e, (a .* coefficients(p)')', domain(p))
+    return MPolynomial(e, (a .* coefficients(p)')', domain(p))
 end
 
 # To Rm: Matrix of partial derivatives (e.g. Jacobian)
@@ -423,21 +423,21 @@ function derivative(
         c[:, i, idx:(idx+NT-1)] = (ai .* coefficients(p)')'
         idx += NT
     end
-    return MPolynomial2(e, c, domain(p))
+    return MPolynomial(e, c, domain(p))
 end
 
-antiderivative(p::MPolynomial2, ns::IntegerVec) = derivative(p, -ns)
+antiderivative(p::MPolynomial, ns::IntegerVec) = derivative(p, -ns)
 
 
 ## Operations
 
 Base.transpose(p::PolynomialRnToRpxq) =
-    MPolynomial2(exponents(p), permutedims(coefficients(p), (2, 1, 3)), domain(p))
+    MPolynomial(exponents(p), permutedims(coefficients(p), (2, 1, 3)), domain(p))
 
-function Base.:(+)(p1::MPolynomial2{N,CT,D}, p2::MPolynomial2{N,CT,D}) where {N,CT,D}
+function Base.:(+)(p1::MPolynomial{N,CT,D}, p2::MPolynomial{N,CT,D}) where {N,CT,D}
     e = [exponents(p1) exponents(p2)]
     c = _appendcoefficients(coefficients(p1), coefficients(p2))
-    return MPolynomial2(e, c, D)
+    return MPolynomial(e, c, D)
 end
 
 function Base.:(*)(p1::PolynomialRnToR{N,D}, p2::PolynomialRnToR{N,D}) where {N,D}
@@ -454,46 +454,46 @@ function Base.:(*)(p1::PolynomialRnToR{N,D}, p2::PolynomialRnToR{N,D}) where {N,
         c[idx] = coefficient(p1, i) * coefficient(p2, j)
         idx += 1
     end
-    return MPolynomial2(e, c, D)
+    return MPolynomial(e, c, D)
 end
 
-Base.:(*)(a::Num, p::MPolynomial2) = MPolynomial2(exponents(p), a * coefficients(p), domain(p))
-Base.:(*)(a::Real, p::MPolynomial2) = MPolynomial2(exponents(p), a * coefficients(p), domain(p))
+Base.:(*)(a::Num, p::MPolynomial) = MPolynomial(exponents(p), a * coefficients(p), domain(p))
+Base.:(*)(a::Real, p::MPolynomial) = MPolynomial(exponents(p), a * coefficients(p), domain(p))
 
 
 ## Algebraic operations
 
 LinearAlgebra.dot(a::AbstractVector, p::PolynomialRnToRm) =
-    MPolynomial2(exponents(p), vec(coefficients(p)' * a))
+    MPolynomial(exponents(p), vec(coefficients(p)' * a))
 
 Base.:(*)(a::AbstractMatrix, p::PolynomialRnToRm) =
-    MPolynomial2(exponents(p), a * coefficients(p), domain(p))
+    MPolynomial(exponents(p), a * coefficients(p), domain(p))
 
 function Base.:(*)(p::PolynomialRnToRpxq{N,P,Q,D,NT}, x::RealVec) where {N,P,Q,D,NT}
     c = coefficients(p)
     @assert length(x) == Q
-    return MPolynomial2(exponents(p), [c[i, :, j] ⋅ x for i = 1:P, j = 1:NT], D)
+    return MPolynomial(exponents(p), [c[i, :, j] ⋅ x for i = 1:P, j = 1:NT], D)
 end
 
 function Base.:(*)(p::PolynomialRnToRpxq{N,P,Q,D,NT}, A::RealMat) where {N,P,Q,D,NT}
     c = coefficients(p)
     @assert size(A, 1) == Q
-    return MPolynomial2(exponents(p), stack([c[:, :, j] * A for j = 1:NT], dims=3), D)
+    return MPolynomial(exponents(p), stack([c[:, :, j] * A for j = 1:NT], dims=3), D)
 end
 
 function Base.:(*)(A::RealMat, p::PolynomialRnToRpxq{N,P,Q,D,NT}) where {N,P,Q,D,NT}
     c = coefficients(p)
     @assert size(A, 2) == P
-    return MPolynomial2(exponents(p), stack([A * c[:, :, j] for j = 1:NT], dims=3), D)
+    return MPolynomial(exponents(p), stack([A * c[:, :, j] for j = 1:NT], dims=3), D)
 end
 
 
 ## Manipulation
 
-Base.rationalize(p::MPolynomial2) =
-    MPolynomial2(exponents(p), rationalize.(coefficients(p)), domain(p))
-MMJMesh.MMJBase.integerize(p::MPolynomial2) =
-    MPolynomial2(exponents(p), integerize.(coefficients(p)), domain(p))
+Base.rationalize(p::MPolynomial) =
+    MPolynomial(exponents(p), rationalize.(coefficients(p)), domain(p))
+MMJMesh.MMJBase.integerize(p::MPolynomial) =
+    MPolynomial(exponents(p), integerize.(coefficients(p)), domain(p))
 
 
 ## Show
@@ -523,11 +523,11 @@ end
 
 ## Compare
 
-Base.:(==)(p1::MPolynomial2, p2::MPolynomial2) =
+Base.:(==)(p1::MPolynomial, p2::MPolynomial) =
     (p1.exponents == p2.exponents && p1.coefficients == p2.coefficients)
 
 Base.isapprox(
-    p1::MPolynomial2, p2::MPolynomial2; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps(Float64)
+    p1::MPolynomial, p2::MPolynomial; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps(Float64)
 ) =
     (
         p1.exponents == p2.exponents &&
@@ -538,12 +538,12 @@ Base.isapprox(
 ## Monomials
 
 """
-	mmonomials2(n::Integer, p::Integer, dom=R^n, predicate=(...) -> true; type=Float64)
+	mmonomials(n::Integer, p::Integer, dom=R^n, predicate=(...) -> true; type=Float64)
 
 Generate multivariate momonials of `n` components up to degree `p`. Optionally, a domain, a 
 predicate and a coefficient type can be specified
 """
-function mmonomials2(n::Integer, p::Integer, dom=R^n, predicate=(ps...) -> true; type=Float64)
+function mmonomials(n::Integer, p::Integer, dom=R^n, predicate=(ps...) -> true; type=Float64)
     if n == 2
         e = tomatrix(
             sort!(
@@ -553,7 +553,7 @@ function mmonomials2(n::Integer, p::Integer, dom=R^n, predicate=(ps...) -> true;
         )
         c = zeros(type, size(e, 2), size(e, 2))
         c[diagind(c)] .= 1
-        return MPolynomial2(e, c, dom)
+        return MPolynomial(e, c, dom)
     else
         error("Not implemented yet")
     end

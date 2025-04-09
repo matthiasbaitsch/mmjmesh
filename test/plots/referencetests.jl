@@ -186,7 +186,7 @@ f = MMJMesh.Plots.Symbols.Structural2D.demo()
 # -------------------------------------------------------------------------------------------------
 
 gm.activate!()
-ff = MPolynomial2([0 2 0; 0 0 2], [1, -1, -1], QHat)
+ff = MPolynomial([0 2 0; 0 0 2], [1, -1, -1], QHat)
 f = gm.Figure()
 gm.Axis3(f[1, 1], aspect=:data)
 fplot3d!(ff, zscale=0.5)

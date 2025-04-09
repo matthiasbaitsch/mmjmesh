@@ -6,7 +6,7 @@ using LinearAlgebra
 using MMJMesh
 using MMJMesh.MMJBase
 using MMJMesh.Mathematics
-using MMJMesh.Mathematics: MPolynomial2,
+using MMJMesh.Mathematics: MPolynomial,
       _monomialsat, _monomialsderivativeat, _monomialsderivative,
       _lt,
       _subscript, _superscript, _prettymonomial, _factorialpower
@@ -80,11 +80,11 @@ using .Validate
 d = d = (0 .. 1) × (2 .. 3)
 
 # 3x₁³x₂⁴ + 2x₁¹x₂⁵
-u = MPolynomial2([1 3; 5 4], [2, 3], d)
+u = MPolynomial([1 3; 5 4], [2, 3], d)
 # x₁³x₂⁷⋅[3, 4] + x₁²x₂⁶⋅[2, 5] + x₁¹x₂⁵⋅[1, 6]
-v = MPolynomial2([1 2 3; 5 6 7], [1 2 3; 6 5 4], d)
+v = MPolynomial([1 2 3; 5 6 7], [1 2 3; 6 5 4], d)
 # x₁³x₂⁷ ⋅ [9 8 7; 5 8 1; 8 2 4; 6 5 4] + x₁¹x₂⁵ ⋅ [1 2 3; 6 5 4; 4 1 9; 4 3 2]
-w = MPolynomial2([1 3; 5 7], [1 2 3; 6 5 4; 4 1 9; 4 3 2;;; 9 8 7; 5 8 1; 8 2 4; 6 5 4], d)
+w = MPolynomial([1 3; 5 7], [1 2 3; 6 5 4; 4 1 9; 4 3 2;;; 9 8 7; 5 8 1; 8 2 4; 6 5 4], d)
 
 # Test parameters
 x = [3, 2]
@@ -94,21 +94,21 @@ ns2 = SArray{Tuple{2,3,2},Int}([2 1 3; 1 0 2;;; 0 1 2; 1 2 3])
 
 # Comparison
 @test u === u
-@test u === MPolynomial2([1 3; 5 4], [2, 3], d)
+@test u === MPolynomial([1 3; 5 4], [2, 3], d)
 
 # Simplify in constructor: Duplicates
-@test u === MPolynomial2([1 3 3 1; 5 4 4 5], [1, 2, 1, 1], d)
-@test v === MPolynomial2([1 2 3 3 2 1; 5 6 7 7 6 5], [0 1 2 1 1 1; 5 4 3 1 1 1], d)
-@test w === MPolynomial2(
+@test u === MPolynomial([1 3 3 1; 5 4 4 5], [1, 2, 1, 1], d)
+@test v === MPolynomial([1 2 3 3 2 1; 5 6 7 7 6 5], [0 1 2 1 1 1; 5 4 3 1 1 1], d)
+@test w === MPolynomial(
       [1 3 1; 5 7 5],
       [0 1 2; 5 4 3; 3 0 8; 3 2 1;;; 9 8 7; 5 8 1; 8 2 4; 6 5 4;;; 1 1 1; 1 1 1; 1 1 1; 1 1 1],
       d
 )
 
 # Simplify in constructor: Zeros
-@test nterms(MPolynomial2([1 3 3 1; 5 4 4 5], [1, 1, 1, -1])) == 1
-@test nterms(MPolynomial2([1 2 3 3 2 1; 5 6 7 7 6 5], [0 1 2 -2 1 1; 5 4 3 -3 1 1])) == 2
-@test nterms(MPolynomial2(
+@test nterms(MPolynomial([1 3 3 1; 5 4 4 5], [1, 1, 1, -1])) == 1
+@test nterms(MPolynomial([1 2 3 3 2 1; 5 6 7 7 6 5], [0 1 2 -2 1 1; 5 4 3 -3 1 1])) == 2
+@test nterms(MPolynomial(
       [1 3 4; 5 7 6],
       [0 1 2; 5 4 3; 3 0 8; 3 2 1;;; 9 8 7; 5 8 1; 8 2 4; 6 5 4;;; 0 0 0; 0 0 0; 0 0 0; 0 0 0]
 )) == 2
@@ -124,7 +124,7 @@ ns2 = SArray{Tuple{2,3,2},Int}([2 1 3; 1 0 2;;; 0 1 2; 1 2 3])
 # Components
 @test [v[1](x), v[2](x)] == v(x)
 @test MappingFromComponents(components(v)...)(x) == v(x)
-@test domain(MPolynomial2([1 3; 5 4], [2 3; 3 2], QHat)[1]) == QHat
+@test domain(MPolynomial([1 3; 5 4], [2 3; 3 2], QHat)[1]) == QHat
 
 # Values
 @test valueat(u, x) == 2 * 3 * 2^5 + 3 * 3^3 * 2^4
@@ -216,8 +216,8 @@ ns2 = SArray{Tuple{2,3,2},Int}([2 1 3; 1 0 2;;; 0 1 2; 1 2 3])
 @test derivative(v, 1)(x) == derivativeat(v, x, 1)
 
 # Operations
-u2 = MPolynomial2([3 1; 2 3], [7, 1])
-v2 = MPolynomial2([3 1 2; 4 3 2], [4 3 1; 1 4 1])
+u2 = MPolynomial([3 1; 2 3], [7, 1])
+v2 = MPolynomial([3 1 2; 4 3 2], [4 3 1; 1 4 1])
 @test nterms(u + u) == 2
 @test nterms(v + v) == 3
 @test (u + u)(x) == 2u(x)
@@ -237,9 +237,9 @@ v2 = MPolynomial2([3 1 2; 4 3 2], [4 3 1; 1 4 1])
 @test ([4 1; 5 2; 9 1] * v)(x) == [4 1; 5 2; 9 1] * v(x)
 
 # Monomials
-@test domain(mmonomials2(2, 2)) == R^2
-@test domain(mmonomials2(2, 2, QHat)) == QHat
-@test domain(mmonomials2(2, 2, QHat)[1]) == QHat
+@test domain(mmonomials(2, 2)) == R^2
+@test domain(mmonomials(2, 2, QHat)) == QHat
+@test domain(mmonomials(2, 2, QHat)[1]) == QHat
 
 
 # -------------------------------------------------------------------------------------------------
@@ -247,8 +247,8 @@ v2 = MPolynomial2([3 1 2; 4 3 2], [4 3 1; 1 4 1])
 # -------------------------------------------------------------------------------------------------
 
 x = [1, 2, 3]
-f = MPolynomial2([3 1; 1 1; 0 2], [-2.0, 3.0], (1 .. 3) × (0 .. 2π) × (2 .. 8))
-g = MPolynomial2([3 1 1; 1 1 2; 2 2 3], [1.0, 2.0, 4.0], (1.1 .. 5.2) × (0.1 .. 0.4) × (1.8 .. 1.9))
+f = MPolynomial([3 1; 1 1; 0 2], [-2.0, 3.0], (1 .. 3) × (0 .. 2π) × (2 .. 8))
+g = MPolynomial([3 1 1; 1 1 2; 2 2 3], [1.0, 2.0, 4.0], (1.1 .. 5.2) × (0.1 .. 0.4) × (1.8 .. 1.9))
 
 @test validate(f)
 @test validate(g)
@@ -259,14 +259,14 @@ g = MPolynomial2([3 1 1; 1 1 2; 2 2 3], [1.0, 2.0, 4.0], (1.1 .. 5.2) × (0.1 ..
 @test (3.1 * f)(x) == 3.1 * 50
 @test (f + g)(x) == f(x) + g(x)
 @test domaintype(f) == InR3
-@test domain(MPolynomial2([1 2; 2 1], [1, 2])) == R2
+@test domain(MPolynomial([1 2; 2 1], [1, 2])) == R2
 
 # 2x₁²x₂⁵+3x₁³x₂²
-f = MPolynomial2([2 3; 5 2], [2, 3])
+f = MPolynomial([2 3; 5 2], [2, 3])
 x = SVector(1.0, 2.0)
-@test derivative(f, [1, 0]) == MPolynomial2([1 2; 5 2], [4, 9])
-@test derivative(f, [2, 0]) == MPolynomial2([0 1; 5 2], [4, 18])
-@test derivative(f, [1, 1]) == MPolynomial2([1 2; 4 1], [20, 18])
+@test derivative(f, [1, 0]) == MPolynomial([1 2; 5 2], [4, 9])
+@test derivative(f, [2, 0]) == MPolynomial([0 1; 5 2], [4, 18])
+@test derivative(f, [1, 1]) == MPolynomial([1 2; 4 1], [20, 18])
 @test derivativeat(f, x, [1, 1]) == derivative(f, [1, 1])(x)
 @test derivativeat(f, [1, 2], [1, 1]) == derivative(f, [1, 1])(x)
 
@@ -282,8 +282,8 @@ hf = derivative(f, 2)
 
 # Operations
 x = SVector(1.0, 2.0)
-f = MPolynomial2([2 2; 3 4], [4, 1])
-g = MPolynomial2([1 4 1; 6 3 4], [6, 5, 4])
+f = MPolynomial([2 2; 3 4], [4, 1])
+g = MPolynomial([1 4 1; 6 3 4], [6, 5, 4])
 
 h = f * g
 @test h(x) == f(x) * g(x)
@@ -294,18 +294,18 @@ h = f + g
 @test typeof(h) <: PolynomialRnToR
 
 # Check simplify
-f = MPolynomial2([1 2; 1 2], [4, 1], d)
-g = MPolynomial2([1 1; 1 1], [6, 5], d)
+f = MPolynomial([1 2; 1 2], [4, 1], d)
+g = MPolynomial([1 1; 1 1], [6, 5], d)
 
-@test f * g == MPolynomial2([3 2; 3 2], [11, 44])
-@test f + g == MPolynomial2([2 1; 2 1], [1, 15])
+@test f * g == MPolynomial([3 2; 3 2], [11, 44])
+@test f + g == MPolynomial([2 1; 2 1], [1, 15])
 
 # # Antiderivative
 ns = [1, 2, 3]
-f = MPolynomial2([1 2 3; 6 5 4; 1 2 3], [5, 4, 3])
+f = MPolynomial([1 2 3; 6 5 4; 1 2 3], [5, 4, 3])
 @test f ≈ derivative(antiderivative(f, ns), ns)
 
-f = MPolynomial2([3 2; 1 9], [1, 2])
+f = MPolynomial([3 2; 1 9], [1, 2])
 @test degree(f) == 11
 @test degree(f, 1) == 3
 @test degree(f, 2) == 9
@@ -316,16 +316,16 @@ f = MPolynomial2([3 2; 1 9], [1, 2])
 # Old tests: Multivariate monomials
 # -------------------------------------------------------------------------------------------------
 
-ps = mmonomials2(2, 1, type=Int)
-@test ps[4] == MPolynomial2([0; 0;;], [1])
-@test ps[3] == MPolynomial2([0; 1;;], [1])
-@test ps[2] == MPolynomial2([1; 0;;], [1])
-@test ps[1] == MPolynomial2([1; 1;;], [1])
+ps = mmonomials(2, 1, type=Int)
+@test ps[4] == MPolynomial([0; 0;;], [1])
+@test ps[3] == MPolynomial([0; 1;;], [1])
+@test ps[2] == MPolynomial([1; 0;;], [1])
+@test ps[1] == MPolynomial([1; 1;;], [1])
 
 @test coefficients(ps[1]) isa AbstractVector{Int}
 @test ps[1](0, 0) isa Integer
 
-ps = mmonomials2(2, 1, type=BigInt)
+ps = mmonomials(2, 1, type=BigInt)
 @test coefficients(ps[1]) isa AbstractVector{BigInt}
 
 
@@ -333,7 +333,7 @@ ps = mmonomials2(2, 1, type=BigInt)
 # Integration
 # -------------------------------------------------------------------------------------------------
 
-f = MPolynomial2([1 3; 1 2], [1, 3])
+f = MPolynomial([1 3; 1 2], [1, 3])
 @test integrate(f, 1 .. 2, 5 .. 9) == 2307
 
 
@@ -342,19 +342,19 @@ f = MPolynomial2([1 3; 1 2], [1, 3])
 # -------------------------------------------------------------------------------------------------
 
 # Multiplication with symbol
-@test isequal(coefficients(a * MPolynomial2([1 3; 1 2], [1, 3])), [3a, a])
-@test isequal(coefficients(a * MPolynomial2([1 3 4; 1 2 5], [1 0 0; 2 3 0])), [0 a; 3a 2a])
+@test isequal(coefficients(a * MPolynomial([1 3; 1 2], [1, 3])), [3a, a])
+@test isequal(coefficients(a * MPolynomial([1 3 4; 1 2 5], [1 0 0; 2 3 0])), [0 a; 3a 2a])
 
 @test isequal(
       coefficients(
-            a * MPolynomial2([1 3 4; 1 2 5], [1 0 0; 2 3 0;;; 3 2 1; 5 4 9;;; 0 0 0; 0 0 0])
+            a * MPolynomial([1 3 4; 1 2 5], [1 0 0; 2 3 0;;; 3 2 1; 5 4 9;;; 0 0 0; 0 0 0])
       ),
       [3a 2a 1a; 5a 4a 9a;;; a 0 0; 2a 3a 0]
 )
 
 # Symbolic coefficients and parameters
-f = MPolynomial2([1 2; 2 1], [a, b])
-g = MPolynomial2([3 2; 2 3], [7, 2])
+f = MPolynomial([1 2; 2 1], [a, b])
+g = MPolynomial([3 2; 2 3], [7, 2])
 
 @test isequal(f(2, 3), 18a + 12b)
 @test isequal((a * f)(2, 3), 18a^2 + 12a * b)
@@ -364,15 +364,15 @@ g = MPolynomial2([3 2; 2 3], [7, 2])
 @test isequal(ValueAtLF([a, b])(f), 2(a^2) * (b^2))
 
 # Integerization
-f = MPolynomial2([1 2; 2 1], [2.0a, b + 6 // 3]) |> integerize
+f = MPolynomial([1 2; 2 1], [2.0a, b + 6 // 3]) |> integerize
 @test string(coefficients(f)) == "Symbolics.Num[2 + b, 2a]"
 
 # Rationalization
-f = MPolynomial2([1; 0;;], [1])
+f = MPolynomial([1; 0;;], [1])
 F = antiderivative(f, [1, 1]) |> rationalize
 @test coefficient(F, 1) == 0.5
 @test string(coefficient(F, 1)) == "1//2"
 
 # Derivatives
-f = MPolynomial2([1 2; 4 1], [a, b])
+f = MPolynomial([1 2; 4 1], [a, b])
 @test isequal(gradient(f)(1, 2), gradientat(f, [1, 2]))

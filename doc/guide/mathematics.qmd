@@ -161,7 +161,7 @@ fig
 Multivariate polynomial $f(x, y) = x^2 y - y$
 
 ```{julia}
-g = MPolynomial2([2 1; 0 1], [1.0, -1.0], QHat)
+g = MPolynomial([2 1; 0 1], [1.0, -1.0], QHat)
 fig = Figure()
 Axis3(fig[1, 1])
 fplot3d!(g)

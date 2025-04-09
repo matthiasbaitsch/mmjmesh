@@ -18,7 +18,7 @@ using MMJMesh.MMJBase
 include("domains.jl")
 include("mappings.jl")
 include("forms.jl")
-include("mpolynomials2.jl")
+include("mpolynomials.jl")
 include("curves.jl")
 include("interpolations.jl")
 include("parametertypes.jl")
@@ -75,8 +75,8 @@ export Polynomial, Interpolation, fromroots, lagrangepolynomials, monomials, lag
 export PiecewiseFunction, npieces, interpolate
 
 # Polynomials of multiple variables
-export MPolynomial2, PolynomialRnToR, PolynomialRnToRm, PolynomialRnToRpxq, 
-    nterms, exponents, coefficient, coefficients, degrees, mmonomials2 # XXX
+export MPolynomial, PolynomialRnToR, PolynomialRnToRm, PolynomialRnToRpxq, 
+    nterms, exponents, coefficient, coefficients, degrees, mmonomials
 
 # Forms
 export Form, LinearForm, BilinearForm, ValueAtLF, DerivativeAtLF, DDerivativeAtLF, PDerivativeAtLF

@@ -48,11 +48,11 @@ MMJMesh.dimension(::Type{<:PolynomialSpace{1,K}}) where {K} = K + 1
 
 Base.in(::AbstractArray{<:Integer}, ::Type{<:PolynomialSpace}) = @abstractmethod
 Base.in(f::MappingFromR, s::Type{<:PolynomialSpace{1}}) = in([degree(f)], s)
-Base.in(f::MPolynomial2, s::Type{<:PolynomialSpace}) = all(in.(eachcol(f.p.exponents), s))
+Base.in(f::MPolynomial, s::Type{<:PolynomialSpace}) = all(in.(eachcol(f.p.exponents), s))
 
 basis(::Type{<:PolynomialSpace{1,K}}, d) where {K} = monomials(0:K, d)
 basis(s::Type{<:PolynomialSpace{N,K}}, d) where {N,K} =
-    mmonomials2(N, K, d, (k...) -> [k...] ∈ s, type=Int)
+    mmonomials(N, K, d, (k...) -> [k...] ∈ s, type=Int)
 basis(s::PolynomialSpace, d) = basis(typeof(s), d)
 
 """
