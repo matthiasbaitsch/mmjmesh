@@ -37,11 +37,12 @@ include("finiteelements.jl")
 # Domains
 export R, RPlus, R⁺, R0Plus, R⁺₀, IHat, ReferenceInterval
 export R2, R², R3, R³, QHat, ReferenceQuadrilateral
-export InR, InRⁿ, InR2, InR², InR3, InR³, InRnxm, InRⁿˣᵐ
+export InR, InRⁿ, InR2, InR², InR3, InR³, InRmxn, InRᵐˣⁿ
 export points, dimension
 
 # General concept of mapping
-export AbstractMapping, MappingFromR, MappingFromRn, FunctionToR
+export AbstractMapping, MappingFromR, MappingFromRn
+export FunctionToR, MappingToRn, MappingToRmxn
 export FunctionRToR, FunctionRnToR, MappingRnToRm
 export domaintype, codomaintype, domain, degree, degrees, valueat
 export derivativeat, derivative, pderivativeat, pderivative

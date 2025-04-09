@@ -53,6 +53,8 @@ const InR = Real
 const InRⁿ{N} = SVector{N,<:Real}
 """ Element of the set of ``n \\times m``-matrices of real numbers """
 const InRᵐˣⁿ{M,N} = SMatrix{M,N,<:Real}
+""" Element of the set of ``n \\times m``-matrices of real numbers """
+const InRmxn{M,N} = InRᵐˣⁿ{M,N}
 """ Element of the set of pairs of real numbers """
 const InR2 = InRⁿ{2}
 """ Element of the set of pairs of real numbers """
