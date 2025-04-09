@@ -23,7 +23,7 @@ There are many things missing
 # -------------------------------------------------------------------------------------------------
 
 
-## Type declaration
+## Type declaration 
 
 """
     AbstractMapping{DT,CT,D}
@@ -35,7 +35,7 @@ domain. TODO: Use DomainSets.Full
 abstract type AbstractMapping{DT,CT,D} end
 
 
-## Fundamental operationsx
+## Fundamental operations
 
 """
     valueat(m::AbstractMapping{DT, CT}, x::DT) -> CT
@@ -67,7 +67,40 @@ function derivativeat end
 function derivative end
 
 
-## Types of domain, codomain and derivatives
+## Fallback implementation of higher-order derivatives
+
+function derivative(f::AbstractMapping, n::Integer=1)
+    n == 0 && return f
+    n == 1 && return _derivative(f)
+    return derivative(derivative(f, n - 1))
+end
+
+function derivativeat(f::AbstractMapping{DT}, x::DT, n::Integer=1) where {DT}
+    n == 0 && return f(x)
+    n == 1 && return _derivativeat(f, x)
+    return derivative(f, n)(x)
+end
+
+
+## Shorthand notations for derivative and evaluation
+
+Base.adjoint(m::AbstractMapping) = derivative(m, 1)
+(m::AbstractMapping{DT})(x::DT) where {DT} = valueat(m, x)
+
+
+## Matrix times vector of functions
+
+Base.promote_op(matprod, ::Type{<:Real}, t::Type{<:AbstractMapping}) = t
+
+function Base.:(*)(A::AbstractMatrix{T}, x::AbstractVector{<:AbstractMapping{DT,CT,D}}) where {T,DT,CT,D}
+    TS = AbstractMapping{DT,CT,D}
+    mul!(similar(x, TS, axes(A, 1)), A, x)
+end
+
+
+# -------------------------------------------------------------------------------------------------
+# Types of domain, codomain and derivatives
+# -------------------------------------------------------------------------------------------------
 
 """ Type of elements in the domain of the mapping. """
 domaintype(::Type{<:AbstractMapping{DT}}) where {DT} = DT
@@ -95,16 +128,15 @@ derivativetype(::Type{InR}, t, ::Integer=1) = t
 
 function derivativetype(::Type{InRⁿ{N}}, ::Type{InR}, n::Int) where {N}
     n == 1 && return InRⁿ{N}
-    n == 2 && return InRⁿˣᵐ{N,N}
+    n == 2 && return InRᵐˣⁿ{N,N}
     error("Not implemented yet")
 end
 
 function derivativetype(::Type{InRⁿ{N}}, ::Type{InRⁿ{M}}, n::Int) where {N,M}
-    n == 1 && return InRⁿˣᵐ{M,N}
+    n == 1 && return InRᵐˣⁿ{M,N}
     n == 2 && return SArray{Tuple{M,N,N},<:Real}
     error("Not implemented yet")
 end
-
 
 """
 	degree(f)
@@ -124,22 +156,6 @@ For a multivariate mapping `f`, the invocation `degree(f, i)` returns the polyno
 in the i-th parameter.
 """
 degree(::AbstractMapping, i=1) = Inf
-
-
-# Shorthand notations for derivative and evaluation
-Base.adjoint(m::AbstractMapping) = derivative(m, 1)
-(m::AbstractMapping{DT})(x::DT) where {DT} = valueat(m, x)
-
-
-# Make similar array 
-function Base.similar(a::Vector, ::Type{T}, dims::AbstractUnitRange...) where {T<:AbstractMapping}
-    TT = AbstractMapping{domaintype(a[1]),codomaintype(a[1])}
-    if !isempty(dims)
-        return similar(a, TT, Base.to_shape(dims))
-    else
-        return Vector{TT}(undef, length(a))
-    end
-end
 
 
 # -------------------------------------------------------------------------------------------------
@@ -209,194 +225,8 @@ valueat(m::ConstantMapping{DT}, ::DT) where {DT} = m.c
 
 
 # -------------------------------------------------------------------------------------------------
-# Construction of mappings from mappings
-# -------------------------------------------------------------------------------------------------
-
-
-## Sum of mappings
-
-struct Sum{DT,CT,D} <: AbstractMapping{DT,CT,D}
-    m1::AbstractMapping{DT,CT}
-    m2::AbstractMapping{DT,CT}
-    Sum(
-        m1::AbstractMapping{DT,CT,D1}, m2::AbstractMapping{DT,CT,D2}
-    ) where {DT,CT,D1,D2} = new{DT,CT,D1 ∩ D2}(m1, m2)
-end
-
-valueat(s::Sum{DT}, x::DT) where {DT} = valueat(s.m1, x) + valueat(s.m2, x)
-derivative(f::Sum, n::Integer=1) = Sum(derivative(f.m1, n), derivative(f.m2, n))
-derivativeat(f::Sum{DT}, x::DT, n::Integer=1) where {DT} =
-    derivativeat(f.m1, x, n) + derivativeat(f.m2, x, n)
-Base.show(io::IO, s::Sum) = print(io, s.m1, " + ", s.m2)
-Base.:(==)(m1::Sum{DT,CT,D}, m2::Sum{DT,CT,D}) where {DT,CT,D} = (m1.m1 == m2.m1 && m1.m2 == m2.m2)
-
-
-## Number times mapping
-
-struct ScaledMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
-    a::Real
-    m::AbstractMapping
-    ScaledMapping(a::Real, m::AbstractMapping{DT,CT,D}) where {DT,CT,D} = new{DT,CT,D}(a, m)
-end
-
-degree(s::ScaledMapping) = degree(s.m)
-valueat(s::ScaledMapping{DT}, x::DT) where {DT} = s.a * valueat(s.m, x)
-derivative(f::ScaledMapping, n::Integer=1) = f.a * derivative(f.m, n)
-derivativeat(f::ScaledMapping{DT}, x::DT, n::Integer=1) where {DT} = f.a * derivativeat(f.m, x, n)
-antiderivative(f::ScaledMapping{InR,InR}) = f.a * antiderivative(f.m)
-Base.show(io::IO, s::ScaledMapping) = print(io, s.a, " * ", s.m)
-Base.:(==)(m1::ScaledMapping{DT,CT,D}, m2::ScaledMapping{DT,CT,D}) where {DT,CT,D} =
-    (isequal(m1.a, m2.a) && m1.m == m2.m)
-
-
-## Mapping times mapping, only useful if `*` is defined for type `CT`
-
-struct ProductMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
-    m1::AbstractMapping
-    m2::AbstractMapping
-end
-
-ProductMapping(
-    m1::AbstractMapping{DT,CT1,D1}, m2::AbstractMapping{DT,CT2,D2}
-) where {DT,CT1,CT2,D1,D2} = ProductMapping{DT,Base.promote_op(*, CT1, CT2),D1 ∩ D2}(m1, m2)
-
-ProductMapping(m::AbstractMapping{DT,CT,D1}, f::AbstractMapping{DT,InR,D2}) where {DT,CT,D1,D2} =
-    ProductMapping{DT,CT,D1 ∩ D2}(f, m)
-
-valueat(p::ProductMapping{DT}, x::DT) where {DT} = valueat(p.m1, x) * valueat(p.m2, x)
-_derivative(f::ProductMapping) = f.m1' * f.m2 + f.m1 * f.m2'
-derivativeat(f::ProductMapping{DT}, x::DT, n::Integer=1) where {DT} = sum(
-    [binomial(n, k) * derivativeat(f.m1, x, k) * derivativeat(f.m2, x, n - k) for k in 0:n]
-)
-Base.show(io::IO, m::ProductMapping) = print(io, m.m1, " * ", m.m2)
-Base.:(==)(m1::ProductMapping{DT,CT,D}, m2::ProductMapping{DT,CT,D}) where {DT,CT,D} =
-    (m1.m1 == m2.m1 && m1.m2 == m2.m2)
-Base.promote_op(*, ::Type{InR}, ::Type{InRⁿ{N}}) where {N} = InRⁿ{N}
-Base.promote_op(*, ::Type{InR}, ::Type{InR}) = InR
-
-
-## Mapping divided by mapping, only useful if `/` is defined for type `CT`
-
-struct QuotientMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
-    m1::AbstractMapping{DT,CT}
-    m2::AbstractMapping{DT,CT}
-    QuotientMapping(
-        m1::AbstractMapping{DT,CT,D1}, m2::AbstractMapping{DT,CT,D2}
-    ) where {DT,CT,D1,D2} = new{DT,CT,D1 ∩ D2}(m1, m2)
-end
-
-valueat(q::QuotientMapping{DT}, x::DT) where {DT} = valueat(q.m1, x) / valueat(q.m2, x)
-_derivative(f::QuotientMapping) = (f.m1' * f.m2 - f.m1 * f.m2') / (f.m2 * f.m2)
-_derivativeat(f::QuotientMapping{DT}, x::DT) where {DT} =
-    (derivativeat(f.m1, x) * f.m2(x) - f.m1(x) * derivativeat(f.m2, x)) / f.m2(x)^2
-Base.show(io::IO, m::QuotientMapping) = print(io, "(", m.m1, ") / (", m.m2, ")")
-Base.:(==)(m1::QuotientMapping{DT,CT,D}, m2::QuotientMapping{DT,CT,D}) where {DT,CT,D} =
-    (m1.m1 == m2.m1 && m1.m2 == m2.m2)
-
-
-## Composition of mappings m1 ∘ m2
-
-struct ComposedMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
-    m1::AbstractMapping
-    m2::AbstractMapping
-    ComposedMapping(
-        m1::AbstractMapping{DT1,CT1,D1}, m2::AbstractMapping{DT2,CT2,D2}
-    ) where {DT1,CT1,D1,DT2,CT2<:DT1,D2} = new{DT2,CT1,D2}(m1, m2)
-end
-Base.:(∘)(m1::AbstractMapping, m2::AbstractMapping) = ComposedMapping(m1, m2)
-
-valueat(c::ComposedMapping{DT}, x::DT) where {DT} = valueat(c.m1, valueat(c.m2, x))
-_derivative(f::ComposedMapping) = (f.m1' ∘ f.m2) * f.m2'
-_derivativeat(f::ComposedMapping{DT}, x::DT) where {DT} =
-    derivativeat(f.m1, valueat(f.m2, x)) * derivativeat(f.m2, x)
-
-function antiderivative(f::ComposedMapping{InR,InR}, n::Integer=1)
-    g = f.m1
-    h = f.m2
-
-    if degree(h) == 1
-        return (1 / derivativeat(h, 0))^n * (antiderivative(g, n) ∘ h)
-    else
-        @notimplemented
-    end
-end
-
-Base.show(io::IO, m::ComposedMapping) = print(io, m.m1, " ∘ ", m.m2)
-Base.:(==)(m1::ComposedMapping{DT,CT,D}, m2::ComposedMapping{DT,CT,D}) where {DT,CT,D} =
-    (m1.m1 == m2.m1 && m1.m2 == m2.m2)
-
-
-# -------------------------------------------------------------------------------------------------
-# Mappings D -> R^n or D -> R^nxm from components
-# -------------------------------------------------------------------------------------------------
-
-"""
-    MappingFromComponents(c1, c2, ..., cn)
-
-Construct a mapping ``X \\to Z`` from Mappings ``c_k: X \\to Y, k = 1, \\dots, n`` 
-such that ``Z = Y^n``.
-"""
-struct MappingFromComponents{DT,CT,D} <: AbstractMapping{DT,CT,D}
-    components
-    MappingFromComponents(components::AbstractMapping{DT,InR,D}...) where {DT,D} =
-        new{DT,InRⁿ{length(components)},D}(collect(components))
-    MappingFromComponents(components::AbstractMapping{DT,<:InRⁿ{N},D}...) where {DT,N,D} =
-        new{DT,InRⁿˣᵐ{length(components),N},D}(collect(components))
-end
-
-valueat(m::MappingFromComponents{DT,CT,D}, x::DT) where {DT,CT,D} =
-    SVector{size(CT, 1)}([valueat(m.components[i], x) for i ∈ eachindex(m.components)])
-derivative(m::MappingFromComponents, n::Integer=1) =
-    MappingFromComponents([derivative(c, n) for c ∈ m.components]...)
-
-derivativeat(m::MappingFromComponents{DT,CT,D}, x::DT, n::Integer=1) where {DT,CT,D} =
-    SVector{size(CT, 1)}([derivativeat(m.components[i], x, n) for i ∈ eachindex(m.components)])
-
-# Derivative of mapping Rn to Rm (Jacobian)
-function derivativeat(
-    m::MappingFromComponents{InRⁿ{N},InRⁿ{M},D}, x::InRⁿ{N}, n::Integer=1
-) where {N,M,D}
-    @assert n == 1
-    J = MMatrix{M,N,Float64}(undef)
-    for i = 1:M
-        J[i, :] = derivativeat(m.components[i], x)
-    end
-    return J
-end
-
-# Value of mapping to Rn x Rm
-function valueat(m::MappingFromComponents{DT,InRⁿˣᵐ{N,M},D}, x::DT) where {DT,N,M,D}
-    v = MMatrix{N,M,Float64}(undef)
-    for i = 1:N
-        v[i, :] = valueat(m.components[i], x)
-    end
-    return v
-end
-
-Base.getindex(m::MappingFromComponents, i::Integer) = m.components[i]
-Base.show(io::IO, m::MappingFromComponents) = print(io, "MappingFromComponents[$(m.components)]")
-Base.:(==)(m1::MappingFromComponents, m2::MappingFromComponents) = m1.components == m2.components
-
-
-# Generic implementation of higher-order derivatives
-
-function derivative(f::AbstractMapping, n::Integer=1)
-    n == 0 && return f
-    n == 1 && return _derivative(f)
-    return derivative(derivative(f, n - 1))
-end
-
-function derivativeat(f::AbstractMapping{DT}, x::DT, n::Integer=1) where {DT}
-    n == 0 && return f(x)
-    n == 1 && return _derivativeat(f, x)
-    return derivative(f, n)(x)
-end
-
-
-# -------------------------------------------------------------------------------------------------
 # Mappings from R
 # -------------------------------------------------------------------------------------------------
-
 
 """ Mappings from the real numbers. """
 const MappingFromR{CT,D} = AbstractMapping{InR,CT,D}
@@ -408,10 +238,6 @@ const MappingFromR{CT,D} = AbstractMapping{InR,CT,D}
 Return the points of interest of the mapping `m`.
 """
 pois(::MappingFromR) = Float64[]
-pois(p::Sum) = pois(p.m1) ∪ pois(p.m2)
-pois(s::ScaledMapping) = pois(s.m)
-pois(p::ProductMapping) = pois(p.m1) ∪ pois(p.m2)
-pois(q::QuotientMapping) = pois(q.m1) ∪ pois(q.m2) ∪ roots(q.m2)
 
 
 """
@@ -429,41 +255,51 @@ end
 # Mappings from Rn
 # -------------------------------------------------------------------------------------------------
 
-
 """ Mappings from ``R^n``. """
 const MappingFromRn{N,CT,D} = AbstractMapping{InRⁿ{N},CT,D}
 
 
 # -------------------------------------------------------------------------------------------------
-# Functions to R
+# Functions to R (scalar valued)
 # -------------------------------------------------------------------------------------------------
 
+""" Function to ``R``. """
 const FunctionToR{DT,D} = AbstractMapping{DT,InR,D}
 
 LinearAlgebra.dot(f1::FunctionToR{DT}, f2::FunctionToR{DT}) where {DT} = f1 * f2
 
 
 # -------------------------------------------------------------------------------------------------
-# Mappings to Rn
+# Mappings to Rn (vector valued)
 # -------------------------------------------------------------------------------------------------
 
 const MappingToRn{DT,N,D} = AbstractMapping{DT,InRⁿ{N},D}
 
-LinearAlgebra.dot(u1::MappingToRn{DT,N,D}, u2::MappingToRn{DT,N,D}) where {DT,N,D} =
-    sum([u1[i] * u2[i] for i = 1:N])
-
-Base.getindex(u::MappingToRn, i::Integer) = @notimplemented
 components(u::MappingToRn{DT,N}) where {DT,N} = [u[i] for i = 1:N]
+
+Base.length(::MappingToRn{DT,N}) where {DT,N} = N
+Base.eltype(::MappingToRn{DT,N,D}) where {DT,N,D} = FunctionToR{DT,D}
+Base.getindex(::MappingToRn, i::Integer) = @notimplemented
+Base.iterate(u::MappingToRn, idx=1) = idx > length(u) ? nothing : (u[idx], idx + 1)
+
+
+# -------------------------------------------------------------------------------------------------
+# Mappings to Rmxn (matrix valued)
+# -------------------------------------------------------------------------------------------------
+
+const MappingToRmxn{DT,M,N,D} = AbstractMapping{DT,InRᵐˣⁿ{M,N},D}
+
+Base.transpose(::MappingToRmxn) = @notimplemented
+Base.:(*)(::MappingToRmxn, x::RealVecOrMat) = @notimplemented
 
 
 # -------------------------------------------------------------------------------------------------
 # Functions R → R
 # -------------------------------------------------------------------------------------------------
 
+""" Function ``R \\to R``. """
 const FunctionRToR{D} = AbstractMapping{InR,InR,D}
 
-
-# Fundamental operations
 
 """
     antiderivative(f::FunctionRToR, n=1) -> FunctionRToR
@@ -505,24 +341,20 @@ function integrate(f::FunctionRToR, I::Interval)
 end
 
 
-# Rules for antiderivative
-antiderivative(f::ScaledMapping{InR,InR}, n::Integer) =
-    f.a * antiderivative(f.m, n)
-antiderivative(f::Sum{InR,InR}, n::Integer) =
-    antiderivative(f.m1, n) + antiderivative(f.m2, n)
-
-
 # -------------------------------------------------------------------------------------------------
 # Parametric curves R → Rn
 # -------------------------------------------------------------------------------------------------
 
+""" Parametric curve``R \\to R^n``. """
 const ParametricCurve{N,D} = AbstractMapping{InR,InRⁿ{N},D}
 
 ParametricCurve(components::FunctionRToR...) = MappingFromComponents(components...)
 
-# Unit normal
+
+## Unit normal
+
 struct UnitNormal{D} <: ParametricCurve{2,D}
-    u::ParametricCurve
+    u::ParametricCurve{2,D}
     UnitNormal(u::ParametricCurve{2,D}) where {D} = new{D}(u)
 end
 
@@ -537,10 +369,11 @@ end
 # Functions Rn → R
 # -------------------------------------------------------------------------------------------------
 
+""" Function ``R^n \\to R`` of several real variables. """
 const FunctionRnToR{N,D} = AbstractMapping{InRⁿ{N},InR,D}
 
 
-# Helper functions
+## Helper functions
 
 """
     _nn(n, indices...)
@@ -608,7 +441,7 @@ _derivativeat(
 ) where {N,D} = valueat(derivative(f, ns), x)
 
 
-# Differential operators
+## Differential operators
 
 # Operator struct for operator matrices
 struct Operator
@@ -661,47 +494,11 @@ integrate(f::FunctionRnToR{2}, d::DomainSets.Rectangle) =
     integrate(f, DomainSets.component(d, 1), DomainSets.component(d, 2))
 
 
-"""
-    ProductFunction(f1, f2, ..., fn)
-
-Construct product function ``p: R^n \\to R`` with 
-``p(x_1, x_2, ..., x_n) = f_1(x_1) \\cdot f_2(x_2) \\cdot \\dots \\cdot f_n(x_n)``.
-"""
-struct ProductFunction{N,D} <: FunctionRnToR{N,D}
-    factors::Vector{FunctionRToR}
-
-    ProductFunction(fs::FunctionRToR...) =
-        new{length(fs),ProductDomain(domain.(fs)...)}(collect(fs))
-end
-
-valueat(f::ProductFunction{N}, x::InRⁿ{N}) where {N} =
-    prod([f.factors[i](x[i]) for i ∈ 1:N])
-
-derivativeat(f::ProductFunction{N}, x::InRⁿ{N}, n::AbstractArray{<:Integer}) where {N} =
-    prod([derivativeat(f.factors[i], x[i], n[i]) for i in 1:N])
-derivativeat(f::ProductFunction{N}, x::InRⁿ{N}, n::Integer=1) where {N} =
-    _derivativeat(f, x, n)
-
-derivative(f::ProductFunction{N}, n::AbstractArray{<:Integer}) where {N} =
-    ProductFunction([derivative(f.factors[i], n[i]) for i in 1:N]...)
-derivative(f::ProductFunction{N}, n::Integer=1) where {N} = _derivative(f, n)
-
-antiderivative(f::ProductFunction{N}, ns::AbstractArray{<:Integer}) where {N} =
-    ProductFunction([antiderivative(f.factors[i], ns[i]) for i = 1:N]...)
-
-Base.show(io::IO, f::ProductFunction) = print(io, "ProductFunction with factors $(f.factors)")
-Base.:(==)(f1::ProductFunction, f2::ProductFunction) = f1.factors == f2.factors
-
-
 # -------------------------------------------------------------------------------------------------
 # Mappings Rn to Rm
 # -------------------------------------------------------------------------------------------------
 
-"""
-    MappingRnToRm{N,M,D}
-
-A mapping ''\\mathbf{u}: R^n \\to R^m'' with ``n,m > 1``.
-"""
+""" Vector valued mapping ''R^n \\to R^m'' with ``n,m > 1`` of several real variables. """
 const MappingRnToRm{N,M,D} = AbstractMapping{InRⁿ{N},InRⁿ{M},D}
 
 """
@@ -709,25 +506,21 @@ const MappingRnToRm{N,M,D} = AbstractMapping{InRⁿ{N},InRⁿ{M},D}
 
 Jacobian of the mapping `u`.
 """
-jacobian(m::MappingRnToRm) = derivative(m)
+jacobian(u::MappingRnToRm) = derivative(u)
 
 """
-    jacobianat(m::MappingRnToRm, x::InRⁿ)
+    jacobianat(u::MappingRnToRm, x::InRⁿ)
 
-Evaluates the jacobian of the mapping `m` at point `x`.
+Evaluates the jacobian of the mapping `u` at point `x`.
 """
-jacobianat(m::MappingRnToRm, x::InRⁿ{N}) where {N} = derivativeat(m, x)
+jacobianat(u::MappingRnToRm, x::InRⁿ{N}) where {N} = derivativeat(u, x)
 
 
 # -------------------------------------------------------------------------------------------------
 # Vector fields
 # -------------------------------------------------------------------------------------------------
 
-"""
-    VectorField{N,D}
-
-A mapping ''R^n \\to R^n'' with ``n > `1`.
-"""
+""" Vector field ''R^n \\to R^n'' with ``n > `1`. """
 const VectorField{N,D} = MappingRnToRm{N,N,D}
 
 """
@@ -754,11 +547,233 @@ Base.div(v::VectorField) = divergence(v)
 
 
 # -------------------------------------------------------------------------------------------------
+# Construction of mappings from mappings
+# -------------------------------------------------------------------------------------------------
+
+
+## Sum of mappings
+
+struct Sum{DT,CT,D} <: AbstractMapping{DT,CT,D}
+    m1::AbstractMapping{DT,CT}
+    m2::AbstractMapping{DT,CT}
+    Sum(
+        m1::AbstractMapping{DT,CT,D1}, m2::AbstractMapping{DT,CT,D2}
+    ) where {DT,CT,D1,D2} = new{DT,CT,D1 ∩ D2}(m1, m2)
+end
+
+pois(p::Sum) = pois(p.m1) ∪ pois(p.m2)
+valueat(s::Sum{DT}, x::DT) where {DT} = valueat(s.m1, x) + valueat(s.m2, x)
+derivative(f::Sum, n::Integer=1) = Sum(derivative(f.m1, n), derivative(f.m2, n))
+derivativeat(f::Sum{DT}, x::DT, n::Integer=1) where {DT} =
+    derivativeat(f.m1, x, n) + derivativeat(f.m2, x, n)
+antiderivative(f::Sum{InR,InR}, n::Integer=1) =
+    antiderivative(f.m1, n) + antiderivative(f.m2, n)
+
+Base.show(io::IO, s::Sum) = print(io, s.m1, " + ", s.m2)
+Base.:(==)(m1::Sum{DT,CT,D}, m2::Sum{DT,CT,D}) where {DT,CT,D} = (m1.m1 == m2.m1 && m1.m2 == m2.m2)
+
+
+## Number times mapping
+
+struct ScaledMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
+    a::Real
+    m::AbstractMapping
+    ScaledMapping(a::Real, m::AbstractMapping{DT,CT,D}) where {DT,CT,D} = new{DT,CT,D}(a, m)
+end
+
+pois(s::ScaledMapping) = pois(s.m)
+degree(s::ScaledMapping) = degree(s.m)
+valueat(s::ScaledMapping{DT}, x::DT) where {DT} = s.a * valueat(s.m, x)
+derivative(f::ScaledMapping, n::Integer=1) = f.a * derivative(f.m, n)
+derivativeat(f::ScaledMapping{DT}, x::DT, n::Integer=1) where {DT} = f.a * derivativeat(f.m, x, n)
+antiderivative(f::ScaledMapping{InR,InR}, n::Integer=1) =
+    f.a * antiderivative(f.m, n)
+
+
+Base.show(io::IO, s::ScaledMapping) = print(io, s.a, " * ", s.m)
+Base.:(==)(m1::ScaledMapping{DT,CT,D}, m2::ScaledMapping{DT,CT,D}) where {DT,CT,D} =
+    (isequal(m1.a, m2.a) && m1.m == m2.m)
+
+
+## Mapping times mapping, only useful if `*` is defined for type `CT`
+
+struct ProductMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
+    m1::AbstractMapping
+    m2::AbstractMapping
+end
+
+ProductMapping(
+    m1::AbstractMapping{DT,CT1,D1}, m2::AbstractMapping{DT,CT2,D2}
+) where {DT,CT1,CT2,D1,D2} = ProductMapping{DT,Base.promote_op(*, CT1, CT2),D1 ∩ D2}(m1, m2)
+
+ProductMapping(m::AbstractMapping{DT,CT,D1}, f::AbstractMapping{DT,InR,D2}) where {DT,CT,D1,D2} =
+    ProductMapping{DT,CT,D1 ∩ D2}(f, m)
+
+pois(p::ProductMapping) = pois(p.m1) ∪ pois(p.m2)
+valueat(p::ProductMapping{DT}, x::DT) where {DT} = valueat(p.m1, x) * valueat(p.m2, x)
+_derivative(f::ProductMapping) = f.m1' * f.m2 + f.m1 * f.m2'
+derivativeat(f::ProductMapping{DT}, x::DT, n::Integer=1) where {DT} = sum(
+    [binomial(n, k) * derivativeat(f.m1, x, k) * derivativeat(f.m2, x, n - k) for k in 0:n]
+)
+
+Base.show(io::IO, m::ProductMapping) = print(io, m.m1, " * ", m.m2)
+Base.:(==)(m1::ProductMapping{DT,CT,D}, m2::ProductMapping{DT,CT,D}) where {DT,CT,D} =
+    (m1.m1 == m2.m1 && m1.m2 == m2.m2)
+Base.promote_op(*, ::Type{InR}, ::Type{InRⁿ{N}}) where {N} = InRⁿ{N}
+Base.promote_op(*, ::Type{InR}, ::Type{InR}) = InR
+
+
+## Mapping divided by mapping, only useful if `/` is defined for type `CT`
+
+struct QuotientMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
+    m1::AbstractMapping{DT,CT}
+    m2::AbstractMapping{DT,CT}
+    QuotientMapping(
+        m1::AbstractMapping{DT,CT,D1}, m2::AbstractMapping{DT,CT,D2}
+    ) where {DT,CT,D1,D2} = new{DT,CT,D1 ∩ D2}(m1, m2)
+end
+
+pois(q::QuotientMapping) = pois(q.m1) ∪ pois(q.m2) ∪ roots(q.m2)
+valueat(q::QuotientMapping{DT}, x::DT) where {DT} = valueat(q.m1, x) / valueat(q.m2, x)
+_derivative(f::QuotientMapping) = (f.m1' * f.m2 - f.m1 * f.m2') / (f.m2 * f.m2)
+_derivativeat(f::QuotientMapping{DT}, x::DT) where {DT} =
+    (derivativeat(f.m1, x) * f.m2(x) - f.m1(x) * derivativeat(f.m2, x)) / f.m2(x)^2
+
+Base.show(io::IO, m::QuotientMapping) = print(io, "(", m.m1, ") / (", m.m2, ")")
+Base.:(==)(m1::QuotientMapping{DT,CT,D}, m2::QuotientMapping{DT,CT,D}) where {DT,CT,D} =
+    (m1.m1 == m2.m1 && m1.m2 == m2.m2)
+
+
+## Composition of mappings m1 ∘ m2
+
+struct ComposedMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
+    m1::AbstractMapping
+    m2::AbstractMapping
+    ComposedMapping(
+        m1::AbstractMapping{DT1,CT1,D1}, m2::AbstractMapping{DT2,CT2,D2}
+    ) where {DT1,CT1,D1,DT2,CT2<:DT1,D2} = new{DT2,CT1,D2}(m1, m2)
+end
+Base.:(∘)(m1::AbstractMapping, m2::AbstractMapping) = ComposedMapping(m1, m2)
+
+valueat(c::ComposedMapping{DT}, x::DT) where {DT} = valueat(c.m1, valueat(c.m2, x))
+_derivative(f::ComposedMapping) = (f.m1' ∘ f.m2) * f.m2'
+_derivativeat(f::ComposedMapping{DT}, x::DT) where {DT} =
+    derivativeat(f.m1, valueat(f.m2, x)) * derivativeat(f.m2, x)
+
+function antiderivative(f::ComposedMapping{InR,InR}, n::Integer=1)
+    g = f.m1
+    h = f.m2
+
+    if degree(h) == 1
+        return (1 / derivativeat(h, 0))^n * (antiderivative(g, n) ∘ h)
+    else
+        @notimplemented
+    end
+end
+
+Base.show(io::IO, m::ComposedMapping) = print(io, m.m1, " ∘ ", m.m2)
+Base.:(==)(m1::ComposedMapping{DT,CT,D}, m2::ComposedMapping{DT,CT,D}) where {DT,CT,D} =
+    (m1.m1 == m2.m1 && m1.m2 == m2.m2)
+
+
+## Product of functions R to R
+
+struct ProductFunction{N,D} <: FunctionRnToR{N,D}
+    factors::Vector{FunctionRToR}
+
+    ProductFunction(fs::FunctionRToR...) =
+        new{length(fs),ProductDomain(domain.(fs)...)}(collect(fs))
+end
+
+valueat(f::ProductFunction{N}, x::InRⁿ{N}) where {N} =
+    prod([f.factors[i](x[i]) for i ∈ 1:N])
+
+derivativeat(f::ProductFunction{N}, x::InRⁿ{N}, n::AbstractArray{<:Integer}) where {N} =
+    prod([derivativeat(f.factors[i], x[i], n[i]) for i in 1:N])
+derivativeat(f::ProductFunction{N}, x::InRⁿ{N}, n::Integer=1) where {N} =
+    _derivativeat(f, x, n)
+
+derivative(f::ProductFunction{N}, n::AbstractArray{<:Integer}) where {N} =
+    ProductFunction([derivative(f.factors[i], n[i]) for i in 1:N]...)
+derivative(f::ProductFunction{N}, n::Integer=1) where {N} = _derivative(f, n)
+
+antiderivative(f::ProductFunction{N}, ns::AbstractArray{<:Integer}) where {N} =
+    ProductFunction([antiderivative(f.factors[i], ns[i]) for i = 1:N]...)
+
+Base.show(io::IO, f::ProductFunction) = print(io, "ProductFunction with factors $(f.factors)")
+Base.:(==)(f1::ProductFunction, f2::ProductFunction) = f1.factors == f2.factors
+
+
+## Mappings D -> R^n or D -> R^nxm from components
+
+"""
+    MappingFromComponents(c1, c2, ..., cn)
+
+Construct a mapping ``X \\to Z`` from Mappings ``c_k: X \\to Y, k = 1, \\dots, n`` 
+such that ``Z = Y^n``.
+"""
+struct MappingFromComponents{DT,CT,D,N} <: AbstractMapping{DT,CT,D}
+    components::SVector{N}
+    MappingFromComponents(components::SVector{N,<:FunctionToR{DT,D}}) where {N,DT,D} =
+        new{DT,InRⁿ{N},D,N}(components)
+    MappingFromComponents(components::SVector{M,<:MappingToRn{DT,N,D}}) where {M,DT,N,D} =
+        new{DT,InRᵐˣⁿ{M,N},D,M}(components)
+end
+
+MappingFromComponents(components::AbstractMapping...) = MappingFromComponents(collect(components))
+MappingFromComponents(components::Vector{<:AbstractMapping}) =
+    MappingFromComponents(SVector{length(components)}(components))
+
+# Value at
+valueat(m::MappingFromComponents{DT,CT,D}, x::DT) where {DT,CT,D} =
+    SVector{size(CT, 1)}([valueat(m.components[i], x) for i ∈ eachindex(m.components)])
+
+function valueat(m::MappingFromComponents{DT,InRᵐˣⁿ{N,M}}, x::DT) where {DT,N,M}
+    v = MMatrix{N,M,Float64}(undef)
+    for i = 1:N
+        v[i, :] = valueat(m.components[i], x)
+    end
+    return v
+end
+
+# Derivatives
+derivative(m::MappingFromComponents, n::Integer=1) =
+    MappingFromComponents([derivative(c, n) for c ∈ m.components]...)
+derivativeat(m::MappingFromComponents{DT,CT,D}, x::DT, n::Integer=1) where {DT,CT,D} =
+    SVector{size(CT, 1)}([derivativeat(m.components[i], x, n) for i ∈ eachindex(m.components)])
+
+function derivativeat(
+    m::MappingFromComponents{InRⁿ{N},InRⁿ{M}}, x::InRⁿ{N}, n::Integer=1
+) where {N,M}
+    @assert n == 1
+    J = MMatrix{M,N,Float64}(undef)
+    for i = 1:M
+        J[i, :] = derivativeat(m.components[i], x)
+    end
+    return J
+end
+
+# Dot and matrix products
+LinearAlgebra.dot(x::RealVec, m::MappingFromComponents{DT,InRⁿ{N}}) where {DT,N} =
+    dot(x, m.components)
+Base.:(*)(A::RealMat, m::MappingFromComponents{DT,InRⁿ{N}}) where {DT,N} =
+    MappingFromComponents(A * m.components)
+
+# From Base
+Base.eltype(m::MappingFromComponents) = eltype(m.components)
+Base.length(m::MappingFromComponents) = length(m.components)
+Base.getindex(m::MappingFromComponents, i::Integer) = m.components[i]
+Base.show(io::IO, m::MappingFromComponents) = print(io, "MappingFromComponents[$(m.components)]")
+Base.:(==)(m1::MappingFromComponents, m2::MappingFromComponents) = m1.components == m2.components
+
+
+# -------------------------------------------------------------------------------------------------
 # Special functions
 # -------------------------------------------------------------------------------------------------
 
 
-# Sine function
+## Sine function
+
 struct Sin{D} <: FunctionRToR{D}
     Sin(d=R) = new{d}()
 end
@@ -774,7 +789,8 @@ _antiderivative(::Sin{D}) where {D} = -Cos(D)
 Base.show(io::IO, ::Sin) = print(io, "sin(x)")
 
 
-# Cosine function
+## Cosine function
+
 struct Cos{D} <: FunctionRToR{D}
     Cos(d=R) = new{d}()
 end
@@ -791,7 +807,8 @@ _antiderivative(::Cos{D}) where {D} = Sin(D)
 Base.show(io::IO, ::Cos) = print(io, "cos(x)")
 
 
-# Exp function
+## Exp function
+
 struct Exp{D} <: FunctionRToR{D}
     Exp(d=R) = new{d}()
 end
@@ -851,7 +868,6 @@ function lagrangepolynomials(c::AbstractArray{<:Float64}, d=R)
     return [normalize(fromroots(c[filter(j -> j != i, indices)], d), c[i]) for i in indices]
 end
 
-
 _monomial_coeffs(n) = [i == n + 1 for i = 1:n+1]
 
 """
@@ -860,7 +876,7 @@ _monomial_coeffs(n) = [i == n + 1 for i = 1:n+1]
 Monomials of degree ``p_1, \\dots, p_n`` defined on the domain `D`.
 """
 function monomials(p::AbstractArray{<:Integer}, d=R)
-    return [Polynomial(_monomial_coeffs(n), d) for n in p]
+    return MappingFromComponents([Polynomial(_monomial_coeffs(n), d) for n in p])
 end
 
 

@@ -21,13 +21,16 @@ using .Validate
 
 
 # -------------------------------------------------------------------------------------------------
-# Similar
+# Matrix times vector of functions product
 # -------------------------------------------------------------------------------------------------
 
-rand(5, 5) * monomials(0:4)
-Base.similar(monomials(0:4), Polynomial, Base.OneTo(5))
-@test length(similar([Sin(), Cos()], Sin)) == 2
+A = [1 2; 3 4]
+@test A * [Sin(), Sin()] == [3Sin(), 7Sin()]
+@test A * [Sin(), Cos()] == [Sin() + 2Cos(), 3Sin() + 4Cos()]
+@test A * [Polynomial(2, 1), Polynomial(1, 2)] == [Polynomial(4, 5), Polynomial(10, 11)]
+@test A * components(monomials(0:1)) == [Polynomial(1, 2), Polynomial(3, 4)]
 
+A * [Sin(), Sin()] |> typeof
 
 # -------------------------------------------------------------------------------------------------
 # Matrix vector product
@@ -66,23 +69,15 @@ T2 = InR2
 T3 = InR3
 
 @test derivativetype(T1, T2) === InR2
-@test derivativetype(T2, T3, 1) == InRⁿˣᵐ{3,2}
+@test derivativetype(T2, T3, 1) == InRᵐˣⁿ{3,2}
 @test derivativetype(T2, T3, 2) == SArray{Tuple{3,2,2},<:Real}
-@test derivativetype(T3, T2, 1) == InRⁿˣᵐ{2,3}
+@test derivativetype(T3, T2, 1) == InRᵐˣⁿ{2,3}
 @test derivativetype(T3, T2, 2) == SArray{Tuple{2,3,3},<:Real}
 
 @test derivativetype(Sin()) == InR
 @test derivativetype(Sin(), 2) == InR
-@test derivativetype(MappingFromComponents(Sin(), Cos())) == InR2
-@test derivativetype(MappingFromComponents(Sin(), Cos()), 2) == InR2
 @test derivativetype(ProductFunction(Sin(), Cos())) == InR2
-@test derivativetype(ProductFunction(Sin(), Cos()), 2) == InRⁿˣᵐ{2,2}
-@test derivativetype(
-    MappingFromComponents(
-        ProductFunction(Sin(), Cos(), Sin()),
-        ProductFunction(Cos(), -Sin(), -Sin())
-    )
-) == SMatrix{2,3,<:Real}
+@test derivativetype(ProductFunction(Sin(), Cos()), 2) == InRᵐˣⁿ{2,2}
 
 
 # -------------------------------------------------------------------------------------------------
@@ -92,7 +87,7 @@ T3 = InR3
 z = Zero{InR2,InR,QHat}()
 @test z(1, 1) == 0
 @test derivative(z) == Zero{InR2,InR2,QHat}()
-@test derivative(z, 2) == Zero{InR2,InRⁿˣᵐ{2,2},QHat}()
+@test derivative(z, 2) == Zero{InR2,InRᵐˣⁿ{2,2},QHat}()
 @test derivativeat(z, InR2([1, 1])) == [0, 0]
 @test derivativeat(z, [1, 1]) == [0, 0]
 @test derivativeat(z, [1, 1], 2) == [0 0; 0 0]
@@ -137,7 +132,7 @@ g = MappingFromComponents(Sin(), Cos())
 m1 = MappingFromComponents(Sin(), 2 * Cos())
 m2 = MappingFromComponents(3 * Cos(), 4 * Sin())
 m3 = MappingFromComponents(m1, m2)
-@test typeof(m3) <: AbstractMapping{InR,InRⁿˣᵐ{2,2}}
+@test typeof(m3) <: AbstractMapping{InR,InRᵐˣⁿ{2,2}}
 @test m3(1) == stack([m1(1), m2(1)])'
 
 # Vector field R2 -> R2
@@ -173,7 +168,9 @@ f = makefunction(x -> sin(x[1]) * sin(x[2]), 0 .. 5π, 0 .. 5π)
 # Functions R → R
 # -------------------------------------------------------------------------------------------------
 
-# Sine and Cosine
+
+# # Sine and Cosine
+
 s = Sin(0 .. 2π)
 c = Cos(0 .. 2π)
 @test validate(s)
@@ -186,19 +183,25 @@ x = parameter(0 .. 2)
 @test sin(x) == Sin(0 .. 2)
 @test cos(x) == Cos(0 .. 2)
 
-# Exp
+
+# # Exp
+
 f = Exp(0 .. 2π)
 @test validate(f)
 @test validate(antiderivative(f))
 @test exp(x) == Exp(0 .. 2)
 
-# Identity
+
+# # Identity
+
 id = Identity(0.0 .. 5.0)
 @test id(3) == 3
 @test validate(id, atol=1e-6)
 @test antiderivative(id, 2) == 1 / 6 * id^3
 
-# Polynomials
+
+# # Polynomials
+
 p = Polynomial(4, 6, 1, 9, 2, -1)
 @test degree(p) == 5
 @test validate(p)
@@ -246,16 +249,22 @@ x = parameter(0 .. 5)
 @test -7x^2 + 3 + 3x == Polynomial([3, 3, -7], 0 .. 5)
 
 # Monomials
-@test Polynomial([1, 2, 3, 4, 5]) == [1, 2, 3, 4, 5]' * monomials(0:4)
+@test monomials(0:4) isa MappingToRn
+@test Polynomial(1, 2, 3, 4, 5) == [1, 2, 3, 4, 5] ⋅ monomials(0:4)
+@test [m for m = monomials(0:2)] == [Polynomial(1), Polynomial(0, 1), Polynomial(0, 0, 1)]
 
-# Affine function from one interval into another
+
+# # Affine function from one interval into another
+
 f = affinefunction(1 .. 2, 5 .. 1)
 @test degree(f) == 1
 @test f(1) == 5
 @test f(2) == 1
 @test integrate(f, 1 .. 2) == 3
 
-# Affine map
+
+# # Affine map
+
 f = AffineMapping(2, 3)
 @test f(2) == 7
 @test derivativeat(f, 2) == 2
@@ -298,12 +307,17 @@ f = sin(2x)
 # Functions Rn -> R
 # -------------------------------------------------------------------------------------------------
 
+
+# # Helpers
+
 # _nn function
 using MMJMesh.Mathematics: _nn
 @test _nn(2, 1, 1) == [2, 0]
 @test _nn(2, 1, 2, 1, 2) == [2, 2]
 
-# Product function, two parameters
+
+# # Product function of two parameters
+
 f = ProductFunction(Sin(0 .. 1), Cos(0.5 .. 5))
 x = SVector(1.0, 2.0)
 
@@ -342,6 +356,9 @@ hf = derivative(f, 2)
 @test hessianat(f, Vector(x)) == derivativeat(f, x, 2)
 @test hessianat(f, x...) == derivativeat(f, x, 2)
 
+
+# # Differential operators
+
 @test laplacian(f)(x) ≈ -2 * f(x)
 @test laplacianat(f, x) ≈ -2 * f(x)
 @test laplacianat(f, Vector(x)) == laplacianat(f, x)
@@ -351,8 +368,12 @@ hf = derivative(f, 2)
 @test H(f) == derivative(f, 2)
 @test Δ(f)(x) ≈ laplacianat(f, x)
 
+@test ∂x * f == derivative(f, [1, 0])
+@test ∂y * f == derivative(f, [0, 1])
 
-# Product function three variables
+
+# # Product function of three parameters
+
 f = ProductFunction(Sin(1 .. 2), Cos(3 .. 4), Polynomial([2, 3], 6 .. 7))
 x = SVector(1.0, 2.0, 3.0)
 
@@ -408,7 +429,7 @@ f2 = c * Polynomial(1, 2, 3)
 
 
 # -------------------------------------------------------------------------------------------------
-# Operations and simplification rules
+# Test operations and simplification rules
 # -------------------------------------------------------------------------------------------------
 
 x = parameter(R)
@@ -533,20 +554,38 @@ u = MMJMesh.Mathematics.ConstantMapping([1, 2, 3], InRⁿ{3}, R3)
 # Mappings to Rn
 # -------------------------------------------------------------------------------------------------
 
-f1 = MPolynomial([1 2 3; 3 2 1], [6, 5, 4])
-f2 = ProductFunction(Sin(), Cos())
 
-u1 = MappingFromComponents(f1, f2)
-u2 = MappingFromComponents(f2, f1)
+# # Mapping from components
 
-u = u1 ⋅ u2
-@test u(2, 3) == 2 * f1(2, 3) * f2(2, 3)
+x = [2, 3, 4]
+f1 = MPolynomial([1 2 3; 3 2 1; 3 5 1], [6, 5, 4])
+f2 = ProductFunction(Sin(), Cos(), Exp())
+u = MappingFromComponents(Sin(), Cos())
+v = MappingFromComponents(f1, f2)
+w = MappingFromComponents(MappingFromComponents(f1, f2), MappingFromComponents(f2, f1))
 
-u = ∇(f1) ⋅ ∇(f2)
-@test u(2, 3) ≈ derivative(f1, [1, 0])(2, 3) * cos(2) * cos(3) -
-                derivative(f1, [0, 1])(2, 3) * sin(2) * sin(3)
+# Basic functionality
+@test v === MappingFromComponents([f1, f2])
+@test v(x) == [f1(x), f2(x)]
+@test v'(x) == stack([f1'(x), f2'(x)], dims=1)
+@test w(x) == [f1(x) f2(x); f2(x) f1(x)]
 
-@test isequal(∂x * f1, ∂x(f1))
+# Dot product of mappings
+@test (MappingFromComponents(f1, f2) ⋅ MappingFromComponents(f2, f1))(x) == 2 * f1(x) * f2(x)
+@test ∇(f1) ⋅ ∇(f2) ==
+      derivative(f1, [1, 0, 0]) * derivative(f2, [1, 0, 0]) +
+      derivative(f1, [0, 1, 0]) * derivative(f2, [0, 1, 0]) +
+      derivative(f1, [0, 0, 1]) * derivative(f2, [0, 0, 1])
+
+# Derivative types
+@test derivativetype(u) == InR2
+@test derivativetype(u, 2) == InR2
+@test derivativetype(v) == InRᵐˣⁿ{2,3}
+
+# Dot and Matrix product
+@test [1, 2] ⋅ u == Sin() + 2 * Cos()
+@test [1 2; 5 4; 8 7] * u ==
+      MappingFromComponents(Sin() + 2Cos(), 5Sin() + 4Cos(), 8Sin() + 7Cos())
 
 
 # -------------------------------------------------------------------------------------------------
