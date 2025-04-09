@@ -1,4 +1,4 @@
 using Reexport
 
-@reexport import IntervalSets. ..
-@reexport import DomainSets. ×
+@reexport using IntervalSets: (..), leftendpoint, rightendpoint, endpoints
+@reexport using DomainSets: ×
