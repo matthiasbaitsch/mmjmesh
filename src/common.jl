@@ -70,13 +70,15 @@ export mesh
 
 const RealVec = AbstractVector{<:Real}
 const RealMat = AbstractMatrix{<:Real}
+const RealVecOrMat = Union{RealVec,RealMat}
 const RealVecVec = AbstractVector{<:AbstractVector{<:Real}}
 const IntegerVec = AbstractVector{<:Integer}
 const IntegerMat = AbstractMatrix{<:Integer}
+const IntegerVecOrMat = Union{IntegerVec,IntegerMat}
 const IntegerVecVec = AbstractVector{<:AbstractVector{<:Integer}}
 
 
 ## Export
 
-export RealVec, RealMat, RealVecVec
-export IntegerVec, IntegerMat, IntegerVecVec
+export RealVec, RealMat, RealVecOrMat, RealVecVec
+export IntegerVec, IntegerMat, IntegerVecOrMat, IntegerVecVec
