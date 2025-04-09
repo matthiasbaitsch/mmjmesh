@@ -138,7 +138,7 @@ m3 = MappingFromComponents(m1, m2)
 # Vector field R2 -> R2
 x = SVector(1.0, 2.0)
 d = (0 .. 3) × (1 .. 5)
-f1 = MPolynomial([1 2; 2 1], [1, 2], d)
+f1 = MPolynomial2([1 2; 2 1], [1, 2], d)
 f2 = ProductFunction(Sin(0 .. 3), Cos(1 .. 5))
 g = MappingFromComponents(f1, f2)
 
@@ -502,7 +502,7 @@ f = 2 / Polynomial(0, 1)
 o1 = One{InR,R}()
 f1 = Sin()
 u1 = MappingFromComponents(Sin(), Cos(), Sin())
-f3 = MPolynomial([4 3 2; 3 2 1; 2 1 0], [1, 2, 3])
+f3 = MPolynomial2([4 3 2; 3 2 1; 2 1 0], [1, 2, 3])
 @test o1 * f1 === f1
 @test f1 * o1 === f1
 @test One(f1) === o1
@@ -558,7 +558,7 @@ u = MMJMesh.Mathematics.ConstantMapping([1, 2, 3], InRⁿ{3}, R3)
 # # Mapping from components
 
 x = [2, 3, 4]
-f1 = MPolynomial([1 2 3; 3 2 1; 3 5 1], [6, 5, 4])
+f1 = MPolynomial2([1 2 3; 3 2 1; 3 5 1], [6, 5, 4])
 f2 = ProductFunction(Sin(), Cos(), Exp())
 u = MappingFromComponents(Sin(), Cos())
 v = MappingFromComponents(f1, f2)

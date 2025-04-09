@@ -12,18 +12,12 @@ using DomainSets: ×, ProductDomain, Rectangle
 import DomainSets
 import Polynomials
 
-# Multivariate polynomials, my own version of 
-## FixedPolynomials - forgot why I did this
-include("poly.jl")
-import MMJMesh.Mathematics.FixedPolynomials as FP
-
 using MMJMesh
 using MMJMesh.MMJBase
 
 include("domains.jl")
 include("mappings.jl")
 include("forms.jl")
-include("mpolynomials.jl")
 include("mpolynomials2.jl")
 include("curves.jl")
 include("interpolations.jl")
@@ -82,7 +76,7 @@ export PiecewiseFunction, npieces, interpolate
 
 # Polynomials of multiple variables
 export MPolynomial2, PolynomialRnToR, PolynomialRnToRm, PolynomialRnToRpxq, 
-    nterms, exponents, coefficient, coefficients, degrees, mmonomials2
+    nterms, exponents, coefficient, coefficients, degrees, mmonomials2 # XXX
 
 # Forms
 export Form, LinearForm, BilinearForm, ValueAtLF, DerivativeAtLF, DDerivativeAtLF, PDerivativeAtLF

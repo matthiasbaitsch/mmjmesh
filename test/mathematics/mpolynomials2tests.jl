@@ -365,7 +365,7 @@ g = MPolynomial2([3 2; 2 3], [7, 2])
 
 # Integerization
 f = MPolynomial2([1 2; 2 1], [2.0a, b + 6 // 3]) |> integerize
-@test string(coefficients(f)) == "Num[2 + b, 2a]"
+@test string(coefficients(f)) == "Symbolics.Num[2 + b, 2a]"
 
 # Rationalization
 f = MPolynomial2([1; 0;;], [1])
