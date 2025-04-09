@@ -50,13 +50,13 @@ function MakieCore.plot!(plot::FEPlot)
 
     # Plot
     if !isempty(pValueAt)
-        MakieCore.scatter!(plot, pValueAt, color=:black, markersize=15)
+        MakieCore.scatter!(plot, pValueAt, color=:black, markersize=13)
     end
 
     if !isempty(pDerivativeAt)
         MakieCore.scatter!(
             plot, pDerivativeAt,
-            color=:transparent, strokewidth=1.5, strokecolor=:black, markersize=25
+            color=:transparent, strokewidth=1.5, strokecolor=:black, markersize=20
         )
     end
 
@@ -73,8 +73,11 @@ end
 
 function feconf()
     return scene -> begin
+        g = 0.3
         ax = scene.axis
         ax.aspect = Makie.DataAspect()
+        Makie.xlims!(ax, -1 - g, 1 + g)
+        Makie.ylims!(ax, -1 - g, 1 + g)
         Makie.hidedecorations!(ax)
         Makie.hidespines!(ax)
         return scene
