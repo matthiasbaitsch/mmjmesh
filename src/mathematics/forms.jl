@@ -6,7 +6,7 @@ abstract type BilinearForm <: AbstractMapping{SVector{2,AbstractMapping},Real,An
 """
     ValueAtLF(x)
 
-Evaluates the function at `x`.
+The linear form ``b`` with ``b(f) = f(x)`` for a specified position ``x``.
 """
 struct ValueAtLF <: LinearForm
     x
@@ -18,7 +18,7 @@ valueat(u::ValueAtLF, f::FunctionToR) = valueat(f, u.x)
 """
     DerivativeAtLF(x)
 
-Evaluates the derivative at `x`.
+The linear form ``b`` with ``b(f) = f'(x)`` for a specified position ``x``.
 """
 struct DerivativeAtLF <: LinearForm
     x
