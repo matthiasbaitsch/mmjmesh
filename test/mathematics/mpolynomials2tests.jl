@@ -77,12 +77,14 @@ using .Validate
 # -------------------------------------------------------------------------------------------------
 
 # Polynomials
+d = d = (0 .. 1) × (2 .. 3)
+
 # 3x₁³x₂⁴ + 2x₁¹x₂⁵
-u = MPolynomial2([1 3; 5 4], [2, 3])
+u = MPolynomial2([1 3; 5 4], [2, 3], d)
 # x₁³x₂⁷⋅[3, 4] + x₁²x₂⁶⋅[2, 5] + x₁¹x₂⁵⋅[1, 6]
-v = MPolynomial2([1 2 3; 5 6 7], [1 2 3; 6 5 4])
+v = MPolynomial2([1 2 3; 5 6 7], [1 2 3; 6 5 4], d)
 # x₁³x₂⁷ ⋅ [9 8 7; 5 8 1; 8 2 4; 6 5 4] + x₁¹x₂⁵ ⋅ [1 2 3; 6 5 4; 4 1 9; 4 3 2]
-w = MPolynomial2([1 3; 5 7], [1 2 3; 6 5 4; 4 1 9; 4 3 2;;; 9 8 7; 5 8 1; 8 2 4; 6 5 4])
+w = MPolynomial2([1 3; 5 7], [1 2 3; 6 5 4; 4 1 9; 4 3 2;;; 9 8 7; 5 8 1; 8 2 4; 6 5 4], d)
 
 # Test parameters
 x = [3, 2]
@@ -92,14 +94,15 @@ ns2 = SArray{Tuple{2,3,2},Int}([2 1 3; 1 0 2;;; 0 1 2; 1 2 3])
 
 # Comparison
 @test u === u
-@test u === MPolynomial2([1 3; 5 4], [2, 3])
+@test u === MPolynomial2([1 3; 5 4], [2, 3], d)
 
 # Simplify in constructor: Duplicates
-@test u === MPolynomial2([1 3 3 1; 5 4 4 5], [1, 2, 1, 1])
-@test v === MPolynomial2([1 2 3 3 2 1; 5 6 7 7 6 5], [0 1 2 1 1 1; 5 4 3 1 1 1])
+@test u === MPolynomial2([1 3 3 1; 5 4 4 5], [1, 2, 1, 1], d)
+@test v === MPolynomial2([1 2 3 3 2 1; 5 6 7 7 6 5], [0 1 2 1 1 1; 5 4 3 1 1 1], d)
 @test w === MPolynomial2(
       [1 3 1; 5 7 5],
-      [0 1 2; 5 4 3; 3 0 8; 3 2 1;;; 9 8 7; 5 8 1; 8 2 4; 6 5 4;;; 1 1 1; 1 1 1; 1 1 1; 1 1 1]
+      [0 1 2; 5 4 3; 3 0 8; 3 2 1;;; 9 8 7; 5 8 1; 8 2 4; 6 5 4;;; 1 1 1; 1 1 1; 1 1 1; 1 1 1],
+      d
 )
 
 # Simplify in constructor: Zeros
@@ -128,6 +131,17 @@ ns2 = SArray{Tuple{2,3,2},Int}([2 1 3; 1 0 2;;; 0 1 2; 1 2 3])
 @test valueat(v, x) == 3 * 2^5 * [1, 6] + 3^2 * 2^6 * [2, 5] + 3^3 * 2^7 * [3, 4]
 @test valueat(w, x) ==
       3^3 * 2^7 * [9 8 7; 5 8 1; 8 2 4; 6 5 4] + 3 * 2^5 * [1 2 3; 6 5 4; 4 1 9; 4 3 2]
+
+# Transpose
+@test domain(transpose(w)) == domain(w)
+@test transpose(w)(x) == w(x)'
+
+# Algebraic operations
+@test domain(w * [1, 2, 3]) == domain(w)
+@test (w * [1, 2, 3])(x) == w(x) * [1, 2, 3]
+@test (w * [1 2; 5 4; 8 1])(x) == w(x) * [1 2; 5 4; 8 1]
+@test ([1 2 3 4; 5 4 3 2; 9 5 3 1] * w)(x) == [1 2 3 4; 5 4 3 2; 9 5 3 1] * w(x)
+
 
 # Mathematica code for reference values
 # u[x1_, x2_] := 3 x1^3 x2^4 + 2 x1 x2^5
@@ -280,8 +294,8 @@ h = f + g
 @test typeof(h) <: PolynomialRnToR
 
 # Check simplify
-f = MPolynomial2([1 2; 1 2], [4, 1])
-g = MPolynomial2([1 1; 1 1], [6, 5])
+f = MPolynomial2([1 2; 1 2], [4, 1], d)
+g = MPolynomial2([1 1; 1 1], [6, 5], d)
 
 @test f * g == MPolynomial2([3 2; 3 2], [11, 44])
 @test f + g == MPolynomial2([2 1; 2 1], [1, 15])
@@ -290,7 +304,6 @@ g = MPolynomial2([1 1; 1 1], [6, 5])
 ns = [1, 2, 3]
 f = MPolynomial2([1 2 3; 6 5 4; 1 2 3], [5, 4, 3])
 @test f ≈ derivative(antiderivative(f, ns), ns)
-
 
 f = MPolynomial2([3 2; 1 9], [1, 2])
 @test degree(f) == 11
@@ -360,3 +373,6 @@ F = antiderivative(f, [1, 1]) |> rationalize
 @test coefficient(F, 1) == 0.5
 @test string(coefficient(F, 1)) == "1//2"
 
+# Derivatives
+f = MPolynomial2([1 2; 4 1], [a, b])
+@test isequal(gradient(f)(1, 2), gradientat(f, [1, 2]))

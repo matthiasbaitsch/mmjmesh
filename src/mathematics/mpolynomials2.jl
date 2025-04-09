@@ -303,7 +303,7 @@ derivativeat(p::MPolynomial2{N}, x::InRⁿ{N}, ns::IntegerVec) where {N} =
 function derivativeat(
     p::PolynomialRnToR{N}, x::InRⁿ{N}, ns::StaticMatrix{ND,N,<:Integer}
 ) where {N,ND}
-    d = MVector{ND,Float64}(undef)
+    d = Vector{Base.promote_op(*, eltype(coefficients(p)), Float64)}(undef, ND)
     for i = 1:ND
         d[i] = derivativeat(p, x, ns[i, :])
     end
@@ -355,7 +355,7 @@ function derivative(
 ) where {N,D,NT,ND}
     idx = 1
     e = MMatrix{N,NT * ND,Int}(undef)
-    c = MMatrix{ND,NT * ND,eltype(coefficients(p))}(undef)
+    c = Matrix{eltype(coefficients(p))}(undef, ND, NT * ND)
     c .= 0
     for i = 1:ND
         ai, ei = _monomialsderivative(exponents(p), ns[i, :])
@@ -431,6 +431,9 @@ antiderivative(p::MPolynomial2, ns::IntegerVec) = derivative(p, -ns)
 
 ## Operations
 
+Base.transpose(p::PolynomialRnToRpxq) =
+    MPolynomial2(exponents(p), permutedims(coefficients(p), (2, 1, 3)), domain(p))
+
 function Base.:(+)(p1::MPolynomial2{N,CT,D}, p2::MPolynomial2{N,CT,D}) where {N,CT,D}
     e = [exponents(p1) exponents(p2)]
     c = _appendcoefficients(coefficients(p1), coefficients(p2))
@@ -458,7 +461,7 @@ Base.:(*)(a::Num, p::MPolynomial2) = MPolynomial2(exponents(p), a * coefficients
 Base.:(*)(a::Real, p::MPolynomial2) = MPolynomial2(exponents(p), a * coefficients(p), domain(p))
 
 
-## Dot product and multiplication by matrix
+## Algebraic operations
 
 LinearAlgebra.dot(a::AbstractVector, p::PolynomialRnToRm) =
     MPolynomial2(exponents(p), vec(coefficients(p)' * a))
@@ -466,12 +469,31 @@ LinearAlgebra.dot(a::AbstractVector, p::PolynomialRnToRm) =
 Base.:(*)(a::AbstractMatrix, p::PolynomialRnToRm) =
     MPolynomial2(exponents(p), a * coefficients(p), domain(p))
 
+function Base.:(*)(p::PolynomialRnToRpxq{N,P,Q,D,NT}, x::RealVec) where {N,P,Q,D,NT}
+    c = coefficients(p)
+    @assert length(x) == Q
+    return MPolynomial2(exponents(p), [c[i, :, j] ⋅ x for i = 1:P, j = 1:NT], D)
+end
+
+function Base.:(*)(p::PolynomialRnToRpxq{N,P,Q,D,NT}, A::RealMat) where {N,P,Q,D,NT}
+    c = coefficients(p)
+    @assert size(A, 1) == Q
+    return MPolynomial2(exponents(p), stack([c[:, :, j] * A for j = 1:NT], dims=3), D)
+end
+
+function Base.:(*)(A::RealMat, p::PolynomialRnToRpxq{N,P,Q,D,NT}) where {N,P,Q,D,NT}
+    c = coefficients(p)
+    @assert size(A, 2) == P
+    return MPolynomial2(exponents(p), stack([A * c[:, :, j] for j = 1:NT], dims=3), D)
+end
+
 
 ## Manipulation
 
-Base.rationalize(p::MPolynomial2) = MPolynomial2(exponents(p), rationalize.(coefficients(p)))
+Base.rationalize(p::MPolynomial2) =
+    MPolynomial2(exponents(p), rationalize.(coefficients(p)), domain(p))
 MMJMesh.MMJBase.integerize(p::MPolynomial2) =
-    MPolynomial2(exponents(p), integerize.(coefficients(p)))
+    MPolynomial2(exponents(p), integerize.(coefficients(p)), domain(p))
 
 
 ## Show
@@ -498,6 +520,9 @@ function Base.show(io::IO, p::PolynomialRnToRpxq)
     end
 end
 
+
+## Compare
+
 Base.:(==)(p1::MPolynomial2, p2::MPolynomial2) =
     (p1.exponents == p2.exponents && p1.coefficients == p2.coefficients)
 
@@ -508,6 +533,9 @@ Base.isapprox(
         p1.exponents == p2.exponents &&
         isapprox(coefficients(p1), coefficients(p2); atol=atol, rtol=rtol)
     )
+
+
+## Monomials
 
 """
 	mmonomials2(n::Integer, p::Integer, dom=R^n, predicate=(...) -> true; type=Float64)

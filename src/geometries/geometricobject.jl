@@ -80,7 +80,7 @@ Lookup `(DT, NN) → basis` where `DT` is the topological dimension and `NN` the
 of the geometric entity.
 """
 const bases = Dict(
-    (1, 2) => MappingFromComponents(nodalbasis(makeelement(:lagrange, IHat, k=1))...),
-    (2, 4) => MappingFromComponents(nodalbasis(makeelement(:lagrange, QHat, k=1))...)
+    (1, 2) => nodalbasis(makeelement(:lagrange, IHat, k=1)),
+    (2, 4) => nodalbasis(makeelement(:lagrange, QHat, k=1))
 )
 

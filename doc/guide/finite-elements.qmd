@@ -59,13 +59,13 @@ fig
 Linear shape functions
 
 ```{julia}
-makeelement(:lagrange, IHat, k=1) |> nodalbasis |> fplot
+makeelement(:lagrange, IHat, k=1) |> nodalbasis |> components |> fplot
 ```
 
 Hermite polynomials
 
 ```{julia}
-Ns = nodalbasis(makeelement(:hermite, 1 .. 4))
+Ns = nodalbasis(makeelement(:hermite, 1 .. 4)) |> components
 fig = Figure()
 fplot!(Axis(fig[1, 1], title="Functions"), Ns...)
 fplot!(Axis(fig[2, 1], title="Derivatives"), derivative.(Ns)...)
@@ -80,19 +80,19 @@ GLMakie.activate!()
 ```
 
 ```{julia}
-makeelement(:lagrange, QHat, k=1) |> nodalbasis |> fplot3d
+makeelement(:lagrange, QHat, k=1) |> nodalbasis |> components |> fplot3d
 ```
 
 Serendipity shape functions
 
 ```{julia}
-makeelement(:serendipity, (0 .. 2) × (0 .. 1), k=2) |> nodalbasis |> fplot3d
+makeelement(:serendipity, (0 .. 2) × (0 .. 1), k=2) |> nodalbasis |> components |> fplot3d
 ```
 
 Conforming rectangular plate element shape functions
 
 ```{julia}
-makeelement(:hermite, QHat) |> nodalbasis |> fplot3d
+makeelement(:hermite, QHat) |> nodalbasis |> components |> fplot3d
 ```
 
 Quadratic serendipity shape functions on the domain $[0, a] \times [0, b]$
@@ -133,7 +133,7 @@ prettyprint(L"\mathbf{K}^e", EI / l^3, Kᵉ)
 bᵉ(δw) = q * l / 2 * integrate(δw, IHat)
 rᵉ = [bᵉ(Nᵢ) for Nᵢ ∈ Ns]
 
-prettyprint(L"\mathbf{r}^e", q/12, rᵉ)
+prettyprint(L"\mathbf{r}^e", q / 12, rᵉ)
 ```
 
 ### 2D Poisson equation

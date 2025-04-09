@@ -7,7 +7,6 @@ engine: julia
 ```{julia}
 #| include: false
 include("setup.jl")
-
 ```
 
 ## Mappings
@@ -26,10 +25,10 @@ c = cos(x)
 
 f = 2s
 g = s + f'
-h = 1 / 10 * (0.5 - x) * (pi/2 - x) * (3pi/2 - x) * (2pi - x)
+h = 1 / 10 * (0.5 - x) * (pi / 2 - x) * (3pi / 2 - x) * (2pi - x)
 
 p = fplot(c, s, g, h)
-scatter!([0.5, pi/2, 3pi/2, 2pi], zeros(4), color=:tomato)
+scatter!([0.5, pi / 2, 3pi / 2, 2pi], zeros(4), color=:tomato)
 p
 ```
 
@@ -78,11 +77,23 @@ function maclaurin_polynomial(f, n)
     sum([derivativeat(f, 0.0, k) / factorial(k) * x^k for k = 0:n])
 end
 
-f = Sin(-pi..pi)
+f = Sin(-pi .. pi)
 p1 = maclaurin_polynomial(f, 1)
 p3 = maclaurin_polynomial(f, 3)
 p5 = maclaurin_polynomial(f, 5)
 fplot(f, p1, p3, p5)
+```
+
+Cubic Hermite interpolation polynomials
+
+```{julia}
+I = -1 .. 2
+m = monomials(0:3, I)
+s = vcat([[ValueAtLF(x), DerivativeAtLF(x)] for x = endpoints(I)]...)
+A = [sⱼ(mᵢ) for mᵢ = m, sⱼ = s]
+h = inv(A) * m
+
+fplot(h...)
 ```
 
 ### Parametric curves
@@ -100,7 +111,7 @@ fplot(u, u + v, u + w)
 Interpolate points
 
 ```{julia}
-points = tomatrix([[0.0, 0.0], [1.5, 1.0], [2.0, 0.0], [1.5, -1.0], [0.0, 0.0]])
+points = stack([[0.0, 0.0], [1.5, 1.0], [2.0, 0.0], [1.5, -1.0], [0.0, 0.0]])
 u = polynomialinterpolation(points)
 
 fig, ax = fplot(u)
@@ -160,7 +171,7 @@ fig
 Multivariate monomials
 
 ```{julia}
-fplot3d(mmonomials(2, 3, QHat))
+mmonomials2(2, 3, QHat) |> components |> reverse |> fplot3d
 ```
 
 Plot gradient of product function

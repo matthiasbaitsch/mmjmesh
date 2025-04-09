@@ -52,7 +52,7 @@ Base.in(f::MPolynomial, s::Type{<:PolynomialSpace}) = all(in.(eachcol(f.p.expone
 
 basis(::Type{<:PolynomialSpace{1,K}}, d) where {K} = monomials(0:K, d)
 basis(s::Type{<:PolynomialSpace{N,K}}, d) where {N,K} =
-    mmonomials(N, K, d, (k...) -> [k...] ∈ s, type=Int)
+    mmonomials2(N, K, d, (k...) -> [k...] ∈ s, type=Int)
 basis(s::PolynomialSpace, d) = basis(typeof(s), d)
 
 """
