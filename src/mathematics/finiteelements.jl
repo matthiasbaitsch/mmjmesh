@@ -30,7 +30,7 @@ Ciarlet's definition. Parameters are
 struct FiniteElement
     K
     P::Type{<:FunctionSpace}
-    N::Vector{<:LinearForm}
+    N::AbstractVector{<:LinearForm}
     cache::Dict{Symbol,Any}
 
     function FiniteElement(K, P::Type{<:FunctionSpace}, N::Vector{<:LinearForm})
