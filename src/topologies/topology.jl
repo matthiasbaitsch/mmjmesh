@@ -66,7 +66,7 @@ function Topology(d::Int, nn::Int)
     return Topology{d}(Dict(0 => collect(1:nn)), Dict{Tuple{Int,Int},ConnectivityList}())
 end
 
-dimension(::Topology{D}) where {D} = D
+MMJMesh.dimension(::Topology{D}) where {D} = D
 isanonymous(t::Topology, d::Int) = !haskey(t.entities, d)
 MMJMesh.id(t::Topology, d::Int, index::Int) =
     haskey(t.entities, d) ? t.entities[d][index] : index

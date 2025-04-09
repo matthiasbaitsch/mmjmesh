@@ -201,7 +201,7 @@ end
 
 # GmshMesh methods
 
-dimension(m::GmshMesh) = maximum(n -> n.entitydim, m.elementblocks.blocks)
+MMJMesh.dimension(m::GmshMesh) = maximum(n -> n.entitydim, m.elementblocks.blocks)
 
 function blockname(m::GmshMesh, b::Block)
     entity = m.entities[b.entitydim][b.entityTag]

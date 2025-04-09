@@ -12,7 +12,6 @@ using MMJMesh.Meshes
 using MMJMesh.MMJBase
 using MMJMesh.Topologies
 
-import MMJMesh: dimension
 
 # Exports
 

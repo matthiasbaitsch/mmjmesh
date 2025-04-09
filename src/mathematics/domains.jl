@@ -18,7 +18,7 @@ const R⁺₀ = R0Plus
 const IHat = -1.0 .. 1.0
 const ReferenceInterval = IHat
 
-dimension(::AbstractInterval) = 1
+MMJMesh.dimension(::AbstractInterval) = 1
 Base.isfinite(I::Interval) = isfinite(width(I))
 
 """
@@ -44,7 +44,7 @@ const R³ = R3
 const QHat = IHat × IHat
 const ReferenceQuadrilateral = QHat
 
-dimension(::Rectangle{<:SVector{N}}) where {N} = N
+MMJMesh.dimension(::Rectangle{<:SVector{N}}) where {N} = N
 Base.isfinite(r::DomainSets.Rectangle) = all(isfinite.(r.a)) && all(isfinite.(r.b))
 
 """ Element of the real numbers """

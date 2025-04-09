@@ -20,8 +20,6 @@ import MMJMesh.Mathematics.FixedPolynomials as FP
 using MMJMesh
 using MMJMesh.MMJBase
 
-import MMJMesh: dimension
-
 include("domains.jl")
 include("mappings.jl")
 include("forms.jl")
@@ -83,7 +81,6 @@ export Polynomial, Interpolation, fromroots, lagrangepolynomials, monomials, lag
 export PiecewiseFunction, npieces, interpolate
 
 # Polynomials of multiple variables
-export MPolynomial
 export MPolynomial2, PolynomialRnToR, PolynomialRnToRm, PolynomialRnToRpxq, 
     nterms, exponents, coefficient, coefficients, degrees, mmonomials2
 

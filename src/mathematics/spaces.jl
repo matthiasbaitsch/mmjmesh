@@ -19,8 +19,8 @@ basis(s::FunctionSpace, d) = basis(typeof(s), d)
 """
     dimension
 """
-dimension(::Type{FunctionSpace}) = @abstractmethod
-dimension(s::FunctionSpace) = dimension(typeof(s))
+MMJMesh.dimension(::Type{FunctionSpace}) = @abstractmethod
+MMJMesh.dimension(s::FunctionSpace) = dimension(typeof(s))
 
 
 """ Type of elements in the domain of the mapping. """
@@ -44,7 +44,7 @@ FunctionSpace of possibly multivarite polynomials of `N` variables and maximum e
 """
 abstract type PolynomialSpace{N,K} <: FunctionSpace{InRⁿ{N},InR} end
 
-dimension(::Type{<:PolynomialSpace{1,K}}) where {K} = K + 1
+MMJMesh.dimension(::Type{<:PolynomialSpace{1,K}}) where {K} = K + 1
 
 Base.in(::AbstractArray{<:Integer}, ::Type{<:PolynomialSpace}) = @abstractmethod
 Base.in(f::MappingFromR, s::Type{<:PolynomialSpace{1}}) = in([degree(f)], s)
@@ -94,7 +94,7 @@ end
 FunctionSpace of `N`-variate polynomials where the largest sum of exponents is not larger than `K`.
 """
 struct P{N,K} <: PolynomialSpace{N,K} end
-dimension(::Type{<:P{2,K}}) where {K} = Int((K + 1) * (K + 2) / 2)
+MMJMesh.dimension(::Type{<:P{2,K}}) where {K} = Int((K + 1) * (K + 2) / 2)
 Base.in(k::AbstractArray{<:Integer}, ::Type{<:P{N,K}}) where {N,K} = (length(k) == N && sum(k) <= K)
 
 
@@ -104,7 +104,7 @@ Base.in(k::AbstractArray{<:Integer}, ::Type{<:P{N,K}}) where {N,K} = (length(k) 
 FunctionSpace of `N`-variate polynomials where the largest exponent is smaller equal `K`.
 """
 struct Q{N,K} <: PolynomialSpace{N,K} end
-dimension(::Type{<:Q{N,K}}) where {N,K} = (K + 1)^N
+MMJMesh.dimension(::Type{<:Q{N,K}}) where {N,K} = (K + 1)^N
 Base.in(k::AbstractArray{<:Integer}, ::Type{<:Q{N,K}}) where {N,K} = (length(k) == N && maximum(k) <= K)
 
 
@@ -114,7 +114,7 @@ Base.in(k::AbstractArray{<:Integer}, ::Type{<:Q{N,K}}) where {N,K} = (length(k) 
 FunctionSpace of serendipity polynomials. Only defined for n=2 and k=2,3.
 """
 struct S{N,K} <: PolynomialSpace{N,K} end
-dimension(::Type{<:S{2,K}}) where {K} = 4 * K
+MMJMesh.dimension(::Type{<:S{2,K}}) where {K} = 4 * K
 Base.in(k::AbstractArray{<:Integer}, ::Type{<:S{2,K}}) where {K} =
     (K <= 2 && k ∈ Q{2,K} && prod(k) <= K)
 
@@ -125,5 +125,5 @@ Base.in(k::AbstractArray{<:Integer}, ::Type{<:S{2,K}}) where {K} =
 Reduced polynomial space `Q{2,3,K}` for nonconforming Kirchhoff rectangle.
 """
 struct Q23R <: PolynomialSpace{2,3} end
-dimension(::Type{Q23R}) = 12
+MMJMesh.dimension(::Type{Q23R}) = 12
 Base.in(k::AbstractArray{<:Integer}, ::Type{Q23R}) = maximum(k) <= 3 && sum(k) <= 4 && prod(k) < 4
