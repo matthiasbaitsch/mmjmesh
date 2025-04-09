@@ -52,7 +52,7 @@ const InR = Real
 """ Element of the set of ``n``-tuples of real numbers """
 const InRⁿ{N} = SVector{N,<:Real}
 """ Element of the set of ``n \\times m``-matrices of real numbers """
-const InRⁿˣᵐ{N,M} = SMatrix{N,M,<:Real}
+const InRᵐˣⁿ{M,N} = SMatrix{M,N,<:Real}
 """ Element of the set of pairs of real numbers """
 const InR2 = InRⁿ{2}
 """ Element of the set of pairs of real numbers """

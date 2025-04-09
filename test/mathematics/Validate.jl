@@ -112,7 +112,7 @@ end
 
 _validatecodomaintype(x, ::Type{<:InR}) = x isa Real
 _validatecodomaintype(x, ::Type{<:InRⁿ{N}}) where {N} = (size(x) == (N,))
-_validatecodomaintype(x, ::Type{<:InRⁿˣᵐ{N,M}}) where {N,M} = size(x) == (N, M)
+_validatecodomaintype(x, ::Type{<:InRᵐˣⁿ{N,M}}) where {N,M} = size(x) == (N, M)
 
 
 function _validatecodomaintype(m::AbstractMapping)

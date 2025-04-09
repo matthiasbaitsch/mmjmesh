@@ -259,7 +259,7 @@ function MPolynomial2(exponents::IntegerMat, coefficients::AbstractArray{T,3}, D
     Q = size(coefficients, 2)
     NT = size(coefficients, 3)
     S = Tuple{P,Q,NT}
-    return MPolynomial2{N,InRⁿˣᵐ{P,Q},D,NT,S}(exponents, coefficients)
+    return MPolynomial2{N,InRᵐˣⁿ{P,Q},D,NT,S}(exponents, coefficients)
 end
 
 
@@ -267,7 +267,7 @@ end
 
 const PolynomialRnToR{N,D,NT} = MPolynomial2{N,InR,D,NT,Tuple{NT}}
 const PolynomialRnToRm{N,M,D,NT} = MPolynomial2{N,InRⁿ{M},D,NT,Tuple{M,NT}}
-const PolynomialRnToRpxq{N,P,Q,D,NT} = MPolynomial2{N,InRⁿˣᵐ{P,Q},D,NT,Tuple{P,Q,NT}}
+const PolynomialRnToRpxq{N,P,Q,D,NT} = MPolynomial2{N,InRᵐˣⁿ{P,Q},D,NT,Tuple{P,Q,NT}}
 
 
 ## Properties
