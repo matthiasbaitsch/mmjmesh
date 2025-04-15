@@ -21,6 +21,18 @@ function _monomialsat(exponents::SMatrix{N,NT}, x::InRⁿ{N}) where {N,NT}
     return SizedVector{NT}(c)
 end
 
+function _monomialsat(exponents::SMatrix{N,NT,Float64}, x::InRⁿ{N}) where {N,NT}
+    c = MVector{NT,Float64}(undef)
+    for i = 1:NT
+        v = 1
+        for j = 1:N
+            v *= Base.FastMath.pow_fast(x[j], exponents[j, i])
+        end
+        c[i] = v
+    end
+    return c
+end
+
 function _monomialsderivativeat(
     exponents::StaticMatrix{N,NT}, x::InRⁿ{N}, ns::IntegerVec
 ) where {N,NT}
@@ -415,7 +427,7 @@ function derivative(
 ) where {N,M,D,NT,ND}
     idx = 1
     e = MMatrix{N,NT * ND,Int}(undef)
-    c = MArray{Tuple{M,ND,NT * ND},eltype(coefficients(p))}(undef)
+    c = Array{eltype(coefficients(p))}(undef, M, ND, NT * ND)
     c .= 0
     for i = 1:ND
         ai, ei = _monomialsderivative(exponents(p), ns[i, :])
