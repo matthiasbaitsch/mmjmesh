@@ -8,6 +8,9 @@ addnodes!(m::Mesh, xs::RealVec, ys::RealVec) = addnodes!(m, [xs, ys])
 addnodes!(m::Mesh, xs::RealVec, ys::RealVec, zs::RealVec) = addnodes!(m, [xs, ys, zs])
 addnodes!(m::Mesh, p1::RealVec, p2::RealVec, n::Int) = addnodes!(m, linesegment(p1, p2), n)
 
+addnode!(m::Mesh, c1, c2) = addnode!(m, [c1, c2])
+addnode!(m::Mesh, c1, c2, c3) = addnode!(m, [c1, c2, c3])
+
 function addnode!(m::Mesh, p::RealVec)
     @assert length(p) == gdim(m)
     push!(m.geometry, Vector(p))
