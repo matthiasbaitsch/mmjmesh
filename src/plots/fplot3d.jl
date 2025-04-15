@@ -41,7 +41,7 @@ end
 
 
 function fplot3d(
-    fs::AbstractArray{<:AbstractMapping}; colormap=MakieCore.theme(:colormap), fig=Makie.Figure()
+    fs::AbstractArray{<:AbstractMapping}; colormap=MakieCore.theme(:colormap), fig=Makie.Figure(), zrange=nothing
 )
     n = length(fs)
     cnt = 1
@@ -49,8 +49,10 @@ function fplot3d(
     nrow = Int(ceil(n / ncol))
     for i = 1:ncol, j = 1:nrow
         if cnt <= n
-            Makie.hidedecorations!(Makie.Axis3(fig[i, j], protrusions=0))
+            ax = Makie.Axis3(fig[i, j], protrusions=0)
+            Makie.hidedecorations!(ax)
             fplot3d!(fs[cnt], colormap=colormap)
+            !isnothing(zrange) && Makie.zlims!(ax, zrange)
             cnt += 1
         end
     end
