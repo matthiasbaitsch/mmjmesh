@@ -107,7 +107,7 @@ function MakieCore.plot!(plot::MPlot)
 
     # Settings for mesh of 2D elements
     if pdim(mesh) == 2
-        havedata = color isa Vector
+        havedata = color isa Vector || color isa Symbol
         colorbygroups = !havedata && isundefined(:facecolor) && hasgroups(mesh, d=2)
         setifundefined(:featureedgesvisible, true)
         setifundefined(:edgesvisible, nfaces(mesh) <= 100)
@@ -381,6 +381,7 @@ function plotfacefunctions(plot::MPlot)
     xf, tf = _mergemeshes(meshes)
     color = _getcolor(xf, facecolor, 1)
     xf[3, :] *= fzscale
+
 
     # Plot Mesh
     MakieCore.mesh!(
