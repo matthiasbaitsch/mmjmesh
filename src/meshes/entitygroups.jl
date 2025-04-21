@@ -212,3 +212,12 @@ end
 
 entities(m::Mesh, groupname::Symbol) = entities(group(m, groupname))
 entities(g::MeshEntityGroup) = entities(g.mesh, edim(g), indices(g))
+
+
+function indices(g::MeshEntityGroup, d::Int)
+    s = Set{Int}()
+    for e = entities(g)
+        push!(s, indices(e, d)...)
+    end
+    return s |> collect |> sort
+end
