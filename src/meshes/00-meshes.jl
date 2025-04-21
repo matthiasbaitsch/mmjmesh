@@ -47,7 +47,6 @@ export groupname, groupnames
 
 ## data-implementation.jl
 export setdata!, hasdata, data
-# XXX export MeshEntityGroup{0}, MeshEntityGroup{1}, MeshEntityGroup{2}, MeshEntityGroup{3}
 
 ## build.jl
 export addnode!, addnodes!, addelement!, addelements!
