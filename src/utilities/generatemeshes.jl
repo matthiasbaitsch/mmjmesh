@@ -52,7 +52,7 @@ makemeshonrectangle(
 ) = makemeshonrectangle((0 .. w) × (0 .. h), nex, ney, meshtype, gmap=gmap)
 
 function makemeshonrectangle(
-    Ω::DomainSets.Rectangle, nex::Integer, ney::Integer=-1, 
+    Ω::DomainSets.Rectangle, nex::Integer, ney::Integer=-1,
     meshtype::Meshtype=QUADRANGLE; gmap=identity
 )
     # Bounds
@@ -107,6 +107,14 @@ function makemeshonrectangle(
 end
 
 Meshes.Mesh(
-    Ω::DomainSets.Rectangle, nex::Integer, ney::Integer=-1, 
+    Ω::DomainSets.Rectangle, nex::Integer, ney::Integer=-1,
     meshtype::Meshtype=QUADRANGLE; gmap=identity
 ) = makemeshonrectangle(Ω, nex, ney, meshtype, gmap=gmap)
+
+Meshes.Mesh(name::Symbol) = eval(:($name()))
+
+function quadtri()
+    coords = [0.0 1.0 2.0 0.1 0.9 1.9; 0.0 0.1 0.0 0.9 1.0 0.9]
+    elts = [[1, 2, 5, 4], [2, 3, 6], [2, 6, 5]]
+    return Mesh(coords, elts, 2)
+end
