@@ -15,7 +15,7 @@ export @notimplemented
 export @unreachable
 
 ## functions.jl
-export atol, tomatrix, FromType, ROWS, COLS, pdim, gdim
+export atol, tomatrix, FromType, ROWS, COLS, unitvector
 
 ## seqintset.jl
 export SeqIntSet
