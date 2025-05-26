@@ -24,8 +24,17 @@ hasdata(o, id::Symbol) = !isnothing(data(o, id))
 _retrieve_entitydata(::MeshEntity, v) = v
 
 function _retrieve_entitydata(e::MeshEntity, v::AbstractVector)
-    @assert nentities(e.mesh, pdim(e)) == length(v)
-    return v[index(e)]
+
+    # Data corresponds to entity
+    if nentities(e.mesh, pdim(e)) == length(v)
+        return v[index(e)]
+    end
+
+    # Assume data belongs to nodes of entity
+    if nnodes(e.mesh) == length(v)
+        return v[nodeindices(e)]
+    end
+    
 end
 
 

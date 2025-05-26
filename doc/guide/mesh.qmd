@@ -292,3 +292,16 @@ m = Mesh(0 .. 10, 20)
 setdata!(group(m, :elements), :foo, 99)
 println(data(element(m, 2), :foo))
 ```
+
+Set data for nodes and access it on an element level
+
+```{julia}
+using Statistics # For mean - function
+
+m = Mesh(:quadtri)
+setdata!(m, :a, 100 * (1:nnodes(m)))
+println("   Value for node 3: ", data(node(m, 3), :a))
+println(" Nodes of element 1: ", nodeindices(element(m, 1)))
+println("Values of element 1: ", data(element(m, 1), :a))
+println(" Mean for element 1: ", mean(data(element(m, 1), :a)))
+```
