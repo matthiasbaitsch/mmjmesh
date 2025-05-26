@@ -390,6 +390,7 @@ function plotfacefunctions(plot::MPlot)
     )
 
     # Plot mesh lines on elements
+    # XXX duplicate/always visible
     MakieCore.lines!(plot, _collectlines(lpmesh)..., color=fmeshcolor, linewidth=fmeshlinewidth)
 
     # Plot element edges
