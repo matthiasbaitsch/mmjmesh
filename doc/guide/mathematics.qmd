@@ -171,7 +171,7 @@ fig
 Multivariate monomials
 
 ```{julia}
-mmonomials2(2, 3, QHat) |> components |> reverse |> fplot3d
+mmonomials(2, 3, QHat) |> components |> reverse |> fplot3d
 ```
 
 Plot gradient of product function
