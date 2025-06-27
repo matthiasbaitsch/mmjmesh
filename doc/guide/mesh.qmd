@@ -61,21 +61,22 @@ mplot(m, edgesvisible=true) |> mconf()
 As an alternative, one can pass the Gmsh input as string:
 
 ```{julia}
-m = Mesh(
-    """
-    Point(1) = {0, 0, 0, 0};
-    Point(2) = {1, 0, 0, 0};
-    Point(3) = {0.75, 1, 0, 0};
-    Point(4) = {0.25, 1, 0, 0};
-    Line(1) = {1, 2};
-    Line(2) = {2, 3};
-    Line(3) = {3, 4};
-    Line(4) = {4, 1};
-    Curve Loop(1) = {1, 2, 3, 4};
-    Plane Surface(1) = {1};
-    MeshSize{:} = 0.25;
+m = Mesh("""
+    SetFactory("OpenCASCADE");
+    Rectangle(1) = {0, 0, 0, 20, 10, 0};
+    Rectangle(2) = {10, -5, 0, 5, 20, 0};
+    Disk(3) = {20, 5, 0, 15, 5};
+    BooleanUnion{
+        Surface{1}; 
+        Delete;
+    }{
+        Surface{2}; 
+        Surface{3}; 
+        Delete;
+    }
+    MeshSize{:} = 0.5;
     Mesh 2;
-    """
+"""
 )
 mplot(m, edgesvisible=true) |> mconf()
 ```
@@ -305,3 +306,4 @@ println(" Nodes of element 1: ", nodeindices(element(m, 1)))
 println("Values of element 1: ", data(element(m, 1), :a))
 println(" Mean for element 1: ", mean(data(element(m, 1), :a)))
 ```
+
