@@ -406,6 +406,13 @@ end
 # Configure
 # -------------------------------------------------------------------------------------------------
 
+function _find_plot_with_colormap(plots)
+    for p = plots
+        !isnothing(Makie.extract_colormap_recursive(p)) && return p
+    end
+    return nothing
+end
+
 function mconf(; colorbar=true, dataaspect=true, blank=true, title="")
     return scene -> begin
         ax = scene.axis
@@ -417,8 +424,7 @@ function mconf(; colorbar=true, dataaspect=true, blank=true, title="")
             Makie.hidespines!(ax)
         end
         if colorbar && !scene.plot[:colorbygroups][]
-            # Hack using the fact that the mesh is always plotted first
-            p = scene.plot.plots[1]
+            p = _find_plot_with_colormap(scene.plot.plots)
             if !isnothing(Makie.extract_colormap_recursive(p))
                 Makie.Colorbar(scene.figure[1, 2], p)
             end
