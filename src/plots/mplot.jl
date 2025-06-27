@@ -137,6 +137,7 @@ function MakieCore.plot!(plot::MPlot)
 
     # Plot functions on faces goes extra at the moment - TODO this is a hack, refactor
     if pdim(mesh) == 2 && (color isa Function || color isa Symbol)
+        plot.featureedgesvisible[] && nedges(mesh) > 0 && plotedges(plot, true)
         plotfacefunctions(plot)
     else # Plot
         lineplotvisible && plotlineplot(plot)
