@@ -137,7 +137,7 @@ function MakieCore.plot!(plot::MPlot)
 
     # Plot functions on faces goes extra at the moment - TODO this is a hack, refactor
     if pdim(mesh) == 2 && (color isa Function || color isa Symbol)
-        plot.featureedgesvisible[] && nedges(mesh) > 0 && plotedges(plot, true)
+        plot.featureedgesvisible[] && nedges(mesh) > 0 && plot.faceplotzscale[] == 0 && plotedges(plot, true)
         plotfacefunctions(plot)
     else # Plot
         lineplotvisible && plotlineplot(plot)
@@ -425,7 +425,9 @@ function mconf(; colorbar=true, dataaspect=true, blank=true, title="")
         end
         if colorbar && !scene.plot[:colorbygroups][]
             p = _find_plot_with_colormap(scene.plot.plots)
-            if !isnothing(p) && !isnothing(Makie.extract_colormap_recursive(p))
+            if !isnothing(p) &&
+               !isnothing(Makie.extract_colormap_recursive(p)) &&
+               !(p isa MakieCore.Lines)
                 Makie.Colorbar(scene.figure[1, 2], p)
             end
         end
