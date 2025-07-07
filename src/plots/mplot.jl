@@ -425,7 +425,7 @@ function mconf(; colorbar=true, dataaspect=true, blank=true, title="")
         end
         if colorbar && !scene.plot[:colorbygroups][]
             p = _find_plot_with_colormap(scene.plot.plots)
-            if !isnothing(Makie.extract_colormap_recursive(p))
+            if !isnothing(p) && !isnothing(Makie.extract_colormap_recursive(p))
                 Makie.Colorbar(scene.figure[1, 2], p)
             end
         end
