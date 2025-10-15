@@ -100,11 +100,6 @@ struct GmshMesh
 end
 
 
-# PrettyTables configuration
-
-const PT_CONF = set_pt_conf(crop=:horizontal)
-
-
 # MeshFormat and PhysicalName methods
 
 Base.show(io::IO, mf::MeshFormat) = print(io, "# MeshFormat\n\n  version: $(mf.version)\n filetype: $(mf.filetype)\n datasize: $(mf.datasize)\n")
@@ -119,7 +114,7 @@ function Base.show(io::IO, pnc::PhysicalNameCollection)
         println("# No physical names")
     else
         println("# Physical names\n")
-        pretty_table_with_conf(PT_CONF, io, ObjectTable(pnc.names))
+        pretty_table(io, ObjectTable(pnc.names))
     end
 end
 
@@ -135,19 +130,19 @@ function Base.show(io::IO, ec::EntityCollection)
     println(io, "# Entities")
     if !isempty(ec.points)
         println(io, "\n## Points\n")
-        pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.points))
+        pretty_table(io, ObjectTable(ec.points))
     end
     if !isempty(ec.curves)
         println(io, "\n## Curves\n")
-        pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.curves))
+        pretty_table(io, ObjectTable(ec.curves))
     end
     if !isempty(ec.surfaces)
         println(io, "\n## Surfaces\n")
-        pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.surfaces))
+        pretty_table(io, ObjectTable(ec.surfaces))
     end
     if !isempty(ec.volumes)
         println(io, "\n## Volumes\n")
-        pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.volumes))
+        pretty_table(io, ObjectTable(ec.volumes))
     end
 end
 
@@ -165,7 +160,7 @@ function Base.show(io::IO, ec::NodeBlockCollection)
     println(io, " maxnodetag: ", ec.maxnodetag)
     if !isempty(ec.blocks)
         println(io)
-        pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.blocks))
+        pretty_table(io, ObjectTable(ec.blocks))
     end
 end
 
@@ -180,7 +175,7 @@ function Base.show(io::IO, ec::ElementBlockCollection)
     println(io, " maxelementtag: ", ec.maxelementtag)
     if !isempty(ec.blocks)
         println(io)
-        pretty_table_with_conf(PT_CONF, io, ObjectTable(ec.blocks))
+        pretty_table(io, ObjectTable(ec.blocks))
     end
 end
 
