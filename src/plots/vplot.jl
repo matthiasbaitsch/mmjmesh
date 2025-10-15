@@ -31,7 +31,7 @@ function MakieCore.plot!(plot::VPlot)
         if color == :norm
             color = norm.(u)
         end
-        MakieCore.arrows!(
+        MakieCore.arrows2d!(
             plot, MakieCore.Point2f.(p), MakieCore.Vec2f.(u), linecolor=color,
             arrowcolor=color, arrowsize=as, lengthscale=ls, colormap=cm
         )
