@@ -61,7 +61,7 @@ function MakieCore.plot!(plot::FEPlot)
     end
 
     if !isempty(pMixedDerivativeAt)
-        MakieCore.arrows2d!(
+        Makie.arrows2d!(
             plot, 
             pMixedDerivativeAt,
             repeat([MakieCore.Vec2f(1, 1)], length(pMixedDerivativeAt)), 
