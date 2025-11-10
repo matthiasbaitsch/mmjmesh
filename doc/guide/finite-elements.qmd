@@ -38,6 +38,15 @@ fplot!(Axis(fig[2, 1], title="Derivatives"), derivative.(φs)...)
 fig
 ```
 
+Linear combination
+
+```{julia}
+uhat = [0.0, 0.25, 0.125, 0.865, 0.75]
+uh = uhat ⋅ φs
+
+fplot(uh, uh', zero(uh))
+```
+
 ## Elements
 
 ```{julia}
