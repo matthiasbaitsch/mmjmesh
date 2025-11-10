@@ -123,10 +123,19 @@ function _validatecodomaintype(m::AbstractMapping)
 end
 
 
+function _validateidentities(m::AbstractMapping)
+    @test 1 * m === m
+    @test iszero(0 * m)
+end
+
+
 function validate(m::AbstractMapping; atol::Real=0.0, rtol::Real=1e-5)
 
     # Types
     _validatecodomaintype(m)
+
+    # Identities for elements of linear spaces
+    _validateidentities(m)
 
     # Derivatives
     _validatederivatives(m, atol, rtol)
