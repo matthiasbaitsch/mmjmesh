@@ -71,19 +71,20 @@ function _applyoperator(f1::PiecewiseFunction, f2::FunctionRToR, op)
     return PiecewiseFunction(breakpoints, functions)
 end
 
-Base.:(+)(f1::FunctionRToR, f2::PiecewiseFunction) = _applyoperator(f2, f1, +)
-Base.:(+)(f1::PiecewiseFunction, f2::FunctionRToR) = _applyoperator(f1, f2, +)
-Base.:(+)(f1::PiecewiseFunction, f2::PiecewiseFunction) = _applyoperator(f1, f2, +)
-Base.:(*)(f1::FunctionRToR, f2::PiecewiseFunction) = _applyoperator(f2, f1, *)
-Base.:(*)(f1::PiecewiseFunction, f2::FunctionRToR) = _applyoperator(f1, f2, *)
-Base.:(*)(f1::PiecewiseFunction, f2::PiecewiseFunction) = _applyoperator(f1, f2, *)
-Base.:(*)(a::Real, f::PiecewiseFunction) = PiecewiseFunction(f.breakpoints, a * f.functions)
+_sum(f1::FunctionRToR, f2::PiecewiseFunction) = _applyoperator(f2, f1, +)
+_sum(f1::PiecewiseFunction, f2::FunctionRToR) = _applyoperator(f1, f2, +)
+_sum(f1::PiecewiseFunction, f2::ScaledMapping) = _applyoperator(f1, f2, +)
+_sum(f1::ScaledMapping, f2::PiecewiseFunction) = _applyoperator(f2, f1, +)
+_sum(f1::PiecewiseFunction, f2::PiecewiseFunction) = _applyoperator(f1, f2, +)
 
-# TODO find better solution
-Base.:(+)(f1::ScaledMapping{InR,InR}, f2::PiecewiseFunction) = _applyoperator(f2, f1, +)
-Base.:(+)(f1::PiecewiseFunction, f2::ScaledMapping{InR,InR}) = _applyoperator(f1, f2, +)
-Base.:(*)(f1::ScaledMapping{InR,InR}, f2::PiecewiseFunction) = _applyoperator(f2, f1, *)
-Base.:(*)(f1::PiecewiseFunction, f2::ScaledMapping{InR,InR}) = _applyoperator(f1, f2, *)
+_product(f1::FunctionRToR, f2::PiecewiseFunction) = _applyoperator(f2, f1, *)
+_product(f1::PiecewiseFunction, f2::FunctionRToR) = _applyoperator(f1, f2, *)
+_product(f1::PiecewiseFunction, f2::ScaledMapping) = _applyoperator(f1, f2, *)
+_product(f1::ScaledMapping, f2::PiecewiseFunction) = _applyoperator(f2, f1, *)
+_product(f1::PiecewiseFunction, f2::PiecewiseFunction) = _applyoperator(f1, f2, *)
+
+_scaled(a::Real, f::PiecewiseFunction) = PiecewiseFunction(f.breakpoints, a * f.functions)
+
 
 """
     interpolate(x::AbstractVector{<:Real}, y::AbstractVector{<:Real}; order=1)

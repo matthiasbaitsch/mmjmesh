@@ -284,6 +284,7 @@ const PolynomialRnToRpxq{N,P,Q,D,NT} = MPolynomial{N,InRᵐˣⁿ{P,Q},D,NT,Tuple
 
 ## Properties
 
+Base.iszero(p::MPolynomial) = iszero(coefficients(p))
 exponents(p::MPolynomial) = p.exponents
 exponents(p::MPolynomial, idx::Integer) = p.exponents[:, idx]
 coefficients(p::MPolynomial) = p.coefficients

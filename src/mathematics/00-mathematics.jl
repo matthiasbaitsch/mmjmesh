@@ -36,7 +36,8 @@ export points, dimension
 export AbstractMapping, MappingFromR, MappingFromRn
 export FunctionToR, MappingToRn, MappingToRmxn
 export FunctionRToR, FunctionRnToR, MappingRnToRm
-export domaintype, codomaintype, domain, degree, degrees, valueat
+export domaintype, codomaintype, domain, degree, degrees
+export constval, valueat
 export derivativeat, derivative, pderivativeat, pderivative
 export antiderivative, integrate, sample, plot, pois, roots
 
@@ -67,11 +68,13 @@ export VectorField, div, divergence, divergenceat
 export ParametricCurve, UnitNormal
 
 # Special functions II
+export constant
 export Sin, Cos, Exp
 export mmonomials, affinefunction, simplifyx
 export AdHocMapping, makefunction
 export AffineMapping
-export Polynomial, Interpolation, fromroots, lagrangepolynomials, monomials, lagrangebasis1d
+export Polynomial, Interpolation
+export monomial, monomials, fromroots, lagrangepolynomials, lagrangebasis1d
 export PiecewiseFunction, npieces, interpolate
 
 # Polynomials of multiple variables

@@ -82,6 +82,14 @@ function derivativeat(f::AbstractMapping{DT}, x::DT, n::Integer=1) where {DT}
 end
 
 
+## Constval
+
+function constval(m::AbstractMapping)
+    @assert isconst(m)
+    return _constval(m)
+end
+
+
 ## Shorthand notations for derivative and evaluation
 
 Base.adjoint(m::AbstractMapping) = derivative(m, 1)
@@ -96,6 +104,33 @@ function Base.:(*)(A::AbstractMatrix{T}, x::AbstractVector{<:AbstractMapping{DT,
     TS = AbstractMapping{DT,CT,D}
     mul!(similar(x, TS, axes(A, 1)), A, x)
 end
+
+
+## About the Mapping
+
+Base.isconst(m::AbstractMapping) = false
+Base.iszero(m::AbstractMapping) = false
+Base.isone(m::AbstractMapping) = false
+
+
+"""
+	degree(f)
+	degree(f, i)
+
+Polynomial degree of f. Returns the
+
+- number -1 if `f`` is the zero function
+
+- largest exponent if `f` is a polynomial
+
+- largest sum of exponents if `f` is a multivariate polynomial
+
+- `Inf` in all other cases
+
+For a multivariate mapping `f`, the invocation `degree(f, i)` returns the polynomial degree 
+in the i-th parameter.
+"""
+degree(::AbstractMapping, i=1) = Inf
 
 
 # -------------------------------------------------------------------------------------------------
@@ -138,25 +173,6 @@ function derivativetype(::Type{InRⁿ{N}}, ::Type{InRⁿ{M}}, n::Int) where {N,M
     error("Not implemented yet")
 end
 
-"""
-	degree(f)
-	degree(f, i)
-
-Polynomial degree of f. Returns the
-
-- number -1 if `f`` is the zero function
-
-- largest exponent if `f` is a polynomial
-
-- largest sum of exponents if `f` is a multivariate polynomial
-
-- `Inf` in all other cases
-
-For a multivariate mapping `f`, the invocation `degree(f, i)` returns the polynomial degree 
-in the i-th parameter.
-"""
-degree(::AbstractMapping, i=1) = Inf
-
 
 # -------------------------------------------------------------------------------------------------
 # Neutral elements
@@ -166,15 +182,17 @@ degree(::AbstractMapping, i=1) = Inf
 struct Zero{DT,CT,D} <: AbstractMapping{DT,CT,D} end
 
 degree(::Zero) = -1
+_constval(::Zero) = 0
 valueat(::Zero{DT,CT}, x::DT) where {DT,CT} = zero(CT)
 derivative(::Zero{DT,CT,D}, n::Int=1) where {DT,CT,D} = Zero{DT,derivativetype(DT, CT, n),D}()
 derivativeat(::Zero{DT,CT}, x::DT, n::Int=1) where {DT,CT} = zero(derivativetype(DT, CT, n))
 
+Base.isconst(::Zero) = true
+Base.iszero(::Zero) = true
 Base.zero(::Type{<:AbstractMapping{DT,CT,D}}) where {DT,CT,D} = Zero{DT,CT,D}()
 Base.zero(m::AbstractMapping) = zero(typeof(m))
 Base.show(io::IO, ::Zero) = print(io, "0(x)")
 Base.isequal(::Zero{DT,CT,D}, ::Zero{DT,CT,D}) where {DT,CT,D} = true
-
 
 """ Neutral element w.r.t. multiplication. """
 struct One{DT,D} <: AbstractMapping{DT,InR,D} end
@@ -183,10 +201,13 @@ One(::Type{<:AbstractMapping{DT,CT,D}}) where {DT,CT,D} = One{DT,D}()
 One(m::AbstractMapping) = One(typeof(m))
 
 degree(::One) = 0
+_constval(::One) = 1.0
 valueat(::One{DT}, x::DT) where {DT} = 1.0
 derivative(::One{DT,D}, n::Integer=1) where {DT,D} = Zero{DT,derivativetype(DT, InR, n),D}()
 derivativeat(::One{DT}, x::DT, n::Integer=1) where {DT} = zero(derivativetype(DT, InR, n))
 
+Base.isconst(::One) = true
+Base.isone(::One) = true
 Base.one(::Type{<:AbstractMapping{DT,CT,D}}) where {DT,CT,D} = One{DT,D}()
 Base.one(m::AbstractMapping) = one(typeof(m))
 Base.show(io::IO, ::One) = print(io, "1(x)")
@@ -194,7 +215,7 @@ Base.isequal(::One{DT,D}, ::One{DT,D}) where {DT,D} = true
 
 
 # -------------------------------------------------------------------------------------------------
-# Identity and constant mappings
+# Identity mapping
 # -------------------------------------------------------------------------------------------------
 
 """ Identity function. """
@@ -205,23 +226,39 @@ Identity(d::T) where {T<:AbstractInterval} = Identity{InR,d}()
 degree(::Identity) = 1
 valueat(::Identity{DT}, x::DT) where {DT} = x
 _derivative(::Identity{DT,D}) where {DT,D} = One{DT,D}()
-_derivativeat(::Identity{DT}, x::DT, n::Int=1) where {DT} = one(derivativetype(DT, DT, 1))
-antiderivative(::Identity{InR,D}, n::Int=1) where {D} =
-    1 / factorial(n + 1) * Polynomial(_monomial_coeffs(n + 1), D)
-Base.show(io::IO, ::Identity) = print(io, "identity(x)")
+_derivativeat(::Identity{DT}, x::DT) where {DT} = one(derivativetype(DT, DT, 1))
+antiderivative(::Identity{InR,D}, n::Int=1) where {D} = 1 / factorial(n + 1) * monomial(n + 1, D)
 
+Base.show(io::IO, ::Identity) = print(io, "id(x)")
+
+
+# -------------------------------------------------------------------------------------------------
+# Function parameter - abusing notation
+# -------------------------------------------------------------------------------------------------
 
 """ An independent variable of a function. """
 parameter(d::AbstractInterval=R) = Identity(d)
 
 
+# -------------------------------------------------------------------------------------------------
+# Constant mapping
+# -------------------------------------------------------------------------------------------------
+
 """ Constant mapping. """
 struct ConstantMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
     c::Any
-    ConstantMapping(c, dt, d) = new{dt,typeof(c),d}(c)
 end
 
+constant(::AbstractMapping{DT,CT,D}, c::CT) where {DT,CT,D} = ConstantMapping{DT,CT,D}(c)
+
+degree(::ConstantMapping) = 0
 valueat(m::ConstantMapping{DT}, ::DT) where {DT} = m.c
+_constval(m::ConstantMapping) = m.c
+_derivative(m::ConstantMapping) = zero(m)
+_derivativeat(m::ConstantMapping, ::Any) = zero(m.c)
+_antiderivative(m::ConstantMapping) = m.c * Identity(domain(m))
+
+Base.isconst(::ConstantMapping) = true
 
 
 # -------------------------------------------------------------------------------------------------
@@ -390,6 +427,7 @@ function _nn(n::Integer, indices::Integer...)
     return n
 end
 
+
 """
     _derivative(f::FunctionRnToR{N}, n::Integer)
 
@@ -490,6 +528,7 @@ function integrate(f::FunctionRnToR{2}, I1::Interval, I2::Interval)
     F = antiderivative(f, [1, 1])
     return F(a, c) + F(b, d) - F(a, d) - F(b, c)
 end
+
 integrate(f::FunctionRnToR{2}, d::DomainSets.Rectangle) =
     integrate(f, DomainSets.component(d, 1), DomainSets.component(d, 2))
 
@@ -553,24 +592,26 @@ Base.div(v::VectorField) = divergence(v)
 
 ## Sum of mappings
 
-struct Sum{DT,CT,D} <: AbstractMapping{DT,CT,D}
+struct SumMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
     m1::AbstractMapping{DT,CT}
     m2::AbstractMapping{DT,CT}
-    Sum(
+    SumMapping(
         m1::AbstractMapping{DT,CT,D1}, m2::AbstractMapping{DT,CT,D2}
     ) where {DT,CT,D1,D2} = new{DT,CT,D1 ∩ D2}(m1, m2)
 end
 
-pois(p::Sum) = pois(p.m1) ∪ pois(p.m2)
-valueat(s::Sum{DT}, x::DT) where {DT} = valueat(s.m1, x) + valueat(s.m2, x)
-derivative(f::Sum, n::Integer=1) = Sum(derivative(f.m1, n), derivative(f.m2, n))
-derivativeat(f::Sum{DT}, x::DT, n::Integer=1) where {DT} =
+pois(p::SumMapping) = pois(p.m1) ∪ pois(p.m2)
+valueat(s::SumMapping{DT}, x::DT) where {DT} = valueat(s.m1, x) + valueat(s.m2, x)
+derivative(f::SumMapping, n::Integer=1) = derivative(f.m1, n) + derivative(f.m2, n)
+derivativeat(f::SumMapping{DT}, x::DT, n::Integer=1) where {DT} =
     derivativeat(f.m1, x, n) + derivativeat(f.m2, x, n)
-antiderivative(f::Sum{InR,InR}, n::Integer=1) =
+antiderivative(f::SumMapping{InR,InR}, n::Integer=1) =
     antiderivative(f.m1, n) + antiderivative(f.m2, n)
 
-Base.show(io::IO, s::Sum) = print(io, s.m1, " + ", s.m2)
-Base.:(==)(m1::Sum{DT,CT,D}, m2::Sum{DT,CT,D}) where {DT,CT,D} = (m1.m1 == m2.m1 && m1.m2 == m2.m2)
+Base.show(io::IO, s::SumMapping) = print(io, s.m1, " + ", s.m2)
+Base.:(==)(m1::SumMapping{DT,CT,D}, m2::SumMapping{DT,CT,D}) where {DT,CT,D} =
+    (m1.m1 == m2.m1 && m1.m2 == m2.m2) ||
+    (m1.m1 == m2.m2 && m1.m2 == m2.m1)
 
 
 ## Number times mapping
@@ -589,7 +630,6 @@ derivativeat(f::ScaledMapping{DT}, x::DT, n::Integer=1) where {DT} = f.a * deriv
 antiderivative(f::ScaledMapping{InR,InR}, n::Integer=1) =
     f.a * antiderivative(f.m, n)
 
-
 Base.show(io::IO, s::ScaledMapping) = print(io, s.a, " * ", s.m)
 Base.:(==)(m1::ScaledMapping{DT,CT,D}, m2::ScaledMapping{DT,CT,D}) where {DT,CT,D} =
     (isequal(m1.a, m2.a) && m1.m == m2.m)
@@ -606,8 +646,13 @@ ProductMapping(
     m1::AbstractMapping{DT,CT1,D1}, m2::AbstractMapping{DT,CT2,D2}
 ) where {DT,CT1,CT2,D1,D2} = ProductMapping{DT,Base.promote_op(*, CT1, CT2),D1 ∩ D2}(m1, m2)
 
-ProductMapping(m::AbstractMapping{DT,CT,D1}, f::AbstractMapping{DT,InR,D2}) where {DT,CT,D1,D2} =
-    ProductMapping{DT,CT,D1 ∩ D2}(f, m)
+ProductMapping(
+    m::AbstractMapping{DT,CT,D1}, f::FunctionToR{DT,D2}
+) where {DT,CT,D1,D2} = ProductMapping{DT,CT,D1 ∩ D2}(f, m)
+
+ProductMapping(
+    f1::FunctionToR{DT,D1}, f2::FunctionToR{DT,D2}
+) where {DT,D1,D2} = ProductMapping{DT,InR,D1 ∩ D2}(f1, f2)
 
 pois(p::ProductMapping) = pois(p.m1) ∪ pois(p.m2)
 valueat(p::ProductMapping{DT}, x::DT) where {DT} = valueat(p.m1, x) * valueat(p.m2, x)
@@ -618,7 +663,9 @@ derivativeat(f::ProductMapping{DT}, x::DT, n::Integer=1) where {DT} = sum(
 
 Base.show(io::IO, m::ProductMapping) = print(io, m.m1, " * ", m.m2)
 Base.:(==)(m1::ProductMapping{DT,CT,D}, m2::ProductMapping{DT,CT,D}) where {DT,CT,D} =
-    (m1.m1 == m2.m1 && m1.m2 == m2.m2)
+    (m1.m1 == m2.m1 && m1.m2 == m2.m2) ||
+    (m1.m2 == m2.m1 && m1.m1 == m2.m2)
+
 Base.promote_op(*, ::Type{InR}, ::Type{InRⁿ{N}}) where {N} = InRⁿ{N}
 Base.promote_op(*, ::Type{InR}, ::Type{InR}) = InR
 
@@ -653,7 +700,6 @@ struct ComposedMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
         m1::AbstractMapping{DT1,CT1,D1}, m2::AbstractMapping{DT2,CT2,D2}
     ) where {DT1,CT1,D1,DT2,CT2<:DT1,D2} = new{DT2,CT1,D2}(m1, m2)
 end
-Base.:(∘)(m1::AbstractMapping, m2::AbstractMapping) = ComposedMapping(m1, m2)
 
 valueat(c::ComposedMapping{DT}, x::DT) where {DT} = valueat(c.m1, valueat(c.m2, x))
 _derivative(f::ComposedMapping) = (f.m1' ∘ f.m2) * f.m2'
@@ -665,10 +711,10 @@ function antiderivative(f::ComposedMapping{InR,InR}, n::Integer=1)
     h = f.m2
 
     if degree(h) == 1
-        return (1 / derivativeat(h, 0))^n * (antiderivative(g, n) ∘ h)
-    else
-        @notimplemented
+        return 1 / constval(h')^n * (antiderivative(g, n) ∘ h)
     end
+    
+    @notimplemented
 end
 
 Base.show(io::IO, m::ComposedMapping) = print(io, m.m1, " ∘ ", m.m2)
@@ -824,6 +870,8 @@ antiderivative(f::Exp, ::Integer=1) = f
 Base.show(io::IO, ::Exp) = print(io, "exp(x)")
 
 
+## Polynomial function
+
 """
     Polynomial([a0, a1, a2, ...], d=R)
 
@@ -838,8 +886,10 @@ Polynomial(c::AbstractArray, d=R) = Polynomial{d}(Polynomials.Polynomial(c))
 Polynomial(c::Real...; d=R) = Polynomial{d}(Polynomials.Polynomial(c))
 
 coefficients(p::Polynomial) = Polynomials.coeffs(p.p)
+coefficient(p::Polynomial, idx::Int) = Polynomials.coeffs(p.p)[idx]
 
 _roots(p::Polynomial) = Polynomials.roots(p.p)
+_constval(p::Polynomial) = degree(p) == -1 ? 0 : coefficient(p, 1)
 degree(p::Polynomial) = Polynomials.degree(p.p)
 fromroots(roots::AbstractArray{<:Real}, d=R) = Polynomial(Polynomials.fromroots(roots), d)
 valueat(p::Polynomial, x::InR) = p.p(x)
@@ -849,11 +899,10 @@ derivativeat(p::Polynomial, x::InR, n::Integer=1) = derivative(p, n)(x)
 antiderivative(p::Polynomial{D}, n::Integer=1) where {D} =
     Polynomial(Polynomials.integrate(p.p, n), D)
 
+Base.isconst(p::Polynomial) = (degree(p) <= 0)
+Base.iszero(p::Polynomial) = isequal(coefficients(p), [])
+Base.isone(p::Polynomial) = isequal(coefficients(p), [1])
 Base.show(io::IO, p::Polynomial) = print(io, p.p)
-Base.:(+)(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = Polynomial(p1.p + p2.p, D1 ∩ D2)
-Base.:(*)(a::Num, p::Polynomial{D}) where {D} = Polynomial(a * p.p, D)
-Base.:(*)(a::Real, p::Polynomial{D}) where {D} = Polynomial(a * p.p, D)
-Base.:(*)(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = Polynomial(p1.p * p2.p, D1 ∩ D2)
 Base.:(==)(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = (D1 == D2 && p1.p == p2.p)
 
 
@@ -868,16 +917,21 @@ function lagrangepolynomials(c::AbstractArray{<:Float64}, d=R)
     return [normalize(fromroots(c[filter(j -> j != i, indices)], d), c[i]) for i in indices]
 end
 
-_monomial_coeffs(n) = [i == n + 1 for i = 1:n+1]
+
+"""
+    monomial(n, D=R)
+
+Monomial ``x^n`` defined on domain `D`.
+"""
+monomial(n::Int, d=R) = Polynomial([Int(i == n + 1) for i = 1:n+1], d)
+
 
 """
     monomials(p, D=R)
 
 Monomials of degree ``p_1, \\dots, p_n`` defined on the domain `D`.
 """
-function monomials(p::AbstractArray{<:Integer}, d=R)
-    return MappingFromComponents([Polynomial(_monomial_coeffs(n), d) for n in p])
-end
+monomials(p::AbstractArray{<:Integer}, d=R) = MappingFromComponents([monomial(n, d) for n in p])
 
 
 """
@@ -919,7 +973,6 @@ struct AffineMapping{DT,CT,D} <: AbstractMapping{DT,CT,D}
 end
 
 degree(::AffineMapping) = 1
-
 valueat(m::AffineMapping{DT,CT}, x::DT) where {DT,CT} = CT(m.A * x + m.b)
 
 function derivativeat(m::AffineMapping{DT}, ::DT, n::Integer=1) where {DT}
@@ -927,7 +980,8 @@ function derivativeat(m::AffineMapping{DT}, ::DT, n::Integer=1) where {DT}
     return zero(derivativetype(m, n))
 end
 
-_derivative(m::AffineMapping{DT,CT,D}) where {DT,CT,D} = ConstantMapping(m.A, DT, D)
+_derivative(m::AffineMapping{DT,CT,D}) where {DT,CT,D} =
+    ConstantMapping{DT,derivativetype(m),D}(m.A)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -946,33 +1000,65 @@ makefunction(f::Function, xrange::Interval, yrange::Interval) = makefunction(f, 
 
 
 # -------------------------------------------------------------------------------------------------
+# Type based rules
+# -------------------------------------------------------------------------------------------------
+
+function _sum(m1::ScaledMapping, m2::ScaledMapping)
+    if m1.m == m2.m
+        return (m1.a + m2.a) * m1.m
+    end
+    return SumMapping(m1, m2)
+end
+
+function _sum(m1::ScaledMapping, m2::AbstractMapping)
+    if m1.m == m2
+        return (m1.a + 1) * m1.m
+    end
+    return SumMapping(m1, m2)
+end
+
+_sum(m::ScaledMapping, p::Polynomial) = SumMapping(p, m) # disambiguate
+_sum(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = Polynomial(p1.p + p2.p, D1 ∩ D2)
+_sum(p::Polynomial{D}, ::One{InR,D}) where {D} = monomial(0, D) + p
+_sum(p::Polynomial{D}, ::Identity{InR,D}) where {D} = monomial(1, D) + p
+_sum(p::Polynomial{D}, c::ConstantMapping{InR,InR,D}) where {D} = c.c * monomial(0, D) + p
+_sum(o::One, id::Identity) = _sum(id, o)
+_sum(::Identity{InR,D}, ::One{InR,D}) where {D} = Polynomial([1, 1], D)
+_sum(c::ConstantMapping, id::Identity) = _sum(id, c)
+_sum(::Identity{InR,D}, m::ConstantMapping{InR,InR,D}) where {D} = Polynomial([m.c, 1], D)
+_sum(m1::AbstractMapping, m2::ScaledMapping) = _sum(m2, m1) # Scaled mapping first
+_sum(m1::AbstractMapping, m2::Polynomial) = _sum(m2, m1) # Polynomial first
+_sum(m1::AbstractMapping, m2::AbstractMapping) = SumMapping(m1, m2)
+
+_scaled(a::Real, p::Polynomial{D}) where {D} = Polynomial(a * p.p, D)
+_scaled(a::Real, ::Identity{InR,D}) where {D} = a * monomial(1, D)
+_scaled(a::Real, m::ScaledMapping) = (a * m.a) * m.m
+_scaled(a::Real, m::AbstractMapping) = ScaledMapping(a, m)
+
+_product(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = Polynomial(p1.p * p2.p, D1 ∩ D2)
+_product(f::Polynomial, m::ScaledMapping) = (m.a * f) * m.m
+_product(m1::ScaledMapping, m2::ScaledMapping) = (m1.a * m2.a) * (m1.m * m2.m)
+_product(m1::ScaledMapping, m2::AbstractMapping) = m1.a * (m1.m * m2)
+_product(m::ScaledMapping, f::Polynomial) = f * m # Polynomials first
+_product(m::AbstractMapping, f::Polynomial) = f * m # Polynomials first
+_product(m1::AbstractMapping, m2::ScaledMapping) = m2 * m1 # Scaled first
+_product(m1::AbstractMapping, m2::AbstractMapping) = ProductMapping(m1, m2)
+
+_quotient(m1::AbstractMapping, m2::AbstractMapping) = QuotientMapping(m1, m2)
+
+_composed(m1::ScaledMapping, m2::AbstractMapping) = m1.a * (m1.m ∘ m2)
+_composed(m1::AbstractMapping, m2::AbstractMapping) = ComposedMapping(m1, m2)
+
+
+# -------------------------------------------------------------------------------------------------
 # Operators and simplification rules
 # -------------------------------------------------------------------------------------------------
 
 # +
-Base.:(+)(m1::AbstractMapping, m2::AbstractMapping) = Sum(m1, m2)
-Base.:(+)(z::Zero, ::Zero) = z
+Base.:(+)(m1::AbstractMapping, m2::AbstractMapping) = m1 == m2 ? 2 * m1 : _sum(m1, m2)
 Base.:(+)(::Zero, m::AbstractMapping) = m
-Base.:(+)(::Zero, m::ScaledMapping) = m
 Base.:(+)(m::AbstractMapping, ::Zero) = m
-Base.:(+)(m1::AbstractMapping{DT}, m2::AbstractMapping{DT}) where {DT} =
-    m1 == m2 ? 2.0 * m1 : Sum(m1, m2)
-
-# + polynomial special
-_addscaled(f::Polynomial, a::Real, ::One{InR,D}) where {D} = Polynomial(a, d=D) + f
-_addscaled(f::Polynomial, a::Real, ::Identity{InR,D}) where {D} = Polynomial(0, a, d=D) + f
-Base.:(+)(f::Polynomial, ::Identity{InR,D}) where {D} = f + Polynomial(0, 1, d=D)
-Base.:(+)(::Identity{InR,D}, f::Polynomial) where {D} = f + Polynomial(0, 1, d=D)
-
-# + one special
-Base.:(+)(f::MappingFromR{InR}, ::One{InR,D}) where {D} = f + Polynomial(1, d=D)
-Base.:(+)(::One{InR,D}, f::MappingFromR{InR}) where {D} = f + Polynomial(1, d=D)
-
-# + one/identity special
-_addscaled(a1::Real, ::One{InR,D1}, a2::Real, ::Identity{InR,D2}) where {D1,D2} =
-    Polynomial([a1, a2], D1 ∩ D2)
-_addscaled(a1::Real, id::Identity, a2::Real, one::One) = _addscaled(a2, one, a1, id)
-_addscaled(one::One, a2::Real, id::Identity) = _addscaled(1, one, a2, id)
+Base.:(+)(m::Zero, ::Zero) = m
 
 # -
 Base.:-(m::AbstractMapping) = -1.0 * m
@@ -980,67 +1066,53 @@ Base.:-(m1::AbstractMapping{DT}, m2::AbstractMapping{DT}) where {DT} = m1 + (-m2
 
 # *
 function Base.:(*)(a::Real, m::AbstractMapping)
-    if a == 1
+    if isequal(a, 1)
         return m
-    elseif a == 0
+    elseif isequal(a, 0)
         return zero(m)
     else
-        return ScaledMapping(a, m)
+        return _scaled(a, m)
     end
 end
 
-Base.:(*)(a::Num, m::AbstractMapping) = ScaledMapping(a, m)
+function Base.:(*)(m1::AbstractMapping{DT}, m2::AbstractMapping{DT}) where {DT}
+    if iszero(m1) || iszero(m2)
+        return zero(m1)
+    end
+    if isone(m1)
+        return m2
+    end
+    if isone(m2)
+        return m1
+    end
+    if isconst(m1)
+        return constval(m1) * m2
+    end
+    if isconst(m2)
+        return constval(m2) * m1
+    end
+    return _product(m1, m2)
+end
+
 Base.:(*)(m::AbstractMapping, a::Real) = a * m
-Base.:(*)(::One{DT}, m::AbstractMapping{DT}) where {DT} = m
-Base.:(*)(m::AbstractMapping{DT}, ::One{DT}) where {DT} = m
-Base.:(*)(a::Real, m::ScaledMapping) = (a * m.a) * m.m
-Base.:(*)(::One{DT}, m::ScaledMapping{DT}) where {DT} = m
-Base.:(*)(m::ScaledMapping{DT}, ::One{DT}) where {DT} = m
-Base.:(*)(m1::ScaledMapping{DT}, m2::ScaledMapping{DT}) where {DT} = m1.a * m2.a * (m1.m * m2.m)
-Base.:(*)(m1::ScaledMapping{DT}, m2::AbstractMapping{DT}) where {DT} = m1.a * (m1.m * m2)
-Base.:(*)(m1::AbstractMapping{DT}, m2::ScaledMapping{DT}) where {DT} = m2.a * (m1 * m2.m)
-Base.:(*)(m1::AbstractMapping{DT}, m2::AbstractMapping{DT}) where {DT} =
-    ProductMapping(m1, m2)
 
 # /
-Base.:(/)(m1::AbstractMapping, m2::AbstractMapping) = QuotientMapping(m1, m2)
-Base.:(/)(a::Real, m2::AbstractMapping) = QuotientMapping(Polynomial(a), m2)
+Base.:(/)(m1::AbstractMapping, m2::AbstractMapping) = _quotient(m1, m2)
+Base.:(/)(a::Real, m2::AbstractMapping) = _quotient(Polynomial(a), m2)
 Base.:(/)(m2::AbstractMapping, a::Real) = 1 / a * m2
 
 # ∘
-Base.:(∘)(m1::ScaledMapping, m2::AbstractMapping) = m1.a * (m1.m ∘ m2)
+Base.:(∘)(m1::AbstractMapping, m2::AbstractMapping) = _composed(m1, m2)
 
 # ^
-Base.:(^)(::Identity{InR,D}, n::Int) where {D} = Polynomial(_monomial_coeffs(n), D)
+Base.:(^)(::Identity{InR,D}, n::Int) where {D} = monomial(n, D)
 
 # Add or subtract a Number
-Base.:(+)(f::Identity{Real,D}, a::Real) where {D} = a == 0 ? f : Polynomial([a, 1], D)
-Base.:(+)(f::FunctionToR, a::Real) = f + a * One(f)
+Base.:(+)(f::FunctionToR, a::Real) = a == 1 ? f + one(f) : f + constant(f, a)
 Base.:(+)(a::Real, f::FunctionToR) = f + a
-Base.:(-)(a::Real, f::FunctionToR) = a + (-f)
+Base.:(-)(a::Real, f::FunctionToR) = -f + a
 Base.:(-)(f::FunctionToR, a::Real) = f + (-a)
-
-# Scaled mapping special
-Base.:(+)(m1::ScaledMapping{DT,CT}, ::Zero{DT,CT}) where {DT,CT} = m1
-
-# Two scaled functions
-_addscaled(a1::Real, m1::AbstractMapping, a2::Real, m2::AbstractMapping) =
-    m1 == m2 ? (a1 + a2) * m1 : Sum(a1 * m1, a2 * m2)
-
-Base.:(+)(m1::ScaledMapping{DT,CT}, m2::ScaledMapping{DT,CT}) where {DT,CT} =
-    _addscaled(m1.a, m1.m, m2.a, m2.m)
-
-# Scaled and other function
-_addscaled(m1::AbstractMapping, a::Real, m2::AbstractMapping) =
-    m1 == m2 ? (1 + a) * m1 : Sum(m1, a * m2)
-
-Base.:(+)(f1::AbstractMapping{DT,CT}, f2::ScaledMapping{DT,CT}) where {DT,CT} =
-    _addscaled(f1, f2.a, f2.m)
-Base.:(+)(f1::ScaledMapping{InR,InR}, f2::One{InR}) = _addscaled(f2, f1.a, f1.m)
-Base.:(+)(m1::ScaledMapping{DT,CT}, m2::AbstractMapping{DT,CT}) where {DT,CT} = m2 + m1
 
 # Enable dot product
 LinearAlgebra.dot(a::Real, m::AbstractMapping) = a * m
 LinearAlgebra.dot(m::AbstractMapping, a::Real) = a * m
-LinearAlgebra.dot(a::Num, m::AbstractMapping) = a * m
-LinearAlgebra.dot(m::AbstractMapping, a::Num) = a * m

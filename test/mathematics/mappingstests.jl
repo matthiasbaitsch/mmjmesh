@@ -85,6 +85,9 @@ T3 = InR3
 # -------------------------------------------------------------------------------------------------
 
 z = Zero{InR2,InR,QHat}()
+@test iszero(z)
+@test isconst(z)
+@test constval(z) == 0
 @test z(1, 1) == 0
 @test derivative(z) == Zero{InR2,InR2,QHat}()
 @test derivative(z, 2) == Zero{InR2,InRᵐˣⁿ{2,2},QHat}()
@@ -98,12 +101,16 @@ z = Zero{InR2,InR,QHat}()
 # -------------------------------------------------------------------------------------------------
 
 o1 = One{InR,R}()
+@test isone(o1)
+@test isconst(o1)
+@test constval(o1) == 1
 @test One(Sin()) === o1
 @test o1(1) == 1
 @test derivativeat(o1, 1) == 0
 @test validate(o1, atol=1e-8)
 
 o3 = One{InRⁿ{3},R3}()
+@test isone(o3)
 @test valueat(o3, [1, 2, 3]) == 1
 @test valueat(o3, SVector{3,Float64}([1, 2, 3])) == 1
 @test o3(1, 2, 3) == 1
@@ -200,55 +207,10 @@ id = Identity(0.0 .. 5.0)
 @test antiderivative(id, 2) == 1 / 6 * id^3
 
 
-# # Polynomials
+# # Monomials
 
-p = Polynomial(4, 6, 1, 9, 2, -1)
-@test degree(p) == 5
-@test validate(p)
-@test validate(antiderivative(p))
+@test monomial(3) == Polynomial([0, 0, 0, 1])
 
-# Constructor
-@test Polynomial([1, 2, 3]) == Polynomial(1, 2, 3)
-
-# Roots and domain
-@test roots(Polynomial([-1, 0, 1])) == [-1, 1]
-@test roots(Polynomial([-1, 0, 1], RPlus)) == [1]
-@test roots(Polynomial([-1, 0, 1], -5 .. 0)) == [-1]
-@test roots(Polynomial([-1, 0, 1]), -5 .. 0) == [-1]
-@test roots(Polynomial([-1, 0, 1]), 4 .. 5) == []
-
-# Operations
-@test isequal(coefficients(a * p), [4a, 6a, a, 9a, 2a, -a])
-
-# Lagrange
-p = [0, 1, 3, 4, 5.5]
-l4 = lagrangepolynomials(p, 0 .. 5.5)
-for l ∈ l4
-    @test validate(l, atol=1e-4)
-end
-for i ∈ 1:5, j ∈ 1:5
-    @test isapprox(l4[i](p[j]), i == j ? 1 : 0, atol=1e-14)
-end
-
-# From roots
-c = [1, 2, 3]
-p = fromroots(c)
-@test roots(p) ≈ c
-
-# From expression
-x = parameter(0 .. 5)
-@test 1x == x
-@test 1 + x == Polynomial([1, 1], 0 .. 5)
-@test 2 + x == Polynomial([2, 1], 0 .. 5)
-@test 1 + 3x == Polynomial([1, 3], 0 .. 5)
-@test 2 + 3x == Polynomial([2, 3], 0 .. 5)
-@test 3x + 1 == Polynomial([1, 3], 0 .. 5)
-@test 3x + 2 == Polynomial([2, 3], 0 .. 5)
-@test 3 + 3x - 7x^2 == Polynomial([3, 3, -7], 0 .. 5)
-@test 3x - 7x^2 + 3 == Polynomial([3, 3, -7], 0 .. 5)
-@test -7x^2 + 3 + 3x == Polynomial([3, 3, -7], 0 .. 5)
-
-# Monomials
 @test monomials(0:4) isa MappingToRn
 @test Polynomial(1, 2, 3, 4, 5) == [1, 2, 3, 4, 5] ⋅ monomials(0:4)
 @test [m for m = monomials(0:2)] == [Polynomial(1), Polynomial(0, 1), Polynomial(0, 0, 1)]
@@ -283,6 +245,109 @@ f = ProductFunction(Sin(), Sin())
 g = AffineMapping(Diagonal([π, π]), zeros(2))
 h = f ∘ g
 @test isapprox(h([1, 1]), 0.0, atol=1e-14)
+
+
+# # Identity map
+
+id = Identity(R)
+@test degree(id) == 1
+@test id(4) == 4
+@test derivativeat(id, 4, 1) == 1
+@test derivativeat(id, 4, 2) == 0
+@test antiderivative(id)(4) == 1 / 2 * 4^2
+@test antiderivative(id, 2)(4) == 1 / 6 * 4^3
+# TODO make work @test antiderivative(id)' == id
+@test validate(id, atol=1e-7)
+
+
+# # Constant map
+
+x = parameter(0 .. 3)
+u = constant(x, 9.9)
+@test u isa FunctionRToR
+@test isconst(u)
+@test constval(u) == 9.9
+@test degree(u) == 0
+@test u(1) == 9.9
+@test u(2) == 9.9
+@test antiderivative(u) == 9.9 * x
+@test antiderivative(u)(3) == 3 * 9.9
+@test antiderivative(u)'(3) == u(3)
+@test validate(u, atol=1e-7)
+
+u = MMJMesh.Mathematics.ConstantMapping{InRⁿ{3},InR,R³}(99)
+@test u(1, 2, 3) == 99
+
+u = MMJMesh.Mathematics.ConstantMapping{InRⁿ{3},InRⁿ{3},R³}([1, 2, 3])
+@test u(1, 2, 3) == [1, 2, 3]
+
+
+# # Polynomials
+
+@test isconst(Polynomial([0]))
+@test isconst(Polynomial([2]))
+@test !isconst(Polynomial([0, 2]))
+@test constval(Polynomial([0])) == 0
+@test constval(Polynomial([2])) == 2
+
+p = Polynomial(4, 6, 1, 9, 2, -1)
+@test degree(p) == 5
+@test validate(p)
+@test validate(antiderivative(p))
+
+# Constructor
+@test Polynomial([1, 2, 3]) == Polynomial(1, 2, 3)
+
+# About
+@test iszero(Polynomial([0]))
+@test isone(Polynomial([1]))
+
+# Roots and domain
+@test roots(Polynomial([-1, 0, 1])) == [-1, 1]
+@test roots(Polynomial([-1, 0, 1], RPlus)) == [1]
+@test roots(Polynomial([-1, 0, 1], -5 .. 0)) == [-1]
+@test roots(Polynomial([-1, 0, 1]), -5 .. 0) == [-1]
+@test roots(Polynomial([-1, 0, 1]), 4 .. 5) == []
+
+# Operations
+@test isequal(coefficients(a * p), [4a, 6a, a, 9a, 2a, -a])
+
+# Lagrange
+p = [0, 1, 3, 4, 5.5]
+l4 = lagrangepolynomials(p, 0 .. 5.5)
+for l ∈ l4
+    @test validate(l, atol=1e-4)
+end
+for i ∈ 1:5, j ∈ 1:5
+    @test isapprox(l4[i](p[j]), i == j ? 1 : 0, atol=1e-14)
+end
+
+# From roots
+c = [1, 2, 3]
+p = fromroots(c)
+@test roots(p) ≈ c
+
+# From expression
+dom = 0 .. 5
+x = parameter(dom)
+@test 1x == x
+@test 2x == Polynomial([0, 2], dom)
+@test 1 + x == Polynomial([1, 1], dom)
+@test x + 1 == 1 + x
+@test 2 + x == Polynomial([2, 1], dom)
+@test x + 2 == 2 + x
+@test 1 + Polynomial([1, 2, 3], dom) == Polynomial([2, 2, 3], dom)
+@test Polynomial([1, 2, 3], dom) + 1 == 1 + Polynomial([1, 2, 3], dom)
+@test 2 + Polynomial([1, 2, 3], dom) == Polynomial([3, 2, 3], dom)
+@test Polynomial([1, 2, 3], dom) + 2 == 2 + Polynomial([1, 2, 3], dom)
+@test x + Polynomial([1, 2, 3], dom) == Polynomial([1, 3, 3], dom)
+@test Polynomial([1, 2, 3], dom) + x == x + Polynomial([1, 2, 3], dom)
+@test 3 + 3x - 7x^2 == Polynomial([3, 3, -7], dom)
+@test 3x - 7x^2 + 3 == Polynomial([3, 3, -7], dom)
+@test -7x^2 + 3 + 3x == Polynomial([3, 3, -7], dom)
+@test x + Polynomial([1, 2, 3], dom) + 2x == Polynomial([1, 5, 3], dom)
+
+
 
 
 # -------------------------------------------------------------------------------------------------
@@ -433,7 +498,6 @@ f2 = c * Polynomial(1, 2, 3)
 # -------------------------------------------------------------------------------------------------
 
 x = parameter(R)
-
 m1 = Sin()
 m2 = Sin()
 m3 = Cos()
@@ -444,13 +508,21 @@ m4 = Polynomial([0, 0, 1], 0 .. 4)
 @test 2 * m1 == 2 * m1
 @test 2 * m1 == 2 * m2
 @test 2 * m1 + 3 * m2 == 5 * m1
+@test 10 * (10 * m1) == 100 * m1
 @test (-1) * ((-1) * m1) == m1
 @test (-1) * (-m1) == m1
-@test (2m1) * (4m3) == 8 * m1 * m3
+@test (2 * sin(x)) * (4 * cos(x)) == 8 * (sin(x) * cos(x))
 @test validate(2 * m1, rtol=1e-4)
 @test typeof(a * cos(x)) <: MMJMesh.Mathematics.ScaledMapping
+@test sin(x) * Polynomial([10]) == 10 * sin(x)
+@test Polynomial([10]) * sin(x) == 10 * sin(x)
 
 # Add and subtract
+@test sin(x) + cos(x) == cos(x) + sin(x)
+@test m1 + m2 == 2 * m1
+@test 2 * m1 + 3 * m2 == 5 * m1
+@test m1 + 3 * m2 == 4 * m1
+@test 3 * m1 + m2 == 4 * m1
 @test m1 + zero(m1) == m1
 @test m1 + m1 == 2.0 * m1
 @test 2 * m1 + m1 == 3 * m1
@@ -459,13 +531,20 @@ m4 = Polynomial([0, 0, 1], 0 .. 4)
 @test antiderivative(m1 + m3) == -Cos() + Sin()
 @test m1 - m1 == zero(m1)
 @test m3 - m1 == Cos() - Sin()
-@test validate(m1 + m3, rtol=1e-4)
+@test derivative(sin(x) + cos(x)) == (sin(x) + cos(x))'
+@test derivative(sin(x) + cos(x), 2) == (sin(x) + cos(x))''
+@test validate(m1 + m3, rtol=1e-4)##
+@test 3 * sin(x) + Polynomial([1, 2, 3]) == Polynomial([1, 2, 3]) + 3 * sin(x)
+
+
+# Multiply
+@test sin(x) * cos(x) == cos(x) * sin(x)
 
 # Add and subtract a number
-@test m1 + 1 == m1 + One(m1)
-@test m1 + 2 == m1 + 2 * One(m1)
-@test m1 - 1 == m1 - One(m1)
-@test m1 - 2 == m1 - 2 * One(m1)
+@test m1 + 1 == m1 + one(m1)
+@test m1 + 2 == m1 + constant(m1, 2)
+@test m1 - 1 == m1 + constant(m1, -1)
+@test m1 - 2 == m1 + constant(m1, -2)
 
 # Add or subtract constant
 f = Exp()
@@ -480,15 +559,36 @@ f = Exp()
 @test validate(f - 2)
 @test validate(2 - f)
 
+# Compose
+@test (3 * m1) ∘ m4 == 3 * (m1 ∘ m4)
+
 # Composition m5 = Sin(x^2)
 m5 = m1 ∘ m4
 @test m5' == (Cos() ∘ Polynomial([0, 0, 1], 0 .. 4)) * Polynomial([0, 2], 0 .. 4)
 @test isapprox(m5(√π), 0, atol=1e-15)
 @test validate(m5, rtol=1e-4)
 
+# Special polynomials
+# XXX
+x = parameter()
+@test Polynomial([0]) * sin(x) === zero(x)
+@test sin(x) * Polynomial([0]) === zero(x)
+@test Polynomial([1]) * sin(x) === sin(x)
+@test sin(x) * Polynomial([1]) === sin(x)
+
 # Product
-p = m1 * m2
-@test validate(p)
+@test 10 * (sin(x) * cos(x)) == (10 * sin(x)) * cos(x)
+@test 0.1 * (10 * sin(x^2)) == sin(x^2)
+@test 0.1 * ((10 * sin(x)) ∘ x^2) == sin(x^2)
+@test sin(x) * (10 * x^2) == MMJMesh.Mathematics.ProductMapping(10 * x^2, sin(x))
+@test sin(x) * x^2 == x^2 * sin(x)
+
+# XXX
+@test 0.1 * (10 * x^0 * sin(x)) == sin(x)
+@test 0.1 * (10 * x^0 * (m1 ∘ m4)) == m1 ∘ m4
+@test (10 * x^0 * (m1 ∘ m4)) * 0.1 == m1 ∘ m4
+
+@test validate(sin(x) * cos(x), rtol=1e-4)
 
 # Quotient
 p = m1 / m3
@@ -527,11 +627,16 @@ f3 = Polynomial(1, 2, 3)
 
 # Polynomial special
 f1 = Polynomial(1, 2, 3)
+f2 = Polynomial(5, 4)
 f3 = 2 * Sin()
 
+@test f1 + f2 == Polynomial(6, 6, 3)
+@test 2 * f1 == Polynomial(2, 4, 6)
+@test f1 - f2 == Polynomial(-4, -2, 3)
+@test f1 * f2 == Polynomial(5, 14, 23, 12)
 @test 2 + f1 == Polynomial(3, 2, 3)
-@test Identity(R) + f1 == Polynomial(1, 3, 3)
-@test 2 * Identity(R) + f1 == Polynomial(1, 4, 3)
+@test x + f1 == Polynomial(1, 3, 3)
+@test 2 * x + f1 == Polynomial(1, 4, 3)
 @test f1 + f3 === f1 + f3
 @test f3 + f1 === f1 + f3
 
@@ -541,19 +646,12 @@ f = 3 + 3x^2 + x - 7x^4 + 7
 
 @test typeof(f) === Polynomial{1.0 .. 2.0}
 @test f == Polynomial(10.0, 1, 3, 0, -7, d=1.0 .. 2.0)
-
-
-# Constant mapping
-u = MMJMesh.Mathematics.ConstantMapping(99, InRⁿ{3}, R3)
-@test u(1, 2, 3) == 99
-u = MMJMesh.Mathematics.ConstantMapping([1, 2, 3], InRⁿ{3}, R3)
-@test u(1, 2, 3) == [1, 2, 3]
-
+@test x + 2 * x^2 == Polynomial([0, 1, 2], 1.0 .. 2.0)
+@test (x + x^2) * (x - x^2) == x^2 - x^4
 
 # -------------------------------------------------------------------------------------------------
 # Mappings to Rn
 # -------------------------------------------------------------------------------------------------
-
 
 # # Mapping from components
 
