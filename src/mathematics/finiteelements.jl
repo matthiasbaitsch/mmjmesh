@@ -17,15 +17,18 @@ end
 
 Given an ascending node vector ``x_1, x_2, \\dots, x_{N_N}``, returns the ``C^1``-continuous 1D finite element basis functions ``\\varphi_1, \\dots, \\varphi_{N_N}`` based on Hermite-polynomials. 
 """
-function hermitefunctions(x::AbstractArray{<:Real})
-    N = length(x)
-    f = Matrix{FunctionRToR}(undef, 2N, N - 1)
+function hermitefunctions(x::AbstractArray{<:Real}; midnode=false)
+    Nn = length(x)
+    Ne = Nn - 1
+    Ni = midnode ? Ne : 0
+
+
+    f = Matrix{FunctionRToR}(undef, 2Nn + Ni, Ne)
     fill!(f, Zero{InR,InR,R}())
-    for e = 1:N-1
-        x1 = x[e]
-        x2 = x[e+1]
-        k = 2 * (e - 1)
-        f[k+1:k+4, e] .= makeelement(:hermite, x1 .. x2) |> nodalbasis
+    for e = 1:Ne
+        ϕs = nodalbasis(makeelement(:hermite, x[e] .. x[e+1], midnode=midnode))
+        k = (2 + midnode) * (e - 1)
+        f[k+1:k+length(ϕs), e] .= ϕs
     end
     return [PiecewiseFunction(x, c) for c = eachrow(f)]
 end
@@ -84,7 +87,7 @@ function nodalbasis(e::FiniteElement)
     return e.cache[:nodalbasis]
 end
 
-nodalbasis(type::Symbol, domain; k = -1, a...) = makeelement(type, domain; k, a...) |> nodalbasis
+nodalbasis(type::Symbol, domain; k=-1, a...) = makeelement(type, domain; k, a...) |> nodalbasis
 
 
 """
@@ -239,11 +242,18 @@ addelementtype!(
 Hermite type finite element. Generates the Bogner-Fox-Schmit element (Braess, p. 72) if `K` is a rectangle 
 and `conforming` is true.
 """
-hermiteelement(K::Interval) = FiniteElement(
-    K,
-    Q{1,3},
-    _combineforms(points(K, :corners), [ValueAtLF, DerivativeAtLF])
-)
+function hermiteelement(K::Interval; midnode=false)
+
+    k = 3
+    Ns = _combineforms(points(K, :corners), [ValueAtLF, DerivativeAtLF])
+
+    if midnode
+        k += 1
+        insert!(Ns, 3, ValueAtLF(sum(endpoints(K)) / 2))
+    end
+
+    return FiniteElement(K, Q{1,k}, Ns)
+end
 
 function hermiteelement(K::Rectangle; conforming=true)
     if conforming

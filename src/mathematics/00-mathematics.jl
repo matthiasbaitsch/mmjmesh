@@ -39,7 +39,7 @@ export FunctionRToR, FunctionRnToR, MappingRnToRm
 export domaintype, codomaintype, domain, degree, degrees
 export constval, valueat
 export derivativeat, derivative, pderivativeat, pderivative
-export antiderivative, integrate, sample, plot, pois, roots
+export antiderivative, integrate, ∫, sample, plot, pois, roots
 
 # Composed functions
 export MappingFromComponents
