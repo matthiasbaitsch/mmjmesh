@@ -92,6 +92,6 @@ export FunctionSpace, PolynomialSpace, P, Q, S, Q23R, basis
 export linesegment, polynomialinterpolation
 
 # Finite elements
-export hatfunctions, FiniteElement, makeelement, nodalbasis
+export hatfunctions, hermitefunctions, FiniteElement, makeelement, nodalbasis
 
 end

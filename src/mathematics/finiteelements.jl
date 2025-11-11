@@ -1,5 +1,5 @@
 """
-    hatfunctions(x::AbstractVector{<:Real})
+    hatfunctions(x)
 
 Given an ascending node vector ``x_1, x_2, \\dots, x_{N_N}``, returns the 1D piecewise 
 affine finite element basis functions ``\\varphi_1, \\dots, \\varphi_{N_N}`` with
@@ -9,6 +9,25 @@ function hatfunctions(x::AbstractVector{<:Real})
     N = length(x)
     ei(i) = [i == j for j = 1:N]
     return [interpolate(x, ei(i), order=1) for i = 1:N]
+end
+
+
+"""
+    hermitefunctions(x)
+
+Given an ascending node vector ``x_1, x_2, \\dots, x_{N_N}``, returns the ``C^1``-continuous 1D finite element basis functions ``\\varphi_1, \\dots, \\varphi_{N_N}`` based on Hermite-polynomials. 
+"""
+function hermitefunctions(x::AbstractArray{<:Real})
+    N = length(x)
+    f = Matrix{FunctionRToR}(undef, 2N, N - 1)
+    fill!(f, Zero{InR,InR,R}())
+    for e = 1:N-1
+        x1 = x[e]
+        x2 = x[e+1]
+        k = 2 * (e - 1)
+        f[k+1:k+4, e] .= makeelement(:hermite, x1 .. x2) |> nodalbasis
+    end
+    return [PiecewiseFunction(x, c) for c = eachrow(f)]
 end
 
 

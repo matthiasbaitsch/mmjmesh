@@ -10,7 +10,7 @@ import GLMakie
 import CairoMakie
 
 using LinearAlgebra
-using CairoMakie: Figure, Axis3, scatter!, lines
+using CairoMakie: Figure, Axis3, scatter!, lines, lines!
 
 using MMJMesh
 using MMJMesh.Plots

@@ -29,6 +29,8 @@ end;
 
 ## 1D basis functions
 
+### Piecewise linear hat functions
+
 ```{julia}
 φs = hatfunctions([0, 0.25, 0.75, 1.5, 2.0])
 
@@ -46,6 +48,39 @@ uh = uhat ⋅ φs
 
 fplot(uh, uh', zero(uh))
 ```
+
+### Piecewise cubic functions with continuous derivatives
+
+```{julia}
+xs = [0, 1, 4, 5]
+φs = hermitefunctions(xs)
+
+fig = Figure()
+fplot!(Axis(fig[1, 1], title="Functions"), φs...)
+fplot!(Axis(fig[2, 1], title="Derivatives"), derivative.(φs)...)
+fig
+```
+
+Linear combination
+
+```{julia}
+uhat = [1, 1, 0, 1.0, 0, -1.0, 1, -1]
+uh = uhat ⋅ φs
+
+xd = []
+yd = []
+for x = xs
+    push!(xd, x, x + 1, x + 1, x, NaN)
+    push!(yd, uh(x), uh(x) + uh'(x), uh(x), uh(x), NaN)
+end
+
+p = fplot(uh, uh', zero(uh))
+scatter!(xs, uhat[1:2:end], color=:tomato)
+scatter!(xs, uhat[2:2:end], color=:blue)
+lines!(xd, yd)
+p
+```
+
 
 ## Elements
 
