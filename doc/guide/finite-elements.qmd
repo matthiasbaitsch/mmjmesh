@@ -64,7 +64,7 @@ fig
 Linear combination
 
 ```{julia}
-uhat = [1, 1, 0, 1.0, 0, -1.0, 1, -1]
+uhat = [1, 1, 0, -0.25, 0, 0.25, 1, -1]
 uh = uhat ⋅ φs
 
 xd = []
@@ -209,4 +209,60 @@ bᵉ(δu) = integrate(δu, K)
 rᵉ = [bᵉ(Nᵢ) for Nᵢ ∈ Ns]
 
 prettyprint(L"\mathbf{r}^e", a * b / 4, rᵉ)
+```
+
+
+## Finite element solutions
+
+```{julia}
+function plotbeamsol(EI, wh)
+    fig = Figure()
+    fplot!(Axis(fig[1, 1], title=L"Displacement $w(x)$"), wh, zero(wh), npoints=100)
+    fplot!(Axis(fig[2, 1], title=L"Bending moment $M(x)$"), -EI * wh'', zero(wh))
+    fplot!(Axis(fig[3, 1], title=L"Shear force $V(x)$"), -EI * wh''', zero(wh))
+    return fig
+end
+```
+
+### Beam on two supports with tip force
+
+```{julia}
+l = 2.5
+EI = 10
+F = 1.0
+xa = 3 * l / 4
+xs = [0, xa, l]
+φs = hermitefunctions(xs)
+
+aa(w, δw) = EI * ∫(w'' * δw'') + 1e6 * (w(0) * δw(0) + w'(0) * δw'(0) + w(xa) * δw(xa))
+bb(δw) = F * δw(l)
+
+K = [aa(φi, φj) for φi = φs, φj = φs]
+r = [bb(φi) for φi = φs]
+
+what = K \ r
+wh = what ⋅ φs
+
+plotbeamsol(EI, wh)
+```
+
+### Cantilever beam with line load
+
+```{julia}
+l = 2.5
+EI = 10
+q = 1.0
+xs = [0, l]
+φs = hermitefunctions(xs, midnode=true)
+
+aa(w, δw) = EI * ∫(w'' * δw'') + 1e6 * (w(0) * δw(0) + w'(0) * δw'(0))
+bb(δw) = q * ∫(δw)
+
+K = [aa(φi, φj) for φi = φs, φj = φs]
+r = [bb(φi) for φi = φs]
+
+what = K \ r
+wh = what ⋅ φs
+
+plotbeamsol(EI, wh)
 ```
