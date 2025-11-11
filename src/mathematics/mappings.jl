@@ -377,6 +377,8 @@ function integrate(f::FunctionRToR, I::Interval)
     end
 end
 
+∫(f::FunctionRToR) = integrate(f, domain(f))
+
 
 # -------------------------------------------------------------------------------------------------
 # Parametric curves R → Rn
