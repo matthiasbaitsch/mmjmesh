@@ -59,6 +59,14 @@ scatter!(p, 0 * p, color=:tomato)
 f
 ```
 
+Powers of function
+
+```{julia}
+x = parameter(0 .. 3π)
+f = sin(x)
+fplot(f, f^2, f^3, f^4, f^5)
+```
+
 Lagrange polynomials
 
 ```{julia}

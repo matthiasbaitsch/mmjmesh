@@ -1108,6 +1108,7 @@ Base.:(∘)(m1::AbstractMapping, m2::AbstractMapping) = _composed(m1, m2)
 
 # ^
 Base.:(^)(::Identity{InR,D}, n::Int) where {D} = monomial(n, D)
+Base.:(^)(f::FunctionRToR, n::Int) where {D} = monomial(n, domain(f)) ∘ f
 
 # Add or subtract a Number
 Base.:(+)(f::FunctionToR, a::Real) = a == 1 ? f + one(f) : f + constant(f, a)
