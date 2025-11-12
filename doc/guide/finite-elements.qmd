@@ -49,7 +49,21 @@ uh = uhat ⋅ φs
 fplot(uh, uh', zero(uh))
 ```
 
-### Piecewise cubic functions with continuous derivatives
+### Piecewise functions with continuous derivatives
+
+#### Standard Hermite polynomials
+
+The common approach (see e.g. Fish and Belytschko: A first course in finite elements) is to use piecewise cubic shape functions 
+
+```{julia}
+Φ = makeelement(:hermite, 0 .. 6) |> nodalbasis |> components
+fig = Figure()
+fplot!(Axis(fig[1, 1], title="Functions"), Φ...)
+fplot!(Axis(fig[2, 1], title="Derivatives"), derivative.(Φ)...)
+fig
+```
+
+and to combine them into the basis functions
 
 ```{julia}
 xs = [0, 1, 4, 5]
@@ -61,7 +75,7 @@ fplot!(Axis(fig[2, 1], title="Derivatives"), derivative.(φs)...)
 fig
 ```
 
-Linear combination
+Any linear combination is then a $C^1$ function.
 
 ```{julia}
 uhat = [1, 1, 0, -0.25, 0, 0.25, 1, -1]
@@ -81,6 +95,17 @@ lines!(xd, yd)
 p
 ```
 
+Note that the coefficient vector $\hat{\mathbf{u}}$ contains function values and derivatives for each node.
+
+#### Extended Hermite polynomials
+
+The exact solution for a beam with constant line load is a polynomial of degree four. In order to be able to compute exact solutions in this case, an additional internal node can be introduced.
+
+```{julia}
+xs = [0, 5, 10]
+φs = hermitefunctions(xs, midnode=true)
+fplot(φs)
+```
 
 ## Elements
 
