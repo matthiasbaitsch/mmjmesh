@@ -57,7 +57,7 @@ m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 
 # Triangles
 a = 20
-m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a, TRIANGLE)
+m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a, meshtype=TRIANGLE)
 @test_reference ref("m2d-004.png") mplot(m, edgesvisible=true) |> mconf()
 @test_reference ref("m2d-005.png") mplot(m, 4.1 * (rand(nnodes(m)) .- 0.25)) |> mconf()
 @test_reference ref("m2d-006.png") mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf()

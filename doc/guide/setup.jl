@@ -10,7 +10,7 @@ import GLMakie
 import CairoMakie
 
 using LinearAlgebra
-using CairoMakie: Figure, Axis3, scatter!, lines, lines!
+using CairoMakie: Figure, Axis, Axis3, scatter!, lines, lines!, DataAspect, hidespines!, hidedecorations!
 
 using MMJMesh
 using MMJMesh.Plots
@@ -26,3 +26,11 @@ CairoMakie.set_theme!(CairoMakie.theme_minimal())
 CairoMakie.update_theme!(colormap=:jet)
 
 meshpath(m) = joinpath(@__DIR__(), "../../data/gmsh", m);
+
+function make_axis(f)
+    ax = Axis(f, aspect=DataAspect())
+    hidespines!(ax)
+    hidedecorations!(ax)
+    ax
+end
+

@@ -15,7 +15,7 @@ m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 @test nfaces(m) == 2a * a
 @test coordinates(m, 1) == [0, 0]
 
-m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a, TRIANGLE)
+m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a, meshtype=TRIANGLE)
 @test nfaces(m) == 2 * 2a * a
 
 m = Mesh((1 .. 3) × (4 .. 5), 2)
@@ -27,6 +27,9 @@ m = Mesh((1 .. 3) × (4 .. 5), 2, 2)
 @test nfaces(m) == 4
 @test coordinates(m, 1) == [1, 4]
 @test coordinates(m, 9) == [3, 5]
+
+m = Mesh(4.0, 2.0, 4, meshtype=CRISSCROSS)
+@test nfaces(m) == 4 * 8
 
 cartesianfrompolar(x) = x[1] * [cos(x[2]), sin(x[2])]
 m = Mesh((1 .. 2) × (0 .. (3 / 2)π), 10, 70, gmap=cartesianfrompolar)

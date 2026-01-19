@@ -19,7 +19,7 @@ using MMJMesh.Mathematics
 # Exports
 
 ## generatemeshes.jl
-export Meshtype, QUADRANGLE, TRIANGLE
+export Meshtype, QUADRANGLE, TRIANGLE, CRISSCROSS
 
 # Parts
 include("generatemeshes.jl")

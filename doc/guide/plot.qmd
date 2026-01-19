@@ -49,14 +49,14 @@ mplot(m, -1.1 .+ 2.2 * rand(2, nedges(m))) |> mconf()
 ### Vertical
 
 ```{julia}
-m = Mesh(π .. 3π, 20, t -> [0; t])
+m = Mesh(π .. 3π, 20, gmap = t -> [0; t])
 mplot(m, -1.1 .+ 3.2 * rand(nedges(m))) |> mconf()
 ```
 
 ### On a spiral
 
 ```{julia}
-m = Mesh(π .. 3π, 20, t -> t * [cos(t); sin(t)])
+m = Mesh(π .. 3π, 20, gmap = t -> t * [cos(t); sin(t)])
 mplot(m, -1.1 .+ 3.2 * rand(2, nedges(m))) |> mconf()
 ```
 
@@ -107,7 +107,7 @@ mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf()
 
 ```{julia}
 a = 20
-m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a, TRIANGLE)
+m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a, meshtype=TRIANGLE)
 println("Nn = ", (a + 1) * (2a + 1))
 print("Links (1, 2):")
 @time l12 = links(m.topology, 1, 2);

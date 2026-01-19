@@ -1,6 +1,7 @@
 using Test
 using LinearAlgebra
 
+using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Plots: _collectlines, _mergemeshes, _getnintervals, sample2d
 
@@ -18,7 +19,6 @@ m = _mergemeshes([m1, m2])
     1.0 1.0 1.0 1.0 2.0 2.0 2.0 2.0
 ]
 @test m[2] == [1 2 4; 1 4 3; 5 6 8; 5 8 7]
-
 
 
 n1, n2 = _getnintervals((1 .. 2) × (3 .. 5), 10)

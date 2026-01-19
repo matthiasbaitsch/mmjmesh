@@ -81,22 +81,10 @@ mplot(m, [Polynomial(rand(-1 .. 1, 4), IHat) for _ ∈ 1:nelements(m)]) |> mconf
 Furthermore, 1D meshes can be created with a parametric function
 
 ```{julia}
-m = Mesh(0 .. 5, 60, t -> [t; 0.3 * sin(π * t)])
+u(t) = [t; 0.3 * sin(π * t)]
+m = Mesh(0 .. 5, 60, gmap = u)
 mplot(m) |> mconf()
 ```
-
-where the last parameter `t -> [t; sin(t)]` (read: `t` is mapped on the vector `(t, sin(t))`) defines the parametric curve
-
-$$
-    \mathbf{u}(t) =
-    \left(
-    \begin{array}{c}
-        t
-        \\ 
-        \sin(t)
-    \end{array}
-    \right).
-$$
 
 ## Demo for 2D meshes
 
