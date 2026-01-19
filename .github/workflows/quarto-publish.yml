@@ -28,8 +28,6 @@ jobs:
       - name: Test
         continue-on-error: true
         run: DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --color=yes --project -e 'using Pkg; Pkg.test(coverage=true)'
-      - name: Process code coverage information
-        uses: julia-actions/julia-processcoverage@v1
       - name: Render Guide
         run: cd doc/guide && DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' quarto render --execute
       - name: Install apidoc dependencies
