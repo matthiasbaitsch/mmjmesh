@@ -18,4 +18,7 @@ include("plots/00-plots.jl")
 # Export some
 include("reexports.jl")
 
+# Precompile
+include("precompile.jl")
+
 end
