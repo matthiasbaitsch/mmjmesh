@@ -5,6 +5,3 @@ MMJMesh = "010ee2c9-7ff8-468a-b3f6-2ff8c4732c90"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
-
-[compat]
-Makie = "<0.24"

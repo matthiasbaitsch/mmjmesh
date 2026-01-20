@@ -1,72 +1,86 @@
-MakieCore.@recipe(FPlot, functions) do scene
-    attr = MakieCore.Attributes(
-        color=MakieCore.theme(scene, :linecolor),
-        linewidth=MakieCore.theme(scene, :linewidth),
-        linestyle=nothing,
-        maxrecursion=15,
-        maxangle=2.5,
-        npoints=5,
-        yscale=1.0,
-        ir=false,
-        connect_jumps=false,
-        cycle=[:color],
-    )
-    MakieCore.generic_plot_attributes!(attr,)
-    MakieCore.colormap_attributes!(attr, MakieCore.theme(scene, :colormap))
-    return attr
+"""
+    fplot(f, [g, h, ...]; kwargs)
+
+Plots the function `f` and optionally more functions.
+"""
+Makie.@recipe FPlot begin
+    "Color"
+    color = @inherit linecolor
+    "Linewidth"
+    linewidth = @inherit linewidth
+    "Linestyle"
+    linestyle = @inherit linestyle
+    "Maximum number of recurstion steps"
+    maxrecursion = 15
+    "Maximum angle between segments in degrees"
+    maxangle = 2.5
+    "Initial number of sampling points"
+    npoints = 5
+    "Scaling factor in y-direction, affects evaluation of angle"
+    yscale = 1.0
+    "Inserts points where the polyline crosses the x-axis"
+    ir = false
+    "Connect lines at points of interest"
+    connect_jumps = false
 end
 
 
-function MakieCore.plot!(plot::FPlot)
+function Makie.plot!(plot::FPlot{<:Tuple{Vararg{<:AbstractMapping}}})
+    attributes = plot.attributes
 
-    att = plot.attributes
+    # Process functions to plot
+    for (i, f) = enumerate(plot.args[])
 
-    # TODO: Plot options, sample options
-    for a ∈ plot.args
-        f = a[]
-        a, b = IntervalSets.endpoints(domain(f))
-        p = pois(f)
-
-        s1d(a, b) = sample1d(f, a, b,
-            maxrecursion=att.maxrecursion[],
-            maxangle=att.maxangle[],
-            npoints=att.npoints[],
-            yscale=att.yscale[],
-            ir=att.ir[]
+        # Shorthand to sample current function from a to b
+        s1d(a, b) = MMJMesh.Plots.sample1d(f, a, b,
+            maxrecursion=attributes.maxrecursion[],
+            maxangle=attributes.maxangle[],
+            npoints=attributes.npoints[],
+            yscale=attributes.yscale[],
+            ir=attributes.ir[]
         )
 
-        if isempty(p)
+        # Points of interest and interval
+        pts = pois(f)
+        a, b = IntervalSets.endpoints(domain(f))
+
+        # Collect x and y
+        if isempty(pts) # No points of interest
             xy = s1d(a, b)
-        else
-            δ = 1e-12 * (b - a)
+        else          # Handle points of intereste
             x = Float64[]
             y = Float64[]
+            δ = 1e-12 * (b - a)
 
+            # Shorthand to sample and to append to x and y
             s1da(a, b) = begin
                 xy = s1d(a, b)
                 append!(x, xy[1, :])
                 append!(y, xy[2, :])
 
-                if !att.connect_jumps[]
+                if !attributes.connect_jumps[]
                     push!(x, NaN)
                     push!(y, NaN)
                 end
             end
 
-            s1da(a, p[1] - δ)
-            for i = 1:length(p)-1
-                s1da(p[i] + δ, p[i+1] - δ)
+            # Sample first, inner and last intervals
+            s1da(a, pts[1] - δ)
+            for i = 1:length(pts)-1
+                s1da(pts[i] + δ, pts[i+1] - δ)
             end
-            s1da(p[end] + δ, b)
+            s1da(pts[end] + δ, b)
 
-            xy = [x'; y']
+            # Put together
+            xy = stack([x, y], dims=1)
         end
 
-
-        MakieCore.lines!(plot, xy)
+        # Plot
+        # Makie.lines!(plot, plot.attributes, xy; color=Makie.Cycled(i))
+        Makie.lines!(plot, xy, color=Makie.Cycled(i))
     end
+
     return plot
 end
 
-
-fplot(functions::AbstractArray; kwargs...) = fplot(functions...; kwargs)
+fplot(functions::AbstractArray; kwargs...) = fplot(functions...; kwargs...)

@@ -9,7 +9,6 @@ using LinearAlgebra
 
 import Makie
 import Random
-import MakieCore
 import DomainSets
 import IntervalSets
 
@@ -23,7 +22,7 @@ using MMJMesh.Topologies
 using MMJMesh.Mathematics
 
 # Exports
-export plot, plot!, mplot, mconf, fplot, fplot3d, vplot, feplot, feconf
+export mplot, mconf, feplot, feconf, fplot, fplot3d, vplot
 
 # Parts
 include("helperfunctions.jl")

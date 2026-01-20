@@ -1,47 +1,41 @@
-MakieCore.@recipe(FPlot3D, functions) do scene
-    attr = MakieCore.Attributes(
-        npoints=30,
-        color=3,
-        meshcolor=:black,
-        mesh=5,
-        colorrange=MakieCore.automatic,
-        colormap=MakieCore.theme(scene, :colormap),
-        zscale=1
-    )
-    MakieCore.generic_plot_attributes!(attr)
-    MakieCore.colormap_attributes!(attr, MakieCore.theme(scene, :colormap))
-    return attr
+Makie.@recipe FPlot3D begin
+    npoints = 30
+    color = 3
+    meshcolor = :black
+    mesh = 5
+    zscale = 1
+
+    Makie.mixin_colormap_attributes()...
+    Makie.mixin_generic_plot_attributes()...
 end
 
 
-function MakieCore.plot!(plot::FPlot3D)
-    attributes = plot.attributes
-    mesh = attributes.mesh[]
-    color = attributes.color[]
-    meshcolor = attributes.meshcolor[]
-    npoints = attributes.npoints[]
-    colorrange = attributes.colorrange[]
-    colormap = attributes.colormap[]
-    zscale = attributes.zscale[]
-    for arg ∈ plot.args
-        f = arg[]
+function Makie.plot!(plot::FPlot3D)
+    npoints = plot.npoints[]
+    color = plot.color[]
+    meshcolor = plot.meshcolor[]
+    mesh = plot.mesh[]
+    zscale = plot.zscale[]
+    colorrange = plot.colorrange[]
+    colormap = plot.colormap[]
+    for f ∈ plot.args[]
         d = domain(f)
         !isfinite(d) && error("Domain is infinite: $d")
         fx, ft = sample2d(f, domain=d, npoints=npoints)
         fx[3, :] *= zscale
         lx = sample2dlines(f, domain=d, npoints=npoints, nmeshlines=mesh, zscale=zscale)
-        MakieCore.mesh!(
+        Makie.mesh!(
             plot, fx, ft,
             color=_getcolor(fx, color, zscale), colorrange=colorrange, colormap=colormap
         )
-        MakieCore.lines!(plot, _collectlines(lx)..., color=meshcolor)
+        Makie.lines!(plot, _collectlines(lx)..., color=meshcolor)
     end
     return plot
 end
 
 
 function fplot3d(
-    fs::AbstractArray{<:AbstractMapping}; colormap=MakieCore.theme(:colormap), fig=Makie.Figure(), zrange=nothing
+    fs::AbstractArray{<:AbstractMapping}; colormap=Makie.theme(:colormap), fig=Makie.Figure(), zrange=nothing
 )
     n = length(fs)
     cnt = 1

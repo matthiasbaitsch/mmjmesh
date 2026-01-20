@@ -1,21 +1,19 @@
+Makie.@recipe FEPlot (element,) begin
 
-MakieCore.@recipe(FEPlot, element) do scene
-    attr = MakieCore.Attributes()
-    return attr
 end
 
 function plotit!(plot, K::IntervalSets.AbstractInterval)
     p1 = IntervalSets.leftendpoint(K)
     p2 = IntervalSets.rightendpoint(K)
-    MakieCore.lines!(plot, [p1, p2], [0, 0], color=:black, linewidth=3)
+    Makie.lines!(plot, [p1, p2], [0, 0], color=:black, linewidth=3)
 end
 
 function plotit!(plot, K::DomainSets.Rectangle)
     corners = points(K, :corners)
-    MakieCore.poly!(plot, corners, color=:seashell, strokecolor=:black, strokewidth=3)
+    Makie.poly!(plot, corners, color=:seashell, strokecolor=:black, strokewidth=3)
 end
 
-function MakieCore.plot!(plot::FEPlot)
+function Makie.plot!(plot::FEPlot)
     element = plot.element[]
 
     plotit!(plot, element.K)
@@ -27,8 +25,8 @@ function MakieCore.plot!(plot::FEPlot)
     pMixedDerivativeAt = []
 
     # Helpers
-    p2(x::Real) = MakieCore.Point2f(x, 0)
-    p2(x::AbstractArray) = MakieCore.Point2f(x)
+    p2(x::Real) = Makie.Point2f(x, 0)
+    p2(x::AbstractArray) = Makie.Point2f(x)
 
     handle(lf::ValueAtLF) = push!(pValueAt, p2(lf.x))
     handle(lf::DerivativeAtLF) = push!(pDerivativeAt, p2(lf.x))
@@ -50,11 +48,11 @@ function MakieCore.plot!(plot::FEPlot)
 
     # Plot
     if !isempty(pValueAt)
-        MakieCore.scatter!(plot, pValueAt, color=:black, markersize=13)
+        Makie.scatter!(plot, pValueAt, color=:black, markersize=13)
     end
 
     if !isempty(pDerivativeAt)
-        MakieCore.scatter!(
+        Makie.scatter!(
             plot, pDerivativeAt,
             color=:transparent, strokewidth=1.5, strokecolor=:black, markersize=20
         )
@@ -64,7 +62,7 @@ function MakieCore.plot!(plot::FEPlot)
         Makie.arrows2d!(
             plot, 
             pMixedDerivativeAt,
-            repeat([MakieCore.Vec2f(1, 1)], length(pMixedDerivativeAt)), 
+            repeat([Makie.Vec2f(1, 1)], length(pMixedDerivativeAt)), 
             lengthscale=0.2
         )
     end

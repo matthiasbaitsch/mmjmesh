@@ -1,17 +1,14 @@
-MakieCore.@recipe(VPlot, functions) do scene
-    attr = MakieCore.Attributes(
-        npoints=10,
-        color=:black,
-        arrowsize=7.5,
-        lengthscale=0.25,
-        colormap=MakieCore.theme(scene, :colormap)
-    )
-    MakieCore.generic_plot_attributes!(attr)
-    return attr
+Makie.@recipe VPlot begin
+    npoints = 10
+    color = :black
+    arrowsize = 7.5
+    lengthscale = 0.25
+    Makie.mixin_colormap_attributes()...
+    Makie.mixin_generic_plot_attributes()...
 end
 
 
-function MakieCore.plot!(plot::VPlot)
+function Makie.plot!(plot::VPlot)
     attributes = plot.attributes
     color = attributes.color[]
     np = attributes.npoints[]
@@ -19,8 +16,7 @@ function MakieCore.plot!(plot::VPlot)
     ls = attributes.lengthscale[]
     cm = attributes.colormap[]
 
-    for arg ∈ plot.args
-        f = arg[]
+    for f ∈ plot.args[]
         d = domain(f)
         rx = DomainSets.component(d, 1)
         ry = DomainSets.component(d, 2)
@@ -32,7 +28,7 @@ function MakieCore.plot!(plot::VPlot)
             color = norm.(u)
         end
         Makie.arrows2d!(
-            plot, MakieCore.Point2f.(p), MakieCore.Vec2f.(u), 
+            plot, Makie.Point2f.(p), Makie.Vec2f.(u),
             # FIXME
             # linecolor=color,
             # arrowcolor=color, arrowsize=as, lengthscale=ls, colormap=cm

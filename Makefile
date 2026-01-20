@@ -16,4 +16,5 @@ test:
 clean:
 	find . -name \*.cov | xargs rm
 	rm -rf doc/guide/_book doc/guide/.quarto doc/guide/_freeze
+	rm doc/*/Manifest.toml
 

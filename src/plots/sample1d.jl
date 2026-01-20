@@ -65,7 +65,11 @@ sample1d(
 
 function wiggle!(x::Vector{<:Real}, eps::Real)
     n = length(x)
-    x[2:n-1] += 0.5 * rand(Random.Random.Xoshiro(22421), -eps .. eps, n - 2)
+    x[2:n-1] += 0.5 * rand(
+        Random.Random.Xoshiro(22421),
+        IntervalSets.ClosedInterval(-eps, eps),
+        n - 2
+    )
     return x
 end
 

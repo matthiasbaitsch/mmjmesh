@@ -2,54 +2,49 @@
 # Recipe
 # -------------------------------------------------------------------------------------------------
 
-MakieCore.@recipe(MPlot, mesh, scalars) do scene
+Makie.@recipe MPlot (mesh, scalars) begin
 
-    # Collect attributes from theme
-    attr = MakieCore.Attributes(
+    # Nodes
+    nodesvisible = nothing
+    nodecolor = :tomato
+    nodesize = @inherit markersize
+    nodewarp = nothing
 
-        # Nodes
-        nodesvisible=MakieCore.theme(scene, :nodesvisible),
-        nodecolor=MakieCore.theme(scene, :nodecolor),
-        nodesize=MakieCore.theme(scene, :markersize),
+    # Edges
+    edgesvisible = nothing
+    edgecolor = @inherit linecolor
+    edgelinewidth = nothing
 
-        # Edges
-        edgesvisible=MakieCore.theme(scene, :edgesvisible),
-        edgecolor=MakieCore.theme(scene, :edgecolor),
-        edgelinewidth=MakieCore.theme(scene, :edgelinewidth),
+    # Featureedges
+    featureedgesvisible = true
+    featureedgecolor = nothing
+    featureedgelinewidth = nothing
 
-        # Featureedges
-        featureedgesvisible=MakieCore.theme(scene, :featureedgesvisible),
-        featureedgecolor=MakieCore.theme(scene, :featureedgecolor),
-        featureedgelinewidth=MakieCore.theme(scene, :featureedgelinewidth),
+    # Faces
+    facesvisible = true
+    facecolor = nothing
+    facecolormap = nothing
 
-        # Faces
-        facesvisible=MakieCore.theme(scene, :facesvisible),
-        facecolor=MakieCore.theme(scene, :facecolor),
-        facecolormap=MakieCore.theme(scene, :facecolormap),
+    # Lineplot
+    lineplotvisible = nothing
+    lineplotscale = 0.1
+    lineplotoutlinesvisible = true
+    lineplotoutlinescolor = :black
+    lineplotoutlineslinewidth = @inherit linewidth
+    lineplotfacesvisible = true
+    lineplotfacescolor = nothing
+    lineplotfacescolormap = @inherit colormap
 
-        # Lineplot
-        lineplotvisible=MakieCore.theme(scene, :lineplotvisible),
-        lineplotvalues=MakieCore.theme(scene, :lineplotvalues),
-        lineplotscale=MakieCore.theme(scene, :lineplotscale),
-        lineplotoutlinesvisible=MakieCore.theme(scene, :lineplotoutlinesvisible),
-        lineplotoutlinescolor=MakieCore.theme(scene, :lineplotoutlinescolor),
-        lineplotoutlineslinewidth=MakieCore.theme(scene, :lineplotoutlineslinewidth),
-        lineplotfacesvisible=MakieCore.theme(scene, :lineplotfacesvisible),
-        lineplotfacescolor=MakieCore.theme(scene, :lineplotfacescolor),
-        lineplotfacescolormap=MakieCore.theme(scene, :lineplotfacescolormap),
+    # Faceplot
+    faceplotzscale = 0.0
+    faceplotmesh = 15
+    faceplotnpoints = 30
+    faceplotmeshcolor = @inherit linecolor
+    faceplotmeshlinewidth = 1.25
 
-        # Faceplot
-        faceplotzscale=MakieCore.theme(scene, :faceplotzscale),
-        faceplotmesh=MakieCore.theme(scene, :faceplotmesh),
-        faceplotnpoints=MakieCore.theme(scene, :faceplotnpoints),
-        faceplotmeshcolor=MakieCore.theme(scene, :faceplotmeshcolor),
-        faceplotmeshlinewidth=MakieCore.theme(scene, :faceplotmeshlinewidth),
-    )
-
-    MakieCore.generic_plot_attributes!(attr)
-    MakieCore.colormap_attributes!(attr, MakieCore.theme(scene, :colormap))
-
-    return attr
+    # Defaults
+    Makie.mixin_colormap_attributes()...
+    Makie.mixin_generic_plot_attributes()...
 end
 
 
@@ -57,32 +52,34 @@ end
 # Main plot function
 # -------------------------------------------------------------------------------------------------
 
-function MakieCore.plot!(plot::MPlot)
+Makie.convert_arguments(::Type{MPlot}, m::Mesh) = (m, nothing)
+
+function Makie.plot!(plot::MPlot)
     mesh = plot.mesh[]
+    scalars = plot.scalars[]
+    havescalars = !isnothing(scalars)
 
     # Helpers
-    isundefined(key) = key ∉ keys(plot.attributes) || isnothing(plot.attributes[key][])
-    setifundefined(key, value) = isundefined(key) && (plot.attributes[key] = value)
+    isundefined(key) = !haskey(plot, key) || isnothing(plot[key][])
+    setifundefined(key, value) = isundefined(key) && (plot[key] = value)
 
     # Configure
-    color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
+    color = havescalars ? scalars : plot.facecolor
     colorbygroups = false
     lineplotvisible = false
 
     # Settings if not defined
     setifundefined(:nodesvisible, nnodes(mesh) <= 50)
-    setifundefined(:nodecolor, :tomato)
-    setifundefined(:edgecolor, MakieCore.theme(plot, :linecolor))
-    setifundefined(:lineplotscale, 0.1)
-    setifundefined(:lineplotoutlinesvisible, true)
-    setifundefined(:lineplotfacesvisible, true)
-    setifundefined(:lineplotoutlinescolor, MakieCore.theme(plot, :linecolor))
-    setifundefined(:lineplotoutlineslinewidth, MakieCore.theme(plot, :linewidth))
-    setifundefined(:lineplotfacescolormap, MakieCore.theme(plot, :colormap))
-    setifundefined(:faceplotzscale, 0.0)
-    setifundefined(:faceplotnpoints, 30)
-    setifundefined(:faceplotmeshlinewidth, 1.25)
-    setifundefined(:faceplotmeshcolor, MakieCore.theme(plot, :linecolor))
+    if (nnodes(mesh)) == 0
+        plot.nodesvisible = false
+    end
+    if nedges(mesh) == 0
+        plot.edgesvisible = false
+        plot.featureedgesvisible = false
+    end
+    if nfaces(mesh) == 0
+        plot.facesvisible = false
+    end
 
     # Access node coordinates or warp
     if isundefined(:nodewarp)
@@ -101,20 +98,17 @@ function MakieCore.plot!(plot::MPlot)
         plot.edgesvisible = true
         plot.featureedgesvisible = false
         plot.facesvisible = false
-        lineplotvisible = length(plot) > 1
+        lineplotvisible = !isnothing(scalars)
         setifundefined(:edgelinewidth, 3)
     end
 
-    # Settings for mesh of 2D elements
+    # # Settings for mesh of 2D elements
     if pdim(mesh) == 2
-        havedata = color isa Vector || color isa Symbol
-        colorbygroups = !havedata && isundefined(:facecolor) && hasgroups(mesh, d=2)
-        setifundefined(:featureedgesvisible, true)
+        colorbygroups = !havescalars && isundefined(:facecolor) && hasgroups(mesh, d=2)
         setifundefined(:edgesvisible, nfaces(mesh) <= 100)
-        setifundefined(:edgecolor, MakieCore.theme(plot, :linecolor))
         setifundefined(:edgelinewidth, 0.75)
-        setifundefined(:featureedgelinewidth, 3 * plot.edgelinewidth[])
-        setifundefined(:facesvisible, true)
+        setifundefined(:featureedgelinewidth, 2.25)
+
         if colorbygroups
             setifundefined(:facecolormap, :Pastel1_9)
         else
@@ -123,7 +117,7 @@ function MakieCore.plot!(plot::MPlot)
             else
                 setifundefined(:facecolor, :seashell2)
             end
-            setifundefined(:facecolormap, MakieCore.theme(plot, :colormap))
+            setifundefined(:facecolormap, Makie.theme(plot, :colormap)[])
         end
     end
 
@@ -137,13 +131,15 @@ function MakieCore.plot!(plot::MPlot)
 
     # Plot functions on faces goes extra at the moment - TODO this is a hack, refactor
     if pdim(mesh) == 2 && (color isa Function || color isa Symbol)
-        plot.featureedgesvisible[] && nedges(mesh) > 0 && plot.faceplotzscale[] == 0 && plotedges(plot, true)
-        plotfacefunctions(plot)
+        plotfeaturedges = plot.featureedgesvisible[] && nedges(mesh) > 0 && plot.faceplotzscale[] == 0
+
+        plotfeaturedges && plotedges(plot, true)
+        plot.facesvisible[] && plotfacefunctions(plot)
     else # Plot
         lineplotvisible && plotlineplot(plot)
-        plot.facesvisible[] && nfaces(mesh) > 0 && plotfaces(plot)
-        plot.edgesvisible[] && nedges(mesh) > 0 && plotedges(plot, false)
-        plot.featureedgesvisible[] && nedges(mesh) > 0 && plotedges(plot, true)
+        plot.facesvisible[] && plotfaces(plot, color)
+        plot.edgesvisible[] && plotedges(plot, false)
+        plot.featureedgesvisible[] && plotedges(plot, true)
         plot.nodesvisible[] && plotnodes(plot)
     end
 
@@ -208,24 +204,24 @@ function plotlineplot(plot::MPlot, mesh::Mesh, functions::AbstractVector{<:Funct
 
     # Plot faces
     if plot.lineplotfacesvisible[]
-        MakieCore.mesh!(plot, [xf yf]', reshape(triangles, 3, :)',
+        Makie.mesh!(plot, [xf yf]', reshape(triangles, 3, :)',
             color=cf, colormap=plot.lineplotfacescolormap)
     end
 
     # Plot outlines
     if plot.lineplotoutlinesvisible[]
-        MakieCore.lines!(plot, xe, ye, linewidth=plot.lineplotoutlineslinewidth,
+        Makie.lines!(plot, xe, ye, linewidth=plot.lineplotoutlineslinewidth,
             color=plot.lineplotoutlinescolor)
     end
 end
 
 
-function plotfaces(plot::MPlot)
+function plotfaces(plot::MPlot, color)
 
     # Mesh and color
     mesh = plot.mesh[]
     nodecoordinates = plot.nodecoordinates[]
-    color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
+    # color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
 
     # Test if we have data and overall color
     haveData = color isa Vector
@@ -282,7 +278,7 @@ function plotfaces(plot::MPlot)
     end
 
     # Plot
-    MakieCore.mesh!(
+    Makie.mesh!(
         plot,
         tomatrix(coords), tomatrix(tf, ROWS),
         color=color, colormap=plot.facecolormap, colorrange=plot.colorrange
@@ -296,9 +292,12 @@ function plotedges(plot::MPlot, featureedges::Bool)
 
     # Collect indices of edges to plot
     if featureedges
-        indices = mesh.groups[:boundaryedges]
+        # Boundary edges
+        indices = group(mesh, :boundaryedges)
+
+        # Add edges in groups
         for n in groupnames(mesh, d=1, predefined=false)
-            indices = indices ∪ mesh.groups[n]
+            indices = indices ∪ group(mesh, n)
         end
     else
         indices = 1:nedges(mesh)
@@ -331,44 +330,42 @@ function plotedges(plot::MPlot, featureedges::Bool)
         end
     end
 
-    MakieCore.lines!(plot, _collectlines(points)..., linewidth=lw, color=lc, colormap=:tab10)
+    Makie.lines!(plot, _collectlines(points)..., linewidth=lw, color=lc, colormap=:tab10)
 end
 
 function plotnodes(plot::MPlot)
-    mesh = plot.args[1][]
+    mesh = plot.mesh[]
     nodecoordinates = plot.nodecoordinates[]
     x = nodecoordinates.(nodes(mesh)) |> tomatrix
 
-    MakieCore.scatter!(
+    Makie.scatter!(
         plot, x, color=plot.nodecolor, markersize=plot.nodesize
     )
 end
 
 function plotfacefunctions(plot::MPlot)
-    attributes = plot.attributes
-
     # Edge attributes
-    edgesvisible = attributes.edgesvisible[]
-    edgecolor = attributes.edgecolor[]
-    edgelinewidth = attributes.edgelinewidth[]
+    edgesvisible = plot.edgesvisible[]
+    edgecolor = plot.edgecolor[]
+    edgelinewidth = plot.edgelinewidth[]
 
-    # Face attributes
-    facecolor = attributes.facecolor[]
+    # Face plot
+    facecolor = plot.facecolor[]
 
     # Faceplot
-    fzscale = attributes.faceplotzscale[]
-    fnpoints = attributes.faceplotnpoints[]
-    fnmeshlines = attributes.faceplotmesh[]
-    fmeshcolor = attributes.faceplotmeshcolor[]
-    fmeshlinewidth = attributes.faceplotmeshlinewidth[]
+    fzscale = plot.faceplotzscale[]
+    fnpoints = plot.faceplotnpoints[]
+    fnmeshlines = plot.faceplotmesh[]
+    fmeshcolor = plot.faceplotmeshcolor[]
+    fmeshlinewidth = plot.faceplotmeshlinewidth[]
 
     # General
-    colorrange = attributes.colorrange[]
-    colormap = attributes.colormap[]
+    colorrange = plot.colorrange[]
+    colormap = plot.colormap[]
 
     # Parameters
-    mesh = plot.args[1][]
-    colors = plot.args[2][]
+    mesh = plot.mesh[]
+    colors = plot.scalars[]
 
     # Function to plot
     if colors isa Symbol
@@ -383,21 +380,20 @@ function plotfacefunctions(plot::MPlot)
     color = _getcolor(xf, facecolor, 1)
     xf[3, :] *= fzscale
 
-
     # Plot Mesh
-    MakieCore.mesh!(
+    Makie.mesh!(
         plot, xf, tf, color=color,
         colormap=colormap, colorrange=colorrange
     )
 
     # Plot mesh lines on elements
     if fnmeshlines > 0
-        MakieCore.lines!(plot, _collectlines(lpmesh)..., color=fmeshcolor, linewidth=fmeshlinewidth)
+        Makie.lines!(plot, _collectlines(lpmesh)..., color=fmeshcolor, linewidth=fmeshlinewidth)
     end
 
     # Plot element edges
     if edgesvisible
-        MakieCore.lines!(plot, _collectlines(lpedges)..., color=edgecolor, linewidth=edgelinewidth)
+        Makie.lines!(plot, _collectlines(lpedges)..., color=edgecolor, linewidth=edgelinewidth)
     end
 end
 
@@ -427,7 +423,7 @@ function mconf(; colorbar=true, dataaspect=true, blank=true, title="")
             p = _find_plot_with_colormap(scene.plot.plots)
             if !isnothing(p) &&
                !isnothing(Makie.extract_colormap_recursive(p)) &&
-               !(p isa MakieCore.Lines)
+               !(p isa Makie.Lines)
                 Makie.Colorbar(scene.figure[1, 2], p)
             end
         end
