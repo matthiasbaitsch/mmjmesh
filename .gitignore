@@ -3,3 +3,4 @@ src/dev*.jl
 doc/build
 *.cov
 dev.jl
+LocalPreferences.toml

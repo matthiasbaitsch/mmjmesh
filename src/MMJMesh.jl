@@ -1,5 +1,8 @@
 module MMJMesh
 
+using Preferences
+preference = @load_preference("preference", "default")
+
 # Basic stuff
 include("common.jl")
 include("mmjbase/00-mmjbase.jl")
