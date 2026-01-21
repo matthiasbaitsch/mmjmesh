@@ -128,6 +128,7 @@ end
 
 """
     definegroup!(m, dim, name, indices)
+    definegroup!(m, dim, name; nodegroup=group)
 
 For mesh `m`, define group of `dim`-dimensional entities called `name` with entities `indices`.
 """
@@ -136,6 +137,10 @@ function definegroup!(m::Mesh, dim::Int, name::Symbol, indices)
     g.mesh = m
     m.groups[name] = g
 end
+
+# TODO: test
+definegroup!(m::Mesh, dim::Int, name::Symbol; nodegroup::Symbol) =
+    definegroup!(m, dim, name, indices(m, dim, hasnodes(group(m, nodegroup))))
 
 definegroup!(name::Symbol, es::MeshEntityList{DT}) where {DT} = definegroup!(es.mesh, DT, name, indices(es))
 

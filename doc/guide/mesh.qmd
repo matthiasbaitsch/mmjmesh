@@ -161,6 +161,8 @@ println("     Coordinates: ", coordinates(e))
 println("     Coordinates: ", coordinates(e, 3))
 ```
 
+### Iterate of entities
+
 A loop can be used to process specific entity types
 
 ```{julia}
@@ -184,6 +186,8 @@ for e = entities(face(m, 3))
     println(e)
 end
 ```
+
+### Node selection
 
 Nodes can be selected based on a predicate.
 
@@ -223,6 +227,8 @@ In the MMJMesh mesh, groups are represented by symbols. In addition to the group
 groupnames(m)
 ```
 
+### Predefined groups
+
 Furthermore, some groups are predefined by MMJMesh.
 
 ```{julia}
@@ -234,6 +240,8 @@ A group collects indices of entities in the group
 ```{julia}
 show(group(m, :boundarynodes))
 ```
+
+### Using groups
 
 A group behaves like a vector of integer values.
 
@@ -251,6 +259,8 @@ scatter!(coordinates(m, group(m, :boundarynodes)), color=:hotpink)
 p
 ```
 
+### Defining groups
+
 Additional groups are defined by specifying a dimension, a name and indices.
 
 ```{julia}
@@ -258,6 +268,15 @@ definegroup!(m, 2, :f1, 100:300)
 definegroup!(m, 2, :f2, 200:600)
 definegroup!(m, 1, :e1, 600:800)
 definegroup!(m, 1, :e2, 700:900)
+mplot(m) |> mconf()
+```
+
+Groups can be defined based on existing node groups
+
+```{julia}
+m = Mesh(4.0, 2.0, 17)
+definegroup!(m, 1, :eb1, nodegroup=:b1)
+definegroup!(m, 1, :eb3, nodegroup=:b3)
 mplot(m) |> mconf()
 ```
 

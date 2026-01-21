@@ -52,6 +52,6 @@ export setdata!, hasdata, data
 export addnode!, addnodes!, addelement!, addelements!
 
 ## predicates.jl
-export on
+export on, hasnodes
 
 end
