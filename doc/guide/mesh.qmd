@@ -44,6 +44,8 @@ mplot(m, edgecolor=:groups, nodesvisible=true) |> mconf()
 
 ### Build rectangular mesh
 
+Generate mesh on rectangle with different element types.
+
 ```{julia}
 fig = Figure()
 make_axis(fig[1, 1])
@@ -53,6 +55,18 @@ mplot!(Mesh(4.0, 1.0, 8, meshtype=TRIANGLE))
 make_axis(fig[3, 1])
 mplot!(Mesh(4.0, 1.0, 8, meshtype=CRISSCROSS))
 fig
+```
+
+Node groups are defined for each boundary (counterclockwise starting at the bottom).
+
+```{julia}
+m = Mesh(4.0, 2.0, 17)
+p = mplot(m, nodesvisible=false) |> mconf()
+scatter!(coordinates(m, group(m, :b1)), color=:green, markersize=30)
+scatter!(coordinates(m, group(m, :b2)), color=:magenta, markersize=25)
+scatter!(coordinates(m, group(m, :b3)), color=:orange, markersize=20)
+scatter!(coordinates(m, group(m, :b4)), color=:blue, markersize=15)
+p
 ```
 
 ### Read mesh from Gmsh file
