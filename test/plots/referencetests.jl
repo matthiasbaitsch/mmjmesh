@@ -174,6 +174,16 @@ gm.Axis3(f[1, 1], aspect=:data)
 mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2, facecolor=:tomato)
 @test_reference ref("m2d-22.png") f by = BY
 
+# With deformation
+m = Mesh(4.0, 2.0, 8)
+c = coordinates(m)
+s1 = rand(nnodes(m))
+s2 = rand(nelements(m))
+u1 = [-c[2, :] c[1, :]]'
+u2 = reshape(u1, :)
+@test_reference ref("m2d-23.png") mplot(m, u1) |> mconf() by = BY
+@test_reference ref("m2d-24.png") mplot(m, u2) |> mconf() by = BY
+@test_reference ref("m2d-25.png") mplot(m, s2, u2, uscale=1 / 30) |> mconf() by = BY
 
 # -------------------------------------------------------------------------------------------------
 # Symbols

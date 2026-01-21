@@ -10,7 +10,7 @@ const DEFAULT_FACE_COLORMAP_GROUPS = :Pastel1_9
 # Recipe
 # -------------------------------------------------------------------------------------------------
 
-Makie.@recipe MPlot (mesh, scalars) begin
+Makie.@recipe MPlot (mesh, scalars, vectors) begin
 
     # Nodes
     "Nodes visible."
@@ -61,6 +61,9 @@ Makie.@recipe MPlot (mesh, scalars) begin
     faceplotmeshcolor = @inherit linecolor
     faceplotmeshlinewidth = 1.25
 
+    # Mist
+    uscale = automatic
+
     # Groups 
     "Use groups for coloring."
     groupsforcolors = true
@@ -74,7 +77,39 @@ end
 # Main plot function
 # -------------------------------------------------------------------------------------------------
 
-Makie.convert_arguments(::Type{MPlot}, m::Mesh) = (m, nothing)
+Makie.convert_arguments(::Type{MPlot}, m::Mesh) = (m, nothing, nothing)
+
+Makie.convert_arguments(::Type{MPlot}, m::Mesh, x) = (m, x, nothing)
+
+# One parameter: Scalars or vector
+function Makie.convert_arguments(::Type{MPlot}, m::Mesh, x::AbstractArray)
+
+    veconly(u) = (m, LinearAlgebra.norm.(eachcol(u)), u)
+    
+    if ndims(x) == 1
+        if length(x) == nnodes(m) || length(x) == nelements(m)
+            return (m, x, nothing)
+        end
+        if length(x) == 2 * nnodes(m)
+            return veconly(reshape(x, 2, :))
+        end
+    end
+
+    if ndims(x) == 2 && size(x) == (2, nnodes(m))
+        return veconly(x)
+    end
+
+    return (m, x, nothing)
+end
+
+function Makie.convert_arguments(::Type{MPlot}, m::Mesh, s::AbstractArray, u::AbstractArray)
+    if ndims(u) == 1
+        uu = reshape(u, 2, :)
+    else
+        uu = u
+    end
+    return (m, s, uu)
+end
 
 function Makie.plot!(plot::MPlot)
     _configure!(plot)
@@ -84,6 +119,17 @@ function Makie.plot!(plot::MPlot)
     plot.edgesvisible[] && _plotedges(plot, false)
     plot.featureedgesvisible[] && _plotedges(plot, true)
     plot.nodesvisible[] && _plotnodes(plot)
+
+    if !isnan(plot.uscale[])
+        Makie.text!(
+            plot, 0, 1,
+            text="×$(round(plot.uscale[], digits=4))",
+            align=(:left, :top),
+            offset=(4, -2),
+            space=:relative
+        )
+    end
+
     return plot
 end
 
@@ -127,8 +173,10 @@ function _configure!(plot::MPlot)
     # Local variables
     mesh = plot.mesh[]
     scalars = plot.scalars[]
+    vectors = plot.vectors[]
     havegroups = false
     havescalars = !isnothing(scalars)
+    havevectors = !isnothing(vectors)
     color = havescalars ? scalars : plot.facecolor
 
     # Visibility off
@@ -145,15 +193,28 @@ function _configure!(plot::MPlot)
     end
 
     # Warp node coordinates
+    nwarp(node, _=1) = [coordinates(node)..., nodewarp[index(node)]]
+    ndisp(node, scale=1) = coordinates(node) + scale * vectors[:, index(node)]
+    nid(node, _=1) = coordinates(node)
+
     if _isdefined(plot, :nodewarp)
         nodewarp = plot.nodewarp[]
         if nodewarp isa Function
-            plot.nodecoordinates = plot.nodewarp[]
+            plot.nodecoordinates = (n, _) -> plot.nodewarp[](n)
         elseif nodewarp isa AbstractVector
-            plot.nodecoordinates = (node -> [coordinates(node)..., nodewarp[index(node)]])
+            plot.nodecoordinates = nwarp
         end
+    elseif havevectors
+        plot.nodecoordinates = ndisp
     else
-        plot.nodecoordinates = node -> coordinates(node)
+        plot.nodecoordinates = nid
+    end
+
+    # Displacement scale
+    if havevectors
+        umax = maximum(norm.(eachcol(vectors)))
+        size = mesh.geometry |> boundingbox |> diagonal
+        _setifundefined(plot, :uscale, 0.1 * size / umax)
     end
 
     # Settings for mesh of 1D elements
@@ -211,6 +272,7 @@ function _configure!(plot::MPlot)
     _setifundefined(plot, :featureedgecolor, Makie.theme(:linecolor)[])
     _setifundefined(plot, :facecolor, DEFAULT_FACE_COLOR)
     _setifundefined(plot, :facecolormap, Makie.theme(:colormap)[])
+    _setifundefined(plot, :uscale, NaN)
 end
 
 
@@ -296,7 +358,7 @@ function _plotfaces(plot::MPlot)
     haveData = color isa Vector
 
     # Helpers
-    coords = nodecoordinates.(nodes(mesh))
+    coords = nodecoordinates.(nodes(mesh), plot.uscale[])
     Nn = nnodes(mesh)
     Nf = nfaces(mesh)
 
@@ -367,10 +429,12 @@ function _plotedges(plot::MPlot, featureedges::Bool)
                 indices = indices ∪ group(mesh, n)
             end
         end
+        uscale = 0
     else
         linewidth = plot.edgelinewidth[]
         color = plot.edgecolor[]
         indices = 1:nedges(mesh)
+        uscale = plot.uscale[]
     end
 
     if color == :groups
@@ -378,7 +442,7 @@ function _plotedges(plot::MPlot, featureedges::Bool)
         color = reshape(repeat(ids[indices], 1, 3)', :)
     end
 
-    points = [nodecoordinates.(nodes(edge(mesh, i))) for i = indices]
+    points = [nodecoordinates.(nodes(edge(mesh, i)), uscale) for i = indices]
 
     Makie.lines!(
         plot, _collectlines(points)...,
@@ -390,7 +454,7 @@ end
 function _plotnodes(plot::MPlot)
     mesh = plot.mesh[]
     nodecoordinates = plot.nodecoordinates[]
-    x = nodecoordinates.(nodes(mesh)) |> tomatrix
+    x = nodecoordinates.(nodes(mesh), plot.uscale[]) |> tomatrix
 
     Makie.scatter!(
         plot, x, color=plot.nodecolor, markersize=plot.nodesize
