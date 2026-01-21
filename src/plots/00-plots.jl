@@ -12,6 +12,8 @@ import Random
 import DomainSets
 import IntervalSets
 
+using Makie: automatic
+
 ## Own
 using MMJMesh
 using MMJMesh.Meshes

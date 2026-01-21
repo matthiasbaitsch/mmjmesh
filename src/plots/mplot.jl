@@ -1,3 +1,11 @@
+const DEFAULT_EDGE_LINEWIDTH_2D = 0.75
+const DEFAULT_EDGE_COLORMAP = :tab10
+const DEFAULT_FEATUREEDGE_LINEWIDTH_2D = 2.25
+const DEFAULT_FACE_COLORCOMPONENT = 3
+const DEFAULT_FACE_COLOR = :seashell2
+const DEFAULT_FACE_COLORMAP_GROUPS = :Pastel1_9
+
+
 # -------------------------------------------------------------------------------------------------
 # Recipe
 # -------------------------------------------------------------------------------------------------
@@ -5,35 +13,46 @@
 Makie.@recipe MPlot (mesh, scalars) begin
 
     # Nodes
-    nodesvisible = nothing
+    "Nodes visible."
+    nodesvisible = automatic
+    "Node color."
     nodecolor = :tomato
+    "Node size."
     nodesize = @inherit markersize
-    nodewarp = nothing
+    "Function or array to move nodes TODO."
+    nodewarp = automatic
 
     # Edges
-    edgesvisible = nothing
-    edgecolor = @inherit linecolor
-    edgelinewidth = nothing
+    "Edges visible."
+    edgesvisible = automatic
+    "Edge color. Use `:groups` to color by groups."
+    edgecolor = automatic
+    "Edge linewidth."
+    edgelinewidth = automatic
 
     # Featureedges
+    "Feature edges visible"
     featureedgesvisible = true
-    featureedgecolor = nothing
-    featureedgelinewidth = nothing
-
-    # Faces
-    facesvisible = true
-    facecolor = nothing
-    facecolormap = nothing
+    "Feature edge color. Use `:groups` to color by groups."
+    featureedgecolor = automatic
+    "Feature edge linewidth."
+    featureedgelinewidth = automatic
 
     # Lineplot
-    lineplotvisible = nothing
+    lineplotvisible = automatic
     lineplotscale = 0.1
     lineplotoutlinesvisible = true
     lineplotoutlinescolor = :black
     lineplotoutlineslinewidth = @inherit linewidth
     lineplotfacesvisible = true
-    lineplotfacescolor = nothing
+    lineplotfacescolor = automatic
     lineplotfacescolormap = @inherit colormap
+
+    # Faces
+    facesvisible = true
+    facecolor = automatic
+    facecolormap = automatic
+    faceplotfunction = false
 
     # Faceplot
     faceplotzscale = 0.0
@@ -42,11 +61,14 @@ Makie.@recipe MPlot (mesh, scalars) begin
     faceplotmeshcolor = @inherit linecolor
     faceplotmeshlinewidth = 1.25
 
+    # Groups 
+    "Use groups for coloring."
+    groupsforcolors = true
+
     # Defaults
     Makie.mixin_colormap_attributes()...
     Makie.mixin_generic_plot_attributes()...
 end
-
 
 # -------------------------------------------------------------------------------------------------
 # Main plot function
@@ -55,69 +77,125 @@ end
 Makie.convert_arguments(::Type{MPlot}, m::Mesh) = (m, nothing)
 
 function Makie.plot!(plot::MPlot)
+    _configure!(plot)
+    plot.lineplotvisible[] && _plotlineplot(plot)
+    plot.facesvisible[] && _plotfaces(plot)
+    plot.faceplotfunction[] && _faceplotfunction(plot)
+    plot.edgesvisible[] && _plotedges(plot, false)
+    plot.featureedgesvisible[] && _plotedges(plot, true)
+    plot.nodesvisible[] && _plotnodes(plot)
+    return plot
+end
+
+
+# -------------------------------------------------------------------------------------------------
+# Plot configuration
+# -------------------------------------------------------------------------------------------------
+
+function mconf(; colorbar=true, dataaspect=true, blank=true, title="")
+    return scene -> begin
+        ax = scene.axis
+        if dataaspect
+            ax.aspect = Makie.DataAspect()
+        end
+        if blank
+            Makie.hidedecorations!(ax)
+            Makie.hidespines!(ax)
+        end
+        if colorbar && !scene.plot.groupsforcolors[]
+            p = _find_plot_with_colormap(scene.plot.plots)
+            if !isnothing(p) &&
+               !isnothing(Makie.extract_colormap_recursive(p)) &&
+               !(p isa Makie.Lines)
+                Makie.Colorbar(scene.figure[1, 2], p)
+            end
+        end
+        if title != ""
+            ax.title = title
+        end
+        return scene
+    end
+end
+
+
+# -------------------------------------------------------------------------------------------------
+# Plot logic
+# -------------------------------------------------------------------------------------------------
+
+function _configure!(plot::MPlot)
+
+    # Local variables
     mesh = plot.mesh[]
     scalars = plot.scalars[]
+    havegroups = false
     havescalars = !isnothing(scalars)
-
-    # Helpers
-    isundefined(key) = !haskey(plot, key) || isnothing(plot[key][])
-    setifundefined(key, value) = isundefined(key) && (plot[key] = value)
-
-    # Configure
     color = havescalars ? scalars : plot.facecolor
-    colorbygroups = false
-    lineplotvisible = false
 
-    # Settings if not defined
-    setifundefined(:nodesvisible, nnodes(mesh) <= 50)
+    # Visibility off
     if (nnodes(mesh)) == 0
         plot.nodesvisible = false
     end
     if nedges(mesh) == 0
         plot.edgesvisible = false
+        plot.lineplotvisible = false
         plot.featureedgesvisible = false
     end
     if nfaces(mesh) == 0
         plot.facesvisible = false
     end
 
-    # Access node coordinates or warp
-    if isundefined(:nodewarp)
-        plot.nodecoordinates = node -> coordinates(node)
-    else
+    # Warp node coordinates
+    if _isdefined(plot, :nodewarp)
         nodewarp = plot.nodewarp[]
         if nodewarp isa Function
             plot.nodecoordinates = plot.nodewarp[]
-        elseif nodewarp isa AbstractArray
+        elseif nodewarp isa AbstractVector
             plot.nodecoordinates = (node -> [coordinates(node)..., nodewarp[index(node)]])
         end
+    else
+        plot.nodecoordinates = node -> coordinates(node)
     end
 
     # Settings for mesh of 1D elements
     if pdim(mesh) == 1
         plot.edgesvisible = true
-        plot.featureedgesvisible = false
         plot.facesvisible = false
-        lineplotvisible = !isnothing(scalars)
-        setifundefined(:edgelinewidth, 3)
+        plot.featureedgesvisible = false
+        _setifundefined(plot, :edgelinewidth, 3)
+        _setifundefined(plot, :lineplotvisible, havescalars)
+
+        if plot.groupsforcolors[] && hasgroups(mesh, d=1) && !havescalars
+            havegroups = true
+            _setifundefined(plot, :edgecolor, :groups)
+        end
     end
 
     # # Settings for mesh of 2D elements
     if pdim(mesh) == 2
-        colorbygroups = !havescalars && isundefined(:facecolor) && hasgroups(mesh, d=2)
-        setifundefined(:edgesvisible, nfaces(mesh) <= 100)
-        setifundefined(:edgelinewidth, 0.75)
-        setifundefined(:featureedgelinewidth, 2.25)
+        _setifundefined(plot, :lineplotvisible, false, enforce=true)
+        _setifundefined(plot, :edgesvisible, nfaces(mesh) <= 100)
+        _setifundefined(plot, :edgelinewidth, DEFAULT_EDGE_LINEWIDTH_2D)
+        _setifundefined(plot, :featureedgelinewidth, DEFAULT_FEATUREEDGE_LINEWIDTH_2D)
 
-        if colorbygroups
-            setifundefined(:facecolormap, :Pastel1_9)
-        else
+        if havescalars
             if color isa Function || color isa Symbol
-                setifundefined(:facecolor, 3)
-            else
-                setifundefined(:facecolor, :seashell2)
+                plot.nodesvisible = false
+                plot.facesvisible = false
+                plot.faceplotfunction = true
+                _setifundefined(plot, :facecolor, DEFAULT_FACE_COLORCOMPONENT)
             end
-            setifundefined(:facecolormap, Makie.theme(plot, :colormap)[])
+        else
+            if plot.groupsforcolors[]
+                if hasgroups(mesh, d=1)
+                    havegroups = true
+                    _setifundefined(plot, :featureedgecolor, :groups)
+                end
+                if hasgroups(mesh, d=2)
+                    havegroups = true
+                    _setifundefined(plot, :facecolor, :groups)
+                    _setifundefined(plot, :facecolormap, DEFAULT_FACE_COLORMAP_GROUPS)
+                end
+            end
         end
     end
 
@@ -126,25 +204,13 @@ function Makie.plot!(plot::MPlot)
         @notimplemented
     end
 
-    # Used by mconf
-    plot.colorbygroups = colorbygroups
-
-    # Plot functions on faces goes extra at the moment - TODO this is a hack, refactor
-    if pdim(mesh) == 2 && (color isa Function || color isa Symbol)
-        plotfeaturedges = plot.featureedgesvisible[] && nedges(mesh) > 0 && plot.faceplotzscale[] == 0
-
-        plotfeaturedges && plotedges(plot, true)
-        plot.facesvisible[] && plotfacefunctions(plot)
-    else # Plot
-        lineplotvisible && plotlineplot(plot)
-        plot.facesvisible[] && plotfaces(plot, color)
-        plot.edgesvisible[] && plotedges(plot, false)
-        plot.featureedgesvisible[] && plotedges(plot, true)
-        plot.nodesvisible[] && plotnodes(plot)
-    end
-
-    # Return
-    return plot
+    # Apply default values
+    plot.groupsforcolors = havegroups
+    _setifundefined(plot, :nodesvisible, nnodes(mesh) <= 50)
+    _setifundefined(plot, :edgecolor, Makie.theme(:linecolor)[])
+    _setifundefined(plot, :featureedgecolor, Makie.theme(:linecolor)[])
+    _setifundefined(plot, :facecolor, DEFAULT_FACE_COLOR)
+    _setifundefined(plot, :facecolormap, Makie.theme(:colormap)[])
 end
 
 
@@ -152,15 +218,15 @@ end
 # Plot parts
 # -------------------------------------------------------------------------------------------------
 
-plotlineplot(plot::MPlot) =
-    plotlineplot(plot, plot.mesh[], plot.scalars[])
+_plotlineplot(plot::MPlot) =
+    _plotlineplot(plot, plot.mesh[], plot.scalars[])
 
 # Version for numbers
-plotlineplot(plot::MPlot, mesh::Mesh, values::AbstractVecOrMat{<:Real}) =
-    plotlineplot(plot, mesh, _tofunctions(mesh, values))
+_plotlineplot(plot::MPlot, mesh::Mesh, values::AbstractVecOrMat{<:Real}) =
+    _plotlineplot(plot, mesh, _tofunctions(mesh, values))
 
 # Version for functions
-function plotlineplot(plot::MPlot, mesh::Mesh, functions::AbstractVector{<:FunctionRToR{IHat}})
+function _plotlineplot(plot::MPlot, mesh::Mesh, functions::AbstractVector{<:FunctionRToR{IHat}})
 
     # Check input
     @assert nedges(mesh) == length(functions)
@@ -198,7 +264,7 @@ function plotlineplot(plot::MPlot, mesh::Mesh, functions::AbstractVector{<:Funct
     end
 
     # Color for faces if specified
-    if !isnothing(plot.lineplotfacescolor[])
+    if !_isautomatic(plot, :lineplotfacescolor)
         cf = plot.lineplotfacescolor[]
     end
 
@@ -216,16 +282,18 @@ function plotlineplot(plot::MPlot, mesh::Mesh, functions::AbstractVector{<:Funct
 end
 
 
-function plotfaces(plot::MPlot, color)
-
+function _plotfaces(plot::MPlot)
     # Mesh and color
     mesh = plot.mesh[]
+    scalars = plot.scalars[]
+    havescalars = !isnothing(scalars)
+    color = havescalars ? scalars : plot.facecolor
+
+    # Coordinates
     nodecoordinates = plot.nodecoordinates[]
-    # color = length(plot) > 1 ? plot.scalars[] : plot.facecolor
 
     # Test if we have data and overall color
     haveData = color isa Vector
-    haveColor = !isnothing(plot.facecolor[])
 
     # Helpers
     coords = nodecoordinates.(nodes(mesh))
@@ -233,13 +301,13 @@ function plotfaces(plot::MPlot, color)
     Nf = nfaces(mesh)
 
     # Color by groups
-    if !haveData && !haveColor && hasgroups(mesh, d=2)
+    if plot.facecolor[] == :groups
         color = groupids(mesh, d=2, predefined=false)
         color = maximum(color) .- color
         haveData = true
     end
 
-    # Collect triangles    
+    # Collect
     if !haveData || length(color) == Nn                           # No color or nodal color
         tf = Vector{Vector{Int}}()
         for l in links(mesh.topology, 2, 0)
@@ -286,54 +354,40 @@ function plotfaces(plot::MPlot, color)
 end
 
 
-function plotedges(plot::MPlot, featureedges::Bool)
+function _plotedges(plot::MPlot, featureedges::Bool)
     mesh = plot.mesh[]
     nodecoordinates = plot.nodecoordinates[]
 
-    # Collect indices of edges to plot
     if featureedges
-        # Boundary edges
+        linewidth = plot.featureedgelinewidth[]
+        color = plot.featureedgecolor[]
         indices = group(mesh, :boundaryedges)
-
-        # Add edges in groups
-        for n in groupnames(mesh, d=1, predefined=false)
-            indices = indices ∪ group(mesh, n)
-        end
-    else
-        indices = 1:nedges(mesh)
-    end
-
-    # Coordinates
-    points = [nodecoordinates.(nodes(edge(mesh, i))) for i = indices]
-
-    # Plot attributes
-    if featureedges
-        lc = plot.featureedgecolor[]
-        lw = plot.featureedgelinewidth[]
-        if isnothing(lc)
-            if ngroups(mesh, d=1) > 0
-                ids = groupids(mesh, d=1, predefined=true)
-                lc = reshape(repeat(ids[indices], 1, 3)', :)
-            else
-                lc = :black
+        if color == :groups
+            for n in groupnames(mesh, d=1, predefined=false)
+                indices = indices ∪ group(mesh, n)
             end
         end
     else
-        lw = plot.edgelinewidth[]
-        lc = plot.edgecolor[]
-
-        if lc == :groups
-            @assert ngroups(mesh, d=1) > 0
-            ids = groupids(mesh, d=1, predefined=true)
-            lc = reshape(repeat(ids[indices], 1, 3)', :)
-            plot.colorbygroups = true
-        end
+        linewidth = plot.edgelinewidth[]
+        color = plot.edgecolor[]
+        indices = 1:nedges(mesh)
     end
 
-    Makie.lines!(plot, _collectlines(points)..., linewidth=lw, color=lc, colormap=:tab10)
+    if color == :groups
+        ids = groupids(mesh, d=1, predefined=true)
+        color = reshape(repeat(ids[indices], 1, 3)', :)
+    end
+
+    points = [nodecoordinates.(nodes(edge(mesh, i))) for i = indices]
+
+    Makie.lines!(
+        plot, _collectlines(points)...,
+        linewidth=linewidth, color=color,
+        colormap=DEFAULT_EDGE_COLORMAP
+    )
 end
 
-function plotnodes(plot::MPlot)
+function _plotnodes(plot::MPlot)
     mesh = plot.mesh[]
     nodecoordinates = plot.nodecoordinates[]
     x = nodecoordinates.(nodes(mesh)) |> tomatrix
@@ -343,7 +397,8 @@ function plotnodes(plot::MPlot)
     )
 end
 
-function plotfacefunctions(plot::MPlot)
+function _faceplotfunction(plot::MPlot)
+
     # Edge attributes
     edgesvisible = plot.edgesvisible[]
     edgecolor = plot.edgecolor[]
@@ -408,30 +463,4 @@ function _find_plot_with_colormap(plots)
     end
     return nothing
 end
-
-function mconf(; colorbar=true, dataaspect=true, blank=true, title="")
-    return scene -> begin
-        ax = scene.axis
-        if dataaspect
-            ax.aspect = Makie.DataAspect()
-        end
-        if blank
-            Makie.hidedecorations!(ax)
-            Makie.hidespines!(ax)
-        end
-        if colorbar && !scene.plot[:colorbygroups][]
-            p = _find_plot_with_colormap(scene.plot.plots)
-            if !isnothing(p) &&
-               !isnothing(Makie.extract_colormap_recursive(p)) &&
-               !(p isa Makie.Lines)
-                Makie.Colorbar(scene.figure[1, 2], p)
-            end
-        end
-        if title != ""
-            ax.title = title
-        end
-        return scene
-    end
-end
-
 
