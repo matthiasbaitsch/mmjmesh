@@ -57,7 +57,7 @@ mplot!(Mesh(4.0, 1.0, 8, meshtype=CRISSCROSS))
 fig
 ```
 
-Node groups are defined for each boundary (counterclockwise starting at the bottom).
+Node groups `:b1` to `:b4` are defined for each boundary (counterclockwise starting at the bottom).
 
 ```{julia}
 m = Mesh(4.0, 2.0, 17)

@@ -10,7 +10,7 @@ const DEFAULT_FACE_COLORMAP_GROUPS = :Pastel1_9
 # Recipe
 # -------------------------------------------------------------------------------------------------
 
-Makie.@recipe MPlot (mesh, scalars, vectors) begin
+Makie.@recipe MPlot (mesh, scalars_raw, vectors) begin
 
     # Nodes
     "Nodes visible."
@@ -63,6 +63,7 @@ Makie.@recipe MPlot (mesh, scalars, vectors) begin
 
     # Mist
     uscale = automatic
+    smooth = false
 
     # Groups 
     "Use groups for coloring."
@@ -85,7 +86,7 @@ Makie.convert_arguments(::Type{MPlot}, m::Mesh, x) = (m, x, nothing)
 function Makie.convert_arguments(::Type{MPlot}, m::Mesh, x::AbstractArray)
 
     veconly(u) = (m, LinearAlgebra.norm.(eachcol(u)), u)
-    
+
     if ndims(x) == 1
         if length(x) == nnodes(m) || length(x) == nelements(m)
             return (m, x, nothing)
@@ -170,14 +171,20 @@ end
 
 function _configure!(plot::MPlot)
 
-    # Local variables
+    # Mesh
     mesh = plot.mesh[]
-    scalars = plot.scalars[]
-    vectors = plot.vectors[]
+
+    # Smooth
+    if plot.smooth[]
+        plot.scalars = _smooth(mesh, plot.scalars_raw[])
+    else
+        plot.scalars = plot.scalars_raw[]
+    end
+
+    # Shorthand
     havegroups = false
-    havescalars = !isnothing(scalars)
-    havevectors = !isnothing(vectors)
-    color = havescalars ? scalars : plot.facecolor
+    havescalars = !isnothing(plot.scalars[])
+    havevectors = !isnothing(plot.vectors[])
 
     # Visibility off
     if (nnodes(mesh)) == 0
@@ -194,7 +201,7 @@ function _configure!(plot::MPlot)
 
     # Warp node coordinates
     nwarp(node, _=1) = [coordinates(node)..., nodewarp[index(node)]]
-    ndisp(node, scale=1) = coordinates(node) + scale * vectors[:, index(node)]
+    ndisp(node, scale=1) = coordinates(node) + scale * plot.vectors[][:, index(node)]
     nid(node, _=1) = coordinates(node)
 
     if _isdefined(plot, :nodewarp)
@@ -211,10 +218,10 @@ function _configure!(plot::MPlot)
     end
 
     # Displacement scale
-    if havevectors
-        umax = maximum(norm.(eachcol(vectors)))
+    if havevectors && !_isdefined(plot, :uscale)
+        umax = maximum(norm.(eachcol(plot.vectors[])))
         size = mesh.geometry |> boundingbox |> diagonal
-        _setifundefined(plot, :uscale, 0.1 * size / umax)
+        plot.uscale = 0.1 * size / umax
     end
 
     # Settings for mesh of 1D elements
@@ -239,7 +246,7 @@ function _configure!(plot::MPlot)
         _setifundefined(plot, :featureedgelinewidth, DEFAULT_FEATUREEDGE_LINEWIDTH_2D)
 
         if havescalars
-            if color isa Function || color isa Symbol
+            if plot.scalars[] isa Function || plot.scalars[] isa Symbol
                 plot.nodesvisible = false
                 plot.facesvisible = false
                 plot.faceplotfunction = true

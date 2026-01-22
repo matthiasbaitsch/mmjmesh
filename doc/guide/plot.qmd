@@ -103,6 +103,12 @@ Colors for elements
 mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf()
 ```
 
+Smoothed element results
+
+```{julia}
+mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25), smooth=true) |> mconf()
+```
+
 ### Triangle mesh
 
 ```{julia}

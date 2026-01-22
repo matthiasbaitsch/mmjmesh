@@ -185,6 +185,11 @@ u2 = reshape(u1, :)
 @test_reference ref("m2d-24.png") mplot(m, u2) |> mconf() by = BY
 @test_reference ref("m2d-25.png") mplot(m, s2, u2, uscale=1 / 30) |> mconf() by = BY
 
+# Smooth element results
+m = Mesh(4.0, 2.0, 4)
+@test_reference ref("m2d-26.png") mplot(m, 1.:nelements(m), smooth=true) |> mconf() by = BY
+ 
+
 # -------------------------------------------------------------------------------------------------
 # Symbols
 # -------------------------------------------------------------------------------------------------
