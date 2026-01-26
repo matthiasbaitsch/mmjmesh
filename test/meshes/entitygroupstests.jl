@@ -38,7 +38,7 @@ fg = _entitygroupnames(m, d=2)
 @test fg[1] == [:g1]
 @test fg[2] == [:g1, :g2]
 ng = _entitygroupnames(m, d=0, predefined=true)
-@test ng[1] |> sort == [:boundarynodes, :nodes]
+@test ng[1] |> sort == [:b1, :b4, :boundarynodes, :nodes]
 @test length(_idvector(fg)) == nfaces(m)
 
 
@@ -94,12 +94,12 @@ m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 # Test predefined only
 a = 5
 m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
-@test groupnames(m) == []
+@test groupnames(m) == [:b1, :b2, :b3, :b4]
 @test groupnames(m, d=1) == []
 @test groupnames(m, d=1, predefined=true) == [:boundaryedges, :edges]
 @test groupnames(m, predefined=true) |> sort ==
-      [:boundaryedges, :boundaryfaces, :boundarynodes, :edges, :elements, :faces, :nodes, :solids]
-@test !hasgroups(m, d=0)
+      [:b1, :b2, :b3, :b4, :boundaryedges, :boundaryfaces, :boundarynodes, :edges, :elements, :faces, :nodes, :solids]
+@test hasgroups(m, d=0)
 @test !hasgroups(m, d=1)
 @test !hasgroups(m, d=2)
 @test hasgroups(m, d=0, predefined=true)
@@ -109,9 +109,10 @@ m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 definegroup!(m, 0, :g1, [1, 2, 3, 13, 14, 7, 15])
 definegroup!(m, 2, :g2, [2, 13, 7, 5])
 definegroup!(m, 1, :g3, [4, 5, 9])
-@test groupnames(m) |> sort == [:g1, :g2, :g3]
+@test groupnames(m) |> sort == [:b1, :b2, :b3, :b4, :g1, :g2, :g3]
 @test groupnames(m, predefined=true) ==
       [
+      :b1, :b2, :b3, :b4,
       :boundaryedges, :boundaryfaces, :boundarynodes, :edges, :elements,
       :faces, :g1, :g2, :g3, :nodes, :solids
 ]
@@ -121,7 +122,7 @@ definegroup!(m, 1, :g3, [4, 5, 9])
 f5 = face(m, 5)
 f7 = face(m, 7)
 f33 = face(m, 33)
-@test groupnames(node(m, 3)) |> sort == [:boundarynodes, :g1, :nodes]
+@test groupnames(node(m, 3)) |> sort == [:b1, :boundarynodes, :g1, :nodes]
 @test groupnames(f5) |> sort == [:elements, :faces, :g2]
 @test groupnames(f7) |> sort == [:elements, :faces, :g2]
 @test groupnames(f33) == [:elements, :faces]
