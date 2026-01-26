@@ -138,10 +138,6 @@ function definegroup!(m::Mesh, dim::Int, name::Symbol, indices)
     m.groups[name] = g
 end
 
-# TODO: test
-definegroup!(m::Mesh, dim::Int, name::Symbol; nodegroup::Symbol) =
-    definegroup!(m, dim, name, indices(m, dim, hasnodes(group(m, nodegroup))))
-
 definegroup!(name::Symbol, es::MeshEntityList{DT}) where {DT} = definegroup!(es.mesh, DT, name, indices(es))
 
 """
@@ -217,12 +213,3 @@ end
 
 entities(m::Mesh, groupname::Symbol) = entities(group(m, groupname))
 entities(g::MeshEntityGroup) = entities(g.mesh, edim(g), indices(g))
-
-
-function indices(g::MeshEntityGroup, d::Int)
-    s = Set{Int}()
-    for e = entities(g)
-        push!(s, indices(e, d)...)
-    end
-    return s |> collect |> sort
-end

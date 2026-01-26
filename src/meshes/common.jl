@@ -21,6 +21,19 @@ solidindices(o) = indices(o, 3)
 
 
 # -------------------------------------------------------------------------------------------------
+# Indices
+# -------------------------------------------------------------------------------------------------
+
+function indices(g::Union{MeshEntityGroup,MeshEntityList}, d::Int)
+    s = Set{Int}()
+    for e = entities(g)
+        push!(s, indices(e, d)...)
+    end
+    return s |> collect |> sort
+end
+
+
+# -------------------------------------------------------------------------------------------------
 # Iterate over all entities
 # -------------------------------------------------------------------------------------------------
 
@@ -41,4 +54,4 @@ function Base.iterate(it::EntityIterator, state)
     return entity(it.m, dim, index), (dim, index)
 end
 
-entities(m) = EntityIterator(m)
+entities(m::Union{Mesh,MeshEntity}) = EntityIterator(m)

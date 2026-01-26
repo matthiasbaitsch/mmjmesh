@@ -99,6 +99,7 @@ Base.iterate(el::MeshEntityList, state=1) = state > length(el) ? nothing : (el[s
 indices(mel::MeshEntityList) = mel.indices
 
 # Get entities
+entities(mel::MeshEntityList) = mel
 entities(m::Mesh, pdim::Integer) = entities(m, pdim, indices(m, pdim))
 entities(m::Mesh, pdim::Integer, indices::AbstractVector{<:Integer}) = MeshEntityList(m, pdim, indices)
 entities(me::MeshEntity, pdim::Integer) = MeshEntityList(me.mesh, pdim, indices(me, pdim))

@@ -3,40 +3,44 @@ using MMJMesh.Geometries
 
 
 """
-    on(p::Point)
-    on(s::GeometricObjectP)
+    on(o::Point; atol=1e-12)
+    on(o::GeometricObjectP; atol=1e-12)
 
-Generates a predicate which tests if an object is on the specified geometric object. To be used in conjunction with the `entiy(m, dim, predicate)` function.
+Generates a predicate which tests if an object is on the specified geometric object.
 """
-on(p::Point; atol=1e-12) = n -> isapprox(p.coordinates, coordinates(n), atol=atol) ? 1 : NaN
+on(o::Point; atol=1e-12) = node -> isapprox(o.coordinates, coordinates(node), atol=atol) ? 1 : NaN
+on(o::GeometricObjectP; atol=1e-12) = entity -> _parameterof(o, entity, atol)
 
+# Helpers
 
-_parameterof(s::GeometricObjectP, n::Node, atol) = parameterof(s, coordinates(n), atol=atol)
-
-function _parameterof(s::GeometricObjectP, e::MeshEntity, atol)
+function _parameterof(o::GeometricObjectP, e::MeshEntity, atol)
     nn = 0
     pp = 0
     for c = eachcol(coordinates(e))
-        p = parameterof(s, c, atol=atol)
+        p = parameterof(o, c, atol=atol)
         nn += 1
         pp += p
     end
     return pp / nn
 end
 
-on(s::GeometricObjectP; atol=1e-12) = e -> _parameterof(s, e, atol)
+_parameterof(o::GeometricObjectP, n::Node, atol) = parameterof(o, coordinates(n), atol=atol)
 
-function hasnodes(nodes)
+
+"""
+    any_node_in(nodes::AbstractArray{<:Integer})
+    all_nodes_in(nodes::AbstractArray{<:Integer})
+
+Generates a predicate which tests if any or all nodes of an object are in the specified set of
+nodes.
+"""
+all_nodes_in(nodes::AbstractArray{<:Integer}) = _nodes_in(nodes, select=all)
+any_node_in(nodes::AbstractArray{<:Integer}) = _nodes_in(nodes, select=any)
+
+# Helpers
+
+function _nodes_in(nodes::AbstractArray{<:Integer}; select)
     nodeset = Set(nodes)
-
-    function hasnodes(e)
-        for n = nodeindices(e)
-            if n ∉ nodeset
-                return false
-            end
-        end
-        return true
-    end
-
-    return e -> hasnodes(e) ? index(e) : NaN
+    return e -> select(n -> (n ∈ nodeset), nodeindices(e)) ? index(e) : NaN
 end
+

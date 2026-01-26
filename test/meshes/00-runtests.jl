@@ -6,7 +6,7 @@ using Test
 @testset "Group" include("groupstests.jl")
 @testset "Mesh" include("meshtests.jl")
 @testset "MeshEntity" include("meshentitiestests.jl")
-@testset "MeshEntityGroup" include("entitygroupstests.jl")
+@testset "MeshEntityGroup" include("meshentitygroupstests.jl")
 @testset "Build" include("buildtests.jl")
 @testset "Predicates" include("predicatestests.jl")
 
