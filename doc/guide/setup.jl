@@ -13,6 +13,7 @@ using LinearAlgebra
 using CairoMakie: Figure, Axis, Axis3, scatter!, lines, lines!, DataAspect, hidespines!, hidedecorations!
 
 using MMJMesh
+using MMJMesh.Gmsh
 using MMJMesh.Plots
 using MMJMesh.Meshes
 using MMJMesh.MMJBase
@@ -24,8 +25,6 @@ using MMJMesh.Mathematics
 CairoMakie.activate!()
 CairoMakie.set_theme!(CairoMakie.theme_minimal())
 CairoMakie.update_theme!(colormap=:jet)
-
-meshpath(m) = joinpath(@__DIR__(), "../../data/gmsh", m);
 
 function make_axis(f)
     ax = Axis(f, aspect=DataAspect())

@@ -12,14 +12,41 @@ using MMJMesh.Meshes
 using MMJMesh.MMJBase
 using MMJMesh.Topologies
 
+export meshpath
 
-# Exports
+
+# -------------------------------------------------------------------------------------------------
+# Interface
+# -------------------------------------------------------------------------------------------------
+
+function MMJMesh.Meshes.Mesh(filepath::String; verbosity=0)
+    if endswith(filepath, ".msh")
+        return _readmsh(filepath)
+    elseif endswith(filepath, ".geo")
+        return _readgeo(filepath; verbosity=verbosity)
+    else
+        return _readgeostring(filepath; verbosity=verbosity)
+    end
+end
+
+"""
+    meshpath(filename::String)
+
+Returns path to the specified mesh in `data/gmsh` folder.
+"""
+meshpath(filename::String) = joinpath(dirname(Base.current_project()), "data/gmsh", filename)
+
+
+# -------------------------------------------------------------------------------------------------
+# Helpers
+# -------------------------------------------------------------------------------------------------
 
 # Parts
 include("objecttable.jl")
 include("arrayscanner.jl")
 include("gmshmesh.jl")
 include("readmesh.jl")
+
 
 function _readmsh(filepath)
     gm = readmesh(filepath)
@@ -68,6 +95,7 @@ function _readmsh(filepath)
     return m
 end
 
+
 function _readgeo(filepath; verbosity)
     try
         f = tempname() * ".msh"
@@ -85,6 +113,7 @@ function _readgeo(filepath; verbosity)
     end
 end
 
+
 function _readgeostring(s; verbosity)
     f = tempname() * ".geo"
     io = open(f, "a")
@@ -93,17 +122,6 @@ function _readgeostring(s; verbosity)
     m = _readgeo(f, verbosity=verbosity)
     rm(f)
     return m
-end
-
-# Create Mesh
-function MMJMesh.Meshes.Mesh(filepath::String; verbosity=0)
-    if endswith(filepath, ".msh")
-        return _readmsh(filepath)
-    end
-    if endswith(filepath, ".geo")
-        return _readgeo(filepath; verbosity=verbosity)
-    end
-    return _readgeostring(filepath; verbosity=verbosity)
 end
 
 end
