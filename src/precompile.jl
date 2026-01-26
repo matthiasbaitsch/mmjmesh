@@ -19,7 +19,7 @@ using PrecompileTools: @compile_workload
     """
     )
     MMJMesh.Plots.mplot(m, edgesvisible=true) |> MMJMesh.Plots.mconf()
-    MMJMesh.Plots.mplot(m, rand(MMJMesh.Meshes.nedges(m)), edgesvisible=true) |> MMJMesh.Plots.mconf()
+    MMJMesh.Plots.mplot(m, rand(MMJMesh.Meshes.nnodes(m)), edgesvisible=true) |> MMJMesh.Plots.mconf()
     MMJMesh.Plots.mplot(m, rand(MMJMesh.Meshes.nfaces(m)), edgesvisible=true) |> MMJMesh.Plots.mconf()
-    MMJMesh.Plots.mplot(m, rand(2 * MMJMesh.Meshes.nedges(m)), edgesvisible=true) |> MMJMesh.Plots.mconf()
+    MMJMesh.Plots.mplot(m, rand(2 * MMJMesh.Meshes.nnodes(m)), edgesvisible=true) |> MMJMesh.Plots.mconf()
 end
