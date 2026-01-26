@@ -33,3 +33,4 @@ function make_axis(f)
     ax
 end
 
+meshpath(m) = joinpath(@__DIR__(), "../../data/gmsh", m);
