@@ -44,8 +44,8 @@ m = Mesh(0 .. 4, 60)
 @test_reference ref("m1d-006.png") mplot(m, -1.1 .+ 2.2 * rand(2, nedges(m)),
     lineplotfacescolor=:gray50, lineplotoutlinescolor=:hotpink) |> mconf() by = BY
 
-definegroup!(m, 1, :g1, 5:30)
-definegroup!(m, 1, :g3, 20:40)
+definegroup!(:g1, m, 1, 5:30)
+definegroup!(:g3, m, 1, 20:40)
 @test_reference ref("m1d-007.png") mplot(m) |> mconf() by = BY
 
 # -------------------------------------------------------------------------------------------------
@@ -88,9 +88,9 @@ cm.scatter!(p.axis, x[:, bn], color=:magenta)
 # Face groups
 a = 5
 m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
-definegroup!(m, 2, :g1, [1, 2, 3, 6, 22])
-definegroup!(m, 2, :g2, [5, 6, 7, 8, 22, 33])
-definegroup!(m, 2, :g3, [34])
+definegroup!(:g1, m, 2, [1, 2, 3, 6, 22])
+definegroup!(:g2, m, 2, [5, 6, 7, 8, 22, 33])
+definegroup!(:g3, m, 2, [34])
 
 @test_reference ref("m2d-009.png") mplot(m) |> mconf() by = BY
 @test_reference ref("m2d-010.png") mplot(m, facecolor=:orange) |> mconf() by = BY
@@ -98,9 +98,9 @@ definegroup!(m, 2, :g3, [34])
 # Edge groups
 a = 5
 m = Mesh((0 .. 4) × (0 .. 2), 2a, a)
-definegroup!(m, 1, :g1, 1:10)
-definegroup!(m, 1, :g2, 8:16)
-definegroup!(m, 1, :g3, 62:71)
+definegroup!(:g1, m, 1, 1:10)
+definegroup!(:g2, m, 1, 8:16)
+definegroup!(:g3, m, 1, 62:71)
 
 @test_reference ref("m2d-011.png") mplot(m) |> mconf() by = BY
 @test_reference ref("m2d-012.png") mplot(m, featureedgecolor=:orange) |> mconf() by = BY
@@ -188,7 +188,7 @@ u2 = reshape(u1, :)
 # Smooth element results
 m = Mesh(4.0, 2.0, 4)
 @test_reference ref("m2d-26.png") mplot(m, 1.:nelements(m), smooth=true) |> mconf() by = BY
- 
+
 
 # -------------------------------------------------------------------------------------------------
 # Symbols

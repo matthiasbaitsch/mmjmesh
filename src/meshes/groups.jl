@@ -3,13 +3,13 @@
 # -------------------------------------------------------------------------------------------------
 
 """
-    struct Group{T} <: AbstractVector{Int}
+    struct Group{T} <: AbstractVector{Integer}
 
 A set of indices of objects of type `T`. Requires a function `index(o::T) -> Int` in
 this module.
 """
 mutable struct Group{T} <: AbstractVector{Integer}
-    mesh
+    mesh # TODO: Merge Group with EnityGroup
     indices::SeqIntSet
     Group{T}(a) where {T} = new{T}(undef, SeqIntSet(a))
 end

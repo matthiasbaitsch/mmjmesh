@@ -272,13 +272,13 @@ p
 
 ### Defining groups
 
-Additional groups are defined by specifying a dimension, a name and indices.
+Groups are defined either by entities or by dimension and indices.
 
 ```{julia}
-definegroup!(m, 2, :f1, 100:300)
-definegroup!(m, 2, :f2, 200:600)
-definegroup!(m, 1, :e1, 600:800)
-definegroup!(m, 1, :e2, 700:900)
+definegroup!(:f1, faces(m, 100:300))
+definegroup!(:f2, m, 2, 200:600)
+definegroup!(:e1, edges(m, 600:800))
+definegroup!(:e2, m, 1, 700:900)
 mplot(m) |> mconf()
 ```
 

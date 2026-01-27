@@ -2,6 +2,9 @@
 # Type definitions
 # -------------------------------------------------------------------------------------------------
 
+"""
+Group of mesh entities.
+"""
 const MeshEntityGroup = Group{<:MeshEntity}
 
 """
@@ -12,6 +15,111 @@ Enitity dimension of group or group type.
 """
 edim(::Type{<:Group{<:MeshEntity{DT}}}) where {DT} = DT
 edim(g::Group{<:MeshEntity}) = edim(typeof(g))
+
+
+# -------------------------------------------------------------------------------------------------
+# Interface
+# -------------------------------------------------------------------------------------------------
+
+"""
+    name(g)
+
+Name of group `g`.
+"""
+function name(g::Group)
+    for n = groupnames(g.mesh, predefined=true)
+        g.mesh.groups.entries[n] === g && return n
+    end
+end
+
+"""
+    definegroup!(name, entities)
+    definegroup!(name, m, pdim, indices)
+
+Define group `name`.
+"""
+definegroup!(name::Symbol, es::MeshEntityList{DT}) where {DT} =
+    definegroup!(name, mesh(es), DT, indices(es))
+
+function definegroup!(name::Symbol, m::Mesh, dim::Int, indices::IntegerVec)
+    g = MeshEntityGroup{MeshEntity{dim}}(indices)
+    g.mesh = m
+    m.groups[name] = g
+end
+
+"""
+    groupnames(m; d=-1, predefined=false)
+
+Returns names of all non-empty groups in Mesh `m` of dimension `d`. If `d` is not specified,
+groups of all dimensions are included. If `predefined` is `false`, only 
+user defined groups are considered.
+"""
+function groupnames(m::Mesh; d::Int=-1, predefined::Bool=false)
+    isvalid(name) =
+        (predefined || !ispredefined(m.groups, name)) &&
+        (d == -1 || (!isempty(m.groups[name]) && edim(m.groups[name]) == d))
+    return sort([name for name ∈ names(m.groups) if isvalid(name)])
+end
+
+"""
+    groupnames(e)
+
+Names of groups entity e belongs to sorted by group size. That is, the most specific
+group is returned first.
+"""
+groupnames(e::MeshEntity{DT}) where {DT} = return sort!(
+    [
+        groupname
+        for groupname ∈ groupnames(e.mesh, d=DT, predefined=true)
+        if e ∈ e.mesh.groups[groupname]
+    ],
+    lt=(name1, name2) -> length(e.mesh.groups[name1]) < length(e.mesh.groups[name2])
+)
+
+
+"""
+    groupname(e)
+
+Returns the smallest group containing `e``.
+"""
+groupname(e::MeshEntity) = groupnames(e) |> first
+
+"""
+    groupids(m::Mesh; d::Int, predefined::Bool=false)
+
+Unique numerical ids groups of specified dimension.
+"""
+groupids(m::Mesh; d::Int, predefined::Bool=false) =
+    _idvector(_entitygroupnames(m, d=d, predefined=predefined))
+
+
+"""
+    ngroups(m::Mesh; d::Int=-1, predefined::Bool=false)
+
+Number of groups.
+"""
+ngroups(m::Mesh; d::Int=-1, predefined::Bool=false) =
+    length(groupnames(m, d=d, predefined=predefined))
+
+
+"""
+    hasgroups(m::Mesh; d::Int=-1, predefined::Bool=false)
+
+Tests groups are defined.
+"""
+hasgroups(m::Mesh; d::Int=-1, predefined::Bool=false) =
+    ngroups(m, d=d, predefined=predefined) > 0
+
+
+function group(m::Mesh, name::Symbol)
+    # Hack to set group for recipes
+    g = m.groups[name]
+    g.mesh = m
+    return g
+end
+
+entities(m::Mesh, groupname::Symbol) = entities(group(m, groupname))
+entities(g::MeshEntityGroup) = entities(g.mesh, edim(g), indices(g))
 
 
 # -------------------------------------------------------------------------------------------------
@@ -111,105 +219,3 @@ function _registergrouprecipies(m::Mesh)
 end
 
 
-# -------------------------------------------------------------------------------------------------
-# Interface
-# -------------------------------------------------------------------------------------------------
-
-"""
-    name(g)
-
-Name of group `g`.
-"""
-function name(g::Group)
-    for n = groupnames(g.mesh, predefined=true)
-        g.mesh.groups.entries[n] === g && return n
-    end
-end
-
-"""
-    definegroup!(m, dim, name, indices)
-    definegroup!(m, dim, name; nodegroup=group)
-
-For mesh `m`, define group of `dim`-dimensional entities called `name` with entities `indices`.
-"""
-function definegroup!(m::Mesh, dim::Int, name::Symbol, indices)
-    g = MeshEntityGroup{MeshEntity{dim}}(indices)
-    g.mesh = m
-    m.groups[name] = g
-end
-
-definegroup!(name::Symbol, es::MeshEntityList{DT}) where {DT} = definegroup!(es.mesh, DT, name, indices(es))
-
-"""
-    groupnames(m; d=-1, predefined=false)
-
-Returns names of all non-empty groups in Mesh `m` of dimension `d`. If `d` is not specified,
-groups of all dimensions are included. If `predefined` is `false`, only 
-user defined groups are considered.
-"""
-function groupnames(m::Mesh; d::Int=-1, predefined::Bool=false)
-    isvalid(name) =
-        (predefined || !ispredefined(m.groups, name)) &&
-        (d == -1 || (!isempty(m.groups[name]) && edim(m.groups[name]) == d))
-    return sort([name for name ∈ names(m.groups) if isvalid(name)])
-end
-
-"""
-    groupnames(e)
-
-Names of groups entity e belongs to sorted by group size. That is, the most specific
-group is returned first.
-"""
-groupnames(e::MeshEntity{DT}) where {DT} = return sort!(
-    [
-        groupname
-        for groupname ∈ groupnames(e.mesh, d=DT, predefined=true)
-        if e ∈ e.mesh.groups[groupname]
-    ],
-    lt=(name1, name2) -> length(e.mesh.groups[name1]) < length(e.mesh.groups[name2])
-)
-
-
-"""
-    groupname(e)
-
-Returns the smallest group containing `e``.
-"""
-groupname(e::MeshEntity) = groupnames(e) |> first
-
-"""
-    groupids(m::Mesh; d::Int, predefined::Bool=false)
-
-Unique numerical ids groups of specified dimension.
-"""
-groupids(m::Mesh; d::Int, predefined::Bool=false) =
-    _idvector(_entitygroupnames(m, d=d, predefined=predefined))
-
-
-"""
-    ngroups(m::Mesh; d::Int=-1, predefined::Bool=false)
-
-Number of groups.
-"""
-ngroups(m::Mesh; d::Int=-1, predefined::Bool=false) =
-    length(groupnames(m, d=d, predefined=predefined))
-
-
-"""
-    hasgroups(m::Mesh; d::Int=-1, predefined::Bool=false)
-
-Tests groups are defined.
-"""
-hasgroups(m::Mesh; d::Int=-1, predefined::Bool=false) =
-    ngroups(m, d=d, predefined=predefined) > 0
-
-
-function group(m::Mesh, name::Symbol)
-    # Hack to set group for recipes
-    g = m.groups[name]
-    g.mesh = m
-    return g
-end
-
-entities(m::Mesh, groupname::Symbol) = entities(group(m, groupname))
-entities(g::MeshEntityGroup) = entities(g.mesh, edim(g), indices(g))

@@ -143,10 +143,10 @@ function makemeshonrectangle(
     addlinks!(m.topology, 2, 0, cl)
 
     # Groups for nodes on edges
-    definegroup!(m, 0, :b1, 1:nnx)
-    definegroup!(m, 0, :b2, nnx:nnx:(nnx*nny))
-    definegroup!(m, 0, :b3, (nnx*(nny-1)+1):(nnx*nny))
-    definegroup!(m, 0, :b4, 1:nnx:(nnx*nny))
+    definegroup!(:b1, m, 0, 1:nnx)
+    definegroup!(:b2, m, 0, nnx:nnx:(nnx*nny))
+    definegroup!(:b3, m, 0, (nnx*(nny-1)+1):(nnx*nny))
+    definegroup!(:b4, m, 0, 1:nnx:(nnx*nny))
 
     # Done
     return m

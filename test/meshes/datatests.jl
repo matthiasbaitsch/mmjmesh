@@ -7,7 +7,7 @@ using MMJMesh.Meshes
 
 # Test mesh
 m = Mesh(:quadtri)
-definegroup!(m, 2, :bar, [2])
+definegroup!(:bar, m, 2, [2])
 
 # Assign data
 setdata!(m, :foo, 1)

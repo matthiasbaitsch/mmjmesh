@@ -89,6 +89,9 @@ struct MeshEntityList{DT} <: AbstractVector{MeshEntity{DT}}
         new{pdim}(mesh, indices)
 end
 
+# Misc
+mesh(mel::MeshEntityList) = mel.mesh
+
 # AbstractArray interface
 Base.length(el::MeshEntityList) = length(el.indices)
 Base.size(el::MeshEntityList) = (length(el),)

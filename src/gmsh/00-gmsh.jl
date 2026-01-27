@@ -59,10 +59,10 @@ function _readmsh(filepath)
     groupnamesbytag = Dict{Int,Symbol}()
     for g ∈ gm.physicalnames.names
         name = Symbol(g.name)
-        definegroup!(m, g.dimension, name, Int[])
+        definegroup!(name, m, g.dimension, Int[])
         groupnamesbytag[g.tag] = name
         if g.dimension == 1
-            definegroup!(m, 0, ng(name), Int[])
+            definegroup!(ng(name), m, 0, Int[])
         end
     end
 

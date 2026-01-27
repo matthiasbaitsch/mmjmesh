@@ -32,8 +32,8 @@ ids = _idvector(values)
 # _entitygroupnames
 a = 5
 m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
-definegroup!(m, 2, :g1, [1, 2, 3, 13, 14, 7, 15])
-definegroup!(m, 2, :g2, [2, 13, 7, 5])
+definegroup!(:g1, m, 2, [1, 2, 3, 13, 14, 7, 15])
+definegroup!(:g2, m, 2, [2, 13, 7, 5])
 fg = _entitygroupnames(m, d=2)
 @test fg[1] == [:g1]
 @test fg[2] == [:g1, :g2]
@@ -48,9 +48,9 @@ ng = _entitygroupnames(m, d=0, predefined=true)
 
 a = 5
 m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
-definegroup!(m, 2, :g1, [1, 2, 3, 13, 14, 7, 15])
-definegroup!(m, 2, :g2, [2, 13, 7, 5])
-definegroup!(m, 1, :g3, [1, 2, 3, 13, 14, 7, 15])
+definegroup!(:g1, m, 2, [1, 2, 3, 13, 14, 7, 15])
+definegroup!(:g2, m, 2, [2, 13, 7, 5])
+definegroup!(:g3, m, 1, [1, 2, 3, 13, 14, 7, 15])
 
 @test mesh(group(m, :g1)) === m
 @test mesh(group(m, :g2)) === m
@@ -106,9 +106,9 @@ m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
 @test hasgroups(m, d=1, predefined=true)
 
 # Test with more groups
-definegroup!(m, 0, :g1, [1, 2, 3, 13, 14, 7, 15])
-definegroup!(m, 2, :g2, [2, 13, 7, 5])
-definegroup!(m, 1, :g3, [4, 5, 9])
+definegroup!(:g1, m, 0, [1, 2, 3, 13, 14, 7, 15])
+definegroup!(:g2, m, 2, [2, 13, 7, 5])
+definegroup!(:g3, m, 1, [4, 5, 9])
 @test groupnames(m) |> sort == [:b1, :b2, :b3, :b4, :g1, :g2, :g3]
 @test groupnames(m, predefined=true) ==
       [
@@ -136,19 +136,23 @@ f33 = face(m, 33)
 # -------------------------------------------------------------------------------------------------
 
 g = group(m, :edges)
-for f ∈ edges(m)
+for f = edges(m)
       @test f ∈ g
 end
 
 g = group(m, :faces)
-for f ∈ faces(m)
+for f = faces(m)
       @test f ∈ g
 end
 
-
-# -------------------------------------------------------------------------------------------------
-# Dimension groups
-# -------------------------------------------------------------------------------------------------
-
 @test indices(group(m, :g2), 0) == [2, 3, 5, 6, 7, 8, 13, 14, 15, 16, 17, 18, 19, 25, 26]
 @test indices(group(m, :g2), 1) == [2, 5, 6, 7, 10, 12, 14, 15, 16, 18, 20, 21, 22, 35, 37, 38]
+
+
+# -------------------------------------------------------------------------------------------------
+# Group from entities
+# -------------------------------------------------------------------------------------------------
+
+m = Mesh(3.0, 1.5, 4)
+g = definegroup!(:g3, edges(m, all_nodes_in(group(m, :b3))))
+@test g == [15, 18, 20, 22]
