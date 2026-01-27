@@ -3,43 +3,43 @@ SeqIntSet(a::AbstractVector{Int}; sorted=false)
 
 Set of integers which handles sets containing sequences, for example ```{-100, -99, -98, … , 2, 3, 9, 10, 12, … , 98, 100}```, efficiently.
 """
-struct SeqIntSet <: AbstractVector{Int}
-    start::Vector{Int}
-    step::Vector{Int}
-    index::Vector{Int}
+struct SeqIntSet{T<:Integer} <: AbstractVector{T}
+    start::Vector{T}
+    step::Vector{T}
+    index::Vector{T}
 end
 
 # Constructor
-function SeqIntSet(a::AbstractVector{Int})
+function SeqIntSet(a::AbstractVector{T}) where {T<:Integer}
 
     # Quick return
     isempty(a) && return SeqIntSet(Int[], Int[], [1])
 
     # Initialize
-    start = Int[]
-    step = Int[]
-    index = Int[]
-    b = unique(sort(a))
+    start = T[]
+    step = T[]
+    index = T[]
     state = 0
     step1 = step2 = NaN
+    asu = a |> sort |> unique
 
     # Read sequence
-    for i ∈ 2:length(b)
+    for i = 2:length(asu)
 
         # Calculate steps
         step1 = step2
-        step2 = b[i] - b[i-1]
+        step2 = asu[i] - asu[i-1]
 
         # Process states
         if state == 0
             push!(index, i - 1)
-            push!(start, b[i-1])
+            push!(start, asu[i-1])
             state = 1
         elseif state == 1
             if step1 != step2
                 push!(step, step1)
                 push!(index, i - 1)
-                push!(start, b[i-1])
+                push!(start, asu[i-1])
             else
                 state = 2
             end
@@ -56,25 +56,17 @@ function SeqIntSet(a::AbstractVector{Int})
         if state == 1
             push!(step, step2)
         end
-        push!(index, length(b))
-        push!(start, b[end])
+        push!(index, length(asu))
+        push!(start, asu[end])
         push!(step, 0)
     else
         push!(step, step1)
     end
-    push!(index, length(b) + 1)
+    push!(index, length(asu) + 1)
 
     # Return
     return SeqIntSet(start, step, index)
 end
-
-
-# Handle empty vectors
-function SeqIntSet(a::AbstractVector{Any})
-    @assert isempty(a)
-    return SeqIntSet(Int[], Int[], [1])
-end
-
 
 # Helpers
 nsequences(set::SeqIntSet) = length(set.start)
