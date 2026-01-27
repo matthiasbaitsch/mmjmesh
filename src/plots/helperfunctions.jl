@@ -185,7 +185,7 @@ _setifundefined(plot, key, value; enforce=false) = !_isdefined(plot, key) && (pl
 function _smooth(mesh, xe)
     xn = zeros(nnodes(mesh))
     for e = elements(mesh)
-        xn[nodeindices(e)] .+= xe[index(e)]
+        xn[indices(e, 0)] .+= xe[index(e)]
     end
     for n = nodes(mesh)
         xn[index(n)] /= MMJMesh.Meshes.nentities(n, pdim(mesh))

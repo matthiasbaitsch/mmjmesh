@@ -8,13 +8,11 @@ Group of mesh entities.
 const MeshEntityGroup = Group{<:MeshEntity}
 
 """
-    edim(type)
     edim(group)
 
-Enitity dimension of group or group type.
+Parametric dimension of entities in `group`.
 """
-edim(::Type{<:Group{<:MeshEntity{DT}}}) where {DT} = DT
-edim(g::Group{<:MeshEntity}) = edim(typeof(g))
+edim(g::Group{<:MeshEntity{DT}}) where DT = DT
 
 
 # -------------------------------------------------------------------------------------------------
@@ -118,8 +116,14 @@ function group(m::Mesh, name::Symbol)
     return g
 end
 
+# Entities from mesh via group
+entities(m::Mesh, pdim::Integer, groupname::Symbol; select=all) = 
+    entities(m, pdim, indices(m, pdim, groupname; select=select))
 entities(m::Mesh, groupname::Symbol) = entities(group(m, groupname))
+
+# Entities from group
 entities(g::MeshEntityGroup) = entities(g.mesh, edim(g), indices(g))
+entities(g::MeshEntityGroup, pdim::Integer) = entities(entities(g), pdim)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -161,7 +165,7 @@ function _collectboundary(m::Mesh{1})
     bn = Int[]
     for e ∈ nodes(m)
         if nedges(e) == 1
-            append!(bn, nodeindices(e))
+            append!(bn, indices(e, 0))
         end
     end
     return bn, Int[], Int[]
@@ -174,7 +178,7 @@ function _collectboundary(m::Mesh{2})
     for e ∈ edges(m)
         if nfaces(e) == 1
             push!(be, e.index)
-            append!(bn, nodeindices(e))
+            append!(bn, indices(e, 0))
         end
     end
     return bn, be, Int[]

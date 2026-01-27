@@ -71,7 +71,7 @@ e42 = element(m, 42)
 @test e13 ∉ group(m, :g3)
 @test e42 ∉ group(m, :g1)
 
-@test nodeindices(group(m, :g2)) ==
+@test nodes(group(m, :g2)) |> indices ==
       [2, 3, 5, 6, 7, 8, 13, 14, 15, 16, 17, 18, 19, 25, 26]
 
 
@@ -154,5 +154,6 @@ end
 # -------------------------------------------------------------------------------------------------
 
 m = Mesh(3.0, 1.5, 4)
-g = definegroup!(:g3, edges(m, all_nodes_in(group(m, :b3))))
+g = definegroup!(:g3, edges(m, :b3))
 @test g == [15, 18, 20, 22]
+@test edges(m, :g3) |> indices == [15, 18, 20, 22]

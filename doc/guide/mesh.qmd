@@ -39,7 +39,7 @@ addelements!(m, is1, is2, group=:vert)
 addelements!(m, is2, is1 .+ 1, n=ne2, group=:diag)
 addelements!(m, is1 .+ ne2, is2 .+ (ne2 + 1), n=ne2, group=:diag)
 
-mplot(m, edgecolor=:groups, nodesvisible=true) |> mconf()
+mplot(m, nodesvisible=true) |> mconf()
 ```
 
 ### Build rectangular mesh
@@ -62,10 +62,10 @@ Node groups `:b1` to `:b4` are defined for each boundary (counterclockwise start
 ```{julia}
 m = Mesh(4.0, 2.0, 17)
 p = mplot(m, nodesvisible=false) |> mconf()
-scatter!(coordinates(m, group(m, :b1)), color=:green, markersize=30)
-scatter!(coordinates(m, group(m, :b2)), color=:magenta, markersize=25)
-scatter!(coordinates(m, group(m, :b3)), color=:orange, markersize=20)
-scatter!(coordinates(m, group(m, :b4)), color=:blue, markersize=15)
+scatter!(coordinates(m, :b1), color=:green, markersize=30)
+scatter!(coordinates(m, :b2), color=:magenta, markersize=25)
+scatter!(coordinates(m, :b3), color=:orange, markersize=20)
+scatter!(coordinates(m, :b4), color=:blue, markersize=15)
 p
 ```
 
@@ -91,8 +91,8 @@ As an alternative, one can pass the Gmsh input as string:
 m = Mesh("""
     SetFactory("OpenCASCADE");
     Rectangle(1) = {0, 0, 0, 20, 10, 0};
-    Rectangle(2) = {10, -5, 0, 5, 20, 0};
-    Disk(3) = {20, 5, 0, 15, 5};
+    Rectangle(2) = {9, -4, 0, 5, 18, 0};
+    Disk(3) = {20, 5, 0, 5, 5};
     BooleanUnion{
         Surface{1}; 
         Delete;
@@ -157,11 +157,11 @@ println("          Node 3: ", node(m, 3))
 println("          Edge 8: ", edge(m, 8))
 println("         Element: ", e)
 println(" Edge of element: ", edge(e, 2))
-println("    Node indices: ", nodeindices(e))
+println("    Node indices: ", indices(nodes(e)))
 println("     Coordinates: ", coordinates(e))
 println("     Coordinates: ", coordinates(e, 3))
 println("   Edges 3 and 4: ", gs)
-println("    Node indices: ", nodeindices(gs))
+println("    Node indices: ", indices(nodes(gs)))
 ```
 
 ### Iterate of entities
@@ -196,9 +196,9 @@ Entities can be selected based on a predicate.
 
 ```{julia}
 m = Mesh(meshpath("complex-g1.msh"))
-n1 = nodeindices(m, on(Point(0.75, 1)))
-n2 = nodeindices(m, on(Segment([0.75, 0], [2, 0])))
-n3 = nodeindices(m, on(VLine(0.5)))
+n1 = indices(nodes(m, on(Point(0.75, 1))))
+n2 = indices(nodes(m, on(Segment([0.75, 0], [2, 0]))))
+n3 = indices(nodes(m, on(VLine(0.5))))
 
 p = mplot(m) |> mconf()
 scatter!(coordinates(m, n1), color=:green)
@@ -207,18 +207,18 @@ scatter!(coordinates(m, n3), color=:orange)
 p
 ```
 
-In addition, a single node can be identified as well.
+A single node can be identified as well.
 
 ```{julia}
-nodeindex(m, on(Point(0.75, 1)))
+nodes(m, on(Point(0.75, 1)))[1]
 ```
 
-Select entities connected to certain nodes.
+Select entities connected to certain nodes (advanced).
 
 ```{julia}
 m = Mesh(4.0, 2.0, 5)
-println(edgeindices(m, all_nodes_in(1:3)))
-println(edgeindices(m, any_node_in(1:3)))
+println(indices(edges(m, MMJMesh.Meshes.entities_in(0, 1:3,select=all))))
+println(indices(edges(m, MMJMesh.Meshes.entities_in(0, 1:3,select=any))))
 ```
 
 ## Collections of Entities: Groups
@@ -266,7 +266,7 @@ Groups can be used to filter access to coordinates.
 ```{julia}
 m = Mesh(meshpath("complex-g1.msh"))
 p = mplot(m) |> mconf()
-scatter!(coordinates(m, group(m, :boundarynodes)), color=:hotpink)
+scatter!(coordinates(m, :boundarynodes), color=:hotpink)
 p
 ```
 
@@ -350,7 +350,7 @@ using Statistics # For mean - function
 m = Mesh(:quadtri)
 setdata!(m, :a, 100 * (1:nnodes(m)))
 println("   Value for node 3: ", data(node(m, 3), :a))
-println(" Nodes of element 1: ", nodeindices(element(m, 1)))
+println(" Nodes of element 1: ", indices(nodes(element(m, 1))))
 println("Values of element 1: ", data(element(m, 1), :a))
 println(" Mean for element 1: ", mean(data(element(m, 1), :a)))
 ```

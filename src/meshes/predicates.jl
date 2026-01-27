@@ -28,19 +28,13 @@ _parameterof(o::GeometricObjectP, n::Node, atol) = parameterof(o, coordinates(n)
 
 
 """
-    any_node_in(nodes::AbstractArray{<:Integer})
-    all_nodes_in(nodes::AbstractArray{<:Integer})
+    entities_in(pdim, idxs, select=all)
 
-Generates a predicate which tests if any or all nodes of an object are in the specified set of
-nodes.
+Generates a predicate which tests if indices of entities having parametric dimension `pdim` of an 
+object are in the specified array vector `idxs`.
 """
-all_nodes_in(nodes::AbstractArray{<:Integer}) = _nodes_in(nodes, select=all)
-any_node_in(nodes::AbstractArray{<:Integer}) = _nodes_in(nodes, select=any)
-
-# Helpers
-
-function _nodes_in(nodes::AbstractArray{<:Integer}; select)
-    nodeset = Set(nodes)
-    return e -> select(n -> (n ∈ nodeset), nodeindices(e)) ? index(e) : NaN
+function entities_in(pdim::Integer, idxs::IntegerVec; select)
+    idxs = Set(idxs)
+    return e -> select(i -> (i ∈ idxs), indices(e, pdim)) ? index(e) : NaN
 end
 

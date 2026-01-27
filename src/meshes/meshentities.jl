@@ -1,3 +1,8 @@
+# -------------------------------------------------------------------------------------------------
+# Mesh entity
+# -------------------------------------------------------------------------------------------------
+
+
 """
     MeshEntity{DT,DG,NN,G}
 
@@ -33,6 +38,7 @@ MMJMesh.id(me::MeshEntity{DT}) where {DT} = MMJMesh.id(me.mesh.topology, DT, me.
 nnodes(::Type{<:Node}) = 0
 nnodes(::Type{<:MeshEntity{DT,DG,NN}}) where {DT,DG,NN} = NN
 nnodes(me::MeshEntity) = nnodes(typeof(me))
+
 geometrytype(::MeshEntity{DT,DG,NN,G}) where {DT,DG,NN,G} = G
 
 index(me::MeshEntity) = me.index
@@ -44,8 +50,7 @@ nentities(me::MeshEntity{DT}, pdim::Integer) where {DT} =
     nlinks(me.mesh.topology, DT, pdim, me.index)
 
 entity(me::MeshEntity, pdim::Int, idx::Int) = entity(me.mesh, pdim, index(me, pdim, idx))
-
-nodeindices(n::Node) = [n.index]
+entities(me::MeshEntity, pdim::Integer) = MeshEntityList(me.mesh, pdim, indices(me, pdim))
 
 # Show
 function _mpname(t::Type)
@@ -56,7 +61,7 @@ end
 Base.show(io::IO, e::T) where {T<:MeshEntity{0}} =
     print(io, "$(_mpname(T))($(id(e)))$(coordinates(e))")
 Base.show(io::IO, e::T) where {T<:MeshEntity} =
-    print(io, "$(_mpname(T))($(id(e)))$(nodeindices(e))")
+    print(io, "$(_mpname(T))($(id(e)))$(indices(e, 0))")
 
 # Coordinates
 coordinate(n::Node, c::Int) = n.mesh.geometry.points.coordinates[c, n.index]
@@ -77,6 +82,10 @@ geometry(me::MeshEntity{DT,DG,NN,GeometricObjectI}) where {DT,DG,NN} =
     GeometricObjectI{pdim(me)}(coordinates(me))
 
 
+# -------------------------------------------------------------------------------------------------
+# Mesh entity list
+# -------------------------------------------------------------------------------------------------
+
 """
     MeshEntityList{DT}
 
@@ -95,15 +104,19 @@ mesh(mel::MeshEntityList) = mel.mesh
 # AbstractArray interface
 Base.length(el::MeshEntityList) = length(el.indices)
 Base.size(el::MeshEntityList) = (length(el),)
-Base.getindex(el::MeshEntityList{DT}, i::Integer) where {DT} = entity(el.mesh, DT, el.indices[i])
+Base.getindex(el::MeshEntityList{DT}, i::Integer) where DT = entity(el.mesh, DT, el.indices[i])
 Base.iterate(el::MeshEntityList, state=1) = state > length(el) ? nothing : (el[state], state + 1)
 
 # Indices
 indices(mel::MeshEntityList) = mel.indices
 
-# Get entities
+# Get entities from mesh entity list
 entities(mel::MeshEntityList) = mel
+entities(mel::MeshEntityList, pdim::Integer) = entities(mesh(mel), pdim, indices(mel, pdim))
+
+# Get entities from mesh
 entities(m::Mesh, pdim::Integer) = entities(m, pdim, indices(m, pdim))
-entities(m::Mesh, pdim::Integer, indices::AbstractVector{<:Integer}) = MeshEntityList(m, pdim, indices)
-entities(me::MeshEntity, pdim::Integer) = MeshEntityList(me.mesh, pdim, indices(me, pdim))
+entities(m::Mesh, pdim::Integer, indices::IntegerVec) = MeshEntityList(m, pdim, indices)
+entities(m::Mesh, pdim::Integer, predicate) = entities(m, pdim, indices(m, pdim, predicate))
+
 

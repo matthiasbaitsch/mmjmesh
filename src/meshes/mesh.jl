@@ -58,17 +58,17 @@ end
 MMJMesh.pdim(::Mesh{DT}) where {DT} = DT
 MMJMesh.gdim(::Mesh{DT,DG}) where {DT,DG} = DG
 
+indices(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
+
 nentities(m::Mesh, dim::Int) = Topologies.nentities(m.topology, dim, true)
 entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx, geometrytype(m, pdim))
-
-indices(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
 
 
 # -------------------------------------------------------------------------------------------------
 # Coordinates
 # -------------------------------------------------------------------------------------------------
 
-MMJMesh.coordinates(m::Mesh) = m.geometry.points.coordinates[:, nodeindices(m)]
+MMJMesh.coordinates(m::Mesh) = m.geometry.points.coordinates[:, indices(m, 0)]
 MMJMesh.coordinates(m::Mesh, g::Symbol) = m.geometry.points.coordinates[:, group(m, g)]
 MMJMesh.coordinates(m::Mesh, index::Integer) = m.geometry.points.coordinates[:, index]
 MMJMesh.coordinates(m::Mesh, indices::IntegerVec) = m.geometry.points.coordinates[:, indices]
@@ -106,21 +106,17 @@ function indices(m::Mesh, pdim::Integer, predicate)
     return idxs[perm]
 end
 
-entities(m::Mesh, pdim::Integer, predicate) = entities(m, pdim, indices(m, pdim, predicate))
+function indices(m::Mesh, pdim::Integer, groupname::Symbol; select::Function=all)
+    g = group(m, groupname)
+    gdim = edim(g)
 
-# Specialized versions
-nodeindex(m::Mesh, predicate) = index(m, 0, predicate)
-nodeindices(m::Mesh, predicate) = indices(m, 0, predicate)
-nodes(m::Mesh, predicate) = entities(m, 0, predicate)
-edgeindex(m::Mesh, predicate) = index(m, 1, predicate)
-edgeindices(m::Mesh, predicate) = indices(m, 1, predicate)
-edges(m::Mesh, predicate) = entities(m, 1, predicate)
-faceindex(m::Mesh, predicate) = index(m, 2, predicate)
-faceindices(m::Mesh, predicate) = indices(m, 2, predicate)
-faces(m::Mesh, predicate) = entities(m, 2, predicate)
-elementindex(m::Mesh{DT}, predicate) where {DT} = index(m, DT, predicate)
-elementindices(m::Mesh{DT}, predicate) where {DT} = indices(m, DT, predicate)
-elements(m::Mesh{DT}, predicate) where {DT} = entities(m, DT, predicate)
+    if pdim == gdim
+        return indices(g)
+    else
+        return indices(m, pdim, entities_in(gdim, indices(g), select=select))
+    end
+end
+
 
 
 # -------------------------------------------------------------------------------------------------

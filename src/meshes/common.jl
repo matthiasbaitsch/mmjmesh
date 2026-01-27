@@ -6,27 +6,25 @@ nnodes(o) = nentities(o, 0)
 nedges(o) = nentities(o, 1)
 nfaces(o) = nentities(o, 2)
 nsolids(o) = nentities(o, 3)
-node(o, index::Int) = entity(o, 0, index)
-edge(o, index::Int) = entity(o, 1, index)
-face(o, index::Int) = entity(o, 2, index)
-solid(o, index::Int) = entity(o, 3, index)
-nodes(o) = entities(o, 0)
-edges(o) = entities(o, 1)
-faces(o) = entities(o, 2)
-solids(o) = entities(o, 3)
-nodeindices(o) = indices(o, 0)
-edgeindices(o) = indices(o, 1)
-faceindices(o) = indices(o, 2)
-solidindices(o) = indices(o, 3)
+
+node(o, index) = entity(o, 0, index)
+edge(o, index) = entity(o, 1, index)
+face(o, index) = entity(o, 2, index)
+solid(o, index) = entity(o, 3, index)
+
+nodes(o, args...; kwargs...) = entities(o, 0, args...; kwargs...)
+edges(o, args...; kwargs...) = entities(o, 1, args...; kwargs...)
+faces(o, args...; kwargs...) = entities(o, 2, args...; kwargs...)
+solids(o, args...; kwargs...) = entities(o, 3, args...; kwargs...)
 
 
 # -------------------------------------------------------------------------------------------------
 # Indices
 # -------------------------------------------------------------------------------------------------
 
-function indices(g::Union{MeshEntityGroup,MeshEntityList}, d::Int)
+function indices(o::Union{MeshEntityGroup,MeshEntityList}, d::Int)
     s = Set{Int}()
-    for e = entities(g)
+    for e = entities(o)
         push!(s, indices(e, d)...)
     end
     return s |> collect |> sort

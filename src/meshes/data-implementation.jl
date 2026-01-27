@@ -32,7 +32,7 @@ function _retrieve_entitydata(e::MeshEntity, v::AbstractVector)
 
     # Assume data belongs to nodes of entity
     if nnodes(e.mesh) == length(v)
-        return v[nodeindices(e)]
+        return v[indices(e, 0)]
     end
     
 end
