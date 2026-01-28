@@ -28,10 +28,9 @@ _parameterof(o::GeometricObjectP, n::Node, atol) = parameterof(o, coordinates(n)
 
 
 """
-    entities_in(pdim, idxs, select=all)
+    entities_in(pdim, idxs; select)
 
-Generates a predicate which tests if indices of entities having parametric dimension `pdim` of an 
-object are in the specified array vector `idxs`.
+Generates a predicate which tests if `pdim`-dimensional entities of an entity are in `idxs`. Use `select=all` to require all entities in `idxs`, use `select=any` if any entity in `idxs` is sufficient.
 """
 function entities_in(pdim::Integer, idxs::IntegerVec; select)
     idxs = Set(idxs)

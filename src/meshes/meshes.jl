@@ -63,11 +63,11 @@ MMJMesh.gdim(::Mesh{DT,DG}) where {DT,DG} = DG
 # Coordinates
 # -------------------------------------------------------------------------------------------------
 
-MMJMesh.coordinates(m::Mesh) = m.geometry.points.coordinates[:, indices(m, 0)]
-MMJMesh.coordinates(m::Mesh, g::Symbol) = m.geometry.points.coordinates[:, group(m, g)]
+MMJMesh.coordinates(m::Mesh) = m.geometry.points.coordinates[:, nodeindices(m)]
+MMJMesh.coordinates(m::Mesh, g::Symbol) = m.geometry.points.coordinates[:, nodeindices(m, g)]
 MMJMesh.coordinates(m::Mesh, index::Integer) = m.geometry.points.coordinates[:, index]
 MMJMesh.coordinates(m::Mesh, indices::IntegerVec) = m.geometry.points.coordinates[:, indices]
-MMJMesh.coordinates(m::Mesh, g::Symbol, c::Integer) = m.geometry.points.coordinates[c, group(m, g)]
+MMJMesh.coordinates(m::Mesh, g::Symbol, c::Integer) = m.geometry.points.coordinates[c, nodeindices(m, g)]
 MMJMesh.coordinates(m::Mesh, index::Integer, c::Integer) = m.geometry.points.coordinates[c, index]
 MMJMesh.coordinates(m::Mesh, indices::IntegerVec, c::Integer) = m.geometry.points.coordinates[c, indices]
 
@@ -94,14 +94,19 @@ function indices(m::Mesh, pdim::Integer, predicate)
     return idxs[perm]
 end
 
-function indices(m::Mesh, pdim::Integer, groupname::Symbol; select::Function=all)
-    g = group(m, groupname)
-    gdim = edim(g)
+_false(_) = false
 
-    if pdim == gdim
+function indices(m::Mesh, pdim_entities::Integer, groupname::Symbol; select::Function=_false)
+    g = group(m, groupname)
+    pdim_group = edim(g)
+
+    if pdim_entities == pdim_group
         return indices(g)
     else
-        return indices(m, pdim, entities_in(gdim, indices(g), select=select))
+        if select == _false
+            select = pdim_group > pdim_entities ? any : all
+        end
+        return indices(m, pdim_entities, entities_in(pdim_group, indices(g), select=select))
     end
 end
 
@@ -115,6 +120,9 @@ entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx, geometrytype(m, 
 entities(m::Mesh, pdim::Integer) = entities(m, pdim, indices(m, pdim))
 entities(m::Mesh, pdim::Integer, indices::IntegerVec) = MeshEntityList{pdim}(m, indices)
 entities(m::Mesh, pdim::Integer, predicate) = entities(m, pdim, indices(m, pdim, predicate))
+entities(m::Mesh, pdim::Integer, groupname::Symbol; kwargs...) =
+    entities(m, pdim, indices(m, pdim, groupname; kwargs...))
+entities(m::Mesh, groupname::Symbol) = entities(group(m, groupname))
 
 
 # -------------------------------------------------------------------------------------------------

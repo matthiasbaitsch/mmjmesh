@@ -116,11 +116,6 @@ function group(m::Mesh, name::Symbol)
     return g
 end
 
-# Entities from mesh via group
-entities(m::Mesh, pdim::Integer, groupname::Symbol; select=all) =
-    entities(m, pdim, indices(m, pdim, groupname; select=select))
-entities(m::Mesh, groupname::Symbol) = entities(group(m, groupname))
-
 # Entities from group
 entities(g::MeshEntityGroup) = entities(g.mesh, edim(g), indices(g))
 entities(g::MeshEntityGroup, pdim::Integer) = entities(entities(g), pdim)
