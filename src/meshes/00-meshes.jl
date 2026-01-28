@@ -39,6 +39,7 @@ export MeshEntity, Node, Edge, Face, Solid, index, geometry, geometrytype, area
 export nnodes, nedges, nfaces, nsolids
 export node, edge, face, solid
 export nodes, edges, faces, solids
+export nodeindices, edgeindices, faceindices, solidindices
 
 ## entitygroups.jl
 export definegroup!, group, groupids, edim
