@@ -25,7 +25,7 @@ Makie.@recipe FPlot begin
 end
 
 
-function Makie.plot!(plot::FPlot{<:Tuple{Vararg{<:AbstractMapping}}})
+function Makie.plot!(plot::FPlot)
     attributes = plot.attributes
 
     # Process functions to plot
@@ -47,7 +47,7 @@ function Makie.plot!(plot::FPlot{<:Tuple{Vararg{<:AbstractMapping}}})
         # Collect x and y
         if isempty(pts) # No points of interest
             xy = s1d(a, b)
-        else          # Handle points of intereste
+        else            # Handle points of intereste
             x = Float64[]
             y = Float64[]
             δ = 1e-12 * (b - a)

@@ -10,7 +10,6 @@ using MMJMesh.Utilities
 # Helpers
 # -------------------------------------------------------------------------------------------------
 
-# _idvector
 function validate(values, ids)
       @test length(values) == length(ids)
       for i = eachindex(values), j = eachindex(values)
@@ -145,6 +144,14 @@ for f = faces(m)
       @test f ∈ g
 end
 
+
+# -------------------------------------------------------------------------------------------------
+# Indices
+# -------------------------------------------------------------------------------------------------
+
+@test indices(nodes(m, :g2)) == nodeindices(m, :g2)
+@test indices(edges(m, :g2)) == edgeindices(m, :g2)
+@test indices(faces(m, :g2)) == faceindices(m, :g2)
 @test indices(group(m, :g2), 0) == [2, 3, 5, 6, 7, 8, 13, 14, 15, 16, 17, 18, 19, 25, 26]
 @test indices(group(m, :g2), 1) == [2, 5, 6, 7, 10, 12, 14, 15, 16, 18, 20, 21, 22, 35, 37, 38]
 

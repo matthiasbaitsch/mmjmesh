@@ -14,8 +14,9 @@ import MMJMesh: coordinate, coordinates
 # Parts
 include("data.jl")
 include("groups.jl")
-include("mesh.jl")
+include("meshes.jl")
 include("meshentities.jl")
+include("meshentitylists.jl")
 include("meshentitygroups.jl")
 include("data-implementation.jl")
 include("common.jl")

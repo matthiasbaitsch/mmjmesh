@@ -17,17 +17,22 @@ edges(o, args...; kwargs...) = entities(o, 1, args...; kwargs...)
 faces(o, args...; kwargs...) = entities(o, 2, args...; kwargs...)
 solids(o, args...; kwargs...) = entities(o, 3, args...; kwargs...)
 
+nodeindices(o, args...; kwargs...) = indices(o, 0, args...; kwargs...)
+edgeindices(o, args...; kwargs...) = indices(o, 1, args...; kwargs...)
+faceindices(o, args...; kwargs...) = indices(o, 2, args...; kwargs...)
+solidindices(o, args...; kwargs...) = indices(o, 3, args...; kwargs...)
+
 
 # -------------------------------------------------------------------------------------------------
 # Indices
 # -------------------------------------------------------------------------------------------------
 
-function indices(o::Union{MeshEntityGroup,MeshEntityList}, d::Int)
-    s = Set{Int}()
-    for e = entities(o)
-        push!(s, indices(e, d)...)
+function indices(o::Union{MeshEntityGroup,MeshEntityList}, pdim::Int)
+    if edim(o) == pdim
+        return indices(o)
+    else
+        return Set(vcat(indices.(entities(o), pdim)...)) |> collect |> sort
     end
-    return s |> collect |> sort
 end
 
 

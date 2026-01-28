@@ -12,7 +12,7 @@ const MeshEntityGroup = Group{<:MeshEntity}
 
 Parametric dimension of entities in `group`.
 """
-edim(g::Group{<:MeshEntity{DT}}) where DT = DT
+edim(::Group{<:MeshEntity{DT}}) where DT = DT
 
 
 # -------------------------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ function group(m::Mesh, name::Symbol)
 end
 
 # Entities from mesh via group
-entities(m::Mesh, pdim::Integer, groupname::Symbol; select=all) = 
+entities(m::Mesh, pdim::Integer, groupname::Symbol; select=all) =
     entities(m, pdim, indices(m, pdim, groupname; select=select))
 entities(m::Mesh, groupname::Symbol) = entities(group(m, groupname))
 

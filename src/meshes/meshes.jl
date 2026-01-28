@@ -58,11 +58,6 @@ end
 MMJMesh.pdim(::Mesh{DT}) where {DT} = DT
 MMJMesh.gdim(::Mesh{DT,DG}) where {DT,DG} = DG
 
-indices(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
-
-nentities(m::Mesh, dim::Int) = Topologies.nentities(m.topology, dim, true)
-entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx, geometrytype(m, pdim))
-
 
 # -------------------------------------------------------------------------------------------------
 # Coordinates
@@ -78,25 +73,18 @@ MMJMesh.coordinates(m::Mesh, indices::IntegerVec, c::Integer) = m.geometry.point
 
 
 # -------------------------------------------------------------------------------------------------
-# Elements for convenience
+# Indices
 # -------------------------------------------------------------------------------------------------
 
-nelements(m::Mesh{DT}) where {DT} = nentities(m, DT)
-element(m::Mesh{DT}, index::Int) where {DT} = entity(m, DT, index)
-elements(m::Mesh{DT}) where {DT} = entities(m, DT)
 
-
-# -------------------------------------------------------------------------------------------------
-# Access based on predicates
-# -------------------------------------------------------------------------------------------------
-
-# Generic
 function index(m::Mesh, pdim::Integer, predicate)
     for n = entities(m, pdim)
         !isnan(predicate(n)) && return index(n)
     end
     return -1
 end
+
+indices(m::Mesh, pdim::Int) = 1:nentities(m, pdim)
 
 function indices(m::Mesh, pdim::Integer, predicate)
     ps = predicate.(entities(m, pdim))
@@ -117,6 +105,25 @@ function indices(m::Mesh, pdim::Integer, groupname::Symbol; select::Function=all
     end
 end
 
+
+# -------------------------------------------------------------------------------------------------
+# Entities
+# -------------------------------------------------------------------------------------------------
+
+nentities(m::Mesh, dim::Int) = Topologies.nentities(m.topology, dim, true)
+entity(m::Mesh, pdim::Int, idx::Int) = MeshEntity(m, pdim, idx, geometrytype(m, pdim))
+entities(m::Mesh, pdim::Integer) = entities(m, pdim, indices(m, pdim))
+entities(m::Mesh, pdim::Integer, indices::IntegerVec) = MeshEntityList{pdim}(m, indices)
+entities(m::Mesh, pdim::Integer, predicate) = entities(m, pdim, indices(m, pdim, predicate))
+
+
+# -------------------------------------------------------------------------------------------------
+# Elements for convenience
+# -------------------------------------------------------------------------------------------------
+
+nelements(m::Mesh{DT}) where {DT} = nentities(m, DT)
+element(m::Mesh{DT}, index::Int) where {DT} = entity(m, DT, index)
+elements(m::Mesh{DT}) where {DT} = entities(m, DT)
 
 
 # -------------------------------------------------------------------------------------------------

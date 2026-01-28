@@ -1,8 +1,3 @@
-# -------------------------------------------------------------------------------------------------
-# Mesh entity
-# -------------------------------------------------------------------------------------------------
-
-
 """
     MeshEntity{DT,DG,NN,G}
 
@@ -50,7 +45,7 @@ nentities(me::MeshEntity{DT}, pdim::Integer) where {DT} =
     nlinks(me.mesh.topology, DT, pdim, me.index)
 
 entity(me::MeshEntity, pdim::Int, idx::Int) = entity(me.mesh, pdim, index(me, pdim, idx))
-entities(me::MeshEntity, pdim::Integer) = MeshEntityList(me.mesh, pdim, indices(me, pdim))
+entities(me::MeshEntity, pdim::Integer) = MeshEntityList{pdim}(me.mesh, indices(me, pdim))
 
 # Show
 function _mpname(t::Type)
@@ -80,43 +75,3 @@ geometry(node::Node{DG}) where {DG} = Point{DG}(coordinates(node))
 geometry(face::Face{2,4,Box}) = Box(coordinates(face, 1), coordinates(face, 3))
 geometry(me::MeshEntity{DT,DG,NN,GeometricObjectI}) where {DT,DG,NN} =
     GeometricObjectI{pdim(me)}(coordinates(me))
-
-
-# -------------------------------------------------------------------------------------------------
-# Mesh entity list
-# -------------------------------------------------------------------------------------------------
-
-"""
-    MeshEntityList{DT}
-
-List of entities of a finite element mesh of parametric dimension `DT`.
-"""
-struct MeshEntityList{DT} <: AbstractVector{MeshEntity{DT}}
-    mesh::Mesh
-    indices::AbstractVector{<:Integer}
-    MeshEntityList(mesh::Mesh, pdim::Integer, indices::AbstractVector{<:Integer}) =
-        new{pdim}(mesh, indices)
-end
-
-# Misc
-mesh(mel::MeshEntityList) = mel.mesh
-
-# AbstractArray interface
-Base.length(el::MeshEntityList) = length(el.indices)
-Base.size(el::MeshEntityList) = (length(el),)
-Base.getindex(el::MeshEntityList{DT}, i::Integer) where DT = entity(el.mesh, DT, el.indices[i])
-Base.iterate(el::MeshEntityList, state=1) = state > length(el) ? nothing : (el[state], state + 1)
-
-# Indices
-indices(mel::MeshEntityList) = mel.indices
-
-# Get entities from mesh entity list
-entities(mel::MeshEntityList) = mel
-entities(mel::MeshEntityList, pdim::Integer) = entities(mesh(mel), pdim, indices(mel, pdim))
-
-# Get entities from mesh
-entities(m::Mesh, pdim::Integer) = entities(m, pdim, indices(m, pdim))
-entities(m::Mesh, pdim::Integer, indices::IntegerVec) = MeshEntityList(m, pdim, indices)
-entities(m::Mesh, pdim::Integer, predicate) = entities(m, pdim, indices(m, pdim, predicate))
-
-
