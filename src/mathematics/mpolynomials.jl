@@ -471,7 +471,16 @@ function Base.:(*)(p1::PolynomialRnToR{N,D}, p2::PolynomialRnToR{N,D}) where {N,
 end
 
 Base.:(*)(a::Num, p::MPolynomial) = MPolynomial(exponents(p), a * coefficients(p), domain(p))
-Base.:(*)(a::Real, p::MPolynomial) = MPolynomial(exponents(p), a * coefficients(p), domain(p))
+
+function Base.:(*)(a::Real, p::MPolynomial)
+    if a == 0
+        return zero(p)
+    end
+    if a == 1
+        return p
+    end
+    return MPolynomial(exponents(p), a * coefficients(p), domain(p))
+end
 
 
 ## Algebraic operations
@@ -537,7 +546,7 @@ end
 ## Compare
 
 Base.:(==)(p1::MPolynomial, p2::MPolynomial) =
-    (p1.exponents == p2.exponents && p1.coefficients == p2.coefficients)
+    (isequal(p1.exponents, p2.exponents) && isequal(p1.coefficients, p2.coefficients))
 
 Base.isapprox(
     p1::MPolynomial, p2::MPolynomial; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps(Float64)

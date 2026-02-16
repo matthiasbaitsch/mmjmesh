@@ -905,7 +905,7 @@ Base.isconst(p::Polynomial) = (degree(p) <= 0)
 Base.iszero(p::Polynomial) = isequal(coefficients(p), [])
 Base.isone(p::Polynomial) = isequal(coefficients(p), [1])
 Base.show(io::IO, p::Polynomial) = print(io, p.p)
-Base.:(==)(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = (D1 == D2 && p1.p == p2.p)
+Base.:(==)(p1::Polynomial{D1}, p2::Polynomial{D2}) where {D1,D2} = (D1 == D2 && isequal(p1.p, p2.p))
 
 
 """
@@ -1032,6 +1032,7 @@ _sum(m1::AbstractMapping, m2::ScaledMapping) = _sum(m2, m1) # Scaled mapping fir
 _sum(m1::AbstractMapping, m2::Polynomial) = _sum(m2, m1) # Polynomial first
 _sum(m1::AbstractMapping, m2::AbstractMapping) = SumMapping(m1, m2)
 
+_scaled(a::Num, z::Zero) = z
 _scaled(a::Real, p::Polynomial{D}) where {D} = Polynomial(a * p.p, D)
 _scaled(a::Real, ::Identity{InR,D}) where {D} = a * monomial(1, D)
 _scaled(a::Real, m::ScaledMapping) = (a * m.a) * m.m
@@ -1111,7 +1112,7 @@ Base.:(^)(::Identity{InR,D}, n::Int) where {D} = monomial(n, D)
 Base.:(^)(f::FunctionRToR, n::Int) = monomial(n, domain(f)) ∘ f
 
 # Add or subtract a Number
-Base.:(+)(f::FunctionToR, a::Real) = a == 1 ? f + one(f) : f + constant(f, a)
+Base.:(+)(f::FunctionToR, a::Real) = a == 0 ? f : a == 1 ? f + one(f) : f + constant(f, a)
 Base.:(+)(a::Real, f::FunctionToR) = f + a
 Base.:(-)(a::Real, f::FunctionToR) = -f + a
 Base.:(-)(f::FunctionToR, a::Real) = f + (-a)

@@ -12,8 +12,9 @@ using MMJMesh.Mathematics: MPolynomial,
       _subscript, _superscript, _prettymonomial, _factorialpower
 
 # Uncomment in order to work with this file
-# include("Validate.jl")
+include("Validate.jl") # XXX
 using .Validate
+
 
 # -------------------------------------------------------------------------------------------------
 # Helper functions tests
@@ -142,6 +143,9 @@ ns2 = SArray{Tuple{2,3,2},Int}([2 1 3; 1 0 2;;; 0 1 2; 1 2 3])
 @test (w * [1 2; 5 4; 8 1])(x) == w(x) * [1 2; 5 4; 8 1]
 @test ([1 2 3 4; 5 4 3 2; 9 5 3 1] * w)(x) == [1 2 3 4; 5 4 3 2; 9 5 3 1] * w(x)
 
+
+@test 0 * w == zero(w)
+@test 1 * w === w
 
 # Mathematica code for reference values
 # u[x1_, x2_] := 3 x1^3 x2^4 + 2 x1 x2^5

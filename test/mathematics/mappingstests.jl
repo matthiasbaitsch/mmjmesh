@@ -9,7 +9,7 @@ using MMJMesh.Mathematics: derivativetype, dimension
 
 
 # Uncomment in order to work with this file
-# include("Validate.jl")
+include("Validate.jl") # XXX
 using .Validate
 
 
@@ -348,8 +348,6 @@ x = parameter(dom)
 @test x + Polynomial([1, 2, 3], dom) + 2x == Polynomial([1, 5, 3], dom)
 
 
-
-
 # -------------------------------------------------------------------------------------------------
 # Some special cases for antiderivatives
 # -------------------------------------------------------------------------------------------------
@@ -536,6 +534,10 @@ m4 = Polynomial([0, 0, 1], 0 .. 4)
 @test validate(m1 + m3, rtol=1e-4)##
 @test 3 * sin(x) + Polynomial([1, 2, 3]) == Polynomial([1, 2, 3]) + 3 * sin(x)
 
+@test m1 + 0 == m1
+@test m1 + 1 == m1 + one(m1)
+@test m1 + 2 == m1 + constant(m1, 2)
+@test a * zero(m1) === zero(m1)
 
 # Multiply
 @test sin(x) * cos(x) == cos(x) * sin(x)
@@ -569,7 +571,6 @@ m5 = m1 ∘ m4
 @test validate(m5, rtol=1e-4)
 
 # Special polynomials
-# XXX
 x = parameter()
 @test Polynomial([0]) * sin(x) === zero(x)
 @test sin(x) * Polynomial([0]) === zero(x)
@@ -582,12 +583,9 @@ x = parameter()
 @test 0.1 * ((10 * sin(x)) ∘ x^2) == sin(x^2)
 @test sin(x) * (10 * x^2) == MMJMesh.Mathematics.ProductMapping(10 * x^2, sin(x))
 @test sin(x) * x^2 == x^2 * sin(x)
-
-# XXX
 @test 0.1 * (10 * x^0 * sin(x)) == sin(x)
 @test 0.1 * (10 * x^0 * (m1 ∘ m4)) == m1 ∘ m4
 @test (10 * x^0 * (m1 ∘ m4)) * 0.1 == m1 ∘ m4
-
 @test validate(sin(x) * cos(x), rtol=1e-4)
 
 # Quotient
@@ -632,6 +630,8 @@ f3 = 2 * Sin()
 
 @test f1 + f2 == Polynomial(6, 6, 3)
 @test 2 * f1 == Polynomial(2, 4, 6)
+@test a * f1 == Polynomial(a, 2a, 3a)
+@test 2 * a * f1 == Polynomial(2a, 4a, 6a)
 @test f1 - f2 == Polynomial(-4, -2, 3)
 @test f1 * f2 == Polynomial(5, 14, 23, 12)
 @test 2 + f1 == Polynomial(3, 2, 3)
