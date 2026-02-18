@@ -434,6 +434,9 @@ hf = derivative(f, 2)
 @test ∂x * f == derivative(f, [1, 0])
 @test ∂y * f == derivative(f, [0, 1])
 
+@test ∂x * 2 == 0
+@test ∂x * 1.0 == 0
+
 
 # # Product function of three parameters
 

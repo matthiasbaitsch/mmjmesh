@@ -490,6 +490,9 @@ end
 (op::Operator)(x) = op.op(x)
 Base.:(*)(op::Operator, x) = op.op(x)
 
+# Enable differential operator on matrix of Anys
+derivative(::Real, ::IntegerVec) = 0
+
 # Partial derivatives of functions R2 -> R
 const ∂x = Operator(f -> derivative(f, [1, 0]))
 const ∂y = Operator(f -> derivative(f, [0, 1]))
