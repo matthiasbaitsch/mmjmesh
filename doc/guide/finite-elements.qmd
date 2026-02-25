@@ -49,6 +49,25 @@ uh = uhat ⋅ φs
 fplot(uh, uh', zero(uh))
 ```
 
+### Piecewise Lagrange polynomials
+
+```{julia}
+xs = [1, 2, 5]
+φs = lagrangebasis1d(xs, 3)
+fplot(φs...)
+```
+
+Linear combination
+
+```{julia}
+uhat = [1, -1, 2, -2, 3, -3, 4]
+uh = uhat ⋅ φs
+p = fplot(uh, zero(uh))
+scatter!(xs, 0 * xs)
+scatter!([1, 4 / 3, 5 / 3, 2, 3, 4, 5], uhat, color=:tomato)
+p
+```
+
 ### Piecewise functions with continuous derivatives
 
 #### Standard Hermite polynomials

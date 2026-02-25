@@ -2,6 +2,8 @@ project:
   type: book
   output-dir: "../build/guide"
 
+number-depth: 2
+
 book:
   title: "The MMJMesh Library"
   subtitle: "Minh's and Matthias' Julia Mesh Library"

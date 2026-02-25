@@ -33,6 +33,29 @@ function hermitefunctions(x::AbstractArray{<:Real}; midnode=false)
     return [PiecewiseFunction(x, c) for c = eachrow(f)]
 end
 
+"""
+    lagrangebasis1d(x, k)
+
+Given an ascending node vector `x` and a polynomial degree `k`, returns basis functions
+from piecewise Lagrange polynomials. For each node span of `x`, there are `k - 1` equally
+spaced nodes inserted.
+"""
+function lagrangebasis1d(x::AbstractArray{<:Real}, k)
+    Nn = length(x)
+    Ne = Nn - 1
+    Ni = (k - 1) * Ne
+    f = Matrix{FunctionRToR}(undef, Nn + Ni, Ne)
+    fill!(f, Zero{InR,InR,R}())
+    for e = 1:Ne
+        m = k * (e - 1)
+        ϕs = makeelement(:lagrange, x[e] .. x[e+1], k=k) |> nodalbasis |> collect
+        f[m+1, e] = ϕs[1]
+        f[m+2:m+k, e] = ϕs[3:end]
+        f[m+k+1, e] = ϕs[2]
+
+    end
+    return [PiecewiseFunction(x, c) for c = eachrow(f)]
+end
 
 """
     FiniteElement(K, P, N)
