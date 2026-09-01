@@ -5,7 +5,7 @@ using MMJMesh.Mathematics
 using MMJMesh.Mathematics: _makebreakpoints, indexofpieceat
 
 # Uncomment in order to work with this file
-# include("Validate.jl") # XXX
+# include("Validate.jl")
 using .Validate
 
 

@@ -1,11 +1,12 @@
 using Test
-using LinearAlgebra
+using LinearAlgebra: Diagonal
 
 using MMJMesh
 using MMJMesh.Meshes
 using MMJMesh.Utilities
 using MMJMesh.Geometries
 using MMJMesh.Mathematics
+using DomainSets: ×
 
 m = Mesh(0.0 .. 1.2, 10)
 @test nedges(m) == 10

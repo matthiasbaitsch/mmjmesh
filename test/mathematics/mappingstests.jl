@@ -1,15 +1,16 @@
 using Test
 using Symbolics
 using StaticArrays
-using LinearAlgebra
+using LinearAlgebra: Diagonal, norm, ⋅
 
 using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Mathematics: derivativetype, dimension
+using DomainSets: ×
 
 
 # Uncomment in order to work with this file
-include("Validate.jl") # XXX
+# include("Validate.jl")
 using .Validate
 
 

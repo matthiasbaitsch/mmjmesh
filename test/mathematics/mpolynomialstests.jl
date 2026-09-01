@@ -1,18 +1,19 @@
 using Test
 using Symbolics
 using StaticArrays
-using LinearAlgebra
+using LinearAlgebra: transpose, ⋅
 
 using MMJMesh
 using MMJMesh.MMJBase
 using MMJMesh.Mathematics
+using DomainSets: ×
 using MMJMesh.Mathematics: MPolynomial,
       _monomialsat, _monomialsderivativeat, _monomialsderivative,
       _lt,
       _subscript, _superscript, _prettymonomial, _factorialpower
 
 # Uncomment in order to work with this file
-include("Validate.jl") # XXX
+# include("Validate.jl")
 using .Validate
 
 

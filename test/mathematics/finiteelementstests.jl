@@ -1,10 +1,10 @@
 using Test
 using Symbolics
-using LinearAlgebra
 
 using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Mathematics: _combineforms
+using DomainSets: ×
 
 
 # Uncomment in order to work with this file

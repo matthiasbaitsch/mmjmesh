@@ -1,9 +1,10 @@
 using Test
-using LinearAlgebra
+using LinearAlgebra: Diagonal
 
 using MMJMesh
 using MMJMesh.Mathematics
 using MMJMesh.Plots: _collectlines, _mergemeshes, _getnintervals, sample2d
+using DomainSets: ×
 
 x1, x2 = _collectlines([[[0, 0], [1, 0], [2, 0]], [[0, 1], [2, 1]]])
 @test isequal(x1, [0, 1, 2, NaN, 0, 2, NaN])

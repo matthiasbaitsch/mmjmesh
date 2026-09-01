@@ -10,6 +10,9 @@ apidoc:
 test:
 	julia --depwarn=error --color=yes --project -e 'using Pkg; Pkg.test()'
 
+setup:
+	julia --project -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+
 clean:
 	find . -name \*.cov | xargs rm
 	rm -rf doc/guide/_book doc/guide/.quarto doc/guide/_freeze

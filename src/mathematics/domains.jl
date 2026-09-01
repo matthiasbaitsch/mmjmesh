@@ -84,7 +84,7 @@ function points(K::AbstractInterval, on::Symbol, n::Integer=0)
     p1 = leftendpoint(K)
     p2 = rightendpoint(K)
     h = 1 // (n + 1)
-    s = h:h:1-h
+    s = h:h:(1-h)
 
     if on == :corners
         return [p1, p2]
@@ -100,23 +100,33 @@ end
 function points(K::Rectangle, on::Symbol, n::Integer=0)
     p11, p12 = leftendpoint(K)
     p21, p22 = rightendpoint(K)
-    c = [SA[p11, p12], SA[p21, p12], SA[p21, p22], SA[p11, p22]]
-    h = 1 // (n + 1)
-    s = h:h:1-h
-    flatten(x) = reduce(vcat, x)
 
+    # Corners
     if on == :corners
-        return c
-    elseif on == :sides
+        return [SA[p11, p12], SA[p21, p12], SA[p21, p22], SA[p11, p22]]
+    end
+
+    h = 1 // (n + 1)
+    s = h:h:(1-h)
+    p1 = p11 .+ s * (p21 - p11)
+    p2 = p12 .+ s * (p22 - p12)
+
+    # Sides
+    if on == :sides
         return [
-            [SVector{2}(c) for c in eachcol((c[i] .+ (s' .* (c[i%4+1] - c[i]))))]
-            for i = 1:4
-        ] |> flatten
-    elseif on == :interior
-        p1 = p11 .+ s' .* (p21 - p11)
-        p2 = p12 .+ s' .* (p22 - p12)
+            SVector.(p1, p12)
+            SVector.(p21, p2)
+            SVector.(reverse(p1), p22)
+            SVector.(p11, reverse(p2))
+        ]
+    end
+
+    # Interior
+    if on == :interior
         return reshape([SA[p1[i], p2[j]] for i = 1:n, j = 1:n], :, 1) |> vec
     end
+
+    # Illegal
     error("Illegal value for on: $on")
 end
 

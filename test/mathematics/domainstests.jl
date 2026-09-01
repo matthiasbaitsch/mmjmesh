@@ -65,9 +65,15 @@ K = (1 .. 2) × (3 .. 5)
 
 @variables a, b
 K = (0 .. a) × (0 .. b)
-@test isequal(points(K, :corners), [[0, 0], [a, 0], [a, b], [0, b]])
-@test isequal(points(K, :sides, 1), [[a / 2, 0], [a, b / 2], [a / 2, b], [0, b / 2]])
+@test isequal(
+    points(K, :corners),
+    [[0, 0], [a, 0], [a, b], [0, b]]
+)
+@test isequal(
+    points(K, :sides, 1),
+    [[1//2*a, 0], [a, 1//2*b], [1//2*a, b], [0, 1//2*b]]
+)
 @test isequal(
     points(K, :interior, 2),
-    [[a / 3, b / 3], [2a / 3, b / 3], [a / 3, 2b / 3], [2a / 3, 2b / 3]]
+    [[1//3*a, 1//3 * b], [2//3*a, 1//3*b], [1//3*a, 2//3*b], [2//3*a, 2//3*b]]
 )
