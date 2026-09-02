@@ -26,6 +26,11 @@
     cm.update_theme!(px_per_unit=2)
     const BY = psnr_equality(50)
 
+    # GLMakie's Axis3 (lit 3D surfaces) rasterizes slightly differently between a
+    # GPU (used to generate the reference images) and CI's software renderer, so
+    # these checks need a looser tolerance than the pixel-exact CairoMakie ones.
+    const BY3D = psnr_equality(25)
+
     # -------------------------------------------------------------------------------------------------
     # Paths
     # -------------------------------------------------------------------------------------------------
@@ -135,12 +140,12 @@
     f = gm.Figure() # Warp by function
     gm.Axis3(f[1, 1], aspect=:data)
     mplot!(m, rand(nfaces(m)), nodewarp=warp)
-    @test_reference ref("m2d-017.png") f by = BY
+    @test_reference ref("m2d-017.png") f by = BY3D
 
     f = gm.Figure() # Warp by nodal values
     gm.Axis3(f[1, 1], aspect=:data)
     mplot!(m, rand(nfaces(m)), nodewarp=0.5 * rand(nnodes(m)))
-    @test_reference ref("m2d-018.png") f by = BY
+    @test_reference ref("m2d-018.png") f by = BY3D
 
     # Plot function on face
     m = Mesh((0 .. 8) × (0 .. 4), 4, 2)
@@ -149,7 +154,7 @@
     f = gm.Figure() # Warp by one function on face
     gm.Axis3(f[1, 1], aspect=:data)
     mplot!(m, w, faceplotzscale=0.2, faceplotmesh=2)
-    @test_reference ref("m2d-019.png") f by = BY
+    @test_reference ref("m2d-019.png") f by = BY3D
 
     function results(face, name) # Warp using postprocessing function
         if name == :w
@@ -164,17 +169,17 @@
     f = gm.Figure()
     gm.Axis3(f[1, 1], aspect=:data)
     mplot!(m, :w, faceplotzscale=0.2, faceplotmesh=2)
-    @test_reference ref("m2d-020.png") f by = BY
+    @test_reference ref("m2d-020.png") f by = BY3D
 
     f = gm.Figure()
     gm.Axis3(f[1, 1], aspect=:data)
     mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2)
-    @test_reference ref("m2d-21.png") f by = BY
+    @test_reference ref("m2d-21.png") f by = BY3D
 
     f = gm.Figure()
     gm.Axis3(f[1, 1], aspect=:data)
     mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2, facecolor=:tomato)
-    @test_reference ref("m2d-22.png") f by = BY
+    @test_reference ref("m2d-22.png") f by = BY3D
 
     # With deformation
     m = Mesh(4.0, 2.0, 8)
@@ -206,17 +211,17 @@
     # Function R2 -> R
     # -------------------------------------------------------------------------------------------------
 
-    gm.activate!()
+    gm.activate!(px_per_unit=2)
     ff = MPolynomial([0 2 0; 0 0 2], [1, -1, -1], QHat)
     f = gm.Figure()
     gm.Axis3(f[1, 1], aspect=:data)
     fplot3d!(ff, zscale=0.5)
-    @test_reference ref("plot-01.png") f by = BY
+    @test_reference ref("plot-01.png") f by = BY3D
 
     f = gm.Figure()
     gm.Axis3(f[1, 1], aspect=:data)
     fplot3d!(ff, zscale=0.5, mesh=nothing)
-    @test_reference ref("plot-02.png") f by = BY
+    @test_reference ref("plot-02.png") f by = BY3D
 
     cm.activate!()
     g = ProductFunction(Sin(0 .. 2π), Sin(0 .. 2π))
