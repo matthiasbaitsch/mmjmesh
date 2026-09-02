@@ -111,18 +111,23 @@ end
 
     using MMJMesh
     using MMJMesh.Mathematics
-    using DomainSets: ×
+
+    function validate(e)
+        ϕ = nodalbasis(e)
+        n = length(ϕ)
+
+        @test MMJMesh.Mathematics.domain(ϕ[1]) == R2
+
+        for i = 1:n, j = 1:n
+            @test isequal(e.N[i](ϕ[j]), i == j)
+        end
+
+        return true
+    end
 
     @variables a, b
     K = (0 .. a) × (0 .. b)
 
-    # Serendipity
-    e = makeelement(:serendipity, K, k=2)
-    ϕ = nodalbasis(e)
-
-    @test MMJMesh.Mathematics.domain(ϕ[1]) == R2
-    for i = 1:8, j = 1:8
-        @test isequal(e.N[i](ϕ[j]), i == j)
-    end
-
+    @test makeelement(:serendipity, K, k=2) |> validate
+    @test_broken makeelement(:hermite, K) |> validate
 end
