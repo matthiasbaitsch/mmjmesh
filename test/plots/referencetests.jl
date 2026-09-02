@@ -121,7 +121,7 @@
     @test_reference ref("m2d-016.png") mplot(m, rand(nnodes(m))) |> mconf() by = BY
 
     # Here are 3D plots
-    gm.activate!()
+    gm.activate!(px_per_unit=2)
 
     # Warp in z-direction
     a = 4
