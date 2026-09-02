@@ -30,6 +30,12 @@ const S23 = S{2,3}
 # Dimension
 # -------------------------------------------------------------------------------------------------
 
+# TODO Q23R below is never defined in this file (undefined variable, throws
+# immediately) -- this is why the file isn't wired into the test suite.
+# Figure out what Q23R was meant to be (a restricted/reduced Q{2,3} space?
+# compare with S22/S23 above) and either define it or drop these two @tests,
+# then convert this file to @testitem and add it to test/mathematics.
+
 @test dimension(Q{1,4}()) == 5
 @test dimension(Q14) == 5
 @test dimension(Q24) == 25

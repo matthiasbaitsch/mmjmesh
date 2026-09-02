@@ -1,244 +1,247 @@
-using Test
-using ReferenceTests
+@testitem "Reference" tags = [:slow] begin
 
-import Random
-import GLMakie as gm
-import CairoMakie as cm
+    using Test
+    using ReferenceTests
 
-using MMJMesh
-using MMJMesh.Gmsh
-using MMJMesh.Plots
-using MMJMesh.Meshes
-using MMJMesh.Utilities
-using MMJMesh.Mathematics
-using MMJMesh.Plots.Symbols.Structural2D
+    import Random
+    import GLMakie as gm
+    import CairoMakie as cm
 
-cm.activate!()
+    using MMJMesh
+    using MMJMesh.Gmsh
+    using MMJMesh.Plots
+    using MMJMesh.Meshes
+    using MMJMesh.Utilities
+    using MMJMesh.Mathematics
+    using MMJMesh.Plots.Symbols.Structural2D
 
-
-# -------------------------------------------------------------------------------------------------
-# Set up
-# -------------------------------------------------------------------------------------------------
-Random.seed!(1234)
-cm.update_theme!(colormap=:jet)
-cm.update_theme!(px_per_unit=2)
-const BY = psnr_equality(50)
-
-# -------------------------------------------------------------------------------------------------
-# Paths
-# -------------------------------------------------------------------------------------------------
-ref(f) = joinpath(@__DIR__(), "../../data/references/plots", f)
-meshpath(m) = joinpath(@__DIR__(), "../../data/gmsh", m)
+    cm.activate!()
 
 
-# -------------------------------------------------------------------------------------------------
-# 1D meshes
-# -------------------------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------------------------------
+    # Set up
+    # -------------------------------------------------------------------------------------------------
+    Random.seed!(1234)
+    cm.update_theme!(colormap=:jet)
+    cm.update_theme!(px_per_unit=2)
+    const BY = psnr_equality(50)
 
-m = Mesh(0 .. 4, 60)
-@test_reference ref("m1d-001.png") mplot(Mesh(0 .. 4, 20)) |> mconf() by = BY
-@test_reference ref("m1d-002.png") mplot(m) |> mconf() by = BY
-@test_reference ref("m1d-003.png") mplot(m, -1.1 .+ 2.6 * rand(nnodes(m))) |> mconf() by = BY
-@test_reference ref("m1d-004.png") mplot(m, -1.1 .+ 2.2 * rand(nedges(m))) |> mconf() by = BY
-@test_reference ref("m1d-005.png") mplot(m, -1.1 .+ 2.2 * rand(2, nedges(m))) |> mconf() by = BY
-@test_reference ref("m1d-006.png") mplot(m, -1.1 .+ 2.2 * rand(2, nedges(m)),
-    lineplotfacescolor=:gray50, lineplotoutlinescolor=:hotpink) |> mconf() by = BY
+    # -------------------------------------------------------------------------------------------------
+    # Paths
+    # -------------------------------------------------------------------------------------------------
+    ref(f) = joinpath(@__DIR__(), "../../data/references/plots", f)
+    meshpath(m) = joinpath(@__DIR__(), "../../data/gmsh", m)
 
-definegroup!(:g1, m, 1, 5:30)
-definegroup!(:g3, m, 1, 20:40)
-@test_reference ref("m1d-007.png") mplot(m) |> mconf() by = BY
 
-# -------------------------------------------------------------------------------------------------
-# 2D meshes
-# -------------------------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------------------------------
+    # 1D meshes
+    # -------------------------------------------------------------------------------------------------
 
-# Quadrilaterals
-a = 80
-m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
-@test_reference ref("m2d-001.png") mplot(m, edgesvisible=true, edgecolor=:hotpink) |> mconf() by = BY
-@test_reference ref("m2d-002.png") mplot(m, 4.1 * (rand(nnodes(m)) .- 0.25)) |> mconf() by = BY
-@test_reference ref("m2d-003.png") mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf() by = BY
+    m = Mesh(0 .. 4, 60)
+    @test_reference ref("m1d-001.png") mplot(Mesh(0 .. 4, 20)) |> mconf() by = BY
+    @test_reference ref("m1d-002.png") mplot(m) |> mconf() by = BY
+    @test_reference ref("m1d-003.png") mplot(m, -1.1 .+ 2.6 * rand(nnodes(m))) |> mconf() by = BY
+    @test_reference ref("m1d-004.png") mplot(m, -1.1 .+ 2.2 * rand(nedges(m))) |> mconf() by = BY
+    @test_reference ref("m1d-005.png") mplot(m, -1.1 .+ 2.2 * rand(2, nedges(m))) |> mconf() by = BY
+    @test_reference ref("m1d-006.png") mplot(m, -1.1 .+ 2.2 * rand(2, nedges(m)),
+        lineplotfacescolor=:gray50, lineplotoutlinescolor=:hotpink) |> mconf() by = BY
 
-# Triangles
-a = 20
-m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a, meshtype=TRIANGLE)
-@test_reference ref("m2d-004.png") mplot(m, edgesvisible=true) |> mconf() by = BY
-@test_reference ref("m2d-005.png") mplot(m, 4.1 * (rand(nnodes(m)) .- 0.25)) |> mconf() by = BY
-@test_reference ref("m2d-006.png") mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf() by = BY
+    definegroup!(:g1, m, 1, 5:30)
+    definegroup!(:g3, m, 1, 20:40)
+    @test_reference ref("m1d-007.png") mplot(m) |> mconf() by = BY
 
-# Configuration
-a = 10
-m1 = Mesh((0 .. 4) × (0 .. 2), 2a, a)
-@test_reference ref("m2d-007.png") mplot(m1, 3 * rand(nfaces(m1)),
-    nodesvisible=true, nodecolor=:hotpink, nodesize=12,
-    edgesvisible=true, edgecolor=:lightblue, edgelinewidth=3,
-    featureedgecolor=:red, featureedgelinewidth=6,
-    facecolormap=:bluesreds
-) |> mconf() by = BY
+    # -------------------------------------------------------------------------------------------------
+    # 2D meshes
+    # -------------------------------------------------------------------------------------------------
 
-# Plot boundary nodes
-a = 20
-m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
-p = mplot(m)
-x = coordinates(m)
-bn = m.groups[:boundarynodes]
-cm.scatter!(p.axis, x[:, bn], color=:magenta)
-@test_reference ref("m2d-008.png") p |> mconf() by = BY
+    # Quadrilaterals
+    a = 80
+    m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
+    @test_reference ref("m2d-001.png") mplot(m, edgesvisible=true, edgecolor=:hotpink) |> mconf() by = BY
+    @test_reference ref("m2d-002.png") mplot(m, 4.1 * (rand(nnodes(m)) .- 0.25)) |> mconf() by = BY
+    @test_reference ref("m2d-003.png") mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf() by = BY
 
-# Face groups
-a = 5
-m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
-definegroup!(:g1, m, 2, [1, 2, 3, 6, 22])
-definegroup!(:g2, m, 2, [5, 6, 7, 8, 22, 33])
-definegroup!(:g3, m, 2, [34])
+    # Triangles
+    a = 20
+    m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a, meshtype=TRIANGLE)
+    @test_reference ref("m2d-004.png") mplot(m, edgesvisible=true) |> mconf() by = BY
+    @test_reference ref("m2d-005.png") mplot(m, 4.1 * (rand(nnodes(m)) .- 0.25)) |> mconf() by = BY
+    @test_reference ref("m2d-006.png") mplot(m, 4.1 * (rand(nfaces(m)) .- 0.25)) |> mconf() by = BY
 
-@test_reference ref("m2d-009.png") mplot(m) |> mconf() by = BY
-@test_reference ref("m2d-010.png") mplot(m, facecolor=:orange) |> mconf() by = BY
+    # Configuration
+    a = 10
+    m1 = Mesh((0 .. 4) × (0 .. 2), 2a, a)
+    @test_reference ref("m2d-007.png") mplot(m1, 3 * rand(nfaces(m1)),
+        nodesvisible=true, nodecolor=:hotpink, nodesize=12,
+        edgesvisible=true, edgecolor=:lightblue, edgelinewidth=3,
+        featureedgecolor=:red, featureedgelinewidth=6,
+        facecolormap=:bluesreds
+    ) |> mconf() by = BY
 
-# Edge groups
-a = 5
-m = Mesh((0 .. 4) × (0 .. 2), 2a, a)
-definegroup!(:g1, m, 1, 1:10)
-definegroup!(:g2, m, 1, 8:16)
-definegroup!(:g3, m, 1, 62:71)
+    # Plot boundary nodes
+    a = 20
+    m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
+    p = mplot(m)
+    x = coordinates(m)
+    bn = m.groups[:boundarynodes]
+    cm.scatter!(p.axis, x[:, bn], color=:magenta)
+    @test_reference ref("m2d-008.png") p |> mconf() by = BY
 
-@test_reference ref("m2d-011.png") mplot(m) |> mconf() by = BY
-@test_reference ref("m2d-012.png") mplot(m, featureedgecolor=:orange) |> mconf() by = BY
+    # Face groups
+    a = 5
+    m = Mesh((0 .. 9.0) × (0 .. 4.5), 2a, a)
+    definegroup!(:g1, m, 2, [1, 2, 3, 6, 22])
+    definegroup!(:g2, m, 2, [5, 6, 7, 8, 22, 33])
+    definegroup!(:g3, m, 2, [34])
 
-# Gmesh meshes with groups
-m = Mesh(meshpath("advanced.msh"))
-@test_reference ref("m2d-013.png") mplot(m) |> mconf() by = BY
-m = Mesh(meshpath("complex-g1.msh"))
-@test_reference ref("m2d-014.png") mplot(m) |> mconf() by = BY
+    @test_reference ref("m2d-009.png") mplot(m) |> mconf() by = BY
+    @test_reference ref("m2d-010.png") mplot(m, facecolor=:orange) |> mconf() by = BY
 
-# Gmesh with nodes on edge group
-m = Mesh(meshpath("multi_lambda.msh"))
-p = mplot(m, edgesvisible=true) |> mconf()
-cm.scatter!(p.axis, coordinates(m)[:, m.groups[:ΓD0]])
-@test_reference ref("m2d-015.png") p |> mconf() by = BY
-@test_reference ref("m2d-016.png") mplot(m, rand(nnodes(m))) |> mconf() by = BY
+    # Edge groups
+    a = 5
+    m = Mesh((0 .. 4) × (0 .. 2), 2a, a)
+    definegroup!(:g1, m, 1, 1:10)
+    definegroup!(:g2, m, 1, 8:16)
+    definegroup!(:g3, m, 1, 62:71)
 
-# Here are 3D plots
-gm.activate!()
+    @test_reference ref("m2d-011.png") mplot(m) |> mconf() by = BY
+    @test_reference ref("m2d-012.png") mplot(m, featureedgecolor=:orange) |> mconf() by = BY
 
-# Warp in z-direction
-a = 4
-m = Mesh((0 .. 4) × (0 .. 2), 2a, a)
-function warp(node)
-    x = coordinates(node)
-    x3 = 0.1 * sin(0.25 * pi * (x[1] - 2)) * sin(0.5 * pi * (x[2] - 1))
-    return [x..., x3]
-end
+    # Gmesh meshes with groups
+    m = Mesh(meshpath("advanced.msh"))
+    @test_reference ref("m2d-013.png") mplot(m) |> mconf() by = BY
+    m = Mesh(meshpath("complex-g1.msh"))
+    @test_reference ref("m2d-014.png") mplot(m) |> mconf() by = BY
 
-f = gm.Figure() # Warp by function
-gm.Axis3(f[1, 1], aspect=:data)
-mplot!(m, rand(nfaces(m)), nodewarp=warp)
-@test_reference ref("m2d-017.png") f by = BY
+    # Gmesh with nodes on edge group
+    m = Mesh(meshpath("multi_lambda.msh"))
+    p = mplot(m, edgesvisible=true) |> mconf()
+    cm.scatter!(p.axis, coordinates(m)[:, m.groups[:ΓD0]])
+    @test_reference ref("m2d-015.png") p |> mconf() by = BY
+    @test_reference ref("m2d-016.png") mplot(m, rand(nnodes(m))) |> mconf() by = BY
 
-f = gm.Figure() # Warp by nodal values
-gm.Axis3(f[1, 1], aspect=:data)
-mplot!(m, rand(nfaces(m)), nodewarp=0.5 * rand(nnodes(m)))
-@test_reference ref("m2d-018.png") f by = BY
+    # Here are 3D plots
+    gm.activate!()
 
-# Plot function on face
-m = Mesh((0 .. 8) × (0 .. 4), 4, 2)
-w(face) = x -> index(face) * (1 - x[1]^2) * (1 - x[2]^2)
-
-f = gm.Figure() # Warp by one function on face
-gm.Axis3(f[1, 1], aspect=:data)
-mplot!(m, w, faceplotzscale=0.2, faceplotmesh=2)
-@test_reference ref("m2d-019.png") f by = BY
-
-function results(face, name) # Warp using postprocessing function
-    if name == :w
-        return x -> index(face) * (1 - x[1]^2) * (1 - x[2]^2)
-    elseif name == :sigma
-        s = Polynomial([0, π])
-        return ProductFunction(Sin() ∘ s, Cos() ∘ s)
+    # Warp in z-direction
+    a = 4
+    m = Mesh((0 .. 4) × (0 .. 2), 2a, a)
+    function warp(node)
+        x = coordinates(node)
+        x3 = 0.1 * sin(0.25 * pi * (x[1] - 2)) * sin(0.5 * pi * (x[2] - 1))
+        return [x..., x3]
     end
+
+    f = gm.Figure() # Warp by function
+    gm.Axis3(f[1, 1], aspect=:data)
+    mplot!(m, rand(nfaces(m)), nodewarp=warp)
+    @test_reference ref("m2d-017.png") f by = BY
+
+    f = gm.Figure() # Warp by nodal values
+    gm.Axis3(f[1, 1], aspect=:data)
+    mplot!(m, rand(nfaces(m)), nodewarp=0.5 * rand(nnodes(m)))
+    @test_reference ref("m2d-018.png") f by = BY
+
+    # Plot function on face
+    m = Mesh((0 .. 8) × (0 .. 4), 4, 2)
+    w(face) = x -> index(face) * (1 - x[1]^2) * (1 - x[2]^2)
+
+    f = gm.Figure() # Warp by one function on face
+    gm.Axis3(f[1, 1], aspect=:data)
+    mplot!(m, w, faceplotzscale=0.2, faceplotmesh=2)
+    @test_reference ref("m2d-019.png") f by = BY
+
+    function results(face, name) # Warp using postprocessing function
+        if name == :w
+            return x -> index(face) * (1 - x[1]^2) * (1 - x[2]^2)
+        elseif name == :sigma
+            s = Polynomial([0, π])
+            return ProductFunction(Sin() ∘ s, Cos() ∘ s)
+        end
+    end
+    setdata!(m, :post, results)
+
+    f = gm.Figure()
+    gm.Axis3(f[1, 1], aspect=:data)
+    mplot!(m, :w, faceplotzscale=0.2, faceplotmesh=2)
+    @test_reference ref("m2d-020.png") f by = BY
+
+    f = gm.Figure()
+    gm.Axis3(f[1, 1], aspect=:data)
+    mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2)
+    @test_reference ref("m2d-21.png") f by = BY
+
+    f = gm.Figure()
+    gm.Axis3(f[1, 1], aspect=:data)
+    mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2, facecolor=:tomato)
+    @test_reference ref("m2d-22.png") f by = BY
+
+    # With deformation
+    m = Mesh(4.0, 2.0, 8)
+    c = coordinates(m)
+    s1 = rand(nnodes(m))
+    s2 = rand(nelements(m))
+    u1 = [-c[2, :] c[1, :]]'
+    u2 = reshape(u1, :)
+    @test_reference ref("m2d-23.png") mplot(m, u1) |> mconf() by = BY
+    @test_reference ref("m2d-24.png") mplot(m, u2) |> mconf() by = BY
+    @test_reference ref("m2d-25.png") mplot(m, s2, u2, uscale=1 / 30) |> mconf() by = BY
+
+    # Smooth element results
+    m = Mesh(4.0, 2.0, 4)
+    @test_reference ref("m2d-26.png") mplot(m, 1.:nelements(m), smooth=true) |> mconf() by = BY
+
+
+    # -------------------------------------------------------------------------------------------------
+    # Symbols
+    # -------------------------------------------------------------------------------------------------
+
+    # TODO: Fixme
+    # cm.activate!()
+    # f = MMJMesh.Plots.Symbols.Structural2D.demo()
+    # @test_reference ref("sym-01.png") f
+
+
+    # -------------------------------------------------------------------------------------------------
+    # Function R2 -> R
+    # -------------------------------------------------------------------------------------------------
+
+    gm.activate!()
+    ff = MPolynomial([0 2 0; 0 0 2], [1, -1, -1], QHat)
+    f = gm.Figure()
+    gm.Axis3(f[1, 1], aspect=:data)
+    fplot3d!(ff, zscale=0.5)
+    @test_reference ref("plot-01.png") f by = BY
+
+    f = gm.Figure()
+    gm.Axis3(f[1, 1], aspect=:data)
+    fplot3d!(ff, zscale=0.5, mesh=nothing)
+    @test_reference ref("plot-02.png") f by = BY
+
+    cm.activate!()
+    g = ProductFunction(Sin(0 .. 2π), Sin(0 .. 2π))
+    f = cm.Figure()
+    cm.Axis(f[1, 1])
+    fplot3d!(g, mesh=nothing)
+    vplot!(gradient(g), npoints=9, lengthscale=0.3)
+    @test_reference ref("plot-03.png") f by = BY
+
+
+    # -------------------------------------------------------------------------------------------------
+    # Finite elements
+    # -------------------------------------------------------------------------------------------------
+
+    cm.activate!()
+    fig = cm.Figure(size=(700, 700))
+    cm.Axis(fig)
+    feplot(fig[1, 1], makeelement(:lagrange, IHat, k=1)) |> feconf()
+    feplot(fig[1, 2], makeelement(:lagrange, IHat, k=3)) |> feconf()
+    feplot(fig[2, 1], makeelement(:hermite, IHat)) |> feconf()
+    feplot(fig[2, 2], makeelement(:lagrange, QHat, k=1)) |> feconf()
+    feplot(fig[3, 1], makeelement(:lagrange, QHat, k=2)) |> feconf()
+    feplot(fig[3, 2], makeelement(:serendipity, QHat, k=2)) |> feconf()
+    feplot(fig[4, 1], makeelement(:hermite, QHat, conforming=true)) |> feconf()
+    feplot(fig[4, 2], makeelement(:hermite, QHat, conforming=false)) |> feconf()
+    @test_reference ref("fe-01.png") fig by = BY
+
 end
-setdata!(m, :post, results)
-
-f = gm.Figure()
-gm.Axis3(f[1, 1], aspect=:data)
-mplot!(m, :w, faceplotzscale=0.2, faceplotmesh=2)
-@test_reference ref("m2d-020.png") f by = BY
-
-f = gm.Figure()
-gm.Axis3(f[1, 1], aspect=:data)
-mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2)
-@test_reference ref("m2d-21.png") f by = BY
-
-f = gm.Figure()
-gm.Axis3(f[1, 1], aspect=:data)
-mplot!(m, :sigma, faceplotzscale=0.2, faceplotmesh=2, facecolor=:tomato)
-@test_reference ref("m2d-22.png") f by = BY
-
-# With deformation
-m = Mesh(4.0, 2.0, 8)
-c = coordinates(m)
-s1 = rand(nnodes(m))
-s2 = rand(nelements(m))
-u1 = [-c[2, :] c[1, :]]'
-u2 = reshape(u1, :)
-@test_reference ref("m2d-23.png") mplot(m, u1) |> mconf() by = BY
-@test_reference ref("m2d-24.png") mplot(m, u2) |> mconf() by = BY
-@test_reference ref("m2d-25.png") mplot(m, s2, u2, uscale=1 / 30) |> mconf() by = BY
-
-# Smooth element results
-m = Mesh(4.0, 2.0, 4)
-@test_reference ref("m2d-26.png") mplot(m, 1.:nelements(m), smooth=true) |> mconf() by = BY
-
-
-# -------------------------------------------------------------------------------------------------
-# Symbols
-# -------------------------------------------------------------------------------------------------
-
-# TODO: Fixme
-# cm.activate!()
-# f = MMJMesh.Plots.Symbols.Structural2D.demo()
-# @test_reference ref("sym-01.png") f
-
-
-# -------------------------------------------------------------------------------------------------
-# Function R2 -> R
-# -------------------------------------------------------------------------------------------------
-
-gm.activate!()
-ff = MPolynomial([0 2 0; 0 0 2], [1, -1, -1], QHat)
-f = gm.Figure()
-gm.Axis3(f[1, 1], aspect=:data)
-fplot3d!(ff, zscale=0.5)
-@test_reference ref("plot-01.png") f by = BY
-
-f = gm.Figure()
-gm.Axis3(f[1, 1], aspect=:data)
-fplot3d!(ff, zscale=0.5, mesh=nothing)
-@test_reference ref("plot-02.png") f by = BY
-
-cm.activate!()
-g = ProductFunction(Sin(0 .. 2π), Sin(0 .. 2π))
-f = cm.Figure()
-cm.Axis(f[1, 1])
-fplot3d!(g, mesh=nothing)
-vplot!(gradient(g), npoints=9, lengthscale=0.3)
-@test_reference ref("plot-03.png") f by = BY
-
-
-# -------------------------------------------------------------------------------------------------
-# Finite elements
-# -------------------------------------------------------------------------------------------------
-
-cm.activate!()
-fig = cm.Figure(size=(700, 700))
-cm.Axis(fig)
-feplot(fig[1, 1], makeelement(:lagrange, IHat, k=1)) |> feconf()
-feplot(fig[1, 2], makeelement(:lagrange, IHat, k=3)) |> feconf()
-feplot(fig[2, 1], makeelement(:hermite, IHat)) |> feconf()
-feplot(fig[2, 2], makeelement(:lagrange, QHat, k=1)) |> feconf()
-feplot(fig[3, 1], makeelement(:lagrange, QHat, k=2)) |> feconf()
-feplot(fig[3, 2], makeelement(:serendipity, QHat, k=2)) |> feconf()
-feplot(fig[4, 1], makeelement(:hermite, QHat, conforming=true)) |> feconf()
-feplot(fig[4, 2], makeelement(:hermite, QHat, conforming=false)) |> feconf()
-@test_reference ref("fe-01.png") fig by = BY
-

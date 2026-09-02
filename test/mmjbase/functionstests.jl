@@ -1,19 +1,22 @@
-using Test
+@testitem "Functions" begin
 
-using MMJMesh
-using MMJMesh.MMJBase
+    using Test
+
+    using MMJMesh
+    using MMJMesh.MMJBase
 
 
-# -------------------------------------------------------------------------------------------------
-# tomatrix
-# -------------------------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------------------------------
+    # tomatrix
+    # -------------------------------------------------------------------------------------------------
 
-vectors = [rand(18) for _ = 1:21]
-A = tomatrix(vectors)
+    vectors = [rand(18) for _ = 1:21]
+    A = tomatrix(vectors)
 
-for (i, col) = enumerate(eachcol(A))
-    @test col == vectors[i]
+    for (i, col) = enumerate(eachcol(A))
+        @test col == vectors[i]
+    end
+    @test tomatrix(vectors, COLS) == A
+    @test tomatrix(vectors, ROWS) == A'
+
 end
-@test tomatrix(vectors, COLS) == A
-@test tomatrix(vectors, ROWS) == A'
-
