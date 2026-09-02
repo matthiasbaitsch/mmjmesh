@@ -9,7 +9,7 @@ Pkg.precompile()
 import GLMakie
 import CairoMakie
 
-import LinearAlgebra
+using LinearAlgebra: ⋅
 using CairoMakie: Figure, Axis, Axis3, scatter!, lines, lines!, DataAspect, hidespines!, hidedecorations!
 
 using MMJMesh
