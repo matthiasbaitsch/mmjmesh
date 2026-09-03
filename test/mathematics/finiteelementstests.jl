@@ -129,5 +129,5 @@ end
     K = (0 .. a) × (0 .. b)
 
     @test makeelement(:serendipity, K, k=2) |> validate
-    @test_broken makeelement(:hermite, K) |> validate
+    @test makeelement(:hermite, K) |> validate
 end

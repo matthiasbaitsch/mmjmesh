@@ -9,6 +9,19 @@ Return the product ``m (m - 1) ... (m - n)
 """
 _factorialpower(m::Integer, n::Integer) = prod([m - i for i = 0:n-1])
 
+"""
+    _monomialsat(exponents, x)
+
+Evaluate the monomials given by `exponents` (one column per monomial, one row per
+variable) at the point `x`.
+
+# Example
+
+```julia
+# Monomials x₁x₂⁵ and x₁³x₂⁴ evaluated at (3, 2)
+_monomialsat(SA[1 3; 5 4], SA[3, 2]) == [3^1 * 2^5, 3^3 * 2^4]
+```
+"""
 function _monomialsat(exponents::SMatrix{N,NT}, x::InRⁿ{N}) where {N,NT}
     c = Vector{eltype(x)}(undef, NT)
     for i = 1:NT
@@ -21,24 +34,18 @@ function _monomialsat(exponents::SMatrix{N,NT}, x::InRⁿ{N}) where {N,NT}
     return SizedVector{NT}(c)
 end
 
-function _monomialsat(exponents::SMatrix{N,NT,Float64}, x::InRⁿ{N}) where {N,NT}
-    c = MVector{NT,Float64}(undef)
-    for i = 1:NT
-        v = 1
-        for j = 1:N
-            v *= Base.FastMath.pow_fast(x[j], exponents[j, i])
-        end
-        c[i] = v
-    end
-    return c
-end
+"""
+    _monomialsderivativeat(exponents, x, ns)
 
+Evaluate the partial derivative of order `ns` (a vector of orders, one per variable,
+negative entries meaning antiderivative) of the monomials given by `exponents` at the
+point `x`.
+"""
 function _monomialsderivativeat(
     exponents::StaticMatrix{N,NT}, x::InRⁿ{N}, ns::IntegerVec
 ) where {N,NT}
     @assert length(ns) == N
-    c = MVector{NT,Float64}(undef)
-    for i = 1:NT
+    c = map(1:NT) do i
         v = 1
         for j = 1:N
             e = exponents[j, i]
@@ -51,11 +58,18 @@ function _monomialsderivativeat(
                 v = 0
             end
         end
-        c[i] = v
+        v
     end
-    return c
+    return SizedVector{NT}(c)
 end
 
+"""
+    _monomialsderivative(exponents, ns)
+
+Compute the partial derivative of order `ns` (a vector of orders, one per variable,
+negative entries meaning antiderivative) of the monomials given by `exponents`.
+Return the resulting coefficient factors and exponents.
+"""
 function _monomialsderivative(
     exponents::StaticMatrix{N,NT}, ns::IntegerVec
 ) where {N,NT}

@@ -1,23 +1,9 @@
-@testitem "MPolynomials" setup=[Validate] begin
+@testitem "helper functions" begin
 
     using Test
-    using Symbolics
-    using StaticArrays
-    using LinearAlgebra: transpose, ⋅
 
-    using MMJMesh
-    using MMJMesh.MMJBase
-    using MMJMesh.Mathematics
-    using DomainSets: ×
-    using MMJMesh.Mathematics: MPolynomial,
-          _monomialsat, _monomialsderivativeat, _monomialsderivative,
-          _lt,
-          _subscript, _superscript, _prettymonomial, _factorialpower
+    using MMJMesh.Mathematics: _lt, _subscript, _superscript, _prettymonomial, _factorialpower
 
-
-    # -------------------------------------------------------------------------------------------------
-    # Helper functions tests
-    # -------------------------------------------------------------------------------------------------
 
     # Factorial power
     @test _factorialpower(3, 1) == 3
@@ -25,34 +11,6 @@
     @test _factorialpower(3, 3) == 6
     @test _factorialpower(3, 3) == 6
     @test _factorialpower(3, 4) == 0
-
-    # Monomial evaluation with [x₁x₂⁵, x₁³x₂⁴] at (3, 2)
-    @test _monomialsat(SA[1 3; 5 4], SA[3, 2]) == [3^1 * 2^5, 3^3 * 2^4]
-
-    # Monomial derivative evaluation with [x₁x₂⁵, x₁³x₂⁴] at (3, 2)
-    @test _monomialsderivativeat(SA[1 3; 5 4], SA[3, 2], [0, 0]) == [3 * 2^5, 3^3 * 2^4]
-    @test _monomialsderivativeat(SA[1 3; 5 4], SA[3, 2], -[0, 0]) == [3 * 2^5, 3^3 * 2^4]
-    @test _monomialsderivativeat(SA[1 3; 5 4], SA[3, 2], [1, 1]) == [5 * 2^4, 3 * 3^2 * 4 * 2^3]
-    @test _monomialsderivativeat(SA[1 3; 5 4], SA[3, 2], [2, 1]) == [0, 6 * 3 * 4 * 2^3]
-    @test _monomialsderivativeat(SA[1 3; 5 4], SA[3, 2], [1, 2]) == [20 * 2^3, 3 * 3^2 * 12 * 2^2]
-    @test _monomialsderivativeat(SA[1 3; 5 4], SA[3, 2], -[1, 1]) ==
-          [1 / 2 * 3^2 * 1 / 6 * 2^6, 1 / 4 * 3^4 * 1 / 5 * 2^5]
-    @test _monomialsderivativeat(SA[1 3; 5 4], SA[3, 2], -[2, 1]) ==
-          [1 / 6 * 3^3 * 1 / 6 * 2^6, 1 / 20 * 3^5 * 1 / 5 * 2^5]
-    @test _monomialsderivativeat(SA[1 3; 5 4], SA[3, 2], -[1, 2]) ==
-          [1 / 2 * 3^2 * 1 / 42 * 2^7, 1 / 4 * 3^4 * 1 / 30 * 2^6]
-
-    # Monomial derivatives with [x₁x₂⁵, x₁³x₂⁴]
-    @test _monomialsderivative(SA[1 3; 5 4], [0, 0]) == ([1.0, 1.0], [1 3; 5 4])
-    @test _monomialsderivative(SA[1 3; 5 4], [1, 0]) == ([1, 3], [0 2; 5 4])
-    @test _monomialsderivative(SA[1 3; 5 4], [0, 1]) == ([5, 4], [1 3; 4 3])
-    @test _monomialsderivative(SA[1 3; 5 4], [1, 2]) == ([1 * 5 * 4, 3 * 4 * 3], [0 2; 3 2])
-    @test _monomialsderivative(SA[1 3; 5 4], -[0, 0]) == ([1.0, 1.0], [1 3; 5 4])
-    @test _monomialsderivative(SA[1 3; 5 4], -[1, 0]) == ([1 / 2, 1 / 4], [2 4; 5 4])
-    @test _monomialsderivative(SA[1 3; 5 4], -[0, 1]) == ([1 / 6, 1 / 5], [1 3; 6 5])
-    @test _monomialsderivative(SA[1 3; 5 4], [-1, 2]) == ([1 / 2 * 5 * 4, 1 / 4 * 4 * 3], [2 4; 3 2])
-    @test _monomialsderivative(SA[1 3; 5 4], -[1, 2]) ==
-          ([1 / 2 * 1 / 6 * 1 / 7, 1 / 4 * 1 / 5 * 1 / 6], [2 4; 7 6])
 
     # Exponent comparison
     @test _lt([1, 2], [2, 2])
@@ -71,10 +29,121 @@
     # Pretty print monomial
     @test _prettymonomial([0, 2, 1]) == "x₁⁰x₂²x₃¹"
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Basic tests
-    # -------------------------------------------------------------------------------------------------
+
+@testmodule MonomialChecks begin
+
+    using Test
+    using StaticArrays
+
+    using MMJMesh.Mathematics: _monomialsat, _monomialsderivativeat
+
+    export checkmonomials
+
+    # [x₁x₂⁵, x₁³x₂⁴]
+    const EXPONENTS = SA[
+        1 3 # Exponents for x₁
+        5 4 # Exponents for x₂
+    ]
+
+    # Checks that hold for `point` regardless of its element type (Int, Float64, symbolic),
+    # comparing with `eq` (`isequal`/`==` for exact types, `isapprox` for Float64)
+    function checkmonomials(x1, x2; eq=isequal)
+        point = SA[x1, x2]
+
+        # Monomial evaluation
+        @test eq(
+            _monomialsat(EXPONENTS, point),
+            [x1^1 * x2^5, x1^3 * x2^4]
+        )
+
+        # Monomial derivative evaluation
+        @test eq(
+            _monomialsderivativeat(EXPONENTS, point, [0, 0]),
+            [x1 * x2^5, x1^3 * x2^4]
+        )
+        @test eq(
+            _monomialsderivativeat(EXPONENTS, point, -[0, 0]),
+            [x1 * x2^5, x1^3 * x2^4]
+        )
+        @test eq(
+            _monomialsderivativeat(EXPONENTS, point, [1, 1]),
+            [5x2^4, 3x1^2 * 4x2^3]
+        )
+        @test eq(
+            _monomialsderivativeat(EXPONENTS, point, [2, 1]),
+            [0, 6x1 * 4x2^3]
+        )
+        @test eq(
+            _monomialsderivativeat(EXPONENTS, point, [1, 2]),
+            [20x2^3, 3x1^2 * 12x2^2]
+        )
+        @test eq(
+            _monomialsderivativeat(EXPONENTS, point, -[1, 1]),
+            [1 / 2 * x1^2 * 1 / 6 * x2^6, 1 / 4 * x1^4 * 1 / 5 * x2^5]
+        )
+        @test eq(
+            _monomialsderivativeat(EXPONENTS, point, -[2, 1]),
+            [1 / 6 * x1^3 * 1 / 6 * x2^6, 1 / 20 * x1^5 * 1 / 5 * x2^5]
+        )
+        @test eq(
+            _monomialsderivativeat(EXPONENTS, point, -[1, 2]),
+            [1 / 2 * x1^2 * 1 / 42 * x2^7, 1 / 4 * x1^4 * 1 / 30 * x2^6]
+        )
+    end
+
+end
+
+@testitem "monomial helper functions (Int)" setup = [MonomialChecks] begin
+    MonomialChecks.checkmonomials(3, 2)
+end
+
+@testitem "monomial helper functions (Float64)" setup = [MonomialChecks] begin
+    MonomialChecks.checkmonomials(3.0, 2.0)
+end
+
+@testitem "monomial helper functions (symbolic)" setup = [MonomialChecks] begin
+    using Symbolics
+
+    @variables x1, x2
+    symeq(a, b) = isequal(rationalize.(a-b), [0, 0])
+    MonomialChecks.checkmonomials(x1, x2; eq=symeq)
+end
+
+@testitem "monomial derivative (exponents/coefficients)" begin
+
+    using Test
+    using StaticArrays
+
+    using MMJMesh.Mathematics: _monomialsderivative
+
+    # [x₁x₂⁵, x₁³x₂⁴]
+    # Exponents/orders are always Int, independent of the evaluation point type,
+    # so this is not repeated per point type
+    exponents = SA[1 3; 5 4]
+    @test _monomialsderivative(exponents, [0, 0]) == ([1.0, 1.0], [1 3; 5 4])
+    @test _monomialsderivative(exponents, [1, 0]) == ([1, 3], [0 2; 5 4])
+    @test _monomialsderivative(exponents, [0, 1]) == ([5, 4], [1 3; 4 3])
+    @test _monomialsderivative(exponents, [1, 2]) == ([1 * 5 * 4, 3 * 4 * 3], [0 2; 3 2])
+    @test _monomialsderivative(exponents, -[0, 0]) == ([1.0, 1.0], [1 3; 5 4])
+    @test _monomialsderivative(exponents, -[1, 0]) == ([1 / 2, 1 / 4], [2 4; 5 4])
+    @test _monomialsderivative(exponents, -[0, 1]) == ([1 / 6, 1 / 5], [1 3; 6 5])
+    @test _monomialsderivative(exponents, [-1, 2]) == ([1 / 2 * 5 * 4, 1 / 4 * 4 * 3], [2 4; 3 2])
+    @test _monomialsderivative(exponents, -[1, 2]) ==
+          ([1 / 2 * 1 / 6 * 1 / 7, 1 / 4 * 1 / 5 * 1 / 6], [2 4; 7 6])
+
+end
+
+@testitem "basic operations" begin
+
+    using Test
+    using StaticArrays
+    using LinearAlgebra: transpose, ⋅
+
+    using MMJMesh
+    using MMJMesh.Mathematics
+    using DomainSets: ×
 
     # Polynomials
     d = (0 .. 1) × (2 .. 3)
@@ -88,7 +157,6 @@
 
     # Test parameters
     x = [3, 2]
-    @variables a, b
     ns1 = SA[1 0; 0 1; 3 3]
     ns2 = SArray{Tuple{2,3,2},Int}([2 1 3; 1 0 2;;; 0 1 2; 1 2 3])
 
@@ -100,17 +168,17 @@
     @test u === MPolynomial([1 3 3 1; 5 4 4 5], [1, 2, 1, 1], d)
     @test v === MPolynomial([1 2 3 3 2 1; 5 6 7 7 6 5], [0 1 2 1 1 1; 5 4 3 1 1 1], d)
     @test w === MPolynomial(
-          [1 3 1; 5 7 5],
-          [0 1 2; 5 4 3; 3 0 8; 3 2 1;;; 9 8 7; 5 8 1; 8 2 4; 6 5 4;;; 1 1 1; 1 1 1; 1 1 1; 1 1 1],
-          d
+        [1 3 1; 5 7 5],
+        [0 1 2; 5 4 3; 3 0 8; 3 2 1;;; 9 8 7; 5 8 1; 8 2 4; 6 5 4;;; 1 1 1; 1 1 1; 1 1 1; 1 1 1],
+        d
     )
 
     # Simplify in constructor: Zeros
     @test nterms(MPolynomial([1 3 3 1; 5 4 4 5], [1, 1, 1, -1])) == 1
     @test nterms(MPolynomial([1 2 3 3 2 1; 5 6 7 7 6 5], [0 1 2 -2 1 1; 5 4 3 -3 1 1])) == 2
     @test nterms(MPolynomial(
-          [1 3 4; 5 7 6],
-          [0 1 2; 5 4 3; 3 0 8; 3 2 1;;; 9 8 7; 5 8 1; 8 2 4; 6 5 4;;; 0 0 0; 0 0 0; 0 0 0; 0 0 0]
+        [1 3 4; 5 7 6],
+        [0 1 2; 5 4 3; 3 0 8; 3 2 1;;; 9 8 7; 5 8 1; 8 2 4; 6 5 4;;; 0 0 0; 0 0 0; 0 0 0; 0 0 0]
     )) == 2
 
     # Properties
@@ -191,7 +259,7 @@
           [derivativeat(u, x, [1, 0]), derivativeat(u, x, [0, 1]), derivativeat(u, x, [3, 3])]
     @test derivativeat(u, x, ns2) ==
           [derivativeat(u, x, [2, 0]) derivativeat(u, x, [1, 1]) derivativeat(u, x, [3, 2])
-          derivativeat(u, x, [1, 1]) derivativeat(u, x, [0, 2]) derivativeat(u, x, [2, 3])]
+        derivativeat(u, x, [1, 1]) derivativeat(u, x, [0, 2]) derivativeat(u, x, [2, 3])]
     @test derivativeat(v, x, ns1) ==
           hcat(derivativeat(v, x, [1, 0]), derivativeat(v, x, [0, 1]), derivativeat(v, x, [3, 3]))
 
@@ -239,15 +307,17 @@
     @test ([4, 1] ⋅ v)(x) == [4, 1] ⋅ v(x)
     @test ([4 1; 5 2; 9 1] * v)(x) == [4 1; 5 2; 9 1] * v(x)
 
-    # Monomials
-    @test domain(mmonomials(2, 2)) == R^2
-    @test domain(mmonomials(2, 2, QHat)) == QHat
-    @test domain(mmonomials(2, 2, QHat)[1]) == QHat
+end
 
 
-    # -------------------------------------------------------------------------------------------------
-    # Old tests: Real coefficients
-    # -------------------------------------------------------------------------------------------------
+@testitem "real coefficients" setup = [Validate] begin
+
+    using Test
+    using StaticArrays
+
+    using MMJMesh
+    using MMJMesh.Mathematics
+    using DomainSets: ×
 
     x = [1, 2, 3]
     f = MPolynomial([3 1; 1 1; 0 2], [-2.0, 3.0], (1 .. 3) × (0 .. 2π) × (2 .. 8))
@@ -297,13 +367,14 @@
     @test typeof(h) <: PolynomialRnToR
 
     # Check simplify
+    d = (0 .. 1) × (2 .. 3)
     f = MPolynomial([1 2; 1 2], [4, 1], d)
     g = MPolynomial([1 1; 1 1], [6, 5], d)
 
     @test f * g == MPolynomial([3 2; 3 2], [11, 44])
     @test f + g == MPolynomial([2 1; 2 1], [1, 15])
 
-    # # Antiderivative
+    # Antiderivative
     ns = [1, 2, 3]
     f = MPolynomial([1 2 3; 6 5 4; 1 2 3], [5, 4, 3])
     @test f ≈ derivative(antiderivative(f, ns), ns)
@@ -314,10 +385,15 @@
     @test degree(f, 2) == 9
     @test degrees(f) == [degree(f, 1), degree(f, 2)]
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Old tests: Multivariate monomials
-    # -------------------------------------------------------------------------------------------------
+
+@testitem "multivariate monomials" begin
+
+    using Test
+
+    using MMJMesh
+    using MMJMesh.Mathematics
 
     ps = mmonomials(2, 1, type=Int)
     @test ps[4] == MPolynomial([0; 0;;], [1])
@@ -331,28 +407,47 @@
     ps = mmonomials(2, 1, type=BigInt)
     @test coefficients(ps[1]) isa AbstractVector{BigInt}
 
+    # Domain
+    @test domain(mmonomials(2, 2)) == R^2
+    @test domain(mmonomials(2, 2, QHat)) == QHat
+    @test domain(mmonomials(2, 2, QHat)[1]) == QHat
 
-    # -------------------------------------------------------------------------------------------------
-    # Integration
-    # -------------------------------------------------------------------------------------------------
+end
+
+
+@testitem "integration" begin
+
+    using Test
+
+    using MMJMesh
+    using MMJMesh.Mathematics
 
     f = MPolynomial([1 3; 1 2], [1, 3])
     @test integrate(f, 1 .. 2, 5 .. 9) == 2307
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Symbolic coefficients
-    # -------------------------------------------------------------------------------------------------
+
+@testitem "symbolic coefficients" begin
+
+    using Test
+    using Symbolics
+
+    using MMJMesh
+    using MMJMesh.MMJBase
+    using MMJMesh.Mathematics
+
+    @variables a, b
 
     # Multiplication with symbol
     @test isequal(coefficients(a * MPolynomial([1 3; 1 2], [1, 3])), [3a, a])
     @test isequal(coefficients(a * MPolynomial([1 3 4; 1 2 5], [1 0 0; 2 3 0])), [0 a; 3a 2a])
 
     @test isequal(
-          coefficients(
-                a * MPolynomial([1 3 4; 1 2 5], [1 0 0; 2 3 0;;; 3 2 1; 5 4 9;;; 0 0 0; 0 0 0])
-          ),
-          [3a 2a 1a; 5a 4a 9a;;; a 0 0; 2a 3a 0]
+        coefficients(
+            a * MPolynomial([1 3 4; 1 2 5], [1 0 0; 2 3 0;;; 3 2 1; 5 4 9;;; 0 0 0; 0 0 0])
+        ),
+        [3a 2a 1a; 5a 4a 9a;;; a 0 0; 2a 3a 0]
     )
 
     # Symbolic coefficients and parameters
@@ -368,7 +463,7 @@
 
     # Integerization
     f = MPolynomial([1 2; 2 1], [2.0a, b + 6 // 3]) |> integerize
-    @test isequal(coefficients(f), Symbolics.Num[2 + b, 2a])
+    @test isequal(coefficients(f), Symbolics.Num[2+b, 2a])
 
     # Rationalization
     f = MPolynomial([1; 0;;], [1])

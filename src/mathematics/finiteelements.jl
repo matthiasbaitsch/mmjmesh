@@ -28,7 +28,7 @@ function hermitefunctions(x::AbstractArray{<:Real}; midnode=false)
     for e = 1:Ne
         ϕs = nodalbasis(makeelement(:hermite, x[e] .. x[e+1], midnode=midnode))
         k = (2 + midnode) * (e - 1)
-        f[k+1:k+length(ϕs), e] .= ϕs
+        f[(k+1):(k+length(ϕs)), e] .= ϕs
     end
     return [PiecewiseFunction(x, c) for c = eachrow(f)]
 end
@@ -50,7 +50,7 @@ function lagrangebasis1d(x::AbstractArray{<:Real}, k)
         m = k * (e - 1)
         ϕs = makeelement(:lagrange, x[e] .. x[e+1], k=k) |> nodalbasis |> collect
         f[m+1, e] = ϕs[1]
-        f[m+2:m+k, e] = ϕs[3:end]
+        f[(m+2):(m+k), e] = ϕs[3:end]
         f[m+k+1, e] = ϕs[2]
 
     end
@@ -95,17 +95,19 @@ for symbolic domains.
 """
 function nodalbasis(e::FiniteElement)
     if :nodalbasis ∉ keys(e.cache)
-        # Hack to handle domains with symbolic limits
-        d = e.K
+        domainsymbolic = !(e.K |> eltype |> eltype |> isbitstype)
 
-        if !(d |> eltype |> eltype |> isbitstype)
-            d = R^dimension(e.K)
+        if domainsymbolic
+            ps = basis(e.P, R^dimension(e.K))
+            M = Num[n(p) for p in ps, n in e.N]
+            invM = simplify.(rationalize.(inv(M; laplace=false)))
+        else
+            ps = basis(e.P, e.K)
+            M = [n(p) for p in ps, n in e.N]
+            invM = inv(M)
         end
 
-        # Generate nodal basis
-        ps = basis(e.P, d)
-        M = [n(p) for p in ps, n in e.N]
-        e.cache[:nodalbasis] = inv(M) * ps
+        e.cache[:nodalbasis] = invM * ps
     end
     return e.cache[:nodalbasis]
 end
