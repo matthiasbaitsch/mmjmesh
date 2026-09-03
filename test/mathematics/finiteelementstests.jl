@@ -119,7 +119,7 @@ end
         @test MMJMesh.Mathematics.domain(ϕ[1]) == R2
 
         for i = 1:n, j = 1:n
-            @test isequal(e.N[i](ϕ[j]), i == j)
+            @test isequal(simplify(expand(e.N[i](ϕ[j]))), i == j)
         end
 
         return true
