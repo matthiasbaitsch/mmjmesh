@@ -3,6 +3,7 @@ exclude = [
     "doc/**", 
     "attic/**", 
     "src/plots/**", 
+    "src/reexports.jl",
     "src/mmjbase/symbolics.jl", 
     "test/plots/**"
 ]
