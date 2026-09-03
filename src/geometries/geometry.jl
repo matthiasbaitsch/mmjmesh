@@ -63,7 +63,7 @@ end
 Release unused memory from `g`.
 """
 function squeeze!(g::Geometry)
-    g.coordinates = g.points.coordinates[:, 1:g.points.n]
+    g.points.coordinates = g.points.coordinates[:, 1:g.points.n]
     return nothing
 end
 

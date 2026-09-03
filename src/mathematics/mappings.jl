@@ -423,7 +423,7 @@ of partial derivatives. For instance, calling `_nn(2, 1, 2, 1, 1)` representing
 """
 function _nn(n::Integer, indices::Integer...)
     n = zeros(Int, n)
-    for i ∈ indices
+    for i ∈ Tuple(indices)
         n[i] += 1
     end
     return n

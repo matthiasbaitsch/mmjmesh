@@ -13,8 +13,7 @@
 
     using MMJMesh
     using MMJMesh.Mathematics
-    using MMJMesh.Mathematics: derivativetype, dimension
-    using DomainSets: ×
+    using MMJMesh.Mathematics: derivativetype, dimension, div
 
 
     # -------------------------------------------------------------------------------------------------

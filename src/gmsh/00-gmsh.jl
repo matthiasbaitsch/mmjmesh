@@ -1,7 +1,7 @@
 module Gmsh
 
 # Modules needed by this module
-using Gmsh
+import Gmsh as GmshLib
 using Lerche
 using Tables
 using LinearAlgebra
@@ -34,7 +34,7 @@ end
 
 Returns path to the specified mesh in `data/gmsh` folder.
 """
-meshpath(filename::String) = joinpath(dirname(Base.current_project()), "data/gmsh", filename)
+meshpath(filename::String) = joinpath(@__DIR__, "../../data/gmsh", filename)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -99,16 +99,16 @@ end
 function _readgeo(filepath; verbosity)
     try
         f = tempname() * ".msh"
-        gmsh.initialize()
-        gmsh.option.setNumber("General.Verbosity", verbosity)
-        gmsh.open(filepath)
-        gmsh.write(f)
-        gmsh.finalize()
+        GmshLib.gmsh.initialize()
+        GmshLib.gmsh.option.setNumber("General.Verbosity", verbosity)
+        GmshLib.gmsh.open(filepath)
+        GmshLib.gmsh.write(f)
+        GmshLib.gmsh.finalize()
         m = _readmsh(f)
         rm(f)
         return m
     catch e
-        gmsh.finalize()
+        GmshLib.gmsh.finalize()
         throw(e)
     end
 end

@@ -37,6 +37,6 @@
     @test m ∈ s
     @test [5, 5] ∉ s
     @test me ∉ s
-    @test in(me, s, atol=1e-11)
+    @test in_with_tol(me, s, atol=1e-11)
 
 end

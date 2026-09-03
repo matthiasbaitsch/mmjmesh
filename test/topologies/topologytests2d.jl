@@ -4,7 +4,7 @@
 
     using MMJMesh
     using MMJMesh.Topologies
-    using MMJMesh.Topologies: entities
+    using MMJMesh.Topologies: entities, length
 
     """
     Test topology

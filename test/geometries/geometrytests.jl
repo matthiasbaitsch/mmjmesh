@@ -3,7 +3,7 @@
     using Test
     using MMJMesh
     using MMJMesh.Geometries
-    using MMJMesh.Geometries: coordinates
+    using MMJMesh.Geometries: coordinates, length
 
     @testset "Empty constructor" begin
         g = Geometry(3)

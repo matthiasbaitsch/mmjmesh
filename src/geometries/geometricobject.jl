@@ -18,7 +18,14 @@ MMJMesh.pdim(::Type{<:GeometricObject}) = @notimplemented
 center(::GeometricObject) = @notimplemented
 measure(::GeometricObject) = @notimplemented
 boundingbox(::GeometricObject) = @notimplemented
-Base.in(::RealVec, ::GeometricObject; atol::Real=0.0) = @notimplemented
+
+"""
+    in_with_tol(p, o, atol=0.0)
+
+Like `p ∈ o`, but allows `p` to be up to `atol` away from `o`.
+"""
+in_with_tol(::RealVec, ::GeometricObject; atol::Real=0.0) = @notimplemented
+Base.in(p::RealVec, o::GeometricObject) = in_with_tol(p, o)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -48,7 +55,8 @@ Returns the parameter of point `p` on the one-dimensional geometric object o. Th
 """
 parameterof(o::GeometricObjectP{1}, p; atol::Real=1e-12) = @notimplemented
 
-Base.in(p::RealVec, o::GeometricObject{1}; atol::Real=0.0) = !isnan(parameterof(o, p, atol=atol))
+in_with_tol(p::RealVec, o::GeometricObject{1}; atol::Real=0.0) = !isnan(parameterof(o, p, atol=atol))
+Base.in(p::RealVec, o::GeometricObject{1}) = in_with_tol(p, o)
 
 # -------------------------------------------------------------------------------------------------
 # Geometric object from point interpolation

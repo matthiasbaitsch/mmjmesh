@@ -404,7 +404,8 @@ function derivative(
     n == 1 && return derivative(p, _id(N))
 
     if n == 2
-        ns = MArray{Tuple{N,N,N},Int}(zeros(N, N, N))
+        NN::Int = N
+        ns = MArray{Tuple{N,N,N},Int}(zeros(NN, NN, NN))
         for i = 1:N
             ns[i, :, i] .+= 1
         end

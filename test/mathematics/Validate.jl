@@ -27,7 +27,6 @@
 
 
     function _sample(r::DomainSets.Rectangle)
-        @assert isfinite(r)
         Random.seed!(1234)
         N = DomainSets.dimension(r)
         F = parametrization(Box(r))

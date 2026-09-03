@@ -2,6 +2,7 @@
 
     using Test
     using MMJMesh.Topologies
+    using MMJMesh.Topologies: length
 
     # Basic
     @testset "Basic" begin

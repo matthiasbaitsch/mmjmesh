@@ -14,7 +14,7 @@ import MMJMesh: coordinate, coordinates
 ## geometricobject.jl
 export GeometricObject, GeometricObjectP, GeometricObjectI,
     parametrization, parameterof,
-    center, measure, boundingbox
+    center, measure, boundingbox, in_with_tol
 
 ## geometry.jl
 export Geometry

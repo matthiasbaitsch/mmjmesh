@@ -1,0 +1,9 @@
+exclude = [
+    "dev.jl",
+    "doc/**", 
+    "attic/**", 
+    "src/plots/**", 
+    "src/mmjbase/symbolics.jl", 
+    "test/plots/**"
+]
+

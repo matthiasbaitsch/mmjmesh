@@ -4,7 +4,6 @@ using QuadGK
 using Symbolics
 using IntervalSets
 using StaticArrays
-using SymbolicUtils
 using LinearAlgebra
 using SymbolicUtils: Postwalk, Chain
 using DomainSets: ×, ProductDomain, Rectangle
@@ -38,8 +37,8 @@ export FunctionToR, MappingToRn, MappingToRmxn
 export FunctionRToR, FunctionRnToR, MappingRnToRm
 export domaintype, codomaintype, domain, degree, degrees
 export constval, valueat
-export derivativeat, derivative, pderivativeat, pderivative
-export antiderivative, integrate, ∫, sample, plot, pois, roots
+export derivativeat, derivative
+export antiderivative, integrate, ∫, pois, roots
 
 # Composed functions
 export MappingFromComponents
@@ -70,7 +69,7 @@ export ParametricCurve, UnitNormal
 # Special functions II
 export constant
 export Sin, Cos, Exp
-export mmonomials, affinefunction, simplifyx
+export mmonomials, affinefunction
 export AdHocMapping, makefunction
 export AffineMapping
 export Polynomial, Interpolation
@@ -82,7 +81,7 @@ export MPolynomial, PolynomialRnToR, PolynomialRnToRm, PolynomialRnToRpxq,
     nterms, exponents, coefficient, coefficients, degrees, mmonomials
 
 # Forms
-export Form, LinearForm, BilinearForm, ValueAtLF, DerivativeAtLF, DDerivativeAtLF, PDerivativeAtLF
+export Form, LinearForm, BilinearForm, ValueAtLF, DerivativeAtLF, PDerivativeAtLF
 export ∂xLF, ∂yLF, ∂xyLF
 
 # Spaces

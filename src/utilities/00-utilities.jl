@@ -5,10 +5,6 @@ module Utilities
 import DomainSets
 import IntervalSets
 
-using DomainSets: ×
-using IntervalSets: (..)
-
-
 # Modules needed by this module
 using MMJMesh.Meshes
 using MMJMesh.Topologies
