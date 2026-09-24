@@ -489,6 +489,8 @@ struct Operator
 end
 (op::Operator)(x) = op.op(x)
 Base.:(*)(op::Operator, x) = op.op(x)
+Base.:(-)(op::Operator) = Operator(x -> -op.op(x))
+Base.:(*)(c::Number, op::Operator) = Operator(x -> c * op.op(x))
 
 # Enable differential operator on matrix of Anys
 derivative(::Real, ::IntegerVec) = 0
