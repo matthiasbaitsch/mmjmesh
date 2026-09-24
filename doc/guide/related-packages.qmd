@@ -1,0 +1,96 @@
+# Discussion: Functions as first-class objects
+
+Notes from a design discussion about `AbstractMapping{DT,CT,D}` in
+`src/mathematics/mappings.jl`. Question: does a Julia package already exist
+that treats functions as first-class mathematical objects (typed
+domain/codomain, algebra, composition, differentiation)? Result: no single
+package covers this; the need keeps getting solved per-domain. Below are the
+closest matches found.
+
+## Closest structural match: `AbstractAlgebra.jl` Map interface
+
+<https://nemocas.github.io/AbstractAlgebra.jl/stable/map_interface/>
+
+Part of the Nemo computer-algebra ecosystem. Maps are objects distinct from
+plain Julia functions:
+
+```
+Map{D, C, T, MyMap}
+```
+
+- `D`, `C` — domain and codomain
+- `T` — map class (e.g. `SetMap`, `FunctionalMap`)
+- `MyMap` — concrete implementation
+
+Interface: `domain(M)`, `codomain(M)` as accessor **methods**, `M(a)` for
+application, `compose(f, g)` / `*` for composition, an `IdentityMap` type.
+
+Relevant to the `D` (restricted-domain) parameter question: domain/codomain
+here are returned by methods, not encoded as a value baked into the type.
+Independent precedent for dropping the domain-restriction type parameter in
+favor of a `domain(m)` method with a fallback derived from `DT`.
+
+## Linear and general operators
+
+- **LinearMaps.jl** — <https://github.com/JuliaLinearAlgebra/LinearMaps.jl>
+  Wraps a function as a lazy linear operator (`LinearMap(f, n)`). Supports
+  `+`, `*`, adjoint/transpose, composition, Kronecker products,
+  concatenation — never materializes a matrix. Standard operator interface
+  behind IterativeSolvers.jl / Krylov.jl. Likely the "general linear algebra
+  package" referenced from memory in the discussion.
+- **AbstractOperators.jl** — <https://github.com/kul-optec/AbstractOperators.jl>
+  Same idea generalized to nonlinear operators, arbitrary-dimension
+  domains/codomains. Built for large-scale optimization.
+- **FunctionOperators.jl** — <https://juliapackages.com/p/functionoperators>
+  Same spirit, used in MRI image reconstruction.
+
+## Geometric transformations
+
+- **CoordinateTransformations.jl** —
+  <https://github.com/JuliaGeometry/CoordinateTransformations.jl>
+  `Translation`, `LinearMap`, `AffineMap` as composable, invertible objects
+  (`trans ∘ rot`, `inv(t)`). Used throughout the JuliaGeometry/Makie stack.
+- Makie itself has no function-object type; it leans on **IntervalSets.jl**'s
+  `..` to pass a domain alongside a plain function, e.g.
+  `surface!(ga, lonmin..lonmax, latmin..latmax, field)`. MMJMesh already
+  depends on IntervalSets.jl for the same pattern.
+
+## Domain algebra
+
+- **DomainSets.jl** — <https://github.com/JuliaApproximation/DomainSets.jl>
+  (already an MMJMesh dependency). Abstract `Domain{T}` with
+  union/intersect/product/membership, plus its own minimal internal `Map`
+  for domain transformations.
+
+## Numeric / approximate function algebra
+
+- **ApproxFun.jl** — functions represented via basis expansion
+  (Chebyshev/Fourier), full algebra (`+`, `*`, `'`, `∫`), domain-aware via
+  DomainSets.jl. Works to ~machine precision, not exact. The community's
+  standard answer when this question comes up (see Discourse thread below).
+- **TaylorSeries.jl** — <https://github.com/JuliaDiff/TaylorSeries.jl>
+  Full algebra (`+`, `*`, `/`, composition, `derivative`, `integrate`,
+  elementary functions) on truncated power series (`Taylor1`,
+  `HomogeneousPolynomial`, `TaylorN`). Mature, successfully adopted
+  (TaylorIntegration.jl, TaylorModels.jl). Evidence that "functions as
+  objects, done well" is achievable once the representation is narrowed
+  (here: local polynomial expansion) rather than fully general.
+
+## Prior community discussion
+
+["Package for mathematical functions?"](https://discourse.julialang.org/t/package-for-mathematical-functions/32861)
+— Julia Discourse, ~2019. Same question asked before. Chris Rackauckas
+points to ApproxFun.jl; someone prototypes on AbstractAlgebra.jl's `Map` and
+calls it "a little unwieldy"; Lazy.jl comes up as the fallback for
+exact-but-unstructured closures. No answer covers
+domain-awareness + exactness + generality together.
+
+## Takeaway
+
+No package combines: typed domain/codomain, exact (not floating-point
+approximate) algebra, and general (not linear-only, not local-expansion-only)
+function representation. `MPolynomial` and `AbstractMapping` in MMJMesh sit
+in the gap on purpose, scoped to what FE basis construction needs — same
+conclusion as `DynamicPolynomials.jl`/`MultivariatePolynomials.jl` occupying
+the "real polynomial type" gap that `Symbolics.jl` leaves open (see
+`mpolynomials.jl`).
