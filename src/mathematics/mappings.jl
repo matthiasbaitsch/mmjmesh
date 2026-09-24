@@ -491,6 +491,7 @@ end
 Base.:(*)(op::Operator, x) = op.op(x)
 Base.:(-)(op::Operator) = Operator(x -> -op.op(x))
 Base.:(*)(c::Number, op::Operator) = Operator(x -> c * op.op(x))
+Base.:(+)(op1::Operator, op2::Operator) = Operator(x -> op1.op(x) + op2.op(x))
 
 # Enable differential operator on matrix of Anys
 derivative(::Real, ::IntegerVec) = 0

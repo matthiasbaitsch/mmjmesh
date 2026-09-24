@@ -507,8 +507,13 @@ end
     @test ∂x * f == derivative(f, [1, 0])
     @test ∂y * f == derivative(f, [0, 1])
 
+    @test -∂x * f == -derivative(f, [1, 0])
+    @test 2∂y * f == 2derivative(f, [0, 1])
+
     @test ∂x * 2 == 0
     @test ∂x * 1.0 == 0
+
+    @test (∂x + ∂y) * f == derivative(f, [1, 0]) + derivative(f, [0, 1])
 
 end
 
