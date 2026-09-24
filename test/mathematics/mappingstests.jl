@@ -1,31 +1,9 @@
-@testitem "Mappings" setup=[Validate] begin
-
-    # TODO this single @testitem produces ~5500 individual @test calls (mostly
-    # from Validate.validate's internal loops over derivative orders/sample
-    # points), so VS Code's Test Explorer only shows one pass/fail node for the
-    # whole file. Split into multiple smaller @testitems (e.g. one per mapping
-    # type/section) to get real per-behavior granularity.
+@testitem "Matrix times vector of functions product" begin
 
     using Test
-    using Symbolics
-    using StaticArrays
-    using LinearAlgebra: Diagonal, norm, ⋅
 
     using MMJMesh
     using MMJMesh.Mathematics
-    using MMJMesh.Mathematics: derivativetype, dimension, div
-
-
-    # -------------------------------------------------------------------------------------------------
-    # Symbolic variables
-    # -------------------------------------------------------------------------------------------------
-
-    @variables a b
-
-
-    # -------------------------------------------------------------------------------------------------
-    # Matrix times vector of functions product
-    # -------------------------------------------------------------------------------------------------
 
     A = [1 2; 3 4]
     @test A * [Sin(), Sin()] == [3Sin(), 7Sin()]
@@ -35,9 +13,14 @@
 
     A * [Sin(), Sin()] |> typeof
 
-    # -------------------------------------------------------------------------------------------------
-    # Matrix vector product
-    # -------------------------------------------------------------------------------------------------
+end
+
+@testitem "Matrix vector product" begin
+
+    using Test
+
+    using MMJMesh
+    using MMJMesh.Mathematics
 
     m1 = Sin()
     m2 = Cos()
@@ -47,10 +30,14 @@
     [1.1 2.2; 3.1 5.8] * [m1, m1]
     [1.1 2.2; 3.1 5.8] * [m1, m2]
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Interval domains
-    # -------------------------------------------------------------------------------------------------
+@testitem "Interval domains" begin
+
+    using Test
+
+    using MMJMesh
+    using MMJMesh.Mathematics
 
     @test 3 ∈ R
     @test 0 ∉ RPlus
@@ -62,10 +49,16 @@
     @test R ∩ [1, 2, 3] == [1, 2, 3]
     @test RPlus ∩ [-1, 1, 2, 3] == [1, 2, 3]
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Derivative types
-    # -------------------------------------------------------------------------------------------------
+@testitem "Derivative types" begin
+
+    using Test
+    using StaticArrays
+
+    using MMJMesh
+    using MMJMesh.Mathematics
+    using MMJMesh.Mathematics: derivativetype
 
     T1 = InR
     T2 = InR2
@@ -82,10 +75,14 @@
     @test derivativetype(ProductFunction(Sin(), Cos())) == InR2
     @test derivativetype(ProductFunction(Sin(), Cos()), 2) == InRᵐˣⁿ{2,2}
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Zero function
-    # -------------------------------------------------------------------------------------------------
+@testitem "Zero function" begin
+
+    using Test
+
+    using MMJMesh
+    using MMJMesh.Mathematics
 
     z = Zero{InR2,InR,QHat}()
     @test iszero(z)
@@ -98,10 +95,15 @@
     @test derivativeat(z, [1, 1]) == [0, 0]
     @test derivativeat(z, [1, 1], 2) == [0 0; 0 0]
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # One function
-    # -------------------------------------------------------------------------------------------------
+@testitem "One function" setup = [Validate] begin
+
+    using Test
+    using StaticArrays
+
+    using MMJMesh
+    using MMJMesh.Mathematics
 
     o1 = One{InR,R}()
     @test isone(o1)
@@ -122,10 +124,16 @@
     @test o3''(1, 2, 3) == zeros(3, 3)
     @test (3 * o3)(1, 2, 3) == 3
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Mapping from components
-    # -------------------------------------------------------------------------------------------------
+@testitem "Mapping from components" setup = [Validate] begin
+
+    using Test
+    using StaticArrays
+
+    using MMJMesh
+    using MMJMesh.Mathematics
+    using MMJMesh.Mathematics: div
 
     # Parametric curve
     g = MappingFromComponents(Sin(), Cos())
@@ -165,18 +173,30 @@
     @test jacobian(g)(x) == derivativeat(g, x)
     @test jacobianat(g, x) == derivativeat(g, x)
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Ad hoc mapping
-    # -------------------------------------------------------------------------------------------------
+@testitem "Ad hoc mapping" begin
+
+    using Test
+
+    using MMJMesh
+    using MMJMesh.Mathematics
 
     f = makefunction(x -> sin(x[1]) * sin(x[2]), 0 .. 5π, 0 .. 5π)
     @test valueat(f, [1.0, 2.0]) == sin(1) * sin(2)
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Functions R → R
-    # -------------------------------------------------------------------------------------------------
+@testitem "Functions R to R" setup = [Validate] begin
+
+    using Test
+    using Symbolics
+    using LinearAlgebra: Diagonal, ⋅
+
+    using MMJMesh
+    using MMJMesh.Mathematics
+
+    @variables a b
 
 
     # # Sine and Cosine
@@ -350,10 +370,14 @@
     @test -7x^2 + 3 + 3x == Polynomial([3, 3, -7], dom)
     @test x + Polynomial([1, 2, 3], dom) + 2x == Polynomial([1, 5, 3], dom)
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Some special cases for antiderivatives
-    # -------------------------------------------------------------------------------------------------
+@testitem "Special cases for antiderivatives" begin
+
+    using Test
+
+    using MMJMesh
+    using MMJMesh.Mathematics
 
     x = parameter(R)
     f = sin(10x)
@@ -368,10 +392,15 @@
     @test degree(2x) == 1
     @test antiderivative(f, 4)'''' == f
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Functions Rn -> R
-    # -------------------------------------------------------------------------------------------------
+@testitem "Functions Rn to R" setup = [Validate] begin
+
+    using Test
+    using StaticArrays
+
+    using MMJMesh
+    using MMJMesh.Mathematics
 
 
     # # Helpers
@@ -423,24 +452,6 @@
     @test hessianat(f, x...) == derivativeat(f, x, 2)
 
 
-    # # Differential operators
-
-    @test laplacian(f)(x) ≈ -2 * f(x)
-    @test laplacianat(f, x) ≈ -2 * f(x)
-    @test laplacianat(f, Vector(x)) == laplacianat(f, x)
-    @test laplacianat(f, x...) == laplacianat(f, x)
-
-    @test ∇(f) == derivative(f, 1)
-    @test H(f) == derivative(f, 2)
-    @test Δ(f)(x) ≈ laplacianat(f, x)
-
-    @test ∂x * f == derivative(f, [1, 0])
-    @test ∂y * f == derivative(f, [0, 1])
-
-    @test ∂x * 2 == 0
-    @test ∂x * 1.0 == 0
-
-
     # # Product function of three parameters
 
     f = ProductFunction(Sin(1 .. 2), Cos(3 .. 4), Polynomial([2, 3], 6 .. 7))
@@ -471,10 +482,44 @@
     @test integrate(f, 1 .. 2, 5 .. 9) ≈ 1.31133267192572
     @test integrate(f, (1 .. 2) × (5 .. 9)) ≈ 1.31133267192572
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Parametric curves
-    # -------------------------------------------------------------------------------------------------
+@testitem "Functions Rn to R - Differential operators" begin
+
+    using Test
+    using StaticArrays
+
+    using MMJMesh
+    using MMJMesh.Mathematics
+
+    f = ProductFunction(Sin(0 .. 1), Cos(0.5 .. 5))
+    x = SVector(1.0, 2.0)
+
+    @test laplacian(f)(x) ≈ -2 * f(x)
+    @test laplacianat(f, x) ≈ -2 * f(x)
+    @test laplacianat(f, Vector(x)) == laplacianat(f, x)
+    @test laplacianat(f, x...) == laplacianat(f, x)
+
+    @test ∇(f) == derivative(f, 1)
+    @test H(f) == derivative(f, 2)
+    @test Δ(f)(x) ≈ laplacianat(f, x)
+
+    @test ∂x * f == derivative(f, [1, 0])
+    @test ∂y * f == derivative(f, [0, 1])
+
+    @test ∂x * 2 == 0
+    @test ∂x * 1.0 == 0
+
+end
+
+@testitem "Parametric curves" setup = [Validate] begin
+
+    using Test
+    using StaticArrays
+    using LinearAlgebra: norm, ⋅
+
+    using MMJMesh
+    using MMJMesh.Mathematics
 
     c = ParametricCurve(Sin(), Cos())
     @test c(0.0) == [0, 1]
@@ -496,10 +541,17 @@
     @test codomaintype(f1) <: SVector
     @test codomaintype(f2) <: SVector
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Test operations and simplification rules
-    # -------------------------------------------------------------------------------------------------
+@testitem "Test operations and simplification rules" setup = [Validate] begin
+
+    using Test
+    using Symbolics
+
+    using MMJMesh
+    using MMJMesh.Mathematics
+
+    @variables a b
 
     x = parameter(R)
     m1 = Sin()
@@ -607,6 +659,7 @@
     f1 = Sin()
     u1 = MappingFromComponents(Sin(), Cos(), Sin())
     f3 = MPolynomial([4 3 2; 3 2 1; 2 1 0], [1, 2, 3])
+    o3 = One{InRⁿ{3},R3}()
     @test o1 * f1 === f1
     @test f1 * o1 === f1
     @test One(f1) === o1
@@ -655,9 +708,16 @@
     @test x + 2 * x^2 == Polynomial([0, 1, 2], 1.0 .. 2.0)
     @test (x + x^2) * (x - x^2) == x^2 - x^4
 
-    # -------------------------------------------------------------------------------------------------
-    # Mappings to Rn
-    # -------------------------------------------------------------------------------------------------
+end
+
+@testitem "Mappings to Rn" begin
+
+    using Test
+    using LinearAlgebra: ⋅
+
+    using MMJMesh
+    using MMJMesh.Mathematics
+    using MMJMesh.Mathematics: derivativetype
 
     # # Mapping from components
 
@@ -691,10 +751,16 @@
     @test [1 2; 5 4; 8 7] * u ==
           MappingFromComponents(Sin() + 2Cos(), 5Sin() + 4Cos(), 8Sin() + 7Cos())
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Vector fields
-    # -------------------------------------------------------------------------------------------------
+@testitem "Vector fields" begin
+
+    using Test
+    using StaticArrays
+
+    using MMJMesh
+    using MMJMesh.Mathematics
+    using MMJMesh.Mathematics: div
 
     x = SVector(1.0, 2.0)
     v = MappingFromComponents(ProductFunction(Sin(), Cos()), ProductFunction(Cos(), Sin()))
@@ -705,10 +771,18 @@
     @test divergence(v)(x) ≈ divergenceat(v, x)
     @test div(v) == divergence(v)
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Dot product
-    # -------------------------------------------------------------------------------------------------
+@testitem "Dot product" begin
+
+    using Test
+    using Symbolics
+    using LinearAlgebra: ⋅
+
+    using MMJMesh
+    using MMJMesh.Mathematics
+
+    @variables a b
 
     x = parameter(R)
 
