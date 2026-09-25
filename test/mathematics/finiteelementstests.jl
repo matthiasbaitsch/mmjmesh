@@ -108,9 +108,21 @@ end
 
     using Test
     using Symbolics
+    import SymbolicUtils
+    using SymbolicUtils.Rewriters: Postwalk
 
     using MMJMesh
     using MMJMesh.Mathematics
+
+    function hasintfraction(c)
+        found = Ref(false)
+        Postwalk() do x
+            v = SymbolicUtils.unwrap_const(x)
+            found[] |= v isa Rational && isone(denominator(v))
+            nothing
+        end(Symbolics.unwrap(c))
+        return found[]
+    end
 
     function validate(e)
         ϕ = nodalbasis(e)
@@ -120,6 +132,10 @@ end
 
         for i = 1:n, j = 1:n
             @test isequal(simplify(expand(e.N[i](ϕ[j]))), i == j)
+        end
+
+        for ϕi = ϕ, c = coefficients(ϕi)
+            @test !hasintfraction(c)
         end
 
         return true
