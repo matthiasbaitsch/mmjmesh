@@ -475,4 +475,9 @@ end
     f = MPolynomial([1 2; 4 1], [a, b])
     @test isequal(gradient(f)(1, 2), gradientat(f, [1, 2]))
 
+    # Derivatives of symbolic and integer coefficients stay exact (no Float64)
+    df = derivative(MPolynomial([1 3; 5 4], [2a, 3b]), [1, 1])
+    @test isequal(coefficients(df), [36b, 10a])
+    @test eltype(coefficients(derivative(MPolynomial([1 3; 5 4], [2, 3]), [1, 1]))) == Int
+
 end
