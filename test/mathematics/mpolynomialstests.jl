@@ -128,10 +128,10 @@ end
     @test _monomialsderivative(exponents, [1, 2]) == ([1 * 5 * 4, 3 * 4 * 3], [0 2; 3 2])
     @test _monomialsderivative(exponents, -[0, 0]) == ([1.0, 1.0], [1 3; 5 4])
     @test _monomialsderivative(exponents, -[1, 0]) == ([1 / 2, 1 / 4], [2 4; 5 4])
-    @test _monomialsderivative(exponents, -[0, 1]) == ([1 / 6, 1 / 5], [1 3; 6 5])
+    @test _monomialsderivative(exponents, -[0, 1]) == ([1 // 6, 1 // 5], [1 3; 6 5])
     @test _monomialsderivative(exponents, [-1, 2]) == ([1 / 2 * 5 * 4, 1 / 4 * 4 * 3], [2 4; 3 2])
     @test _monomialsderivative(exponents, -[1, 2]) ==
-          ([1 / 2 * 1 / 6 * 1 / 7, 1 / 4 * 1 / 5 * 1 / 6], [2 4; 7 6])
+          ([1 // 2 * 1 // 6 * 1 // 7, 1 // 4 * 1 // 5 * 1 // 6], [2 4; 7 6])
 
 end
 
@@ -479,5 +479,12 @@ end
     df = derivative(MPolynomial([1 3; 5 4], [2a, 3b]), [1, 1])
     @test isequal(coefficients(df), [36b, 10a])
     @test eltype(coefficients(derivative(MPolynomial([1 3; 5 4], [2, 3]), [1, 1]))) == Int
+
+    # Antiderivatives of integer and symbolic coefficients are rational (no Float64)
+    F = antiderivative(MPolynomial([1 3; 5 4], [2, 3]), [1, 1])
+    @test eltype(coefficients(F)) == Rational{Int}
+    @test sort(collect(coefficients(F))) == [3 // 20, 1 // 6]
+    F = antiderivative(MPolynomial([1 3; 5 4], [2a, 3b]), [1, 1])
+    @test !any(c -> occursin('.', string(c)), coefficients(F))
 
 end

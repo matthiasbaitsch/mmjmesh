@@ -73,7 +73,7 @@ Return the resulting coefficient factors and exponents.
 function _monomialsderivative(
     exponents::StaticMatrix{N,NT}, ns::IntegerVec
 ) where {N,NT}
-    T = any(<(0), ns) ? Float64 : Int
+    T = any(<(0), ns) ? Rational{Int} : Int
     factors = MVector{NT,T}(undef)
     nexponents = MMatrix{N,NT,Int}(undef)
 
@@ -83,7 +83,7 @@ function _monomialsderivative(
             e = exponents[j, i]
             d = ns[j]
             if d < 0
-                v *= 1 / _factorialpower(e - d, -d)
+                v *= 1 // _factorialpower(e - d, -d)
                 nexponents[j, i] = e - d
             elseif d <= e
                 v *= _factorialpower(e, d)
