@@ -115,7 +115,7 @@ function nodalbasis(e::FiniteElement)
         domainsymbolic = !(e.K |> eltype |> eltype |> isbitstype)
 
         if domainsymbolic
-            ps = basis(e.P, R^dimension(e.K))
+            ps = basis(e.P, R^dimension(e.K); type=BigInt)
             M = Num[n(p) for p in ps, n in e.N]
             invM = simplify.(rationalize.(inv(M; laplace=false)))
         else

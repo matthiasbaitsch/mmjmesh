@@ -147,3 +147,27 @@ end
     @test makeelement(:serendipity, K, k=2) |> validate
     @test makeelement(:hermite, K) |> validate
 end
+
+
+@testitem "symbolic element stiffness" begin
+
+    using Test
+    using Symbolics
+    using LinearAlgebra: ⋅
+
+    using MMJMesh
+    using MMJMesh.Mathematics
+
+    @variables a, b, ν
+
+    K = (0 .. a) × (0 .. b)
+    Ne = nodalbasis(makeelement(:hermite, K)) |> components
+    C = Num[1 ν 0; ν 1 0; 0 0 (1-ν)/2]
+    B(w) = [∂xx(w), ∂yy(w), 2 * ∂xy(w)]
+    ae(w, δw) = integrate(simplify((B(w) ⋅ (C * B(δw)))), K) |> simplify
+
+    k11 = ae(Ne[1], Ne[1])
+    @test k11 isa Num
+    @test !occursin('.', string(k11))
+
+end

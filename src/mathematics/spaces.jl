@@ -13,7 +13,7 @@ abstract type FunctionSpace{DT,CT} end
 Generate a basis for function space `s` defined on `d`.
 """
 basis(::Type{FunctionSpace}, d) = @abstractmethod
-basis(s::FunctionSpace, d) = basis(typeof(s), d)
+basis(s::FunctionSpace, d; kw...) = basis(typeof(s), d; kw...)
 
 
 """
@@ -50,10 +50,11 @@ Base.in(::AbstractArray{<:Integer}, ::Type{<:PolynomialSpace}) = @abstractmethod
 Base.in(f::MappingFromR, s::Type{<:PolynomialSpace{1}}) = in([degree(f)], s)
 Base.in(f::MPolynomial, s::Type{<:PolynomialSpace}) = all(in.(eachcol(f.p.exponents), s))
 
-basis(::Type{<:PolynomialSpace{1,K}}, d) where {K} = monomials(0:K, d)
-basis(s::Type{<:PolynomialSpace{N,K}}, d) where {N,K} =
-    mmonomials(N, K, d, (k...) -> [k...] ∈ s, type=Int)
-basis(s::PolynomialSpace, d) = basis(typeof(s), d)
+# 1D monomials have no coefficients, so `type` is accepted and ignored
+basis(::Type{<:PolynomialSpace{1,K}}, d; kw...) where {K} = monomials(0:K, d)
+basis(s::Type{<:PolynomialSpace{N,K}}, d; type=Int) where {N,K} =
+    mmonomials(N, K, d, (k...) -> [k...] ∈ s; type)
+basis(s::PolynomialSpace, d; kw...) = basis(typeof(s), d; kw...)
 
 """
     _dimension(s::Type{<:PolynomialSpace})
