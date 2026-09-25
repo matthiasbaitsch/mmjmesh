@@ -8,6 +8,7 @@ Partially from https://raw.githubusercontent.com/multica-ai/andrej-karpathy-skil
 
 - When the user asks a question, answer it directly and stop. Do not start implementing or editing files unless they separately ask you to proceed.
 - Be as direct and harsh in your criticism as possible.
+- Do not run tests (or the test suite, or dev.jl) unless the user explicitly asks; runs are slow and the user wants to stay in control.
 - Keep durable instructions/preferences for this repo in this file, not in global cross-project memory.
 
 ## Think Before Coding
