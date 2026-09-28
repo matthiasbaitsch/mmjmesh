@@ -515,6 +515,8 @@ end
 
     @test (∂x + ∂y) * f == derivative(f, [1, 0]) + derivative(f, [0, 1])
 
+    # Operator vector
+    @test [-∂xx; -∂yy; -2∂xy] * f == [-ProductFunction(-Sin(0 .. 1), Cos(0.5 .. 5)); -ProductFunction(Sin(0 .. 1), -Cos(0.5 .. 5)); -2*ProductFunction(Cos(0 .. 1), -Sin(0.5 .. 5))]
 end
 
 @testitem "Parametric curves" setup = [Validate] begin
