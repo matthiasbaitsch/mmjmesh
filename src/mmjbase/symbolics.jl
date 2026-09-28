@@ -43,6 +43,11 @@ numerator and denominator with a huge but cancellable common factor that Symboli
 `simplify`/`expand` do not remove, since they cancel shared symbolic factors but do not
 reduce the numeric content of a multi-term rational expression.
 """
+# TODO: Delete `cancel` (and the `SymbolicUtils` compat pin in Project.toml) once
+# SymbolicUtils' `simplify_div` cancels the numeric content itself. It currently
+# fails for integer coefficients > typemax(Int): `poly_to_gcd_form` converts them
+# to Float64, so the gcd content is 1, and since v4.46.7 (#1087) the float
+# coefficients even end up in the result.
 function cancel(expr::Symbolics.Num)
 
     function _numericcoefficients(expr::Symbolics.Num)
