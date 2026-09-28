@@ -257,6 +257,32 @@ end
 # Implementation
 # -------------------------------------------------------------------------------------------------
 
+"""
+    MPolynomial(exponents::IntegerMat, coefficients::AbstractVector, D=R^N)
+    MPolynomial(exponents::IntegerMat, coefficients::AbstractMatrix, D=R^N)
+    MPolynomial(exponents::IntegerMat, coefficients::AbstractArray{T,3}, D=R^N)
+
+Multivariate polynomial in `N` variables with domain `D`. Column `i` of the `N × NT` matrix
+`exponents` holds the exponents of the `i`-th monomial. The last dimension of `coefficients`
+runs over the monomials, its leading dimensions determine the codomain:
+
+- vector of length `NT`: polynomial ``ℝⁿ → ℝ`` (see `PolynomialRnToR`)
+- `M × NT` matrix: polynomial ``ℝⁿ → ℝᵐ`` (see `PolynomialRnToRm`)
+- `P × Q × NT` array: polynomial ``ℝⁿ → ℝᵖˣᵠ`` (see `PolynomialRnToRpxq`)
+
+On construction, terms are sorted by descending total degree, terms with equal exponents are
+merged and terms with zero coefficients are dropped.
+
+Type parameters: `N` number of variables, `CT` codomain type, `D` domain, `NT` number of terms
+and `S` size of the coefficient array.
+
+# Example
+
+```julia
+p = MPolynomial([2 1 0; 0 1 0], [3, -1, 5])     # 3x₁² - x₁x₂ + 5
+q = MPolynomial([1 0; 0 1], [1 0; 0 1])         # (x₁, x₂)
+```
+"""
 struct MPolynomial{N,CT,D,NT,S} <: AbstractMapping{InRⁿ{N},CT,D}
     exponents::SMatrix{N,NT,Int}
     coefficients::SArray{S}
@@ -596,3 +622,16 @@ function mmonomials(n::Integer, p::Integer, dom=R^n, predicate=(ps...) -> true; 
         error("Not implemented yet")
     end
 end
+
+
+## Simplification
+
+"""
+    simplify(p::MPolynomial; expand::Bool=true) -> MPolynomial
+
+Simplify the coefficients of `p`. Exact-rational coefficients like `6//1` are turned back
+into plain integers. Terms are expanded and collected before simplifying unless
+`expand=false` is passed.
+"""
+simplify(p::MPolynomial; expand::Bool=true) =
+    MPolynomial(exponents(p), integerize.(simplify.(coefficients(p); expand)), domain(p))
