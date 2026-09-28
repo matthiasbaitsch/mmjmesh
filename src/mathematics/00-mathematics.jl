@@ -10,6 +10,7 @@ using DomainSets: ×, ProductDomain, Rectangle
 
 import DomainSets
 import Polynomials
+import Symbolics: simplify
 
 using MMJMesh
 using MMJMesh.MMJBase
@@ -39,6 +40,7 @@ export domaintype, codomaintype, domain, degree, degrees
 export constval, valueat
 export derivativeat, derivative
 export antiderivative, integrate, ∫, pois, roots
+export simplify
 
 # Composed functions
 export MappingFromComponents

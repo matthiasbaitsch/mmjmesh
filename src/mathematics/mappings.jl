@@ -371,7 +371,7 @@ function integrate(f::FunctionRToR, I::Interval)
     end
     try
         F = antiderivative(f)
-        return F(rightendpoint(I)) - F(leftendpoint(I))
+        return integerize(cancel(simplify(F(rightendpoint(I)) - F(leftendpoint(I)))))
     catch _
         return quadgk(f, leftendpoint(I), rightendpoint(I))[1]
     end
@@ -534,7 +534,7 @@ function integrate(f::FunctionRnToR{2}, I1::Interval, I2::Interval)
     c = leftendpoint(I2)
     d = rightendpoint(I2)
     F = antiderivative(f, [1, 1])
-    return F(a, c) + F(b, d) - F(a, d) - F(b, c)
+    return cancel(simplify(F(a, c) + F(b, d) - F(a, d) - F(b, c)))
 end
 
 integrate(f::FunctionRnToR{2}, d::DomainSets.Rectangle) =
@@ -1126,3 +1126,7 @@ Base.:(-)(f::FunctionToR, a::Real) = f + (-a)
 # Enable dot product
 LinearAlgebra.dot(a::Real, m::AbstractMapping) = a * m
 LinearAlgebra.dot(m::AbstractMapping, a::Real) = a * m
+
+
+# XXX
+simplify(m::AbstractMapping; expand=true) = m

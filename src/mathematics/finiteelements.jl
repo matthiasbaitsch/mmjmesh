@@ -1,17 +1,5 @@
 
 # -------------------------------------------------------------------------------------------------
-# Helper functions
-# -------------------------------------------------------------------------------------------------
-
-function _intify(x)
-    v = SymbolicUtils.unwrap_const(x)
-    v isa Rational && isone(denominator(v)) ? SymbolicUtils.Const{SymReal}(numerator(v)) : x
-end
-_cleanrationals(ex) = Symbolics.wrap(Postwalk(_intify)(Symbolics.unwrap(ex)))
-_cleanpoly(p::MPolynomial) = MPolynomial(exponents(p), _cleanrationals.(simplify.(coefficients(p))), domain(p))
-
-
-# -------------------------------------------------------------------------------------------------
 # Implementation
 # -------------------------------------------------------------------------------------------------
 
@@ -124,8 +112,7 @@ function nodalbasis(e::FiniteElement)
             invM = inv(M)
         end
 
-        nb = invM * ps
-        e.cache[:nodalbasis] = domainsymbolic ? _cleanpoly(nb) : nb
+        e.cache[:nodalbasis] = simplify(invM * ps)
     end
     return e.cache[:nodalbasis]
 end

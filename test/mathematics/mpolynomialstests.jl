@@ -487,4 +487,8 @@ end
     F = antiderivative(MPolynomial([1 3; 5 4], [2a, 3b]), [1, 1])
     @test !any(c -> occursin('.', string(c)), coefficients(F))
 
+    # Simplification
+    f = MPolynomial([1 2; 2 1], [333(a+a*b^2)/(111a), b])
+    @test isequal(coefficients(simplify(f)), [b, 3 + 3b^2])
+
 end
