@@ -48,6 +48,7 @@ reduce the numeric content of a multi-term rational expression.
 # fails for integer coefficients > typemax(Int): `poly_to_gcd_form` converts them
 # to Float64, so the gcd content is 1, and since v4.46.7 (#1087) the float
 # coefficients even end up in the result.
+# See https://github.com/JuliaSymbolics/SymbolicUtils.jl/issues/1111
 function cancel(expr::Symbolics.Num)
 
     function _numericcoefficients(expr::Symbolics.Num)
