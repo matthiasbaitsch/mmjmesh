@@ -724,7 +724,7 @@ function antiderivative(f::ComposedMapping{InR,InR}, n::Integer=1)
     if degree(h) == 1
         return 1 / constval(h')^n * (antiderivative(g, n) ∘ h)
     end
-    
+
     @notimplemented
 end
 
@@ -934,7 +934,7 @@ end
 
 Monomial ``x^n`` defined on domain `D`.
 """
-monomial(n::Int, d=R) = Polynomial([Int(i == n + 1) for i = 1:n+1], d)
+monomial(n::Int, d=R) = Polynomial([Int(i == n + 1) for i = 1:(n+1)], d)
 
 
 """
