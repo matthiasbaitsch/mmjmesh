@@ -346,6 +346,7 @@ end
     @test 3x - 7x^2 + 3 == Polynomial([3, 3, -7], dom)
     @test -7x^2 + 3 + 3x == Polynomial([3, 3, -7], dom)
     @test x + Polynomial([1, 2, 3], dom) + 2x == Polynomial([1, 5, 3], dom)
+    @test (1 + x)^2 == 1 + 2x + x^2
 
 end
 

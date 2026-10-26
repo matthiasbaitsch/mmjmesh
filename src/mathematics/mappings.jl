@@ -1066,6 +1066,7 @@ Base.:(∘)(m1::AbstractMapping, m2::AbstractMapping) = _composed(m1, m2)
 
 # ^
 Base.:(^)(::Identity{InR,D}, n::Int) where {D} = monomial(n, D)
+Base.:(^)(p::Polynomial{D}, n::Int) where {D} = Polynomial(p.p^n, D)
 Base.:(^)(f::FunctionRToR, n::Int) = monomial(n, domain(f)) ∘ f
 
 # Add or subtract a Number
