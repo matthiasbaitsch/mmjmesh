@@ -71,7 +71,7 @@ export ParametricCurve, UnitNormal
 
 # Special functions II
 export constant
-export Sin, Cos, Exp
+export Sin, Cos, Exp, Sinh, Cosh, Abs, Sign
 export mmonomials, affinefunction
 export AdHocMapping, makefunction
 export AffineMapping
