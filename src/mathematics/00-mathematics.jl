@@ -17,6 +17,7 @@ using MMJMesh.MMJBase
 
 include("domains.jl")
 include("mappings.jl")
+include("standardfunctions.jl")
 include("forms.jl")
 include("mpolynomials.jl")
 include("curves.jl")
