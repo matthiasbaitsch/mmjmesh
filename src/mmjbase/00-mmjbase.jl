@@ -21,7 +21,7 @@ export atol, tomatrix, FromType, ROWS, COLS, unitvector
 export SeqIntSet
 
 ## symbolics.jl
-export rationalize!, integerize, integerize!
+export rationalize!, integerize, integerize!, cancel
 
 
 # Parts
