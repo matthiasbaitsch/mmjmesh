@@ -1,4 +1,6 @@
-## Sine function
+# -------------------------------------------------------------------------------------------------
+# Sine function
+# -------------------------------------------------------------------------------------------------
 
 struct Sin{D} <: FunctionRToR{D}
     Sin(d=R) = new{d}()
@@ -15,7 +17,9 @@ _antiderivative(::Sin{D}) where {D} = -Cos(D)
 Base.show(io::IO, ::Sin) = print(io, "sin(x)")
 
 
-## Cosine function
+# -------------------------------------------------------------------------------------------------
+# Cosine function
+# -------------------------------------------------------------------------------------------------
 
 struct Cos{D} <: FunctionRToR{D}
     Cos(d=R) = new{d}()
@@ -33,7 +37,9 @@ _antiderivative(::Cos{D}) where {D} = Sin(D)
 Base.show(io::IO, ::Cos) = print(io, "cos(x)")
 
 
-## Exp function
+# -------------------------------------------------------------------------------------------------
+# Exp function
+# -------------------------------------------------------------------------------------------------
 
 struct Exp{D} <: FunctionRToR{D}
     Exp(d=R) = new{d}()
@@ -50,7 +56,9 @@ antiderivative(f::Exp, ::Integer=1) = f
 Base.show(io::IO, ::Exp) = print(io, "exp(x)")
 
 
-## Hyperbolic sine function
+# -------------------------------------------------------------------------------------------------
+# Hyperbolic sine function
+# -------------------------------------------------------------------------------------------------
 
 struct Sinh{D} <: FunctionRToR{D}
     Sinh(d=R) = new{d}()
@@ -67,7 +75,9 @@ _antiderivative(::Sinh{D}) where {D} = Cosh(D)
 Base.show(io::IO, ::Sinh) = print(io, "sinh(x)")
 
 
-## Hyperbolic cosine function
+# -------------------------------------------------------------------------------------------------
+# Hyperbolic cosine function
+# -------------------------------------------------------------------------------------------------
 
 struct Cosh{D} <: FunctionRToR{D}
     Cosh(d=R) = new{d}()
@@ -84,7 +94,9 @@ _antiderivative(::Cosh{D}) where {D} = Sinh(D)
 Base.show(io::IO, ::Cosh) = print(io, "cosh(x)")
 
 
-## Absolute value function
+# -------------------------------------------------------------------------------------------------
+# Absolute value function
+# -------------------------------------------------------------------------------------------------
 
 struct Abs{D} <: FunctionRToR{D}
     Abs(d=R) = new{d}()
@@ -102,7 +114,9 @@ pois(::Abs{D}) where {D} = 0 ∈ D ? [0.0] : Float64[]
 Base.show(io::IO, ::Abs) = print(io, "abs(x)")
 
 
-## Sign function
+# -------------------------------------------------------------------------------------------------
+# Sign function
+# -------------------------------------------------------------------------------------------------
 
 struct Sign{D} <: FunctionRToR{D}
     Sign(d=R) = new{d}()
