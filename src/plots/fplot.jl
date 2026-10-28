@@ -22,11 +22,18 @@ Makie.@recipe FPlot begin
     ir = false
     "Connect lines at points of interest"
     connect_jumps = false
+    "Attributes to cycle when creating multiple plots"
+    cycle = [:color]
 end
 
 
 function Makie.plot!(plot::FPlot)
     attributes = plot.attributes
+
+    # Child plots of a recipe do not cycle (MakieOrg/Makie.jl#5322). Hence, several functions in
+    # one call are cycled by hand unless the user set a color. Relies on Makie's internal
+    # sentinel :cycled for unset cycled attributes.
+    cyclebyhand = length(plot.args[]) > 1 && attributes.inputs[:color].value === :cycled
 
     # Process functions to plot
     for (i, f) = enumerate(plot.args[])
@@ -77,7 +84,11 @@ function Makie.plot!(plot::FPlot)
 
         # Plot
         # Makie.lines!(plot, plot.attributes, xy; color=Makie.Cycled(i))
-        Makie.lines!(plot, xy, color=Makie.Cycled(i))
+        color = cyclebyhand ? Makie.Cycled(i) : attributes.color[]
+        Makie.lines!(
+            plot, xy,
+            color=color, linewidth=attributes.linewidth[], linestyle=attributes.linestyle[]
+        )
     end
 
     return plot
