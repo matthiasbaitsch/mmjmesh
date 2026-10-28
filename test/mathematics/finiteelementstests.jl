@@ -6,17 +6,37 @@
     using MMJMesh
     using MMJMesh.Mathematics
 
+    # Check interpolation
     n = 5
     xs = range(0 .. 4.23, n)
     uhats = 1:n
     phis = hatfunctions(xs)
-
     uh1 = uhats ⋅ phis
     uh2 = phis ⋅ uhats
     @test uh1.(xs) ≈ uhats
     @test uh2.(xs) ≈ uhats
     @test iszero(zeros(n) ⋅ phis)
 
+    # Zero pieces outside support, fast path for shared breakpoints
+    phis = hatfunctions(range(0, 5, 10))
+    p1 = phis[1]
+    p2 = phis[2]
+    p = p1 * p2 + p1' * p2'
+    @test !(p1.functions[1] isa Zero)
+    @test !(p2.functions[1] isa Zero)
+    @test p1.functions[2] isa Zero
+    @test p.breakpoints === p1.breakpoints
+    @test p.functions[2] isa Zero
+
+    # Check mass and stiffness entries
+    h = 5 / 9
+    @test ∫(phis[1] * phis[1]) ≈ h / 3
+    @test ∫(phis[5] * phis[5]) ≈ 2h / 3
+    @test ∫(phis[5] * phis[6]) ≈ h / 6
+    @test ∫(phis[5] * phis[8]) ≈ 0
+    @test ∫(phis[5]' * phis[5]') ≈ 2 / h
+    @test ∫(phis[5]' * phis[6]') ≈ -1 / h
+    @test ∫(phis[5]' * phis[8]') ≈ 0
 end
 
 

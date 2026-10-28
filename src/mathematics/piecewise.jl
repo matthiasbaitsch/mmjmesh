@@ -52,7 +52,10 @@ function integrate(f::PiecewiseFunction, I::Interval)
     pts = unique!(vcat([[leftendpoint(I)], [p for p ∈ pois(f) if p ∈ I], [rightendpoint(I)]]...))
     for i = 1:(length(pts)-1)
         sI = pts[i] .. pts[i+1]
-        s += integrate(functionat(f, IntervalSets.mean(sI)), sI)
+        ff = functionat(f, IntervalSets.mean(sI))
+        if !iszero(ff)
+            s += integrate(ff, sI)
+        end
     end
     return s
 end
@@ -71,17 +74,26 @@ function _applyoperator(f1::PiecewiseFunction, f2::FunctionRToR, op)
     return PiecewiseFunction(breakpoints, functions)
 end
 
+function _applyoperatorpw(f1::PiecewiseFunction, f2::PiecewiseFunction, op)
+    if f1.breakpoints != f2.breakpoints
+        return _applyoperator(f1, f2, op)
+    end
+    return PiecewiseFunction(
+        f1.breakpoints, FunctionRToR[op(g1, g2) for (g1, g2) ∈ zip(f1.functions, f2.functions)]
+    )
+end
+
 _sum(f1::FunctionRToR, f2::PiecewiseFunction) = _applyoperator(f2, f1, +)
 _sum(f1::PiecewiseFunction, f2::FunctionRToR) = _applyoperator(f1, f2, +)
 _sum(f1::PiecewiseFunction, f2::ScaledMapping) = _applyoperator(f1, f2, +)
 _sum(f1::ScaledMapping, f2::PiecewiseFunction) = _applyoperator(f2, f1, +)
-_sum(f1::PiecewiseFunction, f2::PiecewiseFunction) = _applyoperator(f1, f2, +)
+_sum(f1::PiecewiseFunction, f2::PiecewiseFunction) = _applyoperatorpw(f1, f2, +)
 
 _product(f1::FunctionRToR, f2::PiecewiseFunction) = _applyoperator(f2, f1, *)
 _product(f1::PiecewiseFunction, f2::FunctionRToR) = _applyoperator(f1, f2, *)
 _product(f1::PiecewiseFunction, f2::ScaledMapping) = _applyoperator(f1, f2, *)
 _product(f1::ScaledMapping, f2::PiecewiseFunction) = _applyoperator(f2, f1, *)
-_product(f1::PiecewiseFunction, f2::PiecewiseFunction) = _applyoperator(f1, f2, *)
+_product(f1::PiecewiseFunction, f2::PiecewiseFunction) = _applyoperatorpw(f1, f2, *)
 
 _scaled(a::Real, f::PiecewiseFunction) = PiecewiseFunction(f.breakpoints, a * f.functions)
 
@@ -96,8 +108,11 @@ function interpolate(x::AbstractArray{<:Real}, y::AbstractArray{<:Real}; order=1
     @assert length(x) == length(y)
     @assert _isascending(x)
 
+    o = Zero{InR,InR,R}()
+    piece(x1, x2, y1, y2) = y1 == 0 && y2 == 0 ? o : affinefunction(x1 .. x2, y1 .. y2)
+
     return PiecewiseFunction(
-        x, [affinefunction(x[i] .. x[i+1], y[i] .. y[i+1]) for i = 1:(length(x)-1)]
+        x, FunctionRToR[piece(x[i], x[i+1], y[i], y[i+1]) for i = 1:(length(x)-1)]
     )
 end
 
