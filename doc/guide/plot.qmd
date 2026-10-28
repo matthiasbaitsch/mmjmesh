@@ -226,6 +226,17 @@ mplot!(
 f
 ```
 
+Triangular faces work the same way. Here, the reference domain is the triangle `THat` with corners $(0, 0)$, $(1, 0)$ and $(0, 1)$. The bubble function below vanishes on all three sides:
+
+```{julia}
+m = Mesh((0 .. 8) × (0 .. 4), 4, 2, meshtype=TRIANGLE)
+w(face) = x -> index(face) * x[1] * x[2] * (1 - x[1] - x[2])
+f = Figure()
+Axis3(f[1, 1], aspect=:data)
+mplot!(m, w, faceplotzscale=5.0, faceplotmesh=2)
+f
+```
+
 ### Plot deformation
 
 ```{julia}
