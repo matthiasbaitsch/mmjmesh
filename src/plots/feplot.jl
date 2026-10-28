@@ -8,7 +8,7 @@ function plotit!(plot, K::IntervalSets.AbstractInterval)
     Makie.lines!(plot, [p1, p2], [0, 0], color=:black, linewidth=3)
 end
 
-function plotit!(plot, K::DomainSets.Rectangle)
+function plotit!(plot, K::Union{DomainSets.Rectangle,DomainSets.EuclideanUnitSimplex{2}})
     corners = points(K, :corners)
     Makie.poly!(plot, corners, color=:seashell, strokecolor=:black, strokewidth=3)
 end
@@ -71,13 +71,30 @@ function Makie.plot!(plot::FEPlot)
 end
 
 
+"""
+    _bounds(K) -> (xmin, xmax, ymin, ymax)
+
+Bounding box of domain `K` for plotting. Intervals are drawn on the x-axis and get a square box.
+"""
+function _bounds(K::IntervalSets.AbstractInterval)
+    a, b = IntervalSets.endpoints(K)
+    return a, b, -(b - a) / 2, (b - a) / 2
+end
+
+function _bounds(K::Union{DomainSets.Rectangle,DomainSets.EuclideanUnitSimplex{2}})
+    xs = [p[1] for p in points(K, :corners)]
+    ys = [p[2] for p in points(K, :corners)]
+    return minimum(xs), maximum(xs), minimum(ys), maximum(ys)
+end
+
 function feconf()
     return scene -> begin
-        g = 0.3
+        xmin, xmax, ymin, ymax = _bounds(scene.plot.element[].K)
+        g = 0.15 * max(xmax - xmin, ymax - ymin)
         ax = scene.axis
         ax.aspect = Makie.DataAspect()
-        Makie.xlims!(ax, -1 - g, 1 + g)
-        Makie.ylims!(ax, -1 - g, 1 + g)
+        Makie.xlims!(ax, xmin - g, xmax + g)
+        Makie.ylims!(ax, ymin - g, ymax + g)
         Makie.hidedecorations!(ax)
         Makie.hidespines!(ax)
         return scene

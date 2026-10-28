@@ -129,7 +129,7 @@ fplot(φs)
 ## Elements
 
 ```{julia}
-fig = Figure(size=(700, 700))
+fig = Figure(size=(700, 875))
 Axis(fig)
 feplot(fig[1, 1], makeelement(:lagrange, IHat, k=1)) |> feconf()
 feplot(fig[1, 2], makeelement(:lagrange, IHat, k=3)) |> feconf()
@@ -137,8 +137,10 @@ feplot(fig[2, 1], makeelement(:hermite, IHat)) |> feconf()
 feplot(fig[2, 2], makeelement(:lagrange, QHat, k=1)) |> feconf()
 feplot(fig[3, 1], makeelement(:lagrange, QHat, k=2)) |> feconf()
 feplot(fig[3, 2], makeelement(:serendipity, QHat, k=2)) |> feconf()
-feplot(fig[4, 1], makeelement(:hermite, QHat, conforming=true)) |> feconf()
-feplot(fig[4, 2], makeelement(:hermite, QHat, conforming=false)) |> feconf()
+feplot(fig[4, 1], makeelement(:lagrange, THat, k=1)) |> feconf()
+feplot(fig[4, 2], makeelement(:lagrange, THat, k=2)) |> feconf()
+feplot(fig[5, 1], makeelement(:hermite, QHat, conforming=true)) |> feconf()
+feplot(fig[5, 2], makeelement(:hermite, QHat, conforming=false)) |> feconf()
 fig
 ```
 
@@ -160,12 +162,18 @@ fplot!(Axis(fig[2, 1], title="Derivatives"), derivative.(Ns)...)
 fig
 ```
 
-Bilinear shape functions
+Linear shape functions on triangle
 
 ```{julia}
 #| include: false
 GLMakie.activate!()
 ```
+
+```{julia}
+makeelement(:lagrange, THat, k=1) |> nodalbasis |> components |> fplot3d
+```
+
+Bilinear shape functions
 
 ```{julia}
 makeelement(:lagrange, QHat, k=1) |> nodalbasis |> components |> fplot3d
