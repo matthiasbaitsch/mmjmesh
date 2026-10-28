@@ -89,6 +89,7 @@ of the geometric entity.
 """
 const bases = Dict(
     (1, 2) => nodalbasis(makeelement(:lagrange, IHat, k=1)),
+    (2, 3) => nodalbasis(makeelement(:lagrange, THat, k=1)),
     (2, 4) => nodalbasis(makeelement(:lagrange, QHat, k=1))
 )
 

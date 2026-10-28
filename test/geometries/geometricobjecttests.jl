@@ -32,14 +32,14 @@
     @test F(1, 1) == coordinates(f1, 3)
     @test F(-1, 1) == coordinates(f1, 4)
 
-    # Face 2 (triangle) TODO: Shape functions on triangle
+    # Face 2 (triangle)
     f2 = face(m, 2)
     gf2 = geometry(f2)
-    # F = parametrization(gf2)
+    F = parametrization(gf2)
 
     @test measure(gf2) ≈ 0.445
-    # @test F(-1, -1) == coordinates(f2, 1)
-    # @test F(1, -1) == coordinates(f2, 2)
-    # @test F(1, 1) == coordinates(f2, 3)
+    @test F(0, 0) ≈ coordinates(f2, 1)
+    @test F(1, 0) ≈ coordinates(f2, 2)
+    @test F(0, 1) ≈ coordinates(f2, 3)
 
 end
