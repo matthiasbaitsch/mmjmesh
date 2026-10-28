@@ -371,9 +371,13 @@ function integrate(f::FunctionRToR, I::Interval)
     end
     try
         F = antiderivative(f)
-        return integerize(cancel(simplify(F(rightendpoint(I)) - F(leftendpoint(I)))))
-    catch _
-        return quadgk(f, leftendpoint(I), rightendpoint(I))[1]
+        v = F(rightendpoint(I)) - F(leftendpoint(I))
+        return v isa Num ? integerize(cancel(simplify(v))) : v
+    catch err
+        err isa NotImplementedError || rethrow()
+        a, b = leftendpoint(I), rightendpoint(I)
+        scale = quadgk(x -> abs(f(x)), a, b)[1]
+        return quadgk(f, a, b, atol=sqrt(eps()) * scale)[1]
     end
 end
 
