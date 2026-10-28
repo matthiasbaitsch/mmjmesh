@@ -86,6 +86,7 @@ end
 
     z = Zero{InR2,InR,QHat}()
     @test iszero(z)
+    @test 3 * z isa Zero
     @test isconst(z)
     @test constval(z) == 0
     @test z(1, 1) == 0

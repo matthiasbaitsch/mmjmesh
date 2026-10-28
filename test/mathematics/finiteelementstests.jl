@@ -27,6 +27,7 @@
     @test p1.functions[2] isa Zero
     @test p.breakpoints === p1.breakpoints
     @test p.functions[2] isa Zero
+    @test (3 * p).functions[2] isa Zero
 
     # Check mass and stiffness entries
     h = 5 / 9

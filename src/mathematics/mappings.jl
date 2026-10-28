@@ -993,7 +993,7 @@ _sum(m1::AbstractMapping, m2::ScaledMapping) = _sum(m2, m1) # Scaled mapping fir
 _sum(m1::AbstractMapping, m2::Polynomial) = _sum(m2, m1) # Polynomial first
 _sum(m1::AbstractMapping, m2::AbstractMapping) = SumMapping(m1, m2)
 
-_scaled(a::Num, z::Zero) = z
+_scaled(::Real, z::Zero) = z
 _scaled(a::Real, p::Polynomial{D}) where {D} = Polynomial(a * p.p, D)
 _scaled(a::Real, ::Identity{InR,D}) where {D} = a * monomial(1, D)
 _scaled(a::Real, m::ScaledMapping) = (a * m.a) * m.m
