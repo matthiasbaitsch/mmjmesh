@@ -5,3 +5,4 @@ doc/build
 *.cov
 dev.jl
 LocalPreferences.toml
+.claude/settings.json
