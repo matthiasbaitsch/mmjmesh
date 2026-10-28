@@ -1,7 +1,7 @@
 _midpoint(x, i) = (x[i] + x[i+1]) / 2
 
 function _isascending(x)
-    for i = 1:length(x)-1
+    for i = 1:(length(x)-1)
         if x[i] >= x[i+1]
             return false
         end
@@ -35,7 +35,7 @@ struct PiecewiseFunction{D} <: FunctionRToR{D}
     end
 end
 
-pois(f::PiecewiseFunction) = f.breakpoints[2:end-1]
+pois(f::PiecewiseFunction) = f.breakpoints[2:(end-1)]
 npieces(f::PiecewiseFunction) = length(f.functions)
 indexofpieceat(f::PiecewiseFunction, x::InR) =
     min(max(searchsortedfirst(f.breakpoints, x) - 1, 1), npieces(f))
@@ -50,7 +50,7 @@ derivative(f::PiecewiseFunction, n::Integer=1) =
 function integrate(f::PiecewiseFunction, I::Interval)
     s = 0.0
     pts = unique!(vcat([[leftendpoint(I)], [p for p ∈ pois(f) if p ∈ I], [rightendpoint(I)]]...))
-    for i = 1:length(pts)-1
+    for i = 1:(length(pts)-1)
         sI = pts[i] .. pts[i+1]
         s += integrate(functionat(f, IntervalSets.mean(sI)), sI)
     end
@@ -65,7 +65,7 @@ function _applyoperator(f1::PiecewiseFunction, f2::FunctionRToR, op)
             mp = _midpoint(breakpoints, i)
             op(functionat(f1, mp), functionat(f2, mp))
         end
-        for i = 1:length(breakpoints)-1
+        for i = 1:(length(breakpoints)-1)
     ]
 
     return PiecewiseFunction(breakpoints, functions)
@@ -97,7 +97,7 @@ function interpolate(x::AbstractArray{<:Real}, y::AbstractArray{<:Real}; order=1
     @assert _isascending(x)
 
     return PiecewiseFunction(
-        x, [affinefunction(x[i] .. x[i+1], y[i] .. y[i+1]) for i = 1:length(x)-1]
+        x, [affinefunction(x[i] .. x[i+1], y[i] .. y[i+1]) for i = 1:(length(x)-1)]
     )
 end
 
