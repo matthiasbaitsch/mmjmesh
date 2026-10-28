@@ -94,6 +94,9 @@ end
     Validate.validate(makeelement(:lagrange, IHat, k=1), atol=1e-14)
     Validate.validate(makeelement(:lagrange, QHat, k=1), atol=1e-14)
     Validate.validate(makeelement(:lagrange, QHat, k=8), atol=1e-8)
+    Validate.validate(makeelement(:lagrange, THat, k=1), atol=1e-14)
+    Validate.validate(makeelement(:lagrange, THat, k=2), atol=1e-14)
+    Validate.validate(makeelement(:lagrange, THat, k=3), atol=1e-14)
     Validate.validate(makeelement(:serendipity, QHat, k=2), atol=1e-14)
     Validate.validate(makeelement(:hermite, IHat), atol=1e-14)
     Validate.validate(makeelement(:hermite, QHat), atol=1e-14)
@@ -121,6 +124,14 @@ end
     end
 
     @test nodalbasis(:serendipity, QHat; k=2) == ϕ
+
+    # Lagrange on triangle
+    for k = 1:3
+        ϕ = nodalbasis(:lagrange, THat; k)
+        @test length(ϕ) == (k + 1) * (k + 2) ÷ 2
+        @test MMJMesh.Mathematics.domain(ϕ[1]) == THat
+        @test sum(ϕ)(0.2, 0.3) ≈ 1
+    end
 
 end
 

@@ -150,7 +150,7 @@ end
 
 const elementdescriptors = Dict{Symbol,ElementDescriptor}()
 const elementcache = Dict{Tuple{Symbol,Any,Integer,Any},FiniteElement}()
-const elementdomainstocache = Set([IHat, QHat])
+const elementdomainstocache = Set([IHat, QHat, THat])
 
 function addelementtype!(
     typeid; description, domaintypes, makeelement,
@@ -207,13 +207,14 @@ end
 """
     lagrangeelement(K, k)
 
-Lagrange type finite element.
+Lagrange type finite element. Uses polynomials from `Q` on intervals and rectangles and
+from `P` on triangles.
 """
 function lagrangeelement(K, k::Integer)
     @assert k >= 1
     return FiniteElement(
         K,
-        Q{dimension(K),k},
+        _lagrangespace(K, k),
         _combineforms(
             [
                 points(K, :corners),
@@ -225,15 +226,19 @@ function lagrangeelement(K, k::Integer)
     )
 end
 
+_lagrangespace(K, k) = Q{dimension(K),k}
+_lagrangespace(::DomainSets.EuclideanUnitSimplex{2}, k) = P{2,k}
+
 addelementtype!(
     :lagrange, description="Standard Lagrange element",
-    domaintypes=[Interval, Rectangle],
+    domaintypes=[Interval, Rectangle, DomainSets.EuclideanUnitSimplex{2}],
     makeelement=lagrangeelement
 )
 
 # Put in Cache
 makeelement(:lagrange, IHat, k=1);
 makeelement(:lagrange, QHat, k=1);
+makeelement(:lagrange, THat, k=1);
 
 
 """
