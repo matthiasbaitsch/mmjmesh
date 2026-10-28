@@ -29,7 +29,7 @@ include("finiteelements.jl")
 
 # Domains
 export R, RPlus, R⁺, R0Plus, R⁺₀, IHat, ReferenceInterval
-export R2, R², R3, R³, QHat, ReferenceQuadrilateral
+export R2, R², R3, R³, QHat, ReferenceQuadrilateral, THat, ReferenceTriangle
 export InR, InRⁿ, InR2, InR², InR3, InR³, InRmxn, InRᵐˣⁿ
 export points, dimension
 

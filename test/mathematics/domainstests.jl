@@ -25,6 +25,10 @@
     @test dimension(R3) == 3
     @test isfinite(QHat)
     @test !isfinite(R2)
+    @test dimension(THat) == 2
+    @test isfinite(THat)
+    @test [0.2, 0.3] ∈ THat
+    @test [0.6, 0.6] ∉ THat
 
     @test [1, 2] ∈ R2
     @test [1, 2, 3] ∈ R3
@@ -64,6 +68,16 @@
         [4 / 3, 11 / 3], [5 / 3, 11 / 3],
         [4 / 3, 13 / 3], [5 / 3, 13 / 3]
     ]
+
+    # Triangle
+    @test points(THat, :corners) == [[0, 0], [1, 0], [0, 1]]
+    @test points(THat, :sides, 2) ≈ [
+        [1 / 3, 0], [2 / 3, 0],
+        [2 / 3, 1 / 3], [1 / 3, 2 / 3],
+        [0, 2 / 3], [0, 1 / 3]
+    ]
+    @test points(THat, :interior, 2) ≈ [[1 / 3, 1 / 3]]
+    @test points(THat, :interior, 3) ≈ [[1 / 4, 1 / 4], [2 / 4, 1 / 4], [1 / 4, 2 / 4]]
 
     @variables a, b
     K = (0 .. a) × (0 .. b)

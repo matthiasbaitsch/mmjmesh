@@ -425,6 +425,11 @@ end
     f = MPolynomial([1 3; 1 2], [1, 3])
     @test integrate(f, 1 .. 2, 5 .. 9) == 2307
 
+    # Reference triangle: 1 + 2x + 3y + 4x²y
+    g = MPolynomial([0 1 0 2; 0 0 1 1], [1, 2, 3, 4])
+    @test integrate(g, THat) == 7 // 5
+    @test integrate(MPolynomial([0; 0;;], [1.5]), THat) == 0.75
+
 end
 
 

@@ -47,6 +47,13 @@ const ReferenceQuadrilateral = QHat
 MMJMesh.dimension(::Rectangle{<:SVector{N}}) where {N} = N
 Base.isfinite(r::DomainSets.Rectangle) = all(isfinite.(r.a)) && all(isfinite.(r.b))
 
+""" Reference triangle ``\\hat{T}`` with corners ``(0, 0)``, ``(1, 0)`` and ``(0, 1)`` """
+const THat = DomainSets.UnitSimplex(Val(2))
+const ReferenceTriangle = THat
+
+MMJMesh.dimension(::DomainSets.EuclideanUnitSimplex{N}) where {N} = N
+Base.isfinite(::DomainSets.EuclideanUnitSimplex) = true
+
 """ Element of the real numbers """
 const InR = Real
 """ Element of the set of ``n``-tuples of real numbers """
@@ -78,7 +85,8 @@ Pick certain points from domain `K` at locations `on` which can take the followi
 
 - `:sides` -- Gives `n` points equidistantly distributed on each side
 
-- `:interior` -- Generates `n` by `n` points in the interior
+- `:interior` -- Generates `n` by `n` points in the interior, on triangles the points of the
+  corresponding lattice which lie inside
 """
 function points(K::AbstractInterval, on::Symbol, n::Integer=0)
     p1 = leftendpoint(K)
@@ -124,6 +132,33 @@ function points(K::Rectangle, on::Symbol, n::Integer=0)
     # Interior
     if on == :interior
         return reshape([SA[p1[i], p2[j]] for i = 1:n, j = 1:n], :, 1) |> vec
+    end
+
+    # Illegal
+    error("Illegal value for on: $on")
+end
+
+function points(::DomainSets.EuclideanUnitSimplex{2}, on::Symbol, n::Integer=0)
+
+    # Corners
+    if on == :corners
+        return [SA[0.0, 0.0], SA[1.0, 0.0], SA[0.0, 1.0]]
+    end
+
+    s = (1:n) ./ (n + 1)
+
+    # Sides
+    if on == :sides
+        return [
+            SVector.(s, 0.0)
+            SVector.(1 .- s, s)
+            SVector.(0.0, reverse(s))
+        ]
+    end
+
+    # Interior
+    if on == :interior
+        return [SA[s[i], s[j]] for j = 1:n for i = 1:n if i + j <= n]
     end
 
     # Illegal

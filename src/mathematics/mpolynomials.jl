@@ -483,6 +483,17 @@ end
 
 antiderivative(p::MPolynomial, ns::IntegerVec) = derivative(p, -ns)
 
+"""
+    integrate(p::MPolynomial, THat)
+
+Exact integral over the reference triangle using ``\\int_{\\hat{T}} x^a y^b = a! \\, b! / (a + b + 2)!``.
+"""
+function integrate(p::MPolynomial{2,InR}, ::DomainSets.EuclideanUnitSimplex{2})
+    w(a, b) = 1 // ((a + b + 2) * (a + b + 1) * binomial(a + b, a))
+    s = sum((c * w(e...) for (e, c) ∈ zip(eachcol(exponents(p)), coefficients(p))), init=0)
+    return s isa Num ? cancel(simplify(s)) : s
+end
+
 
 ## Operations
 
