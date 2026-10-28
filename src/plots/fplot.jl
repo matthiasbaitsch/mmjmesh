@@ -16,8 +16,8 @@ Makie.@recipe FPlot begin
     maxangle = 2.5
     "Initial number of sampling points"
     npoints = 5
-    "Scaling factor in y-direction, affects evaluation of angle"
-    yscale = 1.0
+    "Scaling factor in y-direction, affects evaluation of angle, `:auto` fits into a square"
+    yscale = :auto
     "Inserts points where the polyline crosses the x-axis"
     ir = false
     "Connect lines at points of interest"

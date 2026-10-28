@@ -30,12 +30,18 @@
 
 
     # Test scaling factor
-    p1 = sample1d(f, 0, 1, maxrecursion=20)
-    p2 = sample1d(41 * f, 0, 1, maxrecursion=20)
+    p1 = sample1d(f, 0, 1, maxrecursion=20, yscale=1.0)
+    p2 = sample1d(41 * f, 0, 1, maxrecursion=20, yscale=1.0)
     p3 = sample1d(41 * f, 0, 1, maxrecursion=20, yscale=1.0 / 41.0)
 
     @test size(p1, 2) < size(p2, 2)
     @test p1[1, :] == p3[1, :]
+
+    # Automatic scaling factor
+    p1 = sample1d(f, 0, 1)
+    p2 = sample1d(1e-6 * f, 0, 1)
+
+    @test p1[1, :] ≈ p2[1, :]
 
     # Insert root
     p1 = sample1d(f, -2, 2, maxrecursion=1)
