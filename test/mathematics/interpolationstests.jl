@@ -1,4 +1,4 @@
-@testitem "Interpolations" setup=[Validate] begin
+@testitem "Interpolation on IHat" setup=[Validate] begin
 
     using Test
     using StaticArrays
@@ -7,11 +7,6 @@
     using MMJMesh
     using MMJMesh.Plots
     using MMJMesh.Mathematics
-
-
-    # -------------------------------------------------------------------------------------------------
-    # Interpolation on IHat
-    # -------------------------------------------------------------------------------------------------
 
     C1 = [1, 2]
     C2 = [1.0 2.0; 3.0 4.0]
@@ -37,10 +32,18 @@
     m1 = Interpolation(L11, C1)
     @test m1(-1) == 1.0
 
+end
 
-    # -------------------------------------------------------------------------------------------------
-    # Interpolation on QHat
-    # -------------------------------------------------------------------------------------------------
+
+@testitem "Interpolation on QHat" setup=[Validate] begin
+
+    using Test
+    using StaticArrays
+    using LinearAlgebra
+
+    using MMJMesh
+    using MMJMesh.Plots
+    using MMJMesh.Mathematics
 
     C1 = [1, 2, 3, 4]
     C2 = [1.0 2.0 2.5 1.1; 0.1 0.2 0.9 1.0]
