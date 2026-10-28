@@ -723,9 +723,9 @@ end
     # Dot product of mappings
     @test (MappingFromComponents(f1, f2) ⋅ MappingFromComponents(f2, f1))(x) == 2 * f1(x) * f2(x)
     @test ∇(f1) ⋅ ∇(f2) ==
-          derivative(f1, [1, 0, 0]) * derivative(f2, [1, 0, 0]) +
-          derivative(f1, [0, 1, 0]) * derivative(f2, [0, 1, 0]) +
-          derivative(f1, [0, 0, 1]) * derivative(f2, [0, 0, 1])
+        derivative(f1, [1, 0, 0]) * derivative(f2, [1, 0, 0]) +
+        derivative(f1, [0, 1, 0]) * derivative(f2, [0, 1, 0]) +
+        derivative(f1, [0, 0, 1]) * derivative(f2, [0, 0, 1])
 
     # Derivative types
     @test derivativetype(u) == InR2
@@ -735,7 +735,7 @@ end
     # Dot and Matrix product
     @test [1, 2] ⋅ u == Sin() + 2 * Cos()
     @test [1 2; 5 4; 8 7] * u ==
-          MappingFromComponents(Sin() + 2Cos(), 5Sin() + 4Cos(), 8Sin() + 7Cos())
+        MappingFromComponents(Sin() + 2Cos(), 5Sin() + 4Cos(), 8Sin() + 7Cos())
 
 end
 
